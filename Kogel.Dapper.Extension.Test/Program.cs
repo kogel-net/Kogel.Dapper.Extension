@@ -20,13 +20,6 @@ namespace Kogel.Dapper.Extension.Test
 
             using (var conn = new SqlConnection(connectionString))
             {
-                var updateDiv = conn.CommandSet<Comment>()
-                    .Where(x => x.Content.Contains("test"))
-                    .Update(x => new Comment()
-                    {
-                        StarCount = (x.StarCount+1)*2/3,
-                        Content="test1"
-                    });
 
                 var comment1 = conn.QuerySet<Comment>()
                     .Join<Comment, News>((a, b) => a.ArticleId == b.Id)
@@ -49,7 +42,7 @@ namespace Kogel.Dapper.Extension.Test
                      {
                          id = x.Id,
                          name = 123,
-                         test = x.Content,
+                         test = x.Content+1,
                          rownum = Convert.ToInt32("ROW_NUMBER() OVER(ORDER BY Comment.Id)"),
                          NewsLable = "News.NewsLabel"
                      });

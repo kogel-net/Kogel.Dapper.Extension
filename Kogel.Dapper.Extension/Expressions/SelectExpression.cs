@@ -104,6 +104,10 @@ namespace Kogel.Dapper.Extension.Expressions
         /// <returns></returns>
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
+            if (node.Method.DeclaringType.FullName.Contains("Convert")) {
+
+                //return VisitConstant(node);
+            }
             if (_sqlCmd.Length != 0)
                 _sqlCmd.Append(",");
             //设置值对象
