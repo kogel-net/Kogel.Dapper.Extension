@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kogel.Dapper.Extension", "K
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kogel.Dapper.Extension.MsSql", "Kogel.Dapper.Extension.Mssql\Kogel.Dapper.Extension.MsSql.csproj", "{4FEBB10F-C126-4C82-AF5A-EE5361FEE46C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kogel.Dapper.Extension.MySql", "Kogel.Dapper.Extension.MySql\Kogel.Dapper.Extension.MySql.csproj", "{66F1BBCD-EC0D-46E4-A29B-3777CF923248}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kogel.Dapper.Extension.Oracle", "Kogel.Dapper.Extension.Oracle\Kogel.Dapper.Extension.Oracle.csproj", "{FA113961-E269-437D-BB8D-B30EE87B7883}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{4FEBB10F-C126-4C82-AF5A-EE5361FEE46C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4FEBB10F-C126-4C82-AF5A-EE5361FEE46C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4FEBB10F-C126-4C82-AF5A-EE5361FEE46C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66F1BBCD-EC0D-46E4-A29B-3777CF923248}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66F1BBCD-EC0D-46E4-A29B-3777CF923248}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66F1BBCD-EC0D-46E4-A29B-3777CF923248}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66F1BBCD-EC0D-46E4-A29B-3777CF923248}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA113961-E269-437D-BB8D-B30EE87B7883}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA113961-E269-437D-BB8D-B30EE87B7883}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA113961-E269-437D-BB8D-B30EE87B7883}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA113961-E269-437D-BB8D-B30EE87B7883}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
