@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.28307.757
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kogel.Dapper.Extension", "Kogel.Dapper.Extension\Kogel.Dapper.Extension.csproj", "{87E91D82-CE44-43B0-92B0-F4279A6708D7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kogel.Dapper.Extension.Mssql", "Kogel.Dapper.Extension.Mssql\Kogel.Dapper.Extension.Mssql.csproj", "{4FEBB10F-C126-4C82-AF5A-EE5361FEE46C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kogel.Dapper.Extension.MsSql", "Kogel.Dapper.Extension.Mssql\Kogel.Dapper.Extension.MsSql.csproj", "{4FEBB10F-C126-4C82-AF5A-EE5361FEE46C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
