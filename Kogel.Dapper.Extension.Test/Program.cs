@@ -1,24 +1,21 @@
-﻿using System;
+﻿using Kogel.Dapper.Extension.Core.SetQ;
+using Kogel.Dapper.Extension.Extension.From;
+using Kogel.Dapper.Extension.MsSql;
+using Kogel.Dapper.Extension.Test.Model;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq.Expressions;
-using Kogel.Dapper.Extension.Core.SetQ;
-using Kogel.Dapper.Extension.Extension.From;
-using Kogel.Dapper.Extension.MsSql;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Kogel.Dapper.Extension.Test
 {
-    [TestClass]
-    public class UnitTest1
+    class Program
     {
-        [TestMethod]
-        public void TestMethod1()
+        static void Main(string[] args)
         {
             var connectionString = "Data Source=42.157.195.21,4344;Initial Catalog=Qx_Sport_Common;User ID=qxdev;Password=qxdev123456;";
             Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
 
             using (var conn = new SqlConnection(connectionString))
             {

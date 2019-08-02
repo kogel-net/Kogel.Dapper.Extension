@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Kogel.Dapper.Extension.Attributes;
 
-namespace Kogel.Dapper.Extension.Test
+namespace Kogel.Dapper.Extension.Test.Model
 {
    public class Comment
     {

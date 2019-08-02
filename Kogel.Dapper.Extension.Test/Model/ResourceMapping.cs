@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kogel.Dapper.Extension.Test
+namespace Kogel.Dapper.Extension.Test.Model
 {
     /// <summary>
     /// 版 本 1.0
