@@ -1,0 +1,68 @@
+﻿using Kogel.Dapper.Extension.Model;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+
+namespace Kogel.Dapper.Extension
+{
+    public class EntityCache
+    {
+        internal static List<EntityObject> EntitieList = new List<EntityObject>();
+        /// <summary>
+        /// 注册动态化查询可能会用到的实体类
+        /// </summary>
+        /// <param name="entity">实体类</param>
+        public static EntityObject Register(Type entity)
+        {
+            EntityObject entityObject = new EntityObject(entity);
+            if (!EntitieList.Exists(x => x.Name.Equals(entityObject.Name)))
+            {
+                EntitieList.Add(entityObject);
+            }
+            return entityObject;
+        }
+        /// <summary>
+        /// 注册动态化查询可能会用到的实体类
+        /// </summary>
+        /// <param name="entitys">实体类</param>
+        public static void Register(Type[] entitys)
+        {
+            foreach (var item in entitys)
+            {
+                Register(item);
+            }
+        }
+        /// <summary>
+        /// 注册动态化查询可能会用到的实体类
+        /// </summary>
+        /// <param name="assemblyString">通过给定程序集的长格式名称加载程序集。</param>
+        public static void Register(string assemblyString)
+        {
+#if !NETSTANDARD1_3
+            Assembly assembly = Assembly.Load(assemblyString);
+#else
+            Assembly assembly = Assembly.Load(new AssemblyName(assemblyString));
+#endif
+            Register(assembly.GetTypes());
+        }
+        /// <summary>
+        /// 查询实体类信息
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public static EntityObject QueryEntity(Type entity)
+        {
+            var entityType = EntitieList.FirstOrDefault(x => x.Type.FullName.Equals(entity.FullName));
+            if (entityType != null)
+            {
+                return entityType;
+            }
+            else
+            {
+                return Register(entity);
+            }
+        }
+    }
+}

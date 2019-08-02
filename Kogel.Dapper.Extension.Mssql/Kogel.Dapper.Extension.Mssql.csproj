@@ -1,11 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <PackageId>Dapper</PackageId>
+    <PackageId>Kogel.Dapper.Extension.Mssql</PackageId>
     <PackageTags>orm;sql;micro-orm</PackageTags>
     <Title>Dapper</Title>
-    <Description>A high performance Micro-ORM supporting SQL Server, MySQL, Sqlite, SqlCE, Firebird etc..</Description>
-    <Authors>Sam Saffron;Marc Gravell;Nick Craver</Authors>
+    <Description>Kogel.Dapper.Extension.Mssql</Description>
+    <Authors>Kogel.Dapper.Extension</Authors>
     <TargetFrameworks>net451;netstandard1.3;netstandard2.0;netcoreapp2.1</TargetFrameworks>
+    <Company>Kogel.Dapper.Extension.Mssql</Company>
+    <Product>Kogel.Dapper.Extension.Mssql</Product>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net451'">
     <Reference Include="System" />
@@ -32,5 +34,8 @@
     <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
     <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" />
     <PackageReference Include="System.Xml.XmlDocument" Version="4.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Kogel.Dapper.Extension\Kogel.Dapper.Extension.csproj" />
   </ItemGroup>
 </Project>
