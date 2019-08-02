@@ -33,6 +33,14 @@ namespace Kogel.Dapper.Extension.Helper
             return PropertyType.IsEnum;
 #endif
         }
+        public static bool IsValueTypes(this Type PropertyType)
+        {
+#if NETSTANDARD1_3
+           return PropertyType.GetTypeInfo().IsValueType;
+#else
+            return PropertyType.IsValueType;
+#endif
+        }
         public static PropertyInfo GetPropertys(this Type PropertyType, string name)
         {
 #if NETSTANDARD1_3

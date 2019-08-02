@@ -33,15 +33,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dapper, Version=1.60.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dapper.1.60.1\lib\net451\Dapper.dll</HintPath>
-    </Reference>
-    <Reference Include="Kogel.Dapper.Extension, Version=3.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Kogel.Dapper.Extension.3.1.0\lib\net451\Kogel.Dapper.Extension.dll</HintPath>
-    </Reference>
-    <Reference Include="Kogel.Dapper.Extension.MsSql, Version=3.1.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Kogel.Dapper.Extension.Mssql.3.1.2\lib\net451\Kogel.Dapper.Extension.MsSql.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -60,7 +51,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Kogel.Dapper.Extension.Mssql\Kogel.Dapper.Extension.MsSql.csproj">
+      <Project>{4febb10f-c126-4c82-af5a-ee5361fee46c}</Project>
+      <Name>Kogel.Dapper.Extension.MsSql</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Kogel.Dapper.Extension\Kogel.Dapper.Extension.csproj">
+      <Project>{87e91d82-ce44-43b0-92b0-f4279a6708d7}</Project>
+      <Name>Kogel.Dapper.Extension</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -46,12 +46,7 @@ namespace Kogel.Dapper.Extension.Helper
 
         public static bool IsNullAssignable(Type type)
         {
-#if !NETSTANDARD1_3
-
-            return !type.IsValueType || IsNullableType(type);
-#else
-            return !type.GetTypeInfo().IsValueType || IsNullableType(type);
-#endif
+            return !type.IsValueTypes() || IsNullableType(type);
         }
 
         public static Type GetNonNullableType(Type type)

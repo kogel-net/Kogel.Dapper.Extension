@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq.Expressions;
+using System.Linq;
 
 namespace Kogel.Dapper.Extension.Test
 {
@@ -19,31 +20,12 @@ namespace Kogel.Dapper.Extension.Test
 
             using (var conn = new SqlConnection(connectionString))
             {
-                var commentIn = conn.QuerySet<Comment>()
-                     .Where(x => x.Id.NotIn(new int[] { 1, 2, 3 }) && x.SubTime.AddMinutes(50) < DateTime.Now.AddDays(-1) && x.Type.IsNotNull())
-                     .ToList();
-
-                var commentIn2 = conn.QuerySet<Comment>()
-                    .Where(x => x.Content.In(new string[] { "test1", "test2" }))
-                    .ToList();
-
-                var commentBe = conn.QuerySet<Comment>()
-                    .Where(x => x.Id.Between(1, 5))
-                    .ToList();
-
-                var commentBe2 = conn.QuerySet<Comment>()
-                    .Where(x => x.SubTime.Between(DateTime.Now.AddDays(-10), DateTime.Now.AddDays(1)) && (x.Content == "test1" && x.Content.Contains("test")))
-                    .ToList();
-
-                var comment99 = conn.QuerySet<Comment>()
-                    .Join<Comment, News>((a, b) => a.ArticleId == b.Id)
-                    .Where(x => x.Content == "test1" && x.Content.Contains("t"))
-                    .Where<Comment, News>((a, b) => a.SubTime < DateTime.Now.AddDays(-5) && a.Id > a.Id % 1)
-                    .Get(x => new Comment()
+                var updateDiv = conn.CommandSet<Comment>()
+                    .Where(x => x.Content.Contains("test"))
+                    .Update(x => new Comment()
                     {
-                        Id = 123,
-
-                        ArticleId = x.ArticleId
+                        StarCount = (x.StarCount+1)*2/3,
+                        Content="test1"
                     });
 
                 var comment1 = conn.QuerySet<Comment>()

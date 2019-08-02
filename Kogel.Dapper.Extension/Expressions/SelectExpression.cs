@@ -11,25 +11,13 @@ namespace Kogel.Dapper.Extension.Expressions
     public class SelectExpression : ExpressionVisitor
     {
         #region sql指令
-
         private readonly StringBuilder _sqlCmd;
-
         /// <summary>
         /// sql指令
         /// </summary>
         public string SqlCmd => _sqlCmd.ToString();
 
         public DynamicParameters Param { get; }
-
-        private string _tempFieldName;
-
-        private string TempFieldName
-        {
-            get => _prefix + _tempFieldName;
-            set => _tempFieldName = value;
-        }
-
-        private string ParamName => _parameterPrefix + TempFieldName;
 
         private readonly string _prefix;
 
@@ -104,6 +92,22 @@ namespace Kogel.Dapper.Extension.Expressions
                 _sqlCmd.Append(",");
             //设置值对象
             _sqlCmd.Append(node.Value);
+
+            //设置字段对象
+            _sqlCmd.Append($" as { _openQuote + fieldArr[protiesIndex++] + _closeQuote} ");
+            return node;
+        }
+        /// <summary>
+        /// 解析字段的值(表达式)
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        protected override Expression VisitMethodCall(MethodCallExpression node)
+        {
+            if (_sqlCmd.Length != 0)
+                _sqlCmd.Append(",");
+            //设置值对象
+            _sqlCmd.Append(node.ToConvertAndGetValue());
 
             //设置字段对象
             _sqlCmd.Append($" as { _openQuote + fieldArr[protiesIndex++] + _closeQuote} ");
