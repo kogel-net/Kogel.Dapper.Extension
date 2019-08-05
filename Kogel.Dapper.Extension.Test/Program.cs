@@ -1,13 +1,13 @@
 ﻿using Kogel.Dapper.Extension.Core.SetQ;
 using Kogel.Dapper.Extension.Extension.From;
-using Kogel.Dapper.Extension.MsSql;
+using Kogel.Dapper.Extension.MySql;
 using Kogel.Dapper.Extension.Test.Model;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq.Expressions;
-using System.Linq;
+using MySql.Data.MySqlClient;
 
 namespace Kogel.Dapper.Extension.Test
 {
@@ -16,9 +16,10 @@ namespace Kogel.Dapper.Extension.Test
         static void Main(string[] args)
         {
             var connectionString = "Data Source=42.157.195.21,4344;Initial Catalog=Qx_Sport_Common;User ID=qxdev;Password=qxdev123456;";
+            var mysqlConnection = "Server=localhost;Database=Qx_Sport_Common;Uid=root;Pwd=A5101264a;";
             Stopwatch stopwatch = new Stopwatch();
 
-            using (var conn = new SqlConnection(connectionString))
+            using (var conn = new MySqlConnection(mysqlConnection))
             {
 
                 var comment1 = conn.QuerySet<Comment>()
@@ -27,7 +28,7 @@ namespace Kogel.Dapper.Extension.Test
                     .Where<Comment, News>((a, b) => a.SubTime < DateTime.Now.AddDays(-5) && a.Id > a.Id % 1)
                     .Get(x => new
                     {
-                        count = Convert.ToInt32("(select count(1) from Comment_4)"),
+                        count = Convert.ToInt32("(select count(1) from Comment)"),
                         //test = new List<int>() { 3, 3, 1 }.FirstOrDefault(y=>y==1),
                         aaa = "6666",
                     });
@@ -42,8 +43,8 @@ namespace Kogel.Dapper.Extension.Test
                      {
                          id = x.Id,
                          name = 123,
-                         test = x.Content+1,
-                         rownum = Convert.ToInt32("ROW_NUMBER() OVER(ORDER BY Comment.Id)"),
+                         test = x.Content,
+                         //rownum = Convert.ToInt32("ROW_NUMBER() OVER(ORDER BY Comment.Id)"),
                          NewsLable = "News.NewsLabel"
                      });
 
@@ -61,7 +62,7 @@ namespace Kogel.Dapper.Extension.Test
                          id = a.Id,
                          name = b.NewsLabel,
                          resource = c.RPath,
-                         rownum = Convert.ToInt32("ROW_NUMBER() OVER(ORDER BY Comment.Id)"),
+                         //rownum = Convert.ToInt32("ROW_NUMBER() OVER(ORDER BY Comment.Id)"),
                      });
 
 

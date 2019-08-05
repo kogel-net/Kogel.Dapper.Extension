@@ -33,6 +33,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MySql.Data, Version=6.9.12.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>..\packages\MySql.Data.6.9.12\lib\net45\MySql.Data.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -51,11 +54,20 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Kogel.Dapper.Extension.Mssql\Kogel.Dapper.Extension.MsSql.csproj">
       <Project>{4febb10f-c126-4c82-af5a-ee5361fee46c}</Project>
       <Name>Kogel.Dapper.Extension.MsSql</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Kogel.Dapper.Extension.MySql\Kogel.Dapper.Extension.MySql.csproj">
+      <Project>{66f1bbcd-ec0d-46e4-a29b-3777cf923248}</Project>
+      <Name>Kogel.Dapper.Extension.MySql</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Kogel.Dapper.Extension.Oracle\Kogel.Dapper.Extension.Oracle.csproj">
+      <Project>{fa113961-e269-437d-bb8d-b30ee87b7883}</Project>
+      <Name>Kogel.Dapper.Extension.Oracle</Name>
     </ProjectReference>
     <ProjectReference Include="..\Kogel.Dapper.Extension\Kogel.Dapper.Extension.csproj">
       <Project>{87e91d82-ce44-43b0-92b0-f4279a6708d7}</Project>

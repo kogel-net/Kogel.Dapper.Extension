@@ -151,7 +151,7 @@ namespace Kogel.Dapper.Extension.MySql
                     {
                         var memberName = selector.GetCorrectPropertyName();
                         EntityObject entityObject = EntityCache.QueryEntity(typeof(T));
-                        selectSql = $" SELECT ISNULL(SUM({entityObject.Name}.{ProviderOption.CombineFieldName(entityObject.FieldPairs[memberName])}),0)  ";
+                        selectSql = $" SELECT IFNULL(SUM({entityObject.Name}.{ProviderOption.CombineFieldName(entityObject.FieldPairs[memberName])}),0)  ";
                     }
                     break;
                 case ExpressionType.MemberInit:
