@@ -88,7 +88,7 @@ namespace Kogel.Dapper.Extension.MsSql
             string property = string.Join(",", entityObject.FieldPairs.Select(field => $"{ProviderOption.CombineFieldName(tableName)}.{ProviderOption.CombineFieldName(field.Value) }"));
             return property;
         }
-        public static string ResolveSelect(EntityObject entityObject, LambdaExpression selector, int? topNum)
+        public static string ResolveSelect(EntityObject entityObject, LambdaExpression selector, int? topNum,DynamicParameters Param)
         {
             var selectFormat = topNum.HasValue ? " SELECT {1} {0} " : " SELECT {0} ";
             var selectSql = "";
@@ -102,6 +102,7 @@ namespace Kogel.Dapper.Extension.MsSql
             {
                 var selectExp = new SelectExpression(selector, "", ProviderOption);
                 selectSql = string.Format(selectFormat, selectExp.SqlCmd, $" TOP {topNum} ");
+                Param.AddDynamicParams(selectExp.Param);
             }
             return selectSql;
         }

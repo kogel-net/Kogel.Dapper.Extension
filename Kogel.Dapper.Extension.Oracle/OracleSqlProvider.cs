@@ -5,13 +5,13 @@ using Kogel.Dapper.Extension.Oracle.Extension;
 
 namespace Kogel.Dapper.Extension.Oracle
 {
-    internal class MsSqlProvider : SqlProvider
+    public class OracleSqlProvider : SqlProvider
     {
         private const string OpenQuote = "";
         private const string CloseQuote = "";
         private const char ParameterPrefix = ':';
 
-        public MsSqlProvider()
+        public OracleSqlProvider()
         {
             ProviderOption = new ProviderOption(OpenQuote, CloseQuote, ParameterPrefix);
             ResolveExpression.InitOption(ProviderOption);

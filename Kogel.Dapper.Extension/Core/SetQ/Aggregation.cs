@@ -36,5 +36,12 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             SqlProvider.FormatSum<TResult>(sumExpression);
             return DbCon.QuerySingle<int>(SqlProvider.SqlString, SqlProvider.Params);
         }
+        
+        public string ToSql(ref DynamicParameters parameters)
+        {
+            SqlProvider.FormatCount();
+            parameters.AddDynamicParams(SqlProvider.Params);
+            return SqlProvider.SqlString;
+        }
     }
 }

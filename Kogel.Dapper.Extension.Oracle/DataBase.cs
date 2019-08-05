@@ -10,12 +10,12 @@ namespace Kogel.Dapper.Extension.Oracle
     {
         public static QuerySet<T> QuerySet<T>(this IDbConnection sqlConnection, IDbTransaction dbTransaction = null)
         {
-            return new QuerySet<T>(sqlConnection, new MsSqlProvider(), dbTransaction);
+            return new QuerySet<T>(sqlConnection, new OracleSqlProvider(), dbTransaction);
         }
 
         public static CommandSet<T> CommandSet<T>(this IDbConnection sqlConnection, IDbTransaction dbTransaction = null)
         {
-            return new CommandSet<T>(sqlConnection, new MsSqlProvider(), dbTransaction);
+            return new CommandSet<T>(sqlConnection, new OracleSqlProvider(), dbTransaction);
         }
     }
 }

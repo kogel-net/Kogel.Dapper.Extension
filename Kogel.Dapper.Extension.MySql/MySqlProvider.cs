@@ -5,13 +5,13 @@ using System.Linq.Expressions;
 
 namespace Kogel.Dapper.Extension.MySql
 {
-    internal class MsSqlProvider : SqlProvider
+    public class MySqlProvider : SqlProvider
     {
         private const string OpenQuote = "";
         private const string CloseQuote = "";
         private const char ParameterPrefix = '@';
 
-        public MsSqlProvider()
+        public MySqlProvider()
         {
             ProviderOption = new ProviderOption(OpenQuote, CloseQuote, ParameterPrefix);
             ResolveExpression.InitOption(ProviderOption);
@@ -21,7 +21,7 @@ namespace Kogel.Dapper.Extension.MySql
 
         public override SqlProvider FormatGet<T>()
         {
-            var selectSql = ResolveExpression.ResolveSelect(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression);
+            var selectSql = ResolveExpression.ResolveSelect(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression, Params);
 
             var fromTableSql = FormatTableName();
 
@@ -31,7 +31,6 @@ namespace Kogel.Dapper.Extension.MySql
 
             //表查询条件
             var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set,ref whereSql, Params);
-
 
             var orderbySql = ResolveExpression.ResolveOrderBy(Context.Set.OrderbyExpressionList);
 
@@ -50,7 +49,7 @@ namespace Kogel.Dapper.Extension.MySql
         {
             var topNum = DataBaseContext<T>().QuerySet.TopNum;
 
-            var selectSql = ResolveExpression.ResolveSelect(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression);
+            var selectSql = ResolveExpression.ResolveSelect(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression, Params);
 
             var fromTableSql = FormatTableName();
 
@@ -75,7 +74,7 @@ namespace Kogel.Dapper.Extension.MySql
             //if (string.IsNullOrEmpty(orderbySql))
             //    throw new DapperExtensionException("order by takes precedence over pagelist");
 
-            var selectSql = ResolveExpression.ResolveSelect(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression);
+            var selectSql = ResolveExpression.ResolveSelect(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression, Params);
 
             var fromTableSql = FormatTableName();
 

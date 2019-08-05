@@ -1,6 +1,6 @@
 ﻿using Kogel.Dapper.Extension.Core.SetQ;
 using Kogel.Dapper.Extension.Extension.From;
-using Kogel.Dapper.Extension.MsSql;
+using Kogel.Dapper.Extension.MySql;
 using Kogel.Dapper.Extension.Test.Model;
 using System;
 using System.Collections.Generic;
@@ -20,24 +20,26 @@ namespace Kogel.Dapper.Extension.Test
             var mysqlConnection = "Server=localhost;Database=Qx_Sport_Common;Uid=root;Pwd=A5101264a;";
             Stopwatch stopwatch = new Stopwatch();
 
-            using (var conn = new SqlConnection(connectionString))
+            using (var conn = new MySqlConnection(mysqlConnection))
             {
-                var edit = conn.CommandSet<Comment>()
-                   .Where(x => x.Content == "test")
-                   .Update(x => new Comment
-                   {
-                       Content = "test1",
-                       SubTime = DateTime.Now.AddDays(-1)
-                   });
+                //var edit = conn.CommandSet<Comment>()
+                //   .Where(x => x.Content.Substring(1,3).Contains("t"))
+                //   .Update(x => new Comment
+                //   {
+                //       Content = "test1",
+                //       SubTime = DateTime.Now.AddDays(-1)
+                //   });
+
 
                 var comment1 = conn.QuerySet<Comment>()
                     .Join<Comment, News>((a, b) => a.ArticleId == b.Id)
                     .Where(x => x.Content == "test1" && x.Content.Contains("t"))
-                    .Where<Comment, News>((a, b) => a.SubTime < DateTime.Now.AddDays(-5) && a.Id > a.Id % 1)
-                    .Get(x => new
+                    .From<Comment, News>()
+                    .Get((a, b) => new
                     {
                         test = new List<int>() { 3, 3, 1 }.FirstOrDefault(y => y == 1),
                         aaa = "6666",
+                        bbb = new QuerySet<Comment>(conn, new MySqlProvider()).Where(y => y.ArticleId == b.Id).Count()
                     });
 
 

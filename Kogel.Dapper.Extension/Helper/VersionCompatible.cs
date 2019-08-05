@@ -49,6 +49,14 @@ namespace Kogel.Dapper.Extension.Helper
             return PropertyType.GetProperty(name);
 #endif
         }
+        public static MethodInfo GetMethodInfos(this Type PropertyType,string name)
+        {
+#if NETSTANDARD1_3
+           return PropertyType.GetTypeInfo().GetDeclaredMethod(name);
+#else
+            return PropertyType.GetMethod(name);
+#endif
+        }
         public static MethodInfo[] GetMethodss(this Type PropertyType)
         {
 #if NETSTANDARD1_3
@@ -69,6 +77,14 @@ namespace Kogel.Dapper.Extension.Helper
            return PropertyType.GetTypeInfo().GetCustomAttributes().ToArray<object>();
 #else
             return PropertyType.GetCustomAttributes(inherit);
+#endif
+        }
+        public static Type ReflectedTypes(this MethodInfo method)
+        {
+#if NETSTANDARD1_3
+           return method.ReturnType;
+#else
+            return method.ReflectedType;
 #endif
         }
     }

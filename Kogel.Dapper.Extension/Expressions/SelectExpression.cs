@@ -5,6 +5,7 @@ using Kogel.Dapper.Extension.Model;
 using System.Linq.Expressions;
 using System.Linq;
 using System.Text;
+using Kogel.Dapper.Extension.Helper;
 
 namespace Kogel.Dapper.Extension.Expressions
 {
@@ -17,7 +18,7 @@ namespace Kogel.Dapper.Extension.Expressions
         /// </summary>
         public string SqlCmd => _sqlCmd.ToString();
 
-        public DynamicParameters Param { get; }
+        public DynamicParameters Param;
 
         private readonly string _prefix;
 
@@ -107,6 +108,16 @@ namespace Kogel.Dapper.Extension.Expressions
             if (node.Method.DeclaringType.FullName.Contains("Convert"))//使用convert函数里待执行的sql数据
             {
                 Visit(node.Arguments[0]);
+            }
+            else if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension"))//实现子连接字段查询
+            {
+                if (_sqlCmd.Length != 0)
+                    _sqlCmd.Append(",");
+                //设置值对象
+                _sqlCmd.Append($"({node.MethodCallExpressionToSql(ref Param)})");
+
+                //设置字段对象
+                _sqlCmd.Append($" as { _openQuote + fieldArr[protiesIndex++] + _closeQuote} ");
             }
             else//使用系统自带需要计算的函数
             {

@@ -27,4 +27,7 @@
   <ItemGroup>
     <PackageReference Include="Kogel.Dapper.Extension" Version="3.1.0" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Kogel.Dapper.Extension\Kogel.Dapper.Extension.csproj" />
+  </ItemGroup>
 </Project>

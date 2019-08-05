@@ -134,8 +134,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
                 if (!string.IsNullOrEmpty(tree.Value))
                 {
                     //如果不存在对应表就使用默认表
-                    var paramType = EntityCache.QueryEntity(typeof(T)).Type;
-                    ParameterExpression param = Expression.Parameter(paramType, "param");
+                    ParameterExpression param = Expression.Parameter(typeof(T), "param");
                     object value = tree.Value;
                     if (tree.ValueType == DbType.DateTime)
                     {

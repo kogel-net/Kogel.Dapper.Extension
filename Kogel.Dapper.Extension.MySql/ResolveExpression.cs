@@ -86,11 +86,10 @@ namespace Kogel.Dapper.Extension.MySql
             string property = string.Join(",", entityObject.FieldPairs.Select(field => $"{ProviderOption.CombineFieldName(tableName)}.{ProviderOption.CombineFieldName(field.Value) }"));
             return property;
         }
-        public static string ResolveSelect(EntityObject entityObject, LambdaExpression selector)
+        public static string ResolveSelect(EntityObject entityObject, LambdaExpression selector,DynamicParameters Param)
         {
             var selectFormat = " SELECT {0} ";
             var selectSql = "";
-
             if (selector == null)
             {
                 var propertyBuilder = GetTableField(entityObject);
@@ -100,8 +99,8 @@ namespace Kogel.Dapper.Extension.MySql
             {
                 var selectExp = new SelectExpression(selector, "", ProviderOption);
                 selectSql = string.Format(selectFormat, selectExp.SqlCmd);
+                Param.AddDynamicParams(selectExp.Param);
             }
-
             return selectSql;
         }
 
