@@ -97,26 +97,29 @@ namespace Kogel.Dapper.Extension.Expressions
             _sqlCmd.Append($" as { _openQuote + fieldArr[protiesIndex++] + _closeQuote} ");
             return node;
         }
-        ///// <summary>
-        ///// 解析字段的值(表达式)
-        ///// </summary>
-        ///// <param name="node"></param>
-        ///// <returns></returns>
-        //protected override Expression VisitMethodCall(MethodCallExpression node)
-        //{
-        //    if (node.Method.DeclaringType.FullName.Contains("Convert"))
-        //    {
+        /// <summary>
+        /// 解析字段的值(表达式)
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        protected override Expression VisitMethodCall(MethodCallExpression node)
+        {
+            if (node.Method.DeclaringType.FullName.Contains("Convert"))//使用convert函数里待执行的sql数据
+            {
+                Visit(node.Arguments[0]);
+            }
+            else//使用系统自带需要计算的函数
+            {
+                if (_sqlCmd.Length != 0)
+                    _sqlCmd.Append(",");
 
-        //        //return VisitConstant(node);
-        //    }
-        //    if (_sqlCmd.Length != 0)
-        //        _sqlCmd.Append(",");
-        //    //设置值对象
-        //    _sqlCmd.Append(node.ToConvertAndGetValue());
+                //设置值对象
+                _sqlCmd.Append(node.ToConvertAndGetValue());
 
-        //    //设置字段对象
-        //    _sqlCmd.Append($" as { _openQuote + fieldArr[protiesIndex++] + _closeQuote} ");
-        //    return node;
-        //}
+                //设置字段对象
+                _sqlCmd.Append($" as { _openQuote + fieldArr[protiesIndex++] + _closeQuote} ");
+            }
+            return node;
+        }
     }
 }

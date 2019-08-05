@@ -13,26 +13,22 @@ namespace Kogel.Dapper.Extension.Expressions
     public sealed class UpdateExpression : ExpressionVisitor
     {
         #region sql指令
-
         private readonly StringBuilder _sqlCmd;
-
-        private const string Prefix = "UPDATE_";
-
         /// <summary>
         /// sql指令
         /// </summary>
-        public string SqlCmd => _sqlCmd.Length > 0 ? $" SET {_sqlCmd} " : "";
-
-        private readonly IProviderOption _providerOption;
-
-        private readonly char _parameterPrefix;
+        public string SqlCmd => _sqlCmd.ToString();
 
         public DynamicParameters Param { get; }
 
+        private IProviderOption providerOption { get; set; }
+
         #endregion
-
-        #region 执行解析
-
+        #region 当前解析的对象
+        private EntityObject entity { get; }
+        private int protiesIndex;
+        private string[] fieldArr { get; }//字段数组
+        #endregion
         /// <inheritdoc />
         /// <summary>
         /// 执行解析
@@ -42,67 +38,55 @@ namespace Kogel.Dapper.Extension.Expressions
         public UpdateExpression(LambdaExpression expression, IProviderOption providerOption)
         {
             _sqlCmd = new StringBuilder(100);
-            _providerOption = providerOption;
-            _parameterPrefix = _providerOption.ParameterPrefix;
             Param = new DynamicParameters();
+            this.providerOption = providerOption;
+            //当前定义的查询返回对象
+            entity = EntityCache.QueryEntity(expression.Body.Type);
+            protiesIndex = 0;
+            fieldArr = ((MemberInitExpression)expression.Body).Bindings.AsList().Select(x => entity.FieldPairs[x.Member.Name]).ToArray();
 
             Visit(expression);
+            _sqlCmd.Insert(0, " SET ");
         }
-
-        #endregion
-
-        protected override System.Linq.Expressions.Expression VisitMember(MemberExpression node)
+        /// <summary>
+        /// 解析绑定固定数据
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        protected override Expression VisitConstant(ConstantExpression node)
         {
-            var memberInitExpression = node;
-
-            var entity = ((ConstantExpression) TrimExpression.Trim(memberInitExpression)).Value;
-
-            EntityObject entityModel = EntityCache.QueryEntity(memberInitExpression.Type);
-
-            foreach (var item in entityModel.Properties)
-            {
-                if (item.CustomAttributes.Any(b => b.AttributeType == typeof(Identity)))
-                    continue;
-
-                if (_sqlCmd.Length > 0)
-                    _sqlCmd.Append(",");
-
-                var paramName = entityModel.FieldPairs[item.Name];
-                var value = item.GetValue(entity);
-                var fieldName = _providerOption.CombineFieldName(paramName);
-                SetParam(fieldName, paramName, value);
-            }
-
+            if (_sqlCmd.Length != 0)
+                _sqlCmd.Append(",");
+            //设置字段对象
+            string field = fieldArr[protiesIndex++];
+            _sqlCmd.Append($"{ providerOption.CombineFieldName(field)}={providerOption.ParameterPrefix + "UPDATE_" + field}");
+            //设置值对象
+            Param.Add("UPDATE_" + field, node.Value);
             return node;
         }
-
-
-        protected override System.Linq.Expressions.Expression VisitMemberInit(MemberInitExpression node)
+        /// <summary>
+        /// 解析字段的值(表达式)
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            var memberInitExpression = node;
-
-            foreach (var item in memberInitExpression.Bindings)
+            if (node.Method.DeclaringType.FullName.Contains("Convert"))//使用convert函数里待执行的sql数据
             {
-                var memberAssignment = (MemberAssignment) item;
-
-                if (_sqlCmd.Length > 0)
+                Visit(node.Arguments[0]);
+            }
+            else//使用系统自带需要计算的函数
+            {
+                if (_sqlCmd.Length != 0)
                     _sqlCmd.Append(",");
 
-                var entityModel = EntityCache.QueryEntity(memberAssignment.Member.DeclaringType);
-                var paramName = entityModel.FieldPairs[memberAssignment.Member.GetColumnAttributeName()] ;
-                var fieldName = _providerOption.CombineFieldName(paramName);
-                var constantExpression = (ConstantExpression) memberAssignment.Expression;
-                SetParam(fieldName, paramName, constantExpression.Value);
+                //设置字段对象
+                string field = fieldArr[protiesIndex++];
+                _sqlCmd.Append($"{ providerOption.CombineFieldName(field)}={providerOption.ParameterPrefix + "UPDATE_" + field}");
+                //设置值对象
+                Param.Add("UPDATE_" + field, node.ToConvertAndGetValue());
             }
-
             return node;
-        }
-
-        private void SetParam(string fieldName, string paramName, object value)
-        {
-            var n = $"{_parameterPrefix}{Prefix}{paramName}";
-            _sqlCmd.AppendFormat(" {0}={1} ", fieldName, n);
-            Param.Add(n, value);
         }
     }
 }

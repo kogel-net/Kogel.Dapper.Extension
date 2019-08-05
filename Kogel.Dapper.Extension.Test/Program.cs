@@ -1,6 +1,6 @@
 ﻿using Kogel.Dapper.Extension.Core.SetQ;
 using Kogel.Dapper.Extension.Extension.From;
-using Kogel.Dapper.Extension.MySql;
+using Kogel.Dapper.Extension.MsSql;
 using Kogel.Dapper.Extension.Test.Model;
 using System;
 using System.Collections.Generic;
@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using MySql.Data.MySqlClient;
+using System.Linq;
 
 namespace Kogel.Dapper.Extension.Test
 {
@@ -19,8 +20,15 @@ namespace Kogel.Dapper.Extension.Test
             var mysqlConnection = "Server=localhost;Database=Qx_Sport_Common;Uid=root;Pwd=A5101264a;";
             Stopwatch stopwatch = new Stopwatch();
 
-            using (var conn = new MySqlConnection(mysqlConnection))
+            using (var conn = new SqlConnection(connectionString))
             {
+                var edit = conn.CommandSet<Comment>()
+                   .Where(x => x.Content == "test")
+                   .Update(x => new Comment
+                   {
+                       Content = "test1",
+                       SubTime = DateTime.Now.AddDays(-1)
+                   });
 
                 var comment1 = conn.QuerySet<Comment>()
                     .Join<Comment, News>((a, b) => a.ArticleId == b.Id)
@@ -28,8 +36,7 @@ namespace Kogel.Dapper.Extension.Test
                     .Where<Comment, News>((a, b) => a.SubTime < DateTime.Now.AddDays(-5) && a.Id > a.Id % 1)
                     .Get(x => new
                     {
-                        count = Convert.ToInt32("(select count(1) from Comment)"),
-                        //test = new List<int>() { 3, 3, 1 }.FirstOrDefault(y=>y==1),
+                        test = new List<int>() { 3, 3, 1 }.FirstOrDefault(y => y == 1),
                         aaa = "6666",
                     });
 
@@ -79,12 +86,7 @@ namespace Kogel.Dapper.Extension.Test
                      .WithNoLock()
                      .Count();
 
-                var edit = conn.CommandSet<Comment>()
-                    .Where(x => x.Content == "test")
-                    .Update(x => new Comment
-                    {
-                        Content = "test1"
-                    });
+               
 
                 var querySet = conn.QuerySet<Comment>()
                      .Join<Comment, News>((a, b) => a.ArticleId == b.Id)
