@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 using Dapper;
+using Kogel.Dapper.Extension.Expressions;
 using Kogel.Dapper.Extension.Helper;
 
 namespace Kogel.Dapper.Extension.Extension
@@ -173,22 +174,18 @@ namespace Kogel.Dapper.Extension.Extension
                 return ((MemberExpression)op).Member.Name;
             }
         }
-
+        /// <summary>
+        /// 子查询转sql
+        /// </summary>
+        /// <param name="expression">表达式</param>
+        /// <param name="Param">返回的参数</param>
+        /// <returns></returns>
         public static string MethodCallExpressionToSql(this MethodCallExpression expression,ref DynamicParameters Param)
         {
-            //配置lambda参数,获取调用实例
-            var obj = new ExpressionParameters(expression.Object).ConverParametersExpression().ToConvertAndGetValue();
-            var param = new DynamicParameters();
-            //执行转换sql方法
-            var tosql = expression.Method.DeclaringType.GetMethodInfos("ToSql").Invoke(obj, new object[] { param }).ToString();
-            foreach (var itemName in param.ParameterNames)
-            {
-                var newName = itemName + "_Subquery";
-                var value = param.Get<object>(itemName);
-                tosql = tosql.Replace(itemName, newName);
-                Param.Add(newName, value);
-            }
-            return tosql;
+            //解析子查询
+            var subquery = new SubqueryExpression(expression);
+            Param = subquery.Param;
+            return subquery.SqlCmd;
         }
     }
 }

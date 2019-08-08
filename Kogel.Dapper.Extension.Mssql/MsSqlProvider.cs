@@ -189,7 +189,7 @@ namespace Kogel.Dapper.Extension.MsSql
             return this;
         }
 
-        public override SqlProvider FormatSum<T>(Expression<Func<T, object>> sumExpression)
+        public override SqlProvider FormatSum(LambdaExpression sumExpression)
         {
             var selectSql = ResolveExpression.ResolveSum(sumExpression);
 

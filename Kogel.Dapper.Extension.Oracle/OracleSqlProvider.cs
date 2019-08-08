@@ -186,7 +186,7 @@ namespace Kogel.Dapper.Extension.Oracle
             return this;
         }
 
-        public override SqlProvider FormatSum<T>(Expression<Func<T, object>> sumExpression)
+        public override SqlProvider FormatSum(LambdaExpression sumExpression)
         {
             var selectSql = ResolveExpression.ResolveSum(sumExpression);
 

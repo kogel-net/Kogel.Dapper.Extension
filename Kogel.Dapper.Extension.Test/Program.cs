@@ -22,25 +22,25 @@ namespace Kogel.Dapper.Extension.Test
 
             using (var conn = new SqlConnection(connectionString))
             {
-                var edit = conn.CommandSet<Comment>()
-                   .Where(x => x.Id.In(new int[] { 1, 2, 3 }))
-                   .Update(x => new Comment
-                   {
-                       StarCount = x.StarCount + 1
-                   });
-
-
+                //var comment1 = conn.QuerySet<Comment>().Sum<Comment>(x => x.Id);
                 var comment1 = conn.QuerySet<Comment>()
                     .Join<Comment, News>((a, b) => a.ArticleId == b.Id)
-                    .Where(x => x.Id.Between(80,100))
+                    .Where(x => x.Id.Between(80, 100) && x.SubTime.AddDays(-10) < DateTime.Now)
                     .From<Comment, News>()
-                    .Get((a, b) => new Comment
+                    .Get((a, b) => new
                     {
-                        //test = new List<int>() { 3, 3, 1 }.FirstOrDefault(y => y == 1),
-                        //aaa = "6666" + "777",
-                        Content = a.Content + "test"+b.Headlines+a.IdentityId
-                        // bbb = new QuerySet<Comment>(conn, new MySqlProvider()).Where(y => y.ArticleId == b.Id).Count()
+                        test = new List<int>() { 3, 3, 1 }.FirstOrDefault(y => y == 1),
+                        aaa = "6666" + "777",
+                        Content = a.Content + "test" + b.Headlines + a.IdentityId,
+                        bbb = new QuerySet<Comment>(conn, new MsSqlProvider()).Where(y => y.ArticleId == b.Id).Sum<Comment>(x => x.Id)
                     });
+
+                var edit = conn.CommandSet<Comment>()
+                           .Where(x => x.Id.In(new int[] { 1, 2, 3 }))
+                           .Update(x => new Comment
+                           {
+                               StarCount = x.StarCount + 1
+                           });
 
 
                 var comment2 = conn.QuerySet<Comment>()

@@ -66,7 +66,9 @@ namespace Kogel.Dapper.Extension.Expressions
             //子查询函数
             if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension"))
             {
-
+                DynamicParameters parameters = new DynamicParameters();
+                base.FieldList.Add("(" + node.MethodCallExpressionToSql(ref parameters) + ")");
+                Param.AddDynamicParams(parameters);
             }
             else
             {

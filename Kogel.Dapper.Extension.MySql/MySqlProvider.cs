@@ -184,9 +184,9 @@ namespace Kogel.Dapper.Extension.MySql
             return this;
         }
 
-        public override SqlProvider FormatSum<T>(Expression<Func<T, object>> sumExpression)
+        public override SqlProvider FormatSum(LambdaExpression sumExpression)
         {
-            var selectSql = ResolveExpression.ResolveSum( sumExpression);
+            var selectSql = ResolveExpression.ResolveSum(sumExpression);
 
             var fromTableSql = FormatTableName();
 

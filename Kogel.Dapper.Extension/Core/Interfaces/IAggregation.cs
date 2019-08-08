@@ -19,7 +19,5 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// <param name="sumExpression"></param>
         /// <returns></returns>
         int Sum<TResult>(Expression<Func<TResult, object>> sumExpression);
-
-        string ToSql(ref DynamicParameters parameters);
     }
 }

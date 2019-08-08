@@ -68,12 +68,6 @@ namespace Kogel.Dapper.Extension.Oracle
             whereSql = builder.ToString();
             return whereExpressionList;
         }
-        public static UpdateEntityWhereExpression ResolveWhere(object obj)
-        {
-            var where = new UpdateEntityWhereExpression(obj, ProviderOption);
-            where.Resolve();
-            return where;
-        }
         /// <summary>
         /// 根据反射对象获取表字段
         /// </summary>
@@ -138,7 +132,7 @@ namespace Kogel.Dapper.Extension.Oracle
             return "OUTPUT " + selectSql;
         }
 
-        public static string ResolveSum<T>(Expression<Func<T, object>> selector)
+        public static string ResolveSum(LambdaExpression selector)
         {
             if (selector == null)
                 throw new ArgumentException("selector");
@@ -149,8 +143,8 @@ namespace Kogel.Dapper.Extension.Oracle
                 case ExpressionType.Lambda:
                 case ExpressionType.MemberAccess:
                     {
-                        var memberName = selector.GetCorrectPropertyName();
-                        EntityObject entityObject = EntityCache.QueryEntity(typeof(T));
+                        EntityObject entityObject = EntityCache.QueryEntity(selector.Parameters[0].Type);
+                        var memberName = selector.Body.GetCorrectPropertyName();
                         selectSql = $" SELECT NVL(SUM({entityObject.Name}.{ProviderOption.CombineFieldName(entityObject.FieldPairs[memberName])}),0)  ";
                     }
                     break;
