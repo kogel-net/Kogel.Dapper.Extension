@@ -6,10 +6,11 @@ using System.Linq.Expressions;
 using System.Linq;
 using System.Text;
 using Kogel.Dapper.Extension.Helper;
+using System.Collections.Generic;
 
 namespace Kogel.Dapper.Extension.Expressions
 {
-    public class SelectExpression : ExpressionVisitor
+    public class SelectExpression : BaseExpressionVisitor
     {
         #region sql指令
         private readonly StringBuilder _sqlCmd;
@@ -20,19 +21,11 @@ namespace Kogel.Dapper.Extension.Expressions
 
         public DynamicParameters Param;
 
-        private readonly string _prefix;
-
-        private readonly char _parameterPrefix;
-
-        private readonly string _closeQuote;
-
-        private readonly string _openQuote;
+        private IProviderOption providerOption;
 
         #endregion
         #region 当前解析的对象
         private EntityObject entity { get; }
-        private int protiesIndex;
-        private string[] fieldArr { get; }//字段数组
         #endregion
         /// <summary>
         /// 执行解析
@@ -42,16 +35,13 @@ namespace Kogel.Dapper.Extension.Expressions
         /// <param name="providerOption"></param>
         public SelectExpression(LambdaExpression expression, string prefix, IProviderOption providerOption)
         {
-            _sqlCmd = new StringBuilder(100);
-            Param = new DynamicParameters();
-
-            _prefix = prefix;
-            _parameterPrefix = providerOption.ParameterPrefix;
-            _openQuote = providerOption.OpenQuote;
-            _closeQuote = providerOption.CloseQuote;
+            this._sqlCmd = new StringBuilder(100);
+            this.Param = new DynamicParameters();
+            this.providerOption = providerOption;
             //当前定义的查询返回对象
-            entity = EntityCache.QueryEntity(expression.Body.Type);
-            protiesIndex = 0;
+            this.entity = EntityCache.QueryEntity(expression.Body.Type);
+            //字段数组
+            string[] fieldArr;
             //判断是不是实体类
             if (expression.Body is MemberInitExpression)
             {
@@ -61,74 +51,26 @@ namespace Kogel.Dapper.Extension.Expressions
             {
                 fieldArr = entity.Properties.Select(x => x.Name).ToArray();
             }
+            //开始解析对象
             Visit(expression);
+            //开始拼接成查询字段
+            for (var i = 0; i < fieldArr.Length; i++)
+            {
+                if (_sqlCmd.Length != 0)
+                    _sqlCmd.Append(",");
+                _sqlCmd.Append(base.FieldList[i] + " as " + fieldArr[i]);
+            }
         }
-
-        /// <summary>
-        /// 解析绑定字段
-        /// </summary>
-        /// <param name="node"></param>
-        /// <returns></returns>
-        protected override Expression VisitMember(MemberExpression node)
-        {
-            var member = EntityCache.QueryEntity(node.Member.DeclaringType);
-            if (_sqlCmd.Length != 0)
-                _sqlCmd.Append(",");
-            //设置值对象
-            _sqlCmd.Append(_openQuote + member.Name + _closeQuote + ".");
-            string fieldName = member.FieldPairs[node.Member.Name];
-            _sqlCmd.Append(_openQuote + fieldName + _closeQuote);
-            //设置字段对象
-            _sqlCmd.Append($" as { _openQuote + fieldArr[protiesIndex++] + _closeQuote} ");
-            return node;
-        }
-        /// <summary>
-        /// 解析绑定固定数据
-        /// </summary>
-        /// <param name="node"></param>
-        /// <returns></returns>
-        protected override Expression VisitConstant(ConstantExpression node)
-        {
-            if (_sqlCmd.Length != 0)
-                _sqlCmd.Append(",");
-            //设置值对象
-            _sqlCmd.Append(node.Value);
-
-            //设置字段对象
-            _sqlCmd.Append($" as { _openQuote + fieldArr[protiesIndex++] + _closeQuote} ");
-            return node;
-        }
-        /// <summary>
-        /// 解析字段的值(表达式)
-        /// </summary>
-        /// <param name="node"></param>
-        /// <returns></returns>
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if (node.Method.DeclaringType.FullName.Contains("Convert"))//使用convert函数里待执行的sql数据
+            //子查询函数
+            if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension"))
             {
-                Visit(node.Arguments[0]);
+
             }
-            else if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension"))//实现子连接字段查询
+            else
             {
-                if (_sqlCmd.Length != 0)
-                    _sqlCmd.Append(",");
-                //设置值对象
-                _sqlCmd.Append($"({node.MethodCallExpressionToSql(ref Param)})");
-
-                //设置字段对象
-                _sqlCmd.Append($" as { _openQuote + fieldArr[protiesIndex++] + _closeQuote} ");
-            }
-            else//使用系统自带需要计算的函数
-            {
-                if (_sqlCmd.Length != 0)
-                    _sqlCmd.Append(",");
-
-                //设置值对象
-                _sqlCmd.Append(node.ToConvertAndGetValue());
-
-                //设置字段对象
-                _sqlCmd.Append($" as { _openQuote + fieldArr[protiesIndex++] + _closeQuote} ");
+                base.VisitMethodCall(node);
             }
             return node;
         }

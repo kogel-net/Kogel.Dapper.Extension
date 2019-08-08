@@ -10,7 +10,7 @@ using Kogel.Dapper.Extension.Core.Interfaces;
 
 namespace Kogel.Dapper.Extension.Expressions
 {
-    public sealed class UpdateExpression : ExpressionVisitor
+    public sealed class UpdateExpression : BaseExpressionVisitor
     {
         #region sql指令
         private readonly StringBuilder _sqlCmd;
@@ -19,15 +19,13 @@ namespace Kogel.Dapper.Extension.Expressions
         /// </summary>
         public string SqlCmd => _sqlCmd.ToString();
 
-        public DynamicParameters Param { get; }
+        public DynamicParameters Param;
 
-        private IProviderOption providerOption { get; set; }
+        private IProviderOption providerOption;
 
         #endregion
         #region 当前解析的对象
         private EntityObject entity { get; }
-        private int protiesIndex;
-        private string[] fieldArr { get; }//字段数组
         #endregion
         /// <inheritdoc />
         /// <summary>
@@ -37,56 +35,35 @@ namespace Kogel.Dapper.Extension.Expressions
         /// <returns></returns>
         public UpdateExpression(LambdaExpression expression, IProviderOption providerOption)
         {
-            _sqlCmd = new StringBuilder(100);
-            Param = new DynamicParameters();
+            this._sqlCmd = new StringBuilder(100);
+            this.Param = new DynamicParameters();
             this.providerOption = providerOption;
             //当前定义的查询返回对象
-            entity = EntityCache.QueryEntity(expression.Body.Type);
-            protiesIndex = 0;
-            fieldArr = ((MemberInitExpression)expression.Body).Bindings.AsList().Select(x => entity.FieldPairs[x.Member.Name]).ToArray();
-
+            this.entity = EntityCache.QueryEntity(expression.Body.Type);
+            //字段数组
+            string[] fieldArr = ((MemberInitExpression)expression.Body).Bindings.AsList().Select(x => entity.FieldPairs[x.Member.Name]).ToArray();
+            //开始解析对象
             Visit(expression);
-            _sqlCmd.Insert(0, " SET ");
-        }
-        /// <summary>
-        /// 解析绑定固定数据
-        /// </summary>
-        /// <param name="node"></param>
-        /// <returns></returns>
-        protected override Expression VisitConstant(ConstantExpression node)
-        {
-            if (_sqlCmd.Length != 0)
-                _sqlCmd.Append(",");
-            //设置字段对象
-            string field = fieldArr[protiesIndex++];
-            _sqlCmd.Append($"{ providerOption.CombineFieldName(field)}={providerOption.ParameterPrefix + "UPDATE_" + field}");
-            //设置值对象
-            Param.Add("UPDATE_" + field, node.Value);
-            return node;
-        }
-        /// <summary>
-        /// 解析字段的值(表达式)
-        /// </summary>
-        /// <param name="node"></param>
-        /// <returns></returns>
-        protected override Expression VisitMethodCall(MethodCallExpression node)
-        {
-            if (node.Method.DeclaringType.FullName.Contains("Convert"))//使用convert函数里待执行的sql数据
-            {
-                Visit(node.Arguments[0]);
-            }
-            else//使用系统自带需要计算的函数
+            //开始拼接成查询字段
+            for (var i = 0; i < fieldArr.Length; i++)
             {
                 if (_sqlCmd.Length != 0)
                     _sqlCmd.Append(",");
-
-                //设置字段对象
-                string field = fieldArr[protiesIndex++];
-                _sqlCmd.Append($"{ providerOption.CombineFieldName(field)}={providerOption.ParameterPrefix + "UPDATE_" + field}");
-                //设置值对象
-                Param.Add("UPDATE_" + field, node.ToConvertAndGetValue());
+                string field = fieldArr[i];
+                string value = base.FieldList[i];
+                //判断是不是包含字段的值，如果是就不放入Param中
+                if (value.Contains(entity.Name))
+                {
+                    _sqlCmd.Append(field + "=" + value);
+                }
+                else
+                {
+                    var ParamName = "UPDATE_" + providerOption.CombineFieldName(field);
+                    _sqlCmd.Append(field + "=" + providerOption.ParameterPrefix + ParamName);
+                    Param.Add(ParamName, value);
+                }
             }
-            return node;
+            _sqlCmd.Insert(0, " SET ");
         }
     }
 }

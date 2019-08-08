@@ -68,12 +68,6 @@ namespace Kogel.Dapper.Extension.MySql
             whereSql = builder.ToString();
             return whereExpressionList;
         }
-        public static UpdateEntityWhereExpression ResolveWhere(object obj)
-        {
-            var where = new UpdateEntityWhereExpression(obj, ProviderOption);
-            where.Resolve();
-            return where;
-        }
         /// <summary>
         /// 根据反射对象获取表字段
         /// </summary>

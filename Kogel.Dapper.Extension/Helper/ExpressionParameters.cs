@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kogel.Dapper.Extension.Helper
 {
@@ -25,12 +23,12 @@ namespace Kogel.Dapper.Extension.Helper
             foreach (UnaryExpression exp in methodCall.Arguments)
             {
                 this.parameterExpressions = new List<ParameterExpression>();
-                Visit(expression);
+                Visit(exp);
                 var lambda = Expression.Lambda(exp, parameterExpressions.ToList());
                 UnaryExpression unary = exp.Update(lambda);
                 unaryList.Add(unary);
             }
-            var newMethodCall = methodCall.Update(methodCall.Object, unaryList);
+            var newMethodCall = methodCall.Update(methodCall.Object, unaryList.ToArray());
             return methodCall;
 
         }
