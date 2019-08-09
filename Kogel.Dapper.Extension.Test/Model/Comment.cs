@@ -7,7 +7,7 @@ using Kogel.Dapper.Extension.Attributes;
 
 namespace Kogel.Dapper.Extension.Test.Model
 {
-    [Display(Schema ="dbo")]
+    //[Display(Schema ="dbo")]
    public class Comment
     {
         [Identity]

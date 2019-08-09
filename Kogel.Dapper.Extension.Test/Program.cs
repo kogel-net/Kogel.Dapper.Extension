@@ -1,6 +1,6 @@
 ﻿using Kogel.Dapper.Extension.Core.SetQ;
 using Kogel.Dapper.Extension.Extension.From;
-using Kogel.Dapper.Extension.MsSql;
+using Kogel.Dapper.Extension.MySql;
 using Kogel.Dapper.Extension.Test.Model;
 using System;
 using System.Collections.Generic;
@@ -20,7 +20,7 @@ namespace Kogel.Dapper.Extension.Test
             var mysqlConnection = "Server=localhost;Database=Qx_Sport_Common;Uid=root;Pwd=A5101264a;";
             Stopwatch stopwatch = new Stopwatch();
 
-            using (var conn = new SqlConnection(connectionString))
+            using (var conn = new MySqlConnection(mysqlConnection))
             {
                 //var comment1 = conn.QuerySet<Comment>().Sum<Comment>(x => x.Id);
                 var comment1 = conn.QuerySet<Comment>()
@@ -32,7 +32,7 @@ namespace Kogel.Dapper.Extension.Test
                         test = new List<int>() { 3, 3, 1 }.FirstOrDefault(y => y == 1),
                         aaa = "6666" + "777",
                         Content = a.Content + "test" + b.Headlines + a.IdentityId,
-                        bbb = new QuerySet<Comment>(conn, new MsSqlProvider())
+                        bbb = new QuerySet<Comment>(conn, new MySqlProvider())
                               .Where(y => y.ArticleId == b.Id && y.Content.Contains("test")).Sum<Comment>(x => x.Id) + 100
                     });
 
@@ -104,11 +104,11 @@ namespace Kogel.Dapper.Extension.Test
                       });
 
                 var commentList = conn.QuerySet<Comment>()
-                    .Where(x => x.Content == "test1")
+                    .Where(x => x.Content.Contains("t"))
                     .ToList();
                 int result = conn.CommandSet<Comment>().BatchInsert(commentList, 1000);
 
-                int result2 = conn.CommandSet<Comment>().Where(x => x.Id > 14).Delete();
+                int result2 = conn.CommandSet<Comment>().Where(x => x.Id > 83).Delete();
             }
             stopwatch.Stop();
 

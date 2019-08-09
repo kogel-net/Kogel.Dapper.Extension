@@ -71,7 +71,7 @@ namespace Kogel.Dapper.Extension
             var paramSqlBuilder = new StringBuilder(64);
             var valueSqlBuilder = new StringBuilder(64);
 
-            var properties = EntityCache.QueryEntity(entity.GetType()).Properties;
+            var properties = EntityCache.QueryEntity(typeof(T)).Properties;
 
             var isAppend = false;
             foreach (var propertiy in properties)
