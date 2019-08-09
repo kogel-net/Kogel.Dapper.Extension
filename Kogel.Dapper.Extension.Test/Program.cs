@@ -4,7 +4,6 @@ using Kogel.Dapper.Extension.MySql;
 using Kogel.Dapper.Extension.Test.Model;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using MySql.Data.MySqlClient;
@@ -38,7 +37,7 @@ namespace Kogel.Dapper.Extension.Test
                         ccc = a.IdentityId,
                         ddd = Convert.ToInt32("(select count(1) from Comment)")
                     });
-
+           
 
                 var edit = conn.CommandSet<Comment>()
                            .Where(x => x.Id.In(new int[] { 1, 2, 3 }))
@@ -95,7 +94,7 @@ namespace Kogel.Dapper.Extension.Test
 
                
 
-                var querySet = conn.QuerySet<Comment>()
+                /*var querySet = conn.QuerySet<Comment>()
                      .Join<Comment, News>((a, b) => a.ArticleId == b.Id)
                      .Join<Comment, ResourceMapping>((a, b) => a.Id == b.FKId)
                      .Where(x => x.Content == "test");
@@ -105,7 +104,7 @@ namespace Kogel.Dapper.Extension.Test
                       {
                           id = a.Id,
                           name = b.NewsFrom
-                      });
+                      });*/
 
                 var commentList = conn.QuerySet<Comment>()
                     .Where(x => x.Content.Contains("t"))
