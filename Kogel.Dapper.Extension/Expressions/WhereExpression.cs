@@ -78,7 +78,7 @@ namespace Kogel.Dapper.Extension.Expressions
         protected override Expression VisitMember(MemberExpression node)
         {
             EntityObject entity = EntityCache.QueryEntity(node.Member.DeclaringType);
-            _sqlCmd.Append(_openQuote + entity.Name + _closeQuote + ".");
+            _sqlCmd.Append(entity.Name+".");
             string fieldName = entity.FieldPairs[node.Member.Name];
             _sqlCmd.Append(_openQuote + fieldName + _closeQuote);
             TempFieldName = entity.Name + "_" + fieldName;

@@ -66,16 +66,20 @@ namespace Kogel.Dapper.Extension.Expressions
                 case "Count":
                     {
                         sqlProvider.FormatCount();
-                        _sqlCmd.Append(sqlProvider.SqlString);
-                        Param.AddDynamicParams(sqlProvider.Params);
+                        string Sql = sqlProvider.SqlString;
+                        var Param = ToSubqueryParam(sqlProvider.Params, ref Sql);
+                        _sqlCmd.Append(Sql);
+                        Param.AddDynamicParams(Param);
                     }
                     break;
                 case "Sum":
                     {
                         var lambda = (LambdaExpression)(((UnaryExpression)(this.expression.Arguments[0])).Operand);
                         sqlProvider.FormatSum(lambda);
-                        _sqlCmd.Append(sqlProvider.SqlString);
-                        Param.AddDynamicParams(sqlProvider.Params);
+                        string Sql = sqlProvider.SqlString;
+                        var Param = ToSubqueryParam(sqlProvider.Params, ref Sql);
+                        _sqlCmd.Append(Sql);
+                        this.Param.AddDynamicParams(Param);
                     }
                     break;
                 default:
@@ -95,6 +99,24 @@ namespace Kogel.Dapper.Extension.Expressions
                 parameterExpressions.Add(param);
             }
             return node;
+        }
+        /// <summary>
+        /// 替换成新的参数名，防止命名冲突
+        /// </summary>
+        /// <param name="param"></param>
+        /// <param name="sql"></param>
+        /// <returns></returns>
+        private DynamicParameters ToSubqueryParam( DynamicParameters param,ref string sql)
+        {
+            DynamicParameters newParam = new DynamicParameters();
+            foreach (var paramName in param.ParameterNames)
+            {
+                string newName = paramName + "_Subquery";
+                object value = param.Get<object>(paramName);
+                newParam.Add(newName, value);
+                sql = sql.Replace(paramName, newName);
+            }
+            return newParam;
         }
     }
 }

@@ -27,7 +27,7 @@ namespace Kogel.Dapper.Extension.MsSql
             {
                 var entity = EntityCache.QueryEntity(a.Key.Type.GenericTypeArguments[0]);
                 var columnName = a.Key.Body.GetCorrectPropertyName();
-                return $"{ProviderOption.CombineFieldName(entity.Name)}." + ProviderOption.CombineFieldName(columnName) + (a.Value == EOrderBy.Asc ? " ASC " : " DESC ");
+                return $"{entity.Name}." + ProviderOption.CombineFieldName(columnName) + (a.Value == EOrderBy.Asc ? " ASC " : " DESC ");
             });
             if (!orderByList.Any())
                 return "";
@@ -77,8 +77,7 @@ namespace Kogel.Dapper.Extension.MsSql
         public static string GetTableField(EntityObject entityObject)
         {
             var propertyInfos = entityObject.Properties;
-            string tableName = entityObject.Name;
-            string property = string.Join(",", entityObject.FieldPairs.Select(field => $"{ProviderOption.CombineFieldName(tableName)}.{ProviderOption.CombineFieldName(field.Value) }"));
+            string property = string.Join(",", entityObject.FieldPairs.Select(field => $"{entityObject.Name}.{ProviderOption.CombineFieldName(field.Value) }"));
             return property;
         }
         public static string ResolveSelect(EntityObject entityObject, LambdaExpression selector, int? topNum,DynamicParameters Param)

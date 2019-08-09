@@ -28,7 +28,7 @@ namespace Kogel.Dapper.Extension.MySql
             {
                 var entity = EntityCache.QueryEntity(a.Key.Type.GenericTypeArguments[0]);
                 var columnName = a.Key.Body.GetCorrectPropertyName();
-                return $"{ProviderOption.CombineFieldName(entity.Name)}." + ProviderOption.CombineFieldName(columnName) + (a.Value == EOrderBy.Asc ? " ASC " : " DESC ");
+                return $"{entity.Name}." + ProviderOption.CombineFieldName(columnName) + (a.Value == EOrderBy.Asc ? " ASC " : " DESC ");
             });
             if (!orderByList.Any())
                 return "";

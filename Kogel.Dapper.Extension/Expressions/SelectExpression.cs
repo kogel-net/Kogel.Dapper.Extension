@@ -60,6 +60,7 @@ namespace Kogel.Dapper.Extension.Expressions
                     _sqlCmd.Append(",");
                 _sqlCmd.Append(base.FieldList[i] + " as " + fieldArr[i]);
             }
+            this.Param.AddDynamicParams(base.Param);
         }
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {

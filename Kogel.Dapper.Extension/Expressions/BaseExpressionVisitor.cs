@@ -1,4 +1,5 @@
-﻿using Kogel.Dapper.Extension.Extension;
+﻿using Dapper;
+using Kogel.Dapper.Extension.Extension;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,9 +18,11 @@ namespace Kogel.Dapper.Extension.Expressions
         /// 字段集合
         /// </summary>
         protected List<string> FieldList { get; set; }
+        protected DynamicParameters Param { get; set; }
         public BaseExpressionVisitor()
         {
             FieldList = new List<string>();
+            Param = new DynamicParameters();
         }
         /// <summary>
         /// 有+ - * /需要拼接的对象
@@ -30,6 +33,7 @@ namespace Kogel.Dapper.Extension.Expressions
         {
             var binary = new BinaryExpressionVisitor(node);
             GenerateField(binary.SpliceField.ToString());
+            this.Param.AddDynamicParams(binary.Param);
             return node;
         }
         /// <summary>
@@ -114,9 +118,11 @@ namespace Kogel.Dapper.Extension.Expressions
     public class BinaryExpressionVisitor : BaseExpressionVisitor
     {
         internal StringBuilder SpliceField { get; set; }
+        internal new DynamicParameters Param { get; set; }
         public BinaryExpressionVisitor(BinaryExpression expression)
         {
             SpliceField = new StringBuilder();
+            Param = new DynamicParameters();
             SpliceField.Append("(");
             Visit(expression);
             SpliceField.Append(")");
@@ -149,6 +155,12 @@ namespace Kogel.Dapper.Extension.Expressions
             if (node.Method.DeclaringType.FullName.Contains("Convert"))
             {
                 Visit(node.Arguments[0]);
+            }
+            else if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension"))
+            {
+                DynamicParameters parameters = new DynamicParameters();
+                SpliceField.Append("(" + node.MethodCallExpressionToSql(ref parameters) + ")");
+                Param.AddDynamicParams(parameters);
             }
             else
             {

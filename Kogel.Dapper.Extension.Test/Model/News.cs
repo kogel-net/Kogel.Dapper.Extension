@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Kogel.Dapper.Extension.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,7 @@ namespace Kogel.Dapper.Extension.Test.Model
     /// 日 期：2018年3月8日
     /// 描述：新闻实体类
     /// </summary>
+    [Display(Schema ="dbo")]
     public class News
     {
         /// <summary>

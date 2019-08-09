@@ -57,11 +57,9 @@ namespace Kogel.Dapper.Extension
 
         protected string FormatTableName(bool isNeedFrom = true)
         {
-            var typeOfTableClass = Context.Set.TableType;
-
-            var tableName = EntityCache.QueryEntity(typeOfTableClass).Name;
-
-            SqlString = $" {ProviderOption.OpenQuote}{tableName}{ProviderOption.CloseQuote} ";
+            var entity = EntityCache.QueryEntity(Context.Set.TableType);
+            string schema = string.IsNullOrEmpty(entity.Schema) ? "" : ProviderOption.CombineFieldName(entity.Schema) + ".";
+            SqlString = $" {schema}{ProviderOption.CombineFieldName(entity.Name)} ";
             if (isNeedFrom)
                 SqlString = " FROM " + SqlString;
 
