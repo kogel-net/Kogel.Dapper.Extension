@@ -19,7 +19,7 @@ namespace Kogel.Dapper.Extension.Expressions
         /// </summary>
         public string SqlCmd => _sqlCmd.ToString();
 
-        public DynamicParameters Param;
+        public new DynamicParameters Param;
 
         private IProviderOption providerOption;
 
@@ -33,7 +33,7 @@ namespace Kogel.Dapper.Extension.Expressions
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateExpression(LambdaExpression expression, IProviderOption providerOption)
+        public UpdateExpression(LambdaExpression expression, IProviderOption providerOption):base(providerOption)
         {
             this._sqlCmd = new StringBuilder(100);
             this.Param = new DynamicParameters();
@@ -63,6 +63,8 @@ namespace Kogel.Dapper.Extension.Expressions
                     Param.Add(ParamName, value);
                 }
             }
+            //加入条件参数
+            Param.AddDynamicParams(base.Param);
             _sqlCmd.Insert(0, " SET ");
         }
     }

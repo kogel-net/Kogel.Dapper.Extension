@@ -54,7 +54,10 @@ namespace Kogel.Dapper.Extension.MsSql
                 whereExpressionList.Add(whereParam);
                 builder.Append(whereParam.SqlCmd);
                 //参数
-                Params.AddDynamicParams(whereParam.Param);
+                foreach (var paramKey in whereParam.Param.ParameterNames)
+                {
+                    Params.Add(paramKey, whereParam.Param.Get<object>(paramKey));
+                }
             }
             //添加自定义sql生成的条件和参数
             if ((abstractSet.WhereBuilder != null && abstractSet.WhereBuilder.Length != 0) || (abstractSet.Params != null && abstractSet.Params.ParameterNames.Count() != 0))

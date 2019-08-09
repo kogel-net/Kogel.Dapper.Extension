@@ -25,7 +25,7 @@ namespace Kogel.Dapper.Extension.Test
                 //var comment1 = conn.QuerySet<Comment>().Sum<Comment>(x => x.Id);
                 var comment1 = conn.QuerySet<Comment>()
                     .Join<Comment, News>((a, b) => a.ArticleId == b.Id)
-                    .Where(x => x.Id.Between(80, 100) && x.SubTime.AddDays(-10) < DateTime.Now && x.Id>10)
+                    .Where(x => x.Id.Between(80, 100) && x.SubTime.AddDays(-10) < DateTime.Now && x.Id > 10)
                     .From<Comment, News>()
                     .Get((a, b) => new
                     {
@@ -34,10 +34,10 @@ namespace Kogel.Dapper.Extension.Test
                         Content = a.Content + "'test'" + b.Headlines + a.IdentityId,
                         bbb = new QuerySet<Comment>(conn, new MsSqlProvider())
                               .Where(y => y.ArticleId == b.Id && y.Content.Contains("test")).Sum<Comment>(x => x.Id),
-                        //ccc=a.IdentityId,
-                        //ddd=Convert.ToInt32("select count(1) from Comment")
+                        ccc = a.IdentityId,
+                        ddd = Convert.ToInt32("(select count(1) from Comment)")
                     });
-                    
+
                 var edit = conn.CommandSet<Comment>()
                            .Where(x => x.Id.In(new int[] { 1, 2, 3 }))
                            .Update(x => new Comment
