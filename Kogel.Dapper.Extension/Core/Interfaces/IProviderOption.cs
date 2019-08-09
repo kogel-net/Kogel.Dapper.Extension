@@ -25,6 +25,7 @@
         {
             return OpenQuote + field + CloseQuote;
         }
+        public abstract string GetDate();
         /// <summary>
         /// 结合时间处理
         /// </summary>

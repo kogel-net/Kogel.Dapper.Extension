@@ -12,139 +12,120 @@ using Kogel.Dapper.Extension.Model;
 
 namespace Kogel.Dapper.Extension.Expressions
 {
-    public sealed class WhereExpression : ExpressionVisitor
+    /// <summary>
+    /// 解析查询条件
+    /// </summary>
+    public sealed class WhereExpression :BaseExpressionVisitor
     {
         #region sql指令
-
         private readonly StringBuilder _sqlCmd;
-
         /// <summary>
         /// sql指令
         /// </summary>
         public string SqlCmd => _sqlCmd.Length > 0 ? $" AND {_sqlCmd} " : "";
-
-        public DynamicParameters Param { get; }
-
-        private string _tempFieldName;
-
-        private string TempFieldName
-        {
-            get => _prefix + _tempFieldName+ "_" + Param.ParameterNames.Count();
-            set => _tempFieldName = value;
-        }
-
-        private string ParamName => providerOption.ParameterPrefix + TempFieldName;
-
-        private readonly string _prefix;
-
-        private readonly IProviderOption providerOption;
-
-        private string _closeQuote => providerOption.CloseQuote;
-
-        private string _openQuote => providerOption.OpenQuote;
-
-        #endregion
-
-        #region 执行解析
-
-        /// <inheritdoc />
         /// <summary>
-        /// 执行解析
+        /// 参数
         /// </summary>
-        /// <param name="expression"></param>
-        /// <param name="prefix">字段前缀</param>
-        /// <param name="providerOption"></param>
-        /// <returns></returns>
+        public new DynamicParameters Param { get; }
+        private IProviderOption providerOption;
+        #endregion
+        #region 当前解析的对象
+        private EntityObject entity { get; }
+        #endregion
         public WhereExpression(LambdaExpression expression, string prefix, IProviderOption providerOption)
         {
-            _sqlCmd = new StringBuilder(100);
-            Param = new DynamicParameters();
-
-            _prefix = prefix;
+            this._sqlCmd = new StringBuilder(100);
+            this.Param = new DynamicParameters();
             this.providerOption = providerOption;
-            var exp = TrimExpression.Trim(expression);
-            Visit(exp);
+            //当前定义的查询返回对象
+            this.entity = EntityCache.QueryEntity(expression.Body.Type);
+            //开始解析对象
+            Visit(expression);
+            //开始拼接成条件
+            for (var i = 0; i < base.FieldList.Count; i++)
+            {
+                if (_sqlCmd.Length != 0)
+                    _sqlCmd.Append(" AND ");
+                _sqlCmd.Append(base.FieldList[i]);
+            }
+            this.Param.AddDynamicParams(base.Param);
         }
-        #endregion
-
-        #region 访问成员表达式
-
-        /// <inheritdoc />
+        protected override Expression VisitBinary(BinaryExpression node)
+        {
+            var binaryWhere = new BinaryWhereExpressionVisitor(node, providerOption);
+            this._sqlCmd.Append(binaryWhere.SpliceField);
+            this.Param.AddDynamicParams(binaryWhere.Param);
+            return node;
+        }
+        protected override Expression VisitMethodCall(MethodCallExpression node)
+        {
+            return base.VisitMethodCall(node);
+        }
+    }
+    
+    /// <summary>
+    /// 专门处理条件的二元表达式
+    /// </summary>
+    internal class BinaryWhereExpressionVisitor : BinaryExpressionVisitor
+    {
+        private string FieldName { get; set; }//字段
+        private string ParamName { get => (providerOption.ParameterPrefix + FieldName.Replace(".", "_") + "_" + Param.ParameterNames.Count()); }//带参数标识的
+        public BinaryWhereExpressionVisitor(BinaryExpression expression, IProviderOption providerOption) : base(expression, providerOption)
+        {
+            
+        }
+        protected override Expression VisitMethodCall(MethodCallExpression node)
+        {
+            //使用convert函数里待执行的sql数据
+            if (node.Method.DeclaringType.FullName.Contains("Convert"))
+            {
+                Visit(node.Arguments[0]);
+            }
+            else if(node.Method.DeclaringType.FullName.Equals("Kogel.Dapper.Extension.ExpressExpansion"))//自定义扩展方法
+            {
+                Visit(node.Arguments[0]);
+                Operation(node);
+            }
+            else if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension"))
+            {
+                base.VisitMethodCall(node);
+            }
+            else
+            {
+                Operation(node);
+            }
+            return node;
+        }
         /// <summary>
-        /// 访问成员表达式
+        /// 重写成员对象，得到字段名称
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
         protected override Expression VisitMember(MemberExpression node)
         {
-            EntityObject entity = EntityCache.QueryEntity(node.Member.DeclaringType);
-            _sqlCmd.Append(entity.Name+".");
-            string fieldName = entity.FieldPairs[node.Member.Name];
-            _sqlCmd.Append(_openQuote + fieldName + _closeQuote);
-            TempFieldName = entity.Name + "_" + fieldName;
+            var member = EntityCache.QueryEntity(node.Member.DeclaringType);
+            string fieldName = member.FieldPairs[node.Member.Name];
+            this.FieldName = member.Name + "." + fieldName;
+            SpliceField.Append(this.FieldName);
+
+            //时间类型有时会进入此处
+            if (node.Type == typeof(DateTime))
+            {
+                SpliceField= SpliceField.Replace("DateTime.Now", base.providerOption.GetDate());
+            }
             return node;
         }
-
-        #endregion
-
-        #region 访问二元表达式
-        /// <inheritdoc />
         /// <summary>
-        /// 访问二元表达式
-        /// </summary>
-        /// <param name="node"></param>
-        /// <returns></returns>
-        protected override Expression VisitBinary(BinaryExpression node)
-        {
-            _sqlCmd.Append("(");
-            Visit(node.Left);
-
-            _sqlCmd.Append(node.GetExpressionType());
-
-            Visit(node.Right);
-            _sqlCmd.Append(")");
-
-            return node;
-        }
-        #endregion
-
-        #region 访问常量表达式
-        /// <inheritdoc />
-        /// <summary>
-        /// 访问常量表达式
+        /// 重写值对象，记录参数
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            var value = node.ToConvertAndGetValue();
-            if (value != null)
-            {
-                _sqlCmd.Append(ParamName);
-                Param.Add(TempFieldName, value);
-            }
-            else
-            {
-                _sqlCmd.Append("NULL");
-            }
+            SpliceField.Append(ParamName);
+            Param.Add(ParamName, node.ToConvertAndGetValue());
             return node;
         }
-        #endregion
-
-        #region 访问方法表达式
-        /// <inheritdoc />
-        /// <summary>
-        /// 访问方法表达式
-        /// </summary>
-        /// <param name="node"></param>
-        /// <returns></returns>
-        protected override Expression VisitMethodCall(MethodCallExpression node)
-        {
-            Operation(node);
-            return node;
-        }
-
-        #endregion
 
         private void Operation(MethodCallExpression node)
         {
@@ -153,53 +134,48 @@ namespace Kogel.Dapper.Extension.Expressions
                 case "Contains":
                     {
                         Visit(node.Object);
-                        _sqlCmd.Append($" LIKE {ParamName}");
+                        base.SpliceField.Append($" LIKE {ParamName}");
                         var argumentExpression = (ConstantExpression)node.Arguments[0];
-                        Param.Add(TempFieldName, "%" + argumentExpression.ToConvertAndGetValue() + "%");
+                        Param.Add(ParamName, "%" + argumentExpression.ToConvertAndGetValue() + "%");
                     }
                     break;
                 case "Equals":
                     {
                         Visit(node.Object);
-                        _sqlCmd.Append($" = {ParamName}");
+                        base.SpliceField.Append($" = {ParamName}");
                         var argumentExpression = (ConstantExpression)node.Arguments[0];
-                        Param.Add(TempFieldName, argumentExpression.ToConvertAndGetValue());
+                        Param.Add(ParamName, argumentExpression.ToConvertAndGetValue());
                     }
                     break;
                 case "In":
                     {
-                        Visit(node.Arguments[0]);
-                        _sqlCmd.Append($" IN {ParamName}");
+                        base.SpliceField.Append($" IN {ParamName}");
                         object value = node.Arguments[1].ToConvertAndGetValue();
-                        Param.Add(TempFieldName, value);
+                        Param.Add(ParamName, value);
                     }
                     break;
                 case "NotIn":
                     {
-                        Visit(node.Arguments[0]);
-                        _sqlCmd.Append($" NOT IN {ParamName}");
+                        base.SpliceField.Append($" NOT IN {ParamName}");
                         object value = node.Arguments[1].ToConvertAndGetValue();
-                        Param.Add(TempFieldName, value);
+                        Param.Add(ParamName, value);
                     }
                     break;
                 case "IsNull":
                     {
-                        Visit(node.Arguments[0]);
-                        _sqlCmd.Append(" IS NULL");
+                        base.SpliceField.Append(" IS NULL");
                     }
                     break;
                 case "IsNotNull":
                     {
-                        Visit(node.Arguments[0]);
-                        _sqlCmd.Append(" IS NOT NULL");
+                        base.SpliceField.Append(" IS NOT NULL");
                     }
                     break;
                 case "Between":
                     {
-                        Visit(node.Arguments[0]);
                         string fromParam = ParamName + "_From";
                         string toParam = ParamName + "_To";
-                        _sqlCmd.Append($" BETWEEN {fromParam} AND {toParam}");
+                        base.SpliceField.Append($" BETWEEN {fromParam} AND {toParam}");
                         Param.Add(fromParam, node.Arguments[1].ToConvertAndGetValue());
                         Param.Add(toParam, node.Arguments[2].ToConvertAndGetValue());
                     }
@@ -213,9 +189,9 @@ namespace Kogel.Dapper.Extension.Expressions
                         Visit(node.Object);
                         if (node.Arguments.Count > 0)//Convert.ToInt32("xxx") or Convert.ToString("xxx")
                         {
-                            _sqlCmd.AppendFormat(" {0}", ParamName);
+                            base.SpliceField.AppendFormat(" {0}", ParamName);
                             var argumentExpression = (ConstantExpression)node.Arguments[0];
-                            Param.Add(TempFieldName, argumentExpression.ToConvertAndGetValue());
+                            Param.Add(ParamName, argumentExpression.ToConvertAndGetValue());
                         }
                         else
                         {
@@ -235,8 +211,8 @@ namespace Kogel.Dapper.Extension.Expressions
                         if (!(node.Object is MemberExpression))//数值比对（DateTime.Now.AddDays）
                         {
                             object time = node.ToConvertAndGetValue();
-                            _sqlCmd.AppendFormat(" {0}", ParamName);
-                            Param.Add(TempFieldName, time);
+                            base.SpliceField.AppendFormat(" {0}", ParamName);
+                            Param.Add(ParamName, time);
                         }
                         else//字段比对(类似CreateDate.AddDays)
                         {
@@ -245,9 +221,9 @@ namespace Kogel.Dapper.Extension.Expressions
                             var dateOption = (DateOption)Enum.Parse(typeof(DateOption), node.Method.Name);
                             string fieldName = entity.FieldPairs[member.Member.Name];
                             string sqlCombine = providerOption.CombineDate(dateOption, entity.Name, fieldName, node.Arguments[0].ToConvertAndGetValue().ToString());
-                            _sqlCmd.Append(sqlCombine);
+                            base.SpliceField.Append(sqlCombine);
                             //重新计算参数名称
-                            TempFieldName = entity.Name + "_" + fieldName;
+                            FieldName = entity.Name + "_" + fieldName;
                         }
                     }
                     break;

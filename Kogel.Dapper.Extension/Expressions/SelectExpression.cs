@@ -10,6 +10,9 @@ using System.Collections.Generic;
 
 namespace Kogel.Dapper.Extension.Expressions
 {
+    /// <summary>
+    /// 解析自定义查询字段
+    /// </summary>
     public class SelectExpression : BaseExpressionVisitor
     {
         #region sql指令
@@ -18,8 +21,10 @@ namespace Kogel.Dapper.Extension.Expressions
         /// sql指令
         /// </summary>
         public string SqlCmd => _sqlCmd.ToString();
-
-        public DynamicParameters Param;
+        /// <summary>
+        /// 参数
+        /// </summary>
+        public new DynamicParameters Param;
 
         private IProviderOption providerOption;
 
@@ -61,21 +66,6 @@ namespace Kogel.Dapper.Extension.Expressions
                 _sqlCmd.Append(base.FieldList[i] + " as " + fieldArr[i]);
             }
             this.Param.AddDynamicParams(base.Param);
-        }
-        protected override Expression VisitMethodCall(MethodCallExpression node)
-        {
-            //子查询函数
-            if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension"))
-            {
-                DynamicParameters parameters = new DynamicParameters();
-                base.FieldList.Add("(" + node.MethodCallExpressionToSql(ref parameters) + ")");
-                Param.AddDynamicParams(parameters);
-            }
-            else
-            {
-                base.VisitMethodCall(node);
-            }
-            return node;
         }
     }
 }

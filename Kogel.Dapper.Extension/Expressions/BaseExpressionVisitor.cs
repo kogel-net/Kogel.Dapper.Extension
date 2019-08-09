@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension.Extension;
 using System;
 using System.Collections.Generic;
@@ -119,8 +120,18 @@ namespace Kogel.Dapper.Extension.Expressions
     {
         internal StringBuilder SpliceField { get; set; }
         internal new DynamicParameters Param { get; set; }
+        internal IProviderOption providerOption { get; }
         public BinaryExpressionVisitor(BinaryExpression expression)
         {
+            SpliceField = new StringBuilder();
+            Param = new DynamicParameters();
+            SpliceField.Append("(");
+            Visit(expression);
+            SpliceField.Append(")");
+        }
+        public BinaryExpressionVisitor(BinaryExpression expression, IProviderOption providerOption)
+        {
+            this.providerOption = providerOption;
             SpliceField = new StringBuilder();
             Param = new DynamicParameters();
             SpliceField.Append("(");

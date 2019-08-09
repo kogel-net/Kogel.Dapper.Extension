@@ -9,6 +9,10 @@ namespace Kogel.Dapper.Extension.MsSql.Extension
         {
 
         }
+        public override string GetDate()
+        {
+            return "getdate()";
+        }
         public override string CombineDate(DateOption dateOption, string table, string field,string value)
         {
             string result = string.Empty;

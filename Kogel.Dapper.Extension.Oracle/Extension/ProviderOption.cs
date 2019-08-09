@@ -9,6 +9,10 @@ namespace Kogel.Dapper.Extension.Oracle.Extension
         {
 
         }
+        public override string GetDate()
+        {
+            return "sysdate()";
+        }
         public override string CombineDate(DateOption dateOption, string table, string field, string value)
         {
             string result = string.Empty;

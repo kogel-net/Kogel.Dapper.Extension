@@ -13,7 +13,7 @@ namespace Kogel.Dapper.Extension.Expressions
     /// <summary>
     /// 专门处理子查询的的表达式树扩展类
     /// </summary>
-    public class SubqueryExpression: ExpressionVisitor
+    public class SubqueryExpression : ExpressionVisitor
     {
         private MethodCallExpression expression;
         private List<ParameterExpression> parameterExpressions;
@@ -67,9 +67,9 @@ namespace Kogel.Dapper.Extension.Expressions
                     {
                         sqlProvider.FormatCount();
                         string Sql = sqlProvider.SqlString;
-                        var Param = ToSubqueryParam(sqlProvider.Params, ref Sql);
+                        var param = ToSubqueryParam(sqlProvider.Params, ref Sql);
                         _sqlCmd.Append(Sql);
-                        Param.AddDynamicParams(Param);
+                        this.Param.AddDynamicParams(param);
                     }
                     break;
                 case "Sum":
@@ -77,9 +77,9 @@ namespace Kogel.Dapper.Extension.Expressions
                         var lambda = (LambdaExpression)(((UnaryExpression)(this.expression.Arguments[0])).Operand);
                         sqlProvider.FormatSum(lambda);
                         string Sql = sqlProvider.SqlString;
-                        var Param = ToSubqueryParam(sqlProvider.Params, ref Sql);
+                        var param = ToSubqueryParam(sqlProvider.Params, ref Sql);
                         _sqlCmd.Append(Sql);
-                        this.Param.AddDynamicParams(Param);
+                        this.Param.AddDynamicParams(param);
                     }
                     break;
                 default:
@@ -106,7 +106,7 @@ namespace Kogel.Dapper.Extension.Expressions
         /// <param name="param"></param>
         /// <param name="sql"></param>
         /// <returns></returns>
-        private DynamicParameters ToSubqueryParam( DynamicParameters param,ref string sql)
+        private DynamicParameters ToSubqueryParam(DynamicParameters param, ref string sql)
         {
             DynamicParameters newParam = new DynamicParameters();
             foreach (var paramName in param.ParameterNames)

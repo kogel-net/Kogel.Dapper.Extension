@@ -1,6 +1,6 @@
 ﻿using Kogel.Dapper.Extension.Core.SetQ;
 using Kogel.Dapper.Extension.Extension.From;
-using Kogel.Dapper.Extension.MySql;
+using Kogel.Dapper.Extension.MsSql;
 using Kogel.Dapper.Extension.Test.Model;
 using System;
 using System.Collections.Generic;
@@ -16,23 +16,23 @@ namespace Kogel.Dapper.Extension.Test
     {
         static void Main(string[] args)
         {
-            var connectionString = "Data Source=42.157.195.21,4344;Initial Catalog=Qx_Sport_Common;User ID=qxdev;Password=qxdev123456;";
+            var mssqlConnection = "Data Source=42.157.195.21,4344;Initial Catalog=Qx_Sport_Common;User ID=qxdev;Password=qxdev123456;";
             var mysqlConnection = "Server=localhost;Database=Qx_Sport_Common;Uid=root;Pwd=A5101264a;";
             Stopwatch stopwatch = new Stopwatch();
 
-            using (var conn = new MySqlConnection(mysqlConnection))
+            using (var conn = new SqlConnection(mssqlConnection))
             {
                 //var comment1 = conn.QuerySet<Comment>().Sum<Comment>(x => x.Id);
                 var comment1 = conn.QuerySet<Comment>()
                     .Join<Comment, News>((a, b) => a.ArticleId == b.Id)
-                    .Where(x => x.Id.Between(80, 100) && x.SubTime.AddDays(-10) < DateTime.Now)
+                    .Where(x => x.Id.Between(80, 100) && x.SubTime.AddDays(-10) < DateTime.Now && x.Id>10)
                     .From<Comment, News>()
                     .Get((a, b) => new
                     {
                         test = new List<int>() { 3, 3, 1 }.FirstOrDefault(y => y == 1),
                         aaa = "6666" + "777",
                         Content = a.Content + "test" + b.Headlines + a.IdentityId,
-                        bbb = new QuerySet<Comment>(conn, new MySqlProvider())
+                        bbb = new QuerySet<Comment>(conn, new MsSqlProvider())
                               .Where(y => y.ArticleId == b.Id && y.Content.Contains("test")).Sum<Comment>(x => x.Id) + 100
                     });
 
