@@ -72,6 +72,12 @@ namespace Kogel.Dapper.Extension.Expressions
             {
                 Visit(node.Arguments[0]);
             }
+            else if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension"))
+            {
+                DynamicParameters parameters = new DynamicParameters();
+                GenerateField("(" + node.MethodCallExpressionToSql(ref parameters) + ")");
+                Param.AddDynamicParams(parameters);
+            }
             else
             {
                 GenerateField(GetFieldValue(node));
@@ -102,15 +108,7 @@ namespace Kogel.Dapper.Extension.Expressions
             {
                 value = expression.ToConvertAndGetValue();
             }
-
-            if (expression.Type == typeof(string))
-            {
-                return "'" + value + "'";
-            }
-            else
-            {
-                return value.ToString();
-            }
+            return value.ToString();
         }
     }
     /// <summary>

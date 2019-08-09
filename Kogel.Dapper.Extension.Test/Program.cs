@@ -31,11 +31,13 @@ namespace Kogel.Dapper.Extension.Test
                     {
                         test = new List<int>() { 3, 3, 1 }.FirstOrDefault(y => y == 1),
                         aaa = "6666" + "777",
-                        Content = a.Content + "test" + b.Headlines + a.IdentityId,
+                        Content = a.Content + "'test'" + b.Headlines + a.IdentityId,
                         bbb = new QuerySet<Comment>(conn, new MsSqlProvider())
-                              .Where(y => y.ArticleId == b.Id && y.Content.Contains("test")).Sum<Comment>(x => x.Id) + 100
+                              .Where(y => y.ArticleId == b.Id && y.Content.Contains("test")).Sum<Comment>(x => x.Id),
+                        //ccc=a.IdentityId,
+                        //ddd=Convert.ToInt32("select count(1) from Comment")
                     });
-
+                    
                 var edit = conn.CommandSet<Comment>()
                            .Where(x => x.Id.In(new int[] { 1, 2, 3 }))
                            .Update(x => new Comment
