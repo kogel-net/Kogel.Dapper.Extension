@@ -52,7 +52,7 @@ namespace Kogel.Dapper.Extension.Expressions
                 string field = fieldArr[i];
                 string value = base.FieldList[i];
                 //判断是不是包含字段的值，如果是就不放入Param中
-                if (value.Contains(entity.Name))
+                if (value.Contains(entity.AsName))
                 {
                     _sqlCmd.Append(field + "=" + value);
                 }

@@ -28,7 +28,7 @@ namespace Kogel.Dapper.Extension.MySql
             {
                 var entity = EntityCache.QueryEntity(a.Key.Type.GenericTypeArguments[0]);
                 var columnName = a.Key.Body.GetCorrectPropertyName();
-                return $"{entity.Name}." + ProviderOption.CombineFieldName(columnName) + (a.Value == EOrderBy.Asc ? " ASC " : " DESC ");
+                return $"{entity.AsName}." + ProviderOption.CombineFieldName(columnName) + (a.Value == EOrderBy.Asc ? " ASC " : " DESC ");
             });
             if (!orderByList.Any())
                 return "";
@@ -144,7 +144,7 @@ namespace Kogel.Dapper.Extension.MySql
                     {
                         EntityObject entityObject = EntityCache.QueryEntity(selector.Parameters[0].Type);
                         var memberName = selector.Body.GetCorrectPropertyName();
-                        selectSql = $" SELECT IFNULL(SUM({entityObject.Name}.{ProviderOption.CombineFieldName(entityObject.FieldPairs[memberName])}),0)  ";
+                        selectSql = $" SELECT IFNULL(SUM({entityObject.AsName}.{ProviderOption.CombineFieldName(entityObject.FieldPairs[memberName])}),0)  ";
                     }
                     break;
                 case ExpressionType.MemberInit:

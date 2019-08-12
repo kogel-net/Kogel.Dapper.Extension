@@ -13,6 +13,8 @@ namespace Kogel.Dapper.Extension.Model
         {
             //反射表名称
             this.Name = type.Name;
+            //指定as名称
+            this.AsName = type.Name;
             //获取是否有Display特性
             var typeAttribute = type.GetCustomAttributess(true).FirstOrDefault(x => x.GetType().Equals(typeof(Display)));
             if (typeAttribute != null)
@@ -29,6 +31,12 @@ namespace Kogel.Dapper.Extension.Model
                 if (!string.IsNullOrEmpty(schema))
                 {
                     this.Schema = schema;
+                }
+                //是否有指定as名称
+                string asName = display.AsName;
+                if (!string.IsNullOrEmpty(asName))
+                {
+                    this.AsName = asName;
                 }
             }
             this.Type = type;
@@ -72,6 +80,10 @@ namespace Kogel.Dapper.Extension.Model
         /// 名称空间
         /// </summary>
         public string Schema { get; set; }
+        /// <summary>
+        /// 指定as名称
+        /// </summary>
+        public string AsName { get; set; }
         /// <summary>
         /// 类型
         /// </summary>

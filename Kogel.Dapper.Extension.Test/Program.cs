@@ -1,6 +1,6 @@
 ﻿using Kogel.Dapper.Extension.Core.SetQ;
 using Kogel.Dapper.Extension.Extension.From;
-using Kogel.Dapper.Extension.MySql;
+using Kogel.Dapper.Extension.MsSql;
 using Kogel.Dapper.Extension.Test.Model;
 using System;
 using System.Collections.Generic;
@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using MySql.Data.MySqlClient;
 using System.Linq;
+using System.Data.SqlClient;
 
 namespace Kogel.Dapper.Extension.Test
 {
@@ -19,7 +20,7 @@ namespace Kogel.Dapper.Extension.Test
             var mysqlConnection = "Server=localhost;Database=Qx_Sport_Common;Uid=root;Pwd=A5101264a;";
             Stopwatch stopwatch = new Stopwatch();
 
-            using (var conn = new MySqlConnection(mysqlConnection))
+            using (var conn = new SqlConnection(mssqlConnection))
             {
                 //var comment1 = conn.QuerySet<Comment>().Sum<Comment>(x => x.Id);
                 var comment1 = conn.QuerySet<Comment>()
@@ -32,8 +33,8 @@ namespace Kogel.Dapper.Extension.Test
                         test = new List<int>() { 3, 3, 1 }.FirstOrDefault(y => y == 1),
                         aaa = "6666" + "777",
                         Content = a.Content + "'test'" + b.Headlines + a.IdentityId,
-                        bbb = new QuerySet<Comment>(conn, new MySqlProvider())
-                              .Where(y => y.ArticleId == b.Id && y.Content.Contains("test")).Sum<Comment>(x => x.Id),
+                        bbb = new QuerySet<Comment1>(conn, new MsSqlProvider())
+                              .Where(y => y.ArticleId == b.Id && y.Content.Contains("test")).Sum<Comment1>(x => x.Id),
                         ccc = a.IdentityId,
                         ddd = Convert.ToInt32("(select count(1) from Comment)")
                     });

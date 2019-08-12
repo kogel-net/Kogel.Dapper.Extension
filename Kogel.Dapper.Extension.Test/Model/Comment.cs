@@ -7,9 +7,9 @@ using Kogel.Dapper.Extension.Attributes;
 
 namespace Kogel.Dapper.Extension.Test.Model
 {
-   public class Comment
+    public class Comment
     {
-        [Identity]
+        [Identity(false)]
         public int Id { get; set; }
         /// <summary>
         /// 评论父级id，不为0则是回复评论
@@ -35,5 +35,10 @@ namespace Kogel.Dapper.Extension.Test.Model
         /// 关联的评论id
         /// </summary>
         public long RefCommentId { get; set; }
+    }
+    [Display(Rename = "Comment")]
+    public class Comment1 : Comment
+    {
+
     }
 }

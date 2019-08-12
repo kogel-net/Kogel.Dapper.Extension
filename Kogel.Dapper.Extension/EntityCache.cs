@@ -17,7 +17,7 @@ namespace Kogel.Dapper.Extension
         public static EntityObject Register(Type entity)
         {
             EntityObject entityObject = new EntityObject(entity);
-            if (!EntitieList.Exists(x => x.Name.Equals(entityObject.Name)))
+            if (!EntitieList.Exists(x => x.AssemblyString.Equals(entityObject.AssemblyString)))
             {
                 EntitieList.Add(entityObject);
             }

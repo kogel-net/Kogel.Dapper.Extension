@@ -59,7 +59,8 @@ namespace Kogel.Dapper.Extension
         {
             var entity = EntityCache.QueryEntity(Context.Set.TableType);
             string schema = string.IsNullOrEmpty(entity.Schema) ? "" : ProviderOption.CombineFieldName(entity.Schema) + ".";
-            SqlString = $" {schema}{ProviderOption.CombineFieldName(entity.Name)} ";
+            string fromName = entity.AsName.Equals(entity.Name) ? ProviderOption.CombineFieldName(entity.Name) : $"{ProviderOption.CombineFieldName(entity.Name)} {entity.AsName}";
+            SqlString = $" {schema}{fromName} ";
             if (isNeedFrom)
                 SqlString = " FROM " + SqlString;
 

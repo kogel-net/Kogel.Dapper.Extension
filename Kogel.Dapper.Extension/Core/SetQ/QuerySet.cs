@@ -205,9 +205,9 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             {
                 Action = JoinAction.defaults,
                 JoinMode = joinMode,
-                RightTabName = EntityCache.QueryEntity(typeof(TOuter)).Name,
+                RightTabName = EntityCache.QueryEntity(typeof(TOuter)).AsName,
                 RightAssName = rightField.GetCorrectPropertyName(),
-                LeftTabName = EntityCache.QueryEntity(typeof(TInner)).Name,
+                LeftTabName = EntityCache.QueryEntity(typeof(TInner)).AsName,
                 LeftAssName = leftField.GetCorrectPropertyName(),
                 TableType = typeof(TInner)
             });
@@ -229,7 +229,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             SqlProvider.JoinList.Add(new JoinAssTable()
             {
                 Action = JoinAction.sqlJoin,
-                JoinSql = $"{joinMode.ToString()} JOIN {EntityCache.QueryEntity(typeof(TInner)).Name} ON {  whereRex.Replace(joinWhere.SqlCmd, "", 1)}",
+                JoinSql = $"{joinMode.ToString()} JOIN {EntityCache.QueryEntity(typeof(TInner)).AsName} ON {  whereRex.Replace(joinWhere.SqlCmd, "", 1)}",
                 TableType = (IsDisField ? typeof(TInner) : null)
             });
             if (joinWhere.Param != null)

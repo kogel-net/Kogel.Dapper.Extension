@@ -21,13 +21,13 @@ namespace Kogel.Dapper.Extension.MsSql
             ProviderOption = providerOption;
         }
 
-        public static string ResolveOrderBy(Dictionary< LambdaExpression, EOrderBy> orderbyExpressionDic)
+        public static string ResolveOrderBy(Dictionary<LambdaExpression, EOrderBy> orderbyExpressionDic)
         {
             var orderByList = orderbyExpressionDic.Select(a =>
             {
                 var entity = EntityCache.QueryEntity(a.Key.Type.GenericTypeArguments[0]);
                 var columnName = a.Key.Body.GetCorrectPropertyName();
-                return $"{entity.Name}." + ProviderOption.CombineFieldName(columnName) + (a.Value == EOrderBy.Asc ? " ASC " : " DESC ");
+                return $"{entity.AsName}." + ProviderOption.CombineFieldName(columnName) + (a.Value == EOrderBy.Asc ? " ASC " : " DESC ");
             });
             if (!orderByList.Any())
                 return "";
@@ -77,7 +77,7 @@ namespace Kogel.Dapper.Extension.MsSql
         public static string GetTableField(EntityObject entityObject)
         {
             var propertyInfos = entityObject.Properties;
-            string property = string.Join(",", entityObject.FieldPairs.Select(field => $"{entityObject.Name}.{ProviderOption.CombineFieldName(field.Value) }"));
+            string property = string.Join(",", entityObject.FieldPairs.Select(field => $"{entityObject.AsName}.{ProviderOption.CombineFieldName(field.Value) }"));
             return property;
         }
         public static string ResolveSelect(EntityObject entityObject, LambdaExpression selector, int? topNum,DynamicParameters Param)
@@ -145,7 +145,7 @@ namespace Kogel.Dapper.Extension.MsSql
                     {
                         EntityObject entityObject = EntityCache.QueryEntity(selector.Parameters[0].Type);
                         var memberName = selector.Body.GetCorrectPropertyName();
-                        selectSql = $" SELECT ISNULL(SUM({entityObject.Name}.{ProviderOption.CombineFieldName(entityObject.FieldPairs[memberName])}),0)  ";
+                        selectSql = $" SELECT ISNULL(SUM({entityObject.AsName}.{ProviderOption.CombineFieldName(entityObject.FieldPairs[memberName])}),0)  ";
                     }
                     break;
                 case ExpressionType.MemberInit:

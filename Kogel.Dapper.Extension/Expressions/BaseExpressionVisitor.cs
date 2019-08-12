@@ -59,7 +59,7 @@ namespace Kogel.Dapper.Extension.Expressions
         {
             var member = EntityCache.QueryEntity(node.Member.DeclaringType);
             string fieldName = member.FieldPairs[node.Member.Name];
-            string field = member.Name + "." + fieldName;
+            string field = member.AsName + "." + fieldName;
             GenerateField(field);
             return node;
         }
@@ -159,7 +159,7 @@ namespace Kogel.Dapper.Extension.Expressions
         {
             var member = EntityCache.QueryEntity(node.Member.DeclaringType);
             string fieldName = member.FieldPairs[node.Member.Name];
-            this.FieldName = member.Name + "." + fieldName;
+            this.FieldName = member.AsName + "." + fieldName;
             SpliceField.Append(this.FieldName);
 
             //时间类型有时会进入此处
@@ -273,10 +273,10 @@ namespace Kogel.Dapper.Extension.Expressions
                             var entity = EntityCache.QueryEntity(member.Member.DeclaringType);
                             var dateOption = (DateOption)Enum.Parse(typeof(DateOption), node.Method.Name);
                             string fieldName = entity.FieldPairs[member.Member.Name];
-                            string sqlCombine = providerOption.CombineDate(dateOption, entity.Name, fieldName, node.Arguments[0].ToConvertAndGetValue().ToString());
+                            string sqlCombine = providerOption.CombineDate(dateOption, entity.AsName, fieldName, node.Arguments[0].ToConvertAndGetValue().ToString());
                             this.SpliceField.Append(sqlCombine);
                             //重新计算参数名称
-                            FieldName = entity.Name + "_" + fieldName;
+                            FieldName = entity.AsName + "_" + fieldName;
                         }
                     }
                     break;

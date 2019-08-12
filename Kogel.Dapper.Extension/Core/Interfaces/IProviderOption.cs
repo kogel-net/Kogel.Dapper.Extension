@@ -25,6 +25,10 @@
         {
             return OpenQuote + field + CloseQuote;
         }
+        /// <summary>
+        /// 获取当前时间
+        /// </summary>
+        /// <returns></returns>
         public abstract string GetDate();
         /// <summary>
         /// 结合时间处理
