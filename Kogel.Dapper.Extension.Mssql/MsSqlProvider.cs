@@ -11,11 +11,11 @@ namespace Kogel.Dapper.Extension.MsSql
         private const string OpenQuote = "[";
         private const string CloseQuote = "]";
         private const char ParameterPrefix = '@';
-
+        private IResolveExpression ResolveExpression;
         public MsSqlProvider()
         {
             ProviderOption = new ProviderOption(OpenQuote, CloseQuote, ParameterPrefix);
-            ResolveExpression.InitOption(ProviderOption);
+            ResolveExpression = new ResolveExpression(ProviderOption);
         }
 
         public sealed override IProviderOption ProviderOption { get; set; }
@@ -35,7 +35,7 @@ namespace Kogel.Dapper.Extension.MsSql
             //表查询条件
             var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
 
-            var orderbySql = ResolveExpression.ResolveOrderBy(Context.Set.OrderbyExpressionList);
+            var orderbySql = ResolveExpression.ResolveOrderBy(Context.Set);
 
             SqlString = $"{selectSql} {fromTableSql} {nolockSql} {joinSql} {whereSql} {orderbySql}";
 
@@ -59,7 +59,7 @@ namespace Kogel.Dapper.Extension.MsSql
             //表查询条件
             var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
 
-            var orderbySql = ResolveExpression.ResolveOrderBy(Context.Set.OrderbyExpressionList);
+            var orderbySql = ResolveExpression.ResolveOrderBy(Context.Set);
 
             SqlString = $"{selectSql} {fromTableSql} {nolockSql} {joinSql} {whereSql} {orderbySql}";
 
@@ -68,7 +68,7 @@ namespace Kogel.Dapper.Extension.MsSql
 
         public override SqlProvider FormatToPageList<T>(int pageIndex, int pageSize, bool IsSelectCount = true)
         {
-            var orderbySql = ResolveExpression.ResolveOrderBy(Context.Set.OrderbyExpressionList);
+            var orderbySql = ResolveExpression.ResolveOrderBy(Context.Set);
             if (string.IsNullOrEmpty(orderbySql))
                 throw new DapperExtensionException("order by takes precedence over pagelist");
 

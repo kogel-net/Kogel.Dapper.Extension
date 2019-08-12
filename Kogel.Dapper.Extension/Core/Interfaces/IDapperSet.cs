@@ -16,10 +16,12 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         public LambdaExpression WhereExpression { get; protected set; }
 
         public List<LambdaExpression> WhereExpressionList { get; set; }
-
-        public LambdaExpression IfNotExistsExpression { get; protected set; }
-
+        //表达式排序集合
         public Dictionary<LambdaExpression, EOrderBy> OrderbyExpressionList { get; protected set; }
+        /// <summary>
+        /// 字符串排序
+        /// </summary>
+        public StringBuilder OrderbyBuilder { get; protected set; }
 
         public LambdaExpression SelectExpression { get; internal set; }
 

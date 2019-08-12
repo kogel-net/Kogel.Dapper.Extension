@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq.Expressions;
 using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension.Model;
+using System.Text;
 
 namespace Kogel.Dapper.Extension.Core.SetQ
 {
@@ -16,11 +17,13 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         protected Order(IDbConnection conn, SqlProvider sqlProvider) : base(conn, sqlProvider)
         {
             OrderbyExpressionList = new Dictionary<LambdaExpression, EOrderBy>();
+            OrderbyBuilder = new StringBuilder(); 
         }
 
         protected Order(IDbConnection conn, SqlProvider sqlProvider, IDbTransaction dbTransaction) : base(conn, sqlProvider, dbTransaction)
         {
             OrderbyExpressionList = new Dictionary<LambdaExpression, EOrderBy>();
+            OrderbyBuilder = new StringBuilder();
         }
 
         /// <inheritdoc />
@@ -53,6 +56,13 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         {
             if (field != null)
                 OrderbyExpressionList.Add(field, EOrderBy.Desc);
+
+            return this;
+        }
+        public Order<T> OrderBy(string orderBy)
+        {
+            if (!string.IsNullOrEmpty(orderBy))
+                OrderbyBuilder.Append(orderBy);
 
             return this;
         }

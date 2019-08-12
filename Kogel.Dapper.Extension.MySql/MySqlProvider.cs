@@ -10,18 +10,18 @@ namespace Kogel.Dapper.Extension.MySql
         private const string OpenQuote = "";
         private const string CloseQuote = "";
         private const char ParameterPrefix = '@';
-
+        private IResolveExpression ResolveExpression;
         public MySqlProvider()
         {
             ProviderOption = new ProviderOption(OpenQuote, CloseQuote, ParameterPrefix);
-            ResolveExpression.InitOption(ProviderOption);
+            ResolveExpression = new ResolveExpression(ProviderOption);
         }
 
         public sealed override IProviderOption ProviderOption { get; set; }
 
         public override SqlProvider FormatGet<T>()
         {
-            var selectSql = ResolveExpression.ResolveSelect(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression, Params);
+            var selectSql = ResolveExpression.ResolveSelect(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression, null, Params);
 
             var fromTableSql = FormatTableName();
 
@@ -30,9 +30,9 @@ namespace Kogel.Dapper.Extension.MySql
             var whereSql = string.Empty;
 
             //表查询条件
-            var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set,ref whereSql, Params);
+            var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
 
-            var orderbySql = ResolveExpression.ResolveOrderBy(Context.Set.OrderbyExpressionList);
+            var orderbySql = ResolveExpression.ResolveOrderBy(Context.Set);
 
             SqlString = $@"SELECT T.* FROM( 
                             {selectSql}
@@ -49,7 +49,7 @@ namespace Kogel.Dapper.Extension.MySql
         {
             var topNum = DataBaseContext<T>().QuerySet.TopNum;
 
-            var selectSql = ResolveExpression.ResolveSelect(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression, Params);
+            var selectSql = ResolveExpression.ResolveSelect(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression, null, Params);
 
             var fromTableSql = FormatTableName();
 
@@ -60,7 +60,7 @@ namespace Kogel.Dapper.Extension.MySql
             //表查询条件
             var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
 
-            var orderbySql = ResolveExpression.ResolveOrderBy(Context.Set.OrderbyExpressionList);
+            var orderbySql = ResolveExpression.ResolveOrderBy(Context.Set);
 
             SqlString = $"{selectSql} {fromTableSql} {joinSql} {whereSql} {orderbySql}";
 
@@ -69,12 +69,12 @@ namespace Kogel.Dapper.Extension.MySql
 
         public override SqlProvider FormatToPageList<T>(int pageIndex, int pageSize, bool IsSelectCount = true)
         {
-            var orderbySql = ResolveExpression.ResolveOrderBy(Context.Set.OrderbyExpressionList);
+            var orderbySql = ResolveExpression.ResolveOrderBy(Context.Set);
             //Oracle可以不用必须排序翻页
             //if (string.IsNullOrEmpty(orderbySql))
             //    throw new DapperExtensionException("order by takes precedence over pagelist");
 
-            var selectSql = ResolveExpression.ResolveSelect(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression, Params);
+            var selectSql = ResolveExpression.ResolveSelect(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression, null, Params);
 
             var fromTableSql = FormatTableName();
 
