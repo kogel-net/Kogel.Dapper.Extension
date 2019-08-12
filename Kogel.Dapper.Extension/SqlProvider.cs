@@ -8,6 +8,7 @@ using Kogel.Dapper.Extension.Extension;
 using Kogel.Dapper.Extension.Model;
 using Kogel.Dapper.Extension.Attributes;
 using Kogel.Dapper.Extension.Core.Interfaces;
+using Kogel.Dapper.Extension.Helper;
 
 namespace Kogel.Dapper.Extension
 {
@@ -67,32 +68,39 @@ namespace Kogel.Dapper.Extension
             return SqlString;
         }
 
-        protected string[] FormatInsertParamsAndValues<T>(T entity)
+        protected string[] FormatInsertParamsAndValues<T>(T t)
         {
             var paramSqlBuilder = new StringBuilder(64);
             var valueSqlBuilder = new StringBuilder(64);
 
-            var properties = EntityCache.QueryEntity(typeof(T)).Properties;
+            var entity = EntityCache.QueryEntity(typeof(T));
+            var properties = entity.Properties;
 
             var isAppend = false;
             foreach (var propertiy in properties)
             {
-                //判断不是主键
-                if (propertiy.CustomAttributes.FirstOrDefault(x => x.AttributeType.Equals(typeof(Identity))) == null)
+                //主键标识
+                var typeAttribute = entity.Type.GetCustomAttributess(true).FirstOrDefault(x => x.GetType().Equals(typeof(Identity)));
+                if (typeAttribute != null)
                 {
-                    if (isAppend)
+                    var identity = typeAttribute as Identity;
+                    //是否自增
+                    if (identity.IsIncrease)
                     {
-                        paramSqlBuilder.Append(",");
-                        valueSqlBuilder.Append(",");
+                        continue;
                     }
-                    var name = propertiy.GetColumnAttributeName();
-                    paramSqlBuilder.AppendFormat("{0}{1}{2}", ProviderOption.OpenQuote, name, ProviderOption.CloseQuote);
-                    valueSqlBuilder.Append(ProviderOption.ParameterPrefix + name);
-                    Params.Add(ProviderOption.ParameterPrefix + name, propertiy.GetValue(entity));
-                    isAppend = true;
                 }
+                if (isAppend)
+                {
+                    paramSqlBuilder.Append(",");
+                    valueSqlBuilder.Append(",");
+                }
+                var name = propertiy.GetColumnAttributeName();
+                paramSqlBuilder.AppendFormat("{0}{1}{2}", ProviderOption.OpenQuote, name, ProviderOption.CloseQuote);
+                valueSqlBuilder.Append(ProviderOption.ParameterPrefix + name);
+                Params.Add(ProviderOption.ParameterPrefix + name, propertiy.GetValue(entity));
+                isAppend = true;
             }
-
             return new[] { paramSqlBuilder.ToString(), valueSqlBuilder.ToString() };
         }
 
