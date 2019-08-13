@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using Kogel.Dapper.Extension.Exception;
 using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension.MsSql.Extension;
+using System.Text.RegularExpressions;
 
 namespace Kogel.Dapper.Extension.MsSql
 {
@@ -81,7 +82,6 @@ namespace Kogel.Dapper.Extension.MsSql
             var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref selectSql, Context.Set.SelectExpression);
 
             var whereSql = string.Empty;
-
             //表查询条件
             var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
             if (IsSelectCount)
@@ -90,7 +90,7 @@ namespace Kogel.Dapper.Extension.MsSql
                 SqlString = "";
             SqlString += $@"SELECT T.* FROM    ( 
                             SELECT ROW_NUMBER() OVER ( {orderbySql} ) AS ROWNUMBER,
-                            {(selectSql.Replace("SELECT", ""))}
+                            {(new Regex("SELECT").Replace(selectSql, "", 1))}
                             {fromTableSql} {nolockSql}{joinSql}
                             {whereSql}
                             ) T

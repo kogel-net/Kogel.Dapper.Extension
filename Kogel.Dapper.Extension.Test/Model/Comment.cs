@@ -7,7 +7,7 @@ using Kogel.Dapper.Extension.Attributes;
 
 namespace Kogel.Dapper.Extension.Test.Model
 {
-    [Display(Rename = "Comment_4")]
+    //[Display(Rename = "Comment_4")]
     public class Comment
     {
         [Identity(false)]
@@ -37,7 +37,7 @@ namespace Kogel.Dapper.Extension.Test.Model
         /// </summary>
         public long RefCommentId { get; set; }
     }
-    [Display(Rename = "Comment")]
+    [Display(Rename = "Comment_1")]
     public class Comment1 : Comment
     {
 

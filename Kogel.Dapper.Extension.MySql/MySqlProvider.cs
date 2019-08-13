@@ -2,6 +2,7 @@
 using Kogel.Dapper.Extension.MySql.Extension;
 using System;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 
 namespace Kogel.Dapper.Extension.MySql
 {
@@ -89,7 +90,7 @@ namespace Kogel.Dapper.Extension.MySql
             else
                 SqlString = "";
             SqlString += $@" SELECT 
-                           {selectSql.Replace("SELECT", "")}
+                           {(new Regex("SELECT").Replace(selectSql, "", 1))}
                             {fromTableSql} {joinSql} {whereSql} {orderbySql}
                             LIMIT {((pageIndex - 1) * pageSize)},{pageSize};";
 

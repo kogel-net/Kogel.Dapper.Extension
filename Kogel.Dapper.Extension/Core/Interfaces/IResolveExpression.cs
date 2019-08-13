@@ -86,7 +86,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
                 var columnName = a.Key.Body.GetCorrectPropertyName();
                 return $"{entity.AsName}." + providerOption.CombineFieldName(columnName) + (a.Value == EOrderBy.Asc ? " ASC " : " DESC ");
             });
-            if (!orderByList.Any())
+            if (!orderByList.Any() && (abstractSet.OrderbyBuilder == null || abstractSet.OrderbyBuilder.Length == 0))
                 return "";
 
             return $"ORDER BY {string.Join(",", orderByList)} {abstractSet.OrderbyBuilder}";

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension.Oracle.Extension;
 
@@ -88,7 +89,7 @@ namespace Kogel.Dapper.Extension.Oracle
             SqlString = $@" SELECT T2.* FROM(
                             SELECT T.*,ROWNUM ROWNUMS FROM (
                             SELECT 
-                             {selectSql.Replace("SELECT", "")}
+                            {(new Regex("SELECT").Replace(selectSql, "", 1))}
                             {fromTableSql} {joinSql} {whereSql} {orderbySql}
                             ) T 
                             )T2

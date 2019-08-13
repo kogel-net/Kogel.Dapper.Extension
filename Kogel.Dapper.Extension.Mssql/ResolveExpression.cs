@@ -12,9 +12,9 @@ using Kogel.Dapper.Extension.Model;
 
 namespace Kogel.Dapper.Extension.MsSql
 {
-    internal class ResolveExpression: IResolveExpression
+    internal class ResolveExpression : IResolveExpression
     {
-        public ResolveExpression(IProviderOption providerOption):base(providerOption)
+        public ResolveExpression(IProviderOption providerOption) : base(providerOption)
         {
 
         }
