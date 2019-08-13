@@ -28,7 +28,7 @@ namespace Kogel.Dapper.Extension.Test
                     .Where(x => x.Id.Between(80, 100)
                     && x.SubTime.AddDays(-10) < DateTime.Now && x.Id > 10)
                     .From<Comment, News>()
-                    .OrderBy<News>(x=>x.Id)
+                    .OrderBy<News>(x => x.Id)
                     .PageList(1, 1, (a, b) => new
                     {
                         test = new List<int>() { 3, 3, 1 }.FirstOrDefault(y => y == 1),

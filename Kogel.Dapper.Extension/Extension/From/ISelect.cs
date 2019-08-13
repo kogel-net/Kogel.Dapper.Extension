@@ -53,6 +53,12 @@ namespace Kogel.Dapper.Extension.Extension.From
                 querySet.OrderbyExpressionList.Add(field, EOrderBy.Asc);
             return this;
         }
+        public ISelect<T> OrderBy(string orderBy)
+        {
+            if (!string.IsNullOrEmpty(orderBy))
+                querySet.OrderbyBuilder.Append(orderBy);
+            return this;
+        }
         public ISelect<T> OrderByDescing<TProperty>(Expression<Func<TProperty, object>> field)
         {
             if (field != null)
@@ -95,6 +101,11 @@ namespace Kogel.Dapper.Extension.Extension.From
             base.OrderBy(field);
             return this;
         }
+        public new ISelectFrom<T, T1, T2> OrderBy(string orderBy)
+        {
+            base.OrderBy(orderBy);
+            return this;
+        }
         public new ISelectFrom<T, T1, T2> OrderByDescing<TProperty>(Expression<Func<TProperty, object>> field)
         {
             base.OrderByDescing(field);
@@ -127,6 +138,11 @@ namespace Kogel.Dapper.Extension.Extension.From
         public new ISelectFrom<T, T1, T2, T3> OrderBy<TProperty>(Expression<Func<TProperty, object>> field)
         {
             base.OrderBy(field);
+            return this;
+        }
+        public new ISelectFrom<T, T1, T2, T3> OrderBy(string orderBy)
+        {
+            base.OrderBy(orderBy);
             return this;
         }
         public new ISelectFrom<T, T1, T2, T3> OrderByDescing<TProperty>(Expression<Func<TProperty, object>> field)
