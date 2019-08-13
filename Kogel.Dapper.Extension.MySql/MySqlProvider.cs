@@ -132,7 +132,7 @@ namespace Kogel.Dapper.Extension.MySql
         public override SqlProvider FormatInsert<T>(T entity)
         {
             var paramsAndValuesSql = FormatInsertParamsAndValues(entity);
-            SqlString = $"INSERT INTO {FormatTableName(false)} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]})";
+            SqlString = $"INSERT INTO {FormatTableName(false, false)} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]})";
 
             //if (Context.Set.IfNotExistsExpression == null)
             //    SqlString = $"INSERT INTO {FormatTableName(false)} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]})";
@@ -164,7 +164,7 @@ namespace Kogel.Dapper.Extension.MySql
             var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
             Params.AddDynamicParams(update.Param);
 
-            SqlString = $"UPDATE {FormatTableName(false)} {update.SqlCmd} {whereSql}";
+            SqlString = $"UPDATE {FormatTableName(false, false)} {update.SqlCmd} {whereSql}";
 
             return this;
         }
@@ -179,7 +179,7 @@ namespace Kogel.Dapper.Extension.MySql
             var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
             Params.AddDynamicParams(update.Param);
 
-            SqlString = $"UPDATE {FormatTableName(false)} {update.SqlCmd} {whereSql}";
+            SqlString = $"UPDATE {FormatTableName(false, false)} {update.SqlCmd} {whereSql}";
 
             return this;
         }
@@ -215,7 +215,7 @@ namespace Kogel.Dapper.Extension.MySql
             var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
             Params.AddDynamicParams(update.Param);
 
-            SqlString = $"UPDATE {FormatTableName(false)} {update.SqlCmd} {selectSql} {whereSql}";
+            SqlString = $"UPDATE {FormatTableName(false, false)} {update.SqlCmd} {selectSql} {whereSql}";
 
             return this;
         }

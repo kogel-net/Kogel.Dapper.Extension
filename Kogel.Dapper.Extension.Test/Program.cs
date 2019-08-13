@@ -110,7 +110,7 @@ namespace Kogel.Dapper.Extension.Test
                 var commentList = conn.QuerySet<Comment>()
                     .Where(x => x.Content.Contains("t"))
                     .ToList();
-                int result = conn.CommandSet<Comment>().BatchInsert(commentList, 1000);
+                //int result = conn.CommandSet<Comment>().BatchInsert(commentList, 1000);
 
                 int result2 = conn.CommandSet<Comment>().Where(x => x.Id > 83).Delete();
             }

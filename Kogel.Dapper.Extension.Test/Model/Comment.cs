@@ -7,6 +7,7 @@ using Kogel.Dapper.Extension.Attributes;
 
 namespace Kogel.Dapper.Extension.Test.Model
 {
+    [Display(Rename = "Comment_4")]
     public class Comment
     {
         [Identity(false)]

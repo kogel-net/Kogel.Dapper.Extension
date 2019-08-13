@@ -38,6 +38,11 @@ namespace Kogel.Dapper.Extension.Model
                 {
                     this.AsName = asName;
                 }
+                else
+                {
+                    //防止rename有值，这样就不会出现bug
+                    this.AsName = this.Name;
+                }
             }
             this.Type = type;
             this.AssemblyString = type.FullName;

@@ -56,11 +56,13 @@ namespace Kogel.Dapper.Extension
 
         public abstract SqlProvider FormatUpdateSelect<T>(Expression<Func<T, T>> updator);
 
-        protected string FormatTableName(bool isNeedFrom = true)
+        protected string FormatTableName(bool isNeedFrom = true, bool isAsName = true)
         {
             var entity = EntityCache.QueryEntity(Context.Set.TableType);
             string schema = string.IsNullOrEmpty(entity.Schema) ? "" : ProviderOption.CombineFieldName(entity.Schema) + ".";
-            string fromName = entity.AsName.Equals(entity.Name) ? ProviderOption.CombineFieldName(entity.Name) : $"{ProviderOption.CombineFieldName(entity.Name)} {entity.AsName}";
+            string fromName = entity.Name;
+            if (isAsName)
+                fromName = entity.AsName.Equals(entity.Name) ? ProviderOption.CombineFieldName(entity.Name) : $"{ProviderOption.CombineFieldName(entity.Name)} {entity.AsName}";
             SqlString = $" {schema}{fromName} ";
             if (isNeedFrom)
                 SqlString = " FROM " + SqlString;
