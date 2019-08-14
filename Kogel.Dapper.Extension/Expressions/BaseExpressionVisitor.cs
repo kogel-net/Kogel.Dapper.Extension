@@ -19,7 +19,7 @@ namespace Kogel.Dapper.Extension.Expressions
         /// <summary>
         /// 字段集合
         /// </summary>
-        protected List<string> FieldList { get; set; }
+        internal List<string> FieldList { get; set; }
         protected DynamicParameters Param { get; set; }
         private IProviderOption providerOption { get; set; }
         public BaseExpressionVisitor(IProviderOption providerOption)
@@ -79,6 +79,7 @@ namespace Kogel.Dapper.Extension.Expressions
             {
                 DynamicParameters parameters = new DynamicParameters();
                 GenerateField("(" + node.MethodCallExpressionToSql(ref parameters) + ")");
+
                 Param.AddDynamicParams(parameters);
             }
             else
@@ -143,6 +144,11 @@ namespace Kogel.Dapper.Extension.Expressions
             else if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension"))
             {
                 base.VisitMethodCall(node);
+                foreach (var item in base.FieldList)
+                {
+                    SpliceField.Append(item);
+                }
+                this.Param.AddDynamicParams(base.Param);
             }
             else
             {

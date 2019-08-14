@@ -29,9 +29,6 @@ namespace Kogel.Dapper.Extension.Expressions
         public new DynamicParameters Param { get; }
         private new IProviderOption providerOption;
         #endregion
-        #region 当前解析的对象
-        private EntityObject entity { get; }
-        #endregion
         /// <summary>
         /// 解析条件对象
         /// </summary>
@@ -43,8 +40,6 @@ namespace Kogel.Dapper.Extension.Expressions
             this._sqlCmd = new StringBuilder(100);
             this.Param = new DynamicParameters();
             this.providerOption = providerOption;
-            //当前定义的查询返回对象
-            this.entity = EntityCache.QueryEntity(expression.Body.Type);
             //开始解析对象
             Visit(expression);
             //开始拼接成条件
