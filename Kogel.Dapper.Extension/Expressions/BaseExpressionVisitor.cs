@@ -35,13 +35,13 @@ namespace Kogel.Dapper.Extension.Expressions
         /// <returns></returns>
         protected override Expression VisitBinary(BinaryExpression node)
         {
-            var binary = new BinaryExpressionVisitor(node,providerOption);
+            var binary = new BinaryExpressionVisitor(node, providerOption);
             GenerateField(binary.SpliceField.ToString());
             this.Param.AddDynamicParams(binary.Param);
             return node;
         }
         /// <summary>
-        /// 成员对象
+        /// 值对象
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
@@ -51,7 +51,7 @@ namespace Kogel.Dapper.Extension.Expressions
             return node;
         }
         /// <summary>
-        /// 值对象
+        /// 成员对象
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
@@ -122,7 +122,7 @@ namespace Kogel.Dapper.Extension.Expressions
         internal StringBuilder SpliceField { get; set; }
         internal new DynamicParameters Param { get; set; }
         internal IProviderOption providerOption { get; set; }
-        public WhereExpressionVisitor(IProviderOption providerOption):base(providerOption)
+        public WhereExpressionVisitor(IProviderOption providerOption) : base(providerOption)
         {
             this.providerOption = providerOption;
             this.SpliceField = new StringBuilder();
@@ -297,9 +297,9 @@ namespace Kogel.Dapper.Extension.Expressions
     /// </summary>
     public class BinaryExpressionVisitor : WhereExpressionVisitor
     {
-        public BinaryExpressionVisitor(BinaryExpression expression, IProviderOption providerOption):base(providerOption)
+        public BinaryExpressionVisitor(BinaryExpression expression, IProviderOption providerOption) : base(providerOption)
         {
-            
+
             SpliceField = new StringBuilder();
             Param = new DynamicParameters();
             SpliceField.Append("(");

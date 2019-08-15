@@ -38,7 +38,7 @@ namespace Kogel.Dapper.Extension.Expressions
         /// <param name="expression"></param>
         /// <param name="prefix">字段前缀</param>
         /// <param name="providerOption"></param>
-        public SelectExpression(LambdaExpression expression, string prefix, IProviderOption providerOption):base(providerOption)
+        public SelectExpression(LambdaExpression expression, string prefix, IProviderOption providerOption) : base(providerOption)
         {
             this._sqlCmd = new StringBuilder(100);
             this.Param = new DynamicParameters();

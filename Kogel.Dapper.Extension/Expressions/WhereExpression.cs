@@ -44,7 +44,7 @@ namespace Kogel.Dapper.Extension.Expressions
             Visit(expression);
             //开始拼接成条件
             this._sqlCmd.Append(base.SpliceField);
-            this.SqlCmd = " AND "+this._sqlCmd.ToString();
+            this.SqlCmd = " AND " + this._sqlCmd.ToString();
             if (string.IsNullOrEmpty(prefix))
             {
                 this.Param.AddDynamicParams(base.Param);
