@@ -48,6 +48,8 @@ namespace Kogel.Dapper.Extension
 
         public abstract SqlProvider FormatInsert<T>(T entity);
 
+        public abstract SqlProvider FormatInsertIdentity<T>(T entity);
+
         public abstract SqlProvider FormatUpdate<T>(Expression<Func<T, T>> updateExpression);
 
         public abstract SqlProvider FormatUpdate<T>(T entity);
@@ -75,14 +77,14 @@ namespace Kogel.Dapper.Extension
             var paramSqlBuilder = new StringBuilder(64);
             var valueSqlBuilder = new StringBuilder(64);
 
-            var entity = EntityCache.QueryEntity(typeof(T));
+            var entity = EntityCache.QueryEntity(t.GetType());
             var properties = entity.Properties;
 
             var isAppend = false;
             foreach (var propertiy in properties)
             {
                 //主键标识
-                var typeAttribute = entity.Type.GetCustomAttributess(true).FirstOrDefault(x => x.GetType().Equals(typeof(Identity)));
+                var typeAttribute = propertiy.GetCustomAttributess(true).FirstOrDefault(x => x.GetType().Equals(typeof(Identity)));
                 if (typeAttribute != null)
                 {
                     var identity = typeAttribute as Identity;
@@ -98,9 +100,9 @@ namespace Kogel.Dapper.Extension
                     valueSqlBuilder.Append(",");
                 }
                 var name = propertiy.GetColumnAttributeName();
-                paramSqlBuilder.AppendFormat("{0}{1}{2}", ProviderOption.OpenQuote, name, ProviderOption.CloseQuote);
+                paramSqlBuilder.AppendFormat("{0}{1}{2}", ProviderOption.OpenQuote, entity.FieldPairs[name], ProviderOption.CloseQuote);
                 valueSqlBuilder.Append(ProviderOption.ParameterPrefix + name);
-                Params.Add(ProviderOption.ParameterPrefix + name, propertiy.GetValue(entity));
+                Params.Add(ProviderOption.ParameterPrefix + name, propertiy.GetValue(t));
                 isAppend = true;
             }
             return new[] { paramSqlBuilder.ToString(), valueSqlBuilder.ToString() };

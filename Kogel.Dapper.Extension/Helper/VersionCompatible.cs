@@ -79,12 +79,29 @@ namespace Kogel.Dapper.Extension.Helper
             return PropertyType.GetCustomAttributes(inherit);
 #endif
         }
+        public static object [] GetCustomAttributess(this PropertyInfo PropertyInfo,bool inherit)
+        {
+#if NETSTANDARD1_3
+           return PropertyInfo.GetType().GetTypeInfo().GetCustomAttributes().ToArray<object>();
+#else
+            return PropertyInfo.GetCustomAttributes(inherit);
+#endif
+        }
         public static Type ReflectedTypes(this MethodInfo method)
         {
 #if NETSTANDARD1_3
            return method.ReturnType;
 #else
             return method.ReflectedType;
+#endif
+        }
+
+        public static PropertyInfo[] GetPropertiess(this Type PropertyType)
+        {
+#if NETSTANDARD1_3
+           return PropertyType.GetProperties();
+#else
+            return PropertyType.GetProperties();
 #endif
         }
     }

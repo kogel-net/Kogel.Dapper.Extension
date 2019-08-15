@@ -71,12 +71,5 @@ namespace Kogel.Dapper.Extension.Core.SetC
             WhereExpressionList.Add(predicate);
             return this;
         }
-
-        public IInsert<T> IfNotExists(Expression<Func<T, bool>> predicate)
-        {
-            //IfNotExistsExpression = IfNotExistsExpression == null ? predicate : ((Expression<Func<T, bool>>)IfNotExistsExpression).And(predicate);
-            WhereExpressionList.Add(predicate);
-            return this;
-        }
     }
 }

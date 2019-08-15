@@ -1,6 +1,8 @@
 ﻿using Dapper;
+using Kogel.Dapper.Extension.Attributes;
 using Kogel.Dapper.Extension.Expressions;
 using Kogel.Dapper.Extension.Extension;
+using Kogel.Dapper.Extension.Helper;
 using Kogel.Dapper.Extension.Model;
 using System;
 using System.Collections.Generic;
@@ -142,6 +144,43 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         public virtual UpdateExpression ResolveUpdate<T>(Expression<Func<T, T>> updateExpression)
         {
             return new UpdateExpression(updateExpression, providerOption);
+        }
+        /// <summary>
+        /// 解析更新
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <param name="Param"></param>
+        /// <returns></returns>
+        public virtual string ResolveUpdates<T>(T t, DynamicParameters Param)
+        {
+            var entity = EntityCache.QueryEntity(t.GetType());
+            var properties = entity.Properties;
+            StringBuilder builder = new StringBuilder();
+            foreach (var propertiy in properties)
+            {
+                //主键标识
+                var typeAttribute = propertiy.GetCustomAttributess(true).FirstOrDefault(x => x.GetType().Equals(typeof(Identity)));
+                if (typeAttribute != null)
+                {
+                    var identity = typeAttribute as Identity;
+                    //是否自增
+                    if (identity.IsIncrease)
+                    {
+                        continue;
+                    }
+                }
+                object value = propertiy.GetValue(t);
+                string name = entity.FieldPairs[propertiy.Name];
+                if (builder.Length != 0)
+                {
+                    builder.Append(",");
+                }
+                builder.Append($"{name}={providerOption.ParameterPrefix}Update_{name}");
+                Param.Add($"{providerOption.ParameterPrefix}Update_{name}", value);
+            }
+            builder.Insert(0, " SET ");
+            return builder.ToString();
         }
         public virtual string ResolveWithNoLock(bool nolock)
         {

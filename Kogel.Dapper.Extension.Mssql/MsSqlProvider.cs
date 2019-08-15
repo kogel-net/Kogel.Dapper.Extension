@@ -4,6 +4,7 @@ using Kogel.Dapper.Extension.Exception;
 using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension.MsSql.Extension;
 using System.Text.RegularExpressions;
+using Kogel.Dapper.Extension.Extension;
 
 namespace Kogel.Dapper.Extension.MsSql
 {
@@ -138,24 +139,12 @@ namespace Kogel.Dapper.Extension.MsSql
         {
             var paramsAndValuesSql = FormatInsertParamsAndValues(entity);
             SqlString = $"INSERT INTO {FormatTableName(false, false)} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]})";
-
-            //if (Context.Set.IfNotExistsExpression == null)
-            //    SqlString = $"INSERT INTO {FormatTableName(false)} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]})";
-            //else
-            //{
-            //    var ifnotexistsWhere = ResolveExpression.ResolveWhere(Context.Set.IfNotExistsExpression, "INT_");
-
-            //    SqlString = string.Format(@"INSERT INTO {0}({1})  
-            //    SELECT {2}
-            //    WHERE NOT EXISTS(
-            //        SELECT 1
-            //        FROM {0}  
-            //    {3}
-            //        ); ", FormatTableName(false), paramsAndValuesSql[0], paramsAndValuesSql[1], ifnotexistsWhere.SqlCmd);
-
-            //    Params.AddDynamicParams(ifnotexistsWhere.Param);
-            //}
-
+            return this;
+        }
+        public override SqlProvider FormatInsertIdentity<T>(T entity)
+        {
+            var paramsAndValuesSql = FormatInsertParamsAndValues(entity);
+            SqlString = $"INSERT INTO {FormatTableName(false, false)} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]}) SELECT @@IDENTITY";
             return this;
         }
 
@@ -176,16 +165,12 @@ namespace Kogel.Dapper.Extension.MsSql
 
         public override SqlProvider FormatUpdate<T>(T entity)
         {
-            var update = ResolveExpression.ResolveUpdate<T>(a => entity);
-
+            var update = ResolveExpression.ResolveUpdates<T>(entity, Params);
             var whereSql = string.Empty;
-
             //表查询条件
             var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
-            Params.AddDynamicParams(update.Param);
 
-            SqlString = $"UPDATE {FormatTableName(false, false)} {update.SqlCmd} {whereSql}";
-
+            SqlString = $"UPDATE {FormatTableName(false, false)} {update} {whereSql}";
             return this;
         }
 

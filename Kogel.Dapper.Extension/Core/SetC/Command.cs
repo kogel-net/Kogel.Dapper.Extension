@@ -83,6 +83,13 @@ namespace Kogel.Dapper.Extension.Core.SetC
             return await DbCon.ExecuteAsync(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
         }
 
+        public int InsertIdentity(T entity)
+        {
+            SqlProvider.FormatInsertIdentity(entity);
+            object result= DbCon.ExecuteScalar(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
+            return result != null ? Convert.ToInt32(result) : 0;
+        }
+
         public int BatchInsert(IEnumerable<T> entities, int timeout = 120)
         {
             SqlProvider.FormatInsert(entities.FirstOrDefault());

@@ -22,6 +22,27 @@ namespace Kogel.Dapper.Extension.Test
 
             using (var conn = new SqlConnection(mssqlConnection))
             {
+                var edit = conn.CommandSet<Comment>()
+                         .Where(x => x.Id.In(new int[] { 1, 2, 3 }))
+                         .Update(x => new Comment
+                         {
+                             StarCount = x.StarCount + 1
+                         });
+
+                Comment comment = new Comment();
+                //初始化
+                comment.Init(conn, new MsSqlProvider());
+
+                comment.Content = "Test";
+                comment.SubTime = DateTime.Now;
+                comment.Insert();
+
+                comment.Content = "牛皮";
+                comment.Update();
+
+                comment.Delete();
+
+
                 var comment11 = conn.QuerySet<Comment>()
                     .Where(x => x.Id > new QuerySet<News>(conn, new MsSqlProvider()).Where(y => y.Id < 3).Sum<News>(y => y.Id))
                     .ToList();
@@ -42,16 +63,9 @@ namespace Kogel.Dapper.Extension.Test
                         bbb = new QuerySet<Comment>(conn, new MsSqlProvider())
                                 .Where(y => y.ArticleId == b.Id && y.Content.Contains("test")).Sum<Comment>(x => x.Id),
                         ccc = a.IdentityId,
-                        ddd = Convert.ToInt32("(select count(1) from Comment)")
+                        ddd = Convert.ToInt32("(select count(1) from Comment)"),
+                        a.Id
                     });
-
-
-                var edit = conn.CommandSet<Comment>()
-                           .Where(x => x.Id.In(new int[] { 1, 2, 3 }))
-                           .Update(x => new Comment
-                           {
-                               StarCount = x.StarCount + 1
-                           });
 
 
                 var comment2 = conn.QuerySet<Comment>()

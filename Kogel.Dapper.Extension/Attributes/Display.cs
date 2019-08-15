@@ -23,6 +23,10 @@ namespace Kogel.Dapper.Extension.Attributes
         /// </summary>
         public string AsName { get; set; }
         /// <summary>
+        /// 默认值
+        /// </summary>
+        public object DefaultValue { get; set; }
+        /// <summary>
         /// 描述字段特性
         /// </summary>
         /// <param name="Name">名称</param>

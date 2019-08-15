@@ -136,24 +136,13 @@ namespace Kogel.Dapper.Extension.Oracle
         {
             var paramsAndValuesSql = FormatInsertParamsAndValues(entity);
             SqlString = $"INSERT INTO {FormatTableName(false, false)} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]})";
+            return this;
+        }
 
-            //if (Context.Set.IfNotExistsExpression == null)
-            //    SqlString = $"INSERT INTO {FormatTableName(false)} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]})";
-            //else
-            //{
-            //    var ifnotexistsWhere = ResolveExpression.ResolveWhere(Context.Set.IfNotExistsExpression, "INT_");
-
-            //    SqlString = string.Format(@"INSERT INTO {0}({1})  
-            //    SELECT {2}
-            //    WHERE NOT EXISTS(
-            //        SELECT 1
-            //        FROM {0}  
-            //    {3}
-            //        ); ", FormatTableName(false), paramsAndValuesSql[0], paramsAndValuesSql[1], ifnotexistsWhere.SqlCmd);
-
-            //    Params.AddDynamicParams(ifnotexistsWhere.Param);
-            //}
-
+        public override SqlProvider FormatInsertIdentity<T>(T entity)
+        {
+            var paramsAndValuesSql = FormatInsertParamsAndValues(entity);
+            SqlString = $"INSERT INTO {FormatTableName(false, false)} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]}) SELECT @@IDENTITY";
             return this;
         }
 

@@ -8,9 +8,9 @@ using Kogel.Dapper.Extension.Attributes;
 namespace Kogel.Dapper.Extension.Test.Model
 {
     //[Display(Rename = "Comment_4")]
-    public class Comment
+    public class Comment:IBaseEntity<Comment>
     {
-        [Identity(false)]
+        [Identity]
         public int Id { get; set; }
         /// <summary>
         /// 评论父级id，不为0则是回复评论

@@ -33,7 +33,7 @@ namespace Kogel.Dapper.Extension.Expressions
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateExpression(LambdaExpression expression, IProviderOption providerOption):base(providerOption)
+        public UpdateExpression(LambdaExpression expression, IProviderOption providerOption) : base(providerOption)
         {
             this._sqlCmd = new StringBuilder(100);
             this.Param = new DynamicParameters();
@@ -42,6 +42,7 @@ namespace Kogel.Dapper.Extension.Expressions
             this.entity = EntityCache.QueryEntity(expression.Body.Type);
             //字段数组
             string[] fieldArr = ((MemberInitExpression)expression.Body).Bindings.AsList().Select(x => entity.FieldPairs[x.Member.Name]).ToArray();
+
             //开始解析对象
             Visit(expression);
             //开始拼接成查询字段
