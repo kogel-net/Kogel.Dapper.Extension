@@ -16,8 +16,18 @@ namespace Kogel.Dapper.Extension.Test
     {
         static void Main(string[] args)
         {
+
+
             var mssqlConnection = "Data Source=42.157.195.21,4344;Initial Catalog=Qx_Sport_Common;User ID=qxdev;Password=qxdev123456;";
             var mysqlConnection = "Server=localhost;Database=Qx_Sport_Common;Uid=root;Pwd=A5101264a;";
+
+            ConnectionCache.Register(new ConnectionObject()
+            {
+                connectionString = mssqlConnection,
+                provider = new MsSqlProvider()
+            });
+
+
             Stopwatch stopwatch = new Stopwatch();
 
             using (var conn = new SqlConnection(mssqlConnection))
@@ -42,6 +52,9 @@ namespace Kogel.Dapper.Extension.Test
 
                 comment.Delete();
 
+                Comment newComment = comment.Where(x => x.Id > 1).Get();
+                newComment.Content = "test2";
+                newComment.Update();
 
                 var comment11 = conn.QuerySet<Comment>()
                     .Where(x => x.Id > new QuerySet<News>(conn, new MsSqlProvider()).Where(y => y.Id < 3).Sum<News>(y => y.Id))

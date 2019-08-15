@@ -82,12 +82,12 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// <returns></returns>
         public virtual string ResolveOrderBy(AbstractSet abstractSet)
         {
-            var orderByList = abstractSet.OrderbyExpressionList.Select(a =>
+            var orderByList = abstractSet?.OrderbyExpressionList.Select(a =>
             {
                 var entity = EntityCache.QueryEntity(a.Key.Type.GenericTypeArguments[0]);
                 var columnName = a.Key.Body.GetCorrectPropertyName();
                 return $"{entity.AsName}." + providerOption.CombineFieldName(columnName) + (a.Value == EOrderBy.Asc ? " ASC " : " DESC ");
-            });
+            }) ?? new List<string>();
             if (!orderByList.Any() && (abstractSet.OrderbyBuilder == null || abstractSet.OrderbyBuilder.Length == 0))
                 return "";
 

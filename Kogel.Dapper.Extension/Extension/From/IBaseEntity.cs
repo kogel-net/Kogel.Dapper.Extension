@@ -9,6 +9,8 @@ using Kogel.Dapper.Extension.Model;
 using System.Reflection;
 using Dapper;
 using Kogel.Dapper.Extension.Exception;
+using System.Linq.Expressions;
+using System;
 
 namespace Kogel.Dapper.Extension
 {
@@ -24,7 +26,7 @@ namespace Kogel.Dapper.Extension
         /// <param name="connection"></param>
         /// <param name="sqlProvider"></param>
         /// <param name="dbTransaction"></param>
-        public void Init(IDbConnection connection, SqlProvider sqlProvider, IDbTransaction dbTransaction = null)
+        public virtual void Init(IDbConnection connection, SqlProvider sqlProvider, IDbTransaction dbTransaction = null)
         {
             //创建查询和执行对象的实例
             querySet = new QuerySet<T>(connection, sqlProvider, dbTransaction);
@@ -49,7 +51,7 @@ namespace Kogel.Dapper.Extension
         /// 新增
         /// </summary>
         /// <returns></returns>
-        public void Insert()
+        public virtual void Insert()
         {
             int identityValue = commandSet.InsertIdentity(this as T);
             identityProperty.SetValue(this, identityValue);
@@ -58,7 +60,7 @@ namespace Kogel.Dapper.Extension
         /// <summary>
         /// 修改
         /// </summary>
-        public void Update()
+        public virtual void Update()
         {
             //主键名称
             var identityName = entityObject.FieldPairs[identityProperty.Name];
@@ -78,7 +80,7 @@ namespace Kogel.Dapper.Extension
         /// <summary>
         /// 删除
         /// </summary>
-        public void Delete()
+        public virtual void Delete()
         {
             //主键名称
             var identityName = entityObject.FieldPairs[identityProperty.Name];
@@ -96,13 +98,24 @@ namespace Kogel.Dapper.Extension
             this.Clear();
         }
         /// <summary>
+        /// 条件
+        /// </summary>
+        /// <param name="predicate">表达式</param>
+        /// <returns></returns>
+        public virtual QuerySet<T> Where(Expression<Func<T, bool>> predicate)
+        {
+            var newQuerySet = new QuerySet<T>(querySet.DbCon, querySet.SqlProvider, querySet.DbTransaction);
+            newQuerySet.WhereExpressionList.Add(predicate);
+            return newQuerySet;
+        }
+        /// <summary>
         /// 执行完成一个操作后清除条件
         /// </summary>
         private void Clear()
         {
+            commandSet.WhereBuilder.Clear();
             commandSet.WhereExpressionList.Clear();
             commandSet.Params = new DynamicParameters();
-            commandSet.WhereBuilder.Clear();
             commandSet.SqlProvider.SqlString = string.Empty;
             commandSet.SqlProvider.Params = new DynamicParameters();
         }

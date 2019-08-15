@@ -7,6 +7,9 @@ using System.Text;
 
 namespace Kogel.Dapper.Extension
 {
+    /// <summary>
+    /// 实体类缓存帮助类
+    /// </summary>
     public class EntityCache
     {
         internal static List<EntityObject> EntitieList = new List<EntityObject>();
