@@ -1,6 +1,6 @@
 ﻿using Kogel.Dapper.Extension.Core.SetQ;
 using Kogel.Dapper.Extension.Extension.From;
-using Kogel.Dapper.Extension.MsSql;
+using Kogel.Dapper.Extension.MySql;
 using Kogel.Dapper.Extension.Test.Model;
 using System;
 using System.Collections.Generic;
@@ -9,6 +9,7 @@ using System.Linq.Expressions;
 using MySql.Data.MySqlClient;
 using System.Linq;
 using System.Data.SqlClient;
+using Kogel.Dapper.Extension.MySql;
 
 namespace Kogel.Dapper.Extension.Test
 {
@@ -21,16 +22,16 @@ namespace Kogel.Dapper.Extension.Test
             var mssqlConnection = "Data Source=42.157.195.21,4344;Initial Catalog=Qx_Sport_Common;User ID=qxdev;Password=qxdev123456;";
             var mysqlConnection = "Server=localhost;Database=Qx_Sport_Common;Uid=root;Pwd=A5101264a;";
 
-            ConnectionCache.Register(new ConnectionObject()
-            {
-                connectionString = mssqlConnection,
-                provider = new MsSqlProvider()
-            });
+            //ConnectionCache.Register(new ConnectionObject()
+            //{
+            //    connectionString = mssqlConnection,
+            //    provider = new MsSqlProvider()
+            //});
 
 
             Stopwatch stopwatch = new Stopwatch();
 
-            using (var conn = new SqlConnection(mssqlConnection))
+            using (var conn = new MySqlConnection(mysqlConnection))
             {
                 var edit = conn.CommandSet<Comment>()
                          .Where(x => x.Id.In(new int[] { 1, 2, 3 }))
@@ -39,32 +40,32 @@ namespace Kogel.Dapper.Extension.Test
                              StarCount = x.StarCount + 1
                          });
 
-                Comment comment = new Comment();
-                //初始化
-                comment.Init(conn, new MsSqlProvider());
+                //Comment comment = new Comment();
+                ////初始化
+                //comment.Init(conn, new MySqlProvider());
 
-                comment.Content = "Test";
-                comment.SubTime = DateTime.Now;
-                comment.Insert();
+                //comment.Content = "Test";
+                //comment.SubTime = DateTime.Now;
+                //comment.Insert();
 
-                comment.Content = "牛皮";
-                comment.Update();
+                //comment.Content = "牛皮";
+                //comment.Update();
 
-                comment.Delete();
+                //comment.Delete();
 
-                Comment newComment = comment.Where(x => x.Id > 1).Get();
-                newComment.Content = "test2";
-                newComment.Update();
+                //Comment newComment = comment.Where(x => x.Id > 1).Get();
+                //newComment.Content = "test2";
+                //newComment.Update();
 
                 var comment11 = conn.QuerySet<Comment>()
-                    .Where(x => x.Id > new QuerySet<News>(conn, new MsSqlProvider()).Where(y => y.Id < 3).Sum<News>(y => y.Id))
+                    .Where(x => x.Id > new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id < 3).Sum<News>(y => y.Id))
                     .ToList();
 
                 var comment1 = conn.QuerySet<Comment>()
                     .Join<Comment, News>((a, b) => a.ArticleId == b.Id)
                     .Where(x => x.Id.Between(80, 100)
                     && x.SubTime.AddDays(-10) < DateTime.Now && x.Id > 10
-                    && x.Id > new QuerySet<News>(conn, new MsSqlProvider()).Where(y => y.Id < 3).Sum<News>(y => y.Id)
+                    && x.Id > new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id < 3).Sum<News>(y => y.Id)
                     )
                     .From<Comment, News>()
                     .OrderBy<News>(x => x.Id)
@@ -73,7 +74,7 @@ namespace Kogel.Dapper.Extension.Test
                         test = new List<int>() { 3, 3, 1 }.FirstOrDefault(y => y == 1),
                         aaa = "6666" + "777",
                         Content = a.Content + "'test'" + b.Headlines + a.IdentityId,
-                        bbb = new QuerySet<Comment>(conn, new MsSqlProvider())
+                        bbb = new QuerySet<Comment>(conn, new MySqlProvider())
                                 .Where(y => y.ArticleId == b.Id && y.Content.Contains("test")).Sum<Comment>(x => x.Id),
                         ccc = a.IdentityId,
                         ddd = Convert.ToInt32("(select count(1) from Comment)"),
