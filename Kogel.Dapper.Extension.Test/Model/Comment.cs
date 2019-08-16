@@ -16,7 +16,7 @@ namespace Kogel.Dapper.Extension.Test.Model
         /// 评论父级id，不为0则是回复评论
         /// </summary>
         public int PId { get; set; }
-        public long UserId { get; set; }
+        public int UserId { get; set; }
         public string Content { get; set; }
         public DateTime SubTime { get; set; } = DateTime.Now;
         public int Type { get; set; }

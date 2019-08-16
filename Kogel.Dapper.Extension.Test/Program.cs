@@ -18,6 +18,8 @@ namespace Kogel.Dapper.Extension.Test
         static void Main(string[] args)
         {
 
+            test test = new test();
+            test.send();
 
             var mssqlConnection = "Data Source=42.157.195.21,4344;Initial Catalog=Qx_Sport_Common;User ID=qxdev;Password=qxdev123456;";
             var mysqlConnection = "Server=localhost;Database=Qx_Sport_Common;Uid=root;Pwd=A5101264a;";

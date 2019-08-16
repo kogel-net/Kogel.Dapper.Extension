@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kogel.Dapper.Extension.Orac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kogel.Dapper.Extension.Test", "Kogel.Dapper.Extension.Test\Kogel.Dapper.Extension.Test.csproj", "{5E18BE03-03CE-4732-AA33-7978859BCFEB}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kogel.Dapper.Extension.DbContext", "Kogel.Dapper.Extension.DbContext\Kogel.Dapper.Extension.DbContext.csproj", "{9D30DE9E-D76C-4C22-8F6A-B5C5E7BC7431}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{5E18BE03-03CE-4732-AA33-7978859BCFEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E18BE03-03CE-4732-AA33-7978859BCFEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E18BE03-03CE-4732-AA33-7978859BCFEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D30DE9E-D76C-4C22-8F6A-B5C5E7BC7431}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D30DE9E-D76C-4C22-8F6A-B5C5E7BC7431}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D30DE9E-D76C-4C22-8F6A-B5C5E7BC7431}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D30DE9E-D76C-4C22-8F6A-B5C5E7BC7431}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
