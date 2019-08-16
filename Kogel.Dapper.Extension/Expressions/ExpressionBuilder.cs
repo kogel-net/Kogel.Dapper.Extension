@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace Kogel.Dapper.Extension.Helper
+namespace Kogel.Dapper.Extension.Expressions
 {
     public static class ExpressionBuilder
     {

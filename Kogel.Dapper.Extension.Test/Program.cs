@@ -33,12 +33,13 @@ namespace Kogel.Dapper.Extension.Test
 
             using (var conn = new MySqlConnection(mysqlConnection))
             {
-                var edit = conn.CommandSet<Comment>()
-                         .Where(x => x.Id.In(new int[] { 1, 2, 3 }))
-                         .Update(x => new Comment
-                         {
-                             StarCount = x.StarCount + 1
-                         });
+                //var edit = conn.CommandSet<Comment>()
+                //         .Where(x => x.Id.In(new int[] { 1, 2, 3 }))
+                //         .Update(x => new Comment
+                //         {
+                //             StarCount = x.StarCount + 1
+                //         });
+
 
                 //Comment comment = new Comment();
                 ////初始化
@@ -57,20 +58,22 @@ namespace Kogel.Dapper.Extension.Test
                 //newComment.Content = "test2";
                 //newComment.Update();
 
-                var comment11 = conn.QuerySet<Comment>()
-                    .Where(x => x.Id > new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id < 3).Sum<News>(y => y.Id))
-                    .ToList();
+                //var comment11 = conn.QuerySet<Comment>()
+                //    .Where(x => x.Id > new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id < 3).Sum<News>(y => y.Id))
+                //    .ToList();
 
                 var comment1 = conn.QuerySet<Comment>()
                     .Join<Comment, News>((a, b) => a.ArticleId == b.Id)
-                    .Where(x => x.Id.Between(80, 100)
-                    && x.SubTime.AddDays(-10) < DateTime.Now && x.Id > 10
-                    && x.Id > new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id < 3 && x.Id<y.Id).Sum<News>(y => y.Id)
-                    )
+                    //.Where(x => x.Id.Between(80, 100)
+                    //&& x.SubTime.AddDays(-10) < DateTime.Now && x.Id > 10
+                    //&& x.Id > new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id < 3 && x.Id < y.Id).Sum<News>(y => y.Id)
+                    //)
                     .From<Comment, News>()
                     .OrderBy<News>(x => x.Id)
                     .PageList(1, 1, (a, b) => new
                     {
+                        ids = Guid.NewGuid().ToString(),
+                        isxxx = true,
                         test = new List<int>() { 3, 3, 1 }.FirstOrDefault(y => y == 1),
                         aaa = "6666" + "777",
                         Content = a.Content + "'test'" + b.Headlines + a.IdentityId,
@@ -78,7 +81,7 @@ namespace Kogel.Dapper.Extension.Test
                                 .Where(y => y.ArticleId == b.Id && y.Content.Contains("test")).Sum<Comment>(x => x.Id),
                         ccc = a.IdentityId,
                         ddd = Convert.ToInt32("(select count(1) from Comment)"),
-                        a.Id
+                        a.Id,
                     });
 
 

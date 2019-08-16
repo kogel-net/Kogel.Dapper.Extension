@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Kogel.Dapper.Extension.Helper
+namespace Kogel.Dapper.Extension.Expressions
 {
     internal class ExpressionModifier : ExpressionVisitor
     {

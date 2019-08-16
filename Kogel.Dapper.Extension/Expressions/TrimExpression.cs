@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq.Expressions;
 using Kogel.Dapper.Extension.Extension;
+using Kogel.Dapper.Extension.Helper;
 
-namespace Kogel.Dapper.Extension.Helper
+namespace Kogel.Dapper.Extension.Expressions
 {
     /// <inheritdoc />
     /// <summary>
