@@ -10,6 +10,7 @@ using MySql.Data.MySqlClient;
 using System.Linq;
 using System.Data.SqlClient;
 using Kogel.Dapper.Extension.MySql;
+using Kogel.Dapper.Extension.Model;
 
 namespace Kogel.Dapper.Extension.Test
 {
@@ -79,7 +80,8 @@ namespace Kogel.Dapper.Extension.Test
                         aaa = "6666" + "777",
                         Content = a.Content + "'test'" + b.Headlines + a.IdentityId,
                         bbb = new QuerySet<Comment>(conn, new MySqlProvider())
-                                .Where(y => y.ArticleId == b.Id && y.Content.Contains("test")).Sum<Comment>(x => x.Id),
+                                .Where(y => y.ArticleId == b.Id && y.Content.Contains("test"))
+                                .Sum<Comment>(x => x.Id),
                         ccc = a.IdentityId,
                         ddd = Convert.ToInt32("(select count(1) from Comment)"),
                         a.Id,

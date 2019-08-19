@@ -4,7 +4,7 @@
     <PackageTags>orm;sql;micro-orm</PackageTags>
     <Title>Dapper</Title>
     <Description>Kogel.Dapper.Extension.Oracle</Description>
-    <Authors>Kogel.Dapper.Extension</Authors>
+    <Authors>Kogel</Authors>
     <TargetFrameworks>net451;netstandard1.3;netstandard2.0;netcoreapp2.1</TargetFrameworks>
     <Company>Kogel.Dapper.Extension.Oracle</Company>
     <Product>Kogel.Dapper.Extension.Oracle</Product>
