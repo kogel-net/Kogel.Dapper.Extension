@@ -49,7 +49,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DbContextTest.cs" />
     <Compile Include="Model\Comment.cs" />
     <Compile Include="Model\News.cs" />
     <Compile Include="Model\ResourceMapping.cs" />
@@ -61,16 +60,12 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Kogel.Dapper.Extension.DbContext\Kogel.Dapper.Extension.DbContext.csproj">
-      <Project>{9d30de9e-d76c-4c22-8f6a-b5c5e7bc7431}</Project>
-      <Name>Kogel.Dapper.Extension.DbContext</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Kogel.Dapper.Extension.Mssql\Kogel.Dapper.Extension.MsSql.csproj">
       <Project>{4febb10f-c126-4c82-af5a-ee5361fee46c}</Project>
       <Name>Kogel.Dapper.Extension.MsSql</Name>
     </ProjectReference>
     <ProjectReference Include="..\Kogel.Dapper.Extension.MySql\Kogel.Dapper.Extension.MySql.csproj">
-      <Project>{66f1bbcd-ec0d-46e4-a29b-3777cf923248}</Project>
+      <Project>{1e431ff9-d7f5-4a31-8a1d-cd30ad7ebe6a}</Project>
       <Name>Kogel.Dapper.Extension.MySql</Name>
     </ProjectReference>
     <ProjectReference Include="..\Kogel.Dapper.Extension\Kogel.Dapper.Extension.csproj">

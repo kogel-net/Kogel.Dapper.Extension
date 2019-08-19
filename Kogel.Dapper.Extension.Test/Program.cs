@@ -18,8 +18,8 @@ namespace Kogel.Dapper.Extension.Test
         static void Main(string[] args)
         {
 
-            test test = new test();
-            test.send();
+            //test test = new test();
+            //test.send();
 
             var mssqlConnection = "Data Source=42.157.195.21,4344;Initial Catalog=Qx_Sport_Common;User ID=qxdev;Password=qxdev123456;";
             var mysqlConnection = "Server=localhost;Database=Qx_Sport_Common;Uid=root;Pwd=A5101264a;";
@@ -74,7 +74,6 @@ namespace Kogel.Dapper.Extension.Test
                     .OrderBy<News>(x => x.Id)
                     .PageList(1, 1, (a, b) => new
                     {
-                        ids = Guid.NewGuid().ToString(),
                         isxxx = true,
                         test = new List<int>() { 3, 3, 1 }.FirstOrDefault(y => y == 1),
                         aaa = "6666" + "777",
