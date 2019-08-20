@@ -7,7 +7,7 @@ using Kogel.Dapper.Extension.Attributes;
 
 namespace Kogel.Dapper.Extension.Test.Model
 {
-    [Display(AsName ="commm4")]
+    //[Display(Rename = "Comment_4")]
     public class Comment:IBaseEntity<Comment>
     {
         [Identity]
