@@ -43,6 +43,9 @@ namespace Kogel.Dapper.Extension.Test
                 //             StarCount = x.StarCount + 1
                 //         });
 
+                //单个属性返回
+                var ContentList = conn.QuerySet<Comment>().Where(x => x.Id > 0)
+                     .ToList(x => x.Content);
 
                 //Comment comment = new Comment();
                 ////初始化
@@ -67,10 +70,10 @@ namespace Kogel.Dapper.Extension.Test
 
                 var comment1 = conn.QuerySet<Comment>()
                     .Join<Comment, News>((a, b) => a.ArticleId == b.Id)
-                    //.Where(x => x.Id.Between(80, 100)
-                    //&& x.SubTime.AddDays(-10) < DateTime.Now && x.Id > 10
-                    //&& x.Id > new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id < 3 && x.Id < y.Id).Sum<News>(y => y.Id)
-                    //)
+                    .Where(x => x.Id.Between(80, 100)
+                    && x.SubTime.AddDays(-10) < DateTime.Now && x.Id > 10
+                    && x.Id > new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id < 3 && x.Id < y.Id).Sum<News>(y => y.Id)
+                    )
                     .From<Comment, News>()
                     .OrderBy<News>(x => x.Id)
                     .PageList(1, 1, (a, b) => new

@@ -58,12 +58,20 @@ namespace Kogel.Dapper.Extension.Expressions
             }
             //开始解析对象
             Visit(expression);
-            //开始拼接成查询字段
-            for (var i = 0; i < fieldArr.Length; i++)
+            if (!expression.Body.NodeType.Equals(ExpressionType.MemberAccess))
             {
-                if (_sqlCmd.Length != 0)
-                    _sqlCmd.Append(",");
-                _sqlCmd.Append(base.FieldList[i] + " as " + fieldArr[i]);
+                //开始拼接成查询字段
+                for (var i = 0; i < fieldArr.Length; i++)
+                {
+                    if (_sqlCmd.Length != 0)
+                        _sqlCmd.Append(",");
+                    _sqlCmd.Append(base.FieldList[i] + " as " + fieldArr[i]);
+                }
+            }
+            else
+            {
+                //单个字段返回
+                _sqlCmd.Append(base.FieldList[0]);
             }
             this.Param.AddDynamicParams(base.Param);
         }

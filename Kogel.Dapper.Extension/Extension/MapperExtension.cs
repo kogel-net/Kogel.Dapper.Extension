@@ -44,7 +44,7 @@ namespace Kogel.Dapper.Extension.Extension
             | BindingFlags.NonPublic
             | BindingFlags.Public);
             ConstructorInfo noParameterConstructorInfo = constructorInfoArray.FirstOrDefault(x => x.GetParameters().Length == 0);
-            if (null == noParameterConstructorInfo)//匿名类型
+            if (null == noParameterConstructorInfo && type.FullName.Contains("AnonymousType"))//匿名类型
             {
                 noParameterConstructorInfo = constructorInfoArray.FirstOrDefault();
                 using (var reader = conn.ExecuteReader(sql, param, transaction))
@@ -63,13 +63,12 @@ namespace Kogel.Dapper.Extension.Extension
                     }
                 }
             }
-            else//实体类
+            else
             {
                 data = conn.Query<T>(sql, param, transaction).ToList();
             }
             return data;
         }
-
         #endregion
     }
 }
