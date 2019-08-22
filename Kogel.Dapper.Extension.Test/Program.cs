@@ -1,6 +1,6 @@
 ﻿using Kogel.Dapper.Extension.Core.SetQ;
 using Kogel.Dapper.Extension.Extension.From;
-using Kogel.Dapper.Extension.MySql;
+//using Kogel.Dapper.Extension.MySql;
 using Kogel.Dapper.Extension.Test.Model;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Linq.Expressions;
 using MySql.Data.MySqlClient;
 using System.Linq;
 using System.Data.SqlClient;
-using Kogel.Dapper.Extension.MySql;
+using Kogel.Dapper.Extension.MsSql;
 using Kogel.Dapper.Extension.Model;
 
 namespace Kogel.Dapper.Extension.Test
@@ -34,7 +34,7 @@ namespace Kogel.Dapper.Extension.Test
 
             Stopwatch stopwatch = new Stopwatch();
 
-            using (var conn = new MySqlConnection(mysqlConnection))
+            using (var conn = new SqlConnection(mssqlConnection))
             {
                 //var edit = conn.CommandSet<Comment>()
                 //         .Where(x => x.Id.In(new int[] { 1, 2, 3 }))
@@ -44,8 +44,19 @@ namespace Kogel.Dapper.Extension.Test
                 //         });
 
                 //单个属性返回
-                var ContentList = conn.QuerySet<Comment>().Where(x => x.Id > 0)
+                var ContentList = conn.QuerySet<Comment>()
+                     .AsTableName(typeof(Comment), "Comment_4")
+                     .Where(x => x.Id > 0)
                      .ToList(x => x.Content);
+
+                var commne = conn.QuerySet<Comment>()
+                    .AsTableName(typeof(Comment), "Comment_4")
+                    .Where(x => x.Id > 0)
+                    .Get();
+
+               var identity = conn.CommandSet<Comment>()
+                    .AsTableName(typeof(Comment), "Comment_1")
+                    .InsertIdentity(commne);
 
                 //Comment comment = new Comment();
                 ////初始化
@@ -72,7 +83,7 @@ namespace Kogel.Dapper.Extension.Test
                     .Join<Comment, News>((a, b) => a.ArticleId == b.Id)
                     .Where(x => x.Id.Between(80, 100)
                     && x.SubTime.AddDays(-10) < DateTime.Now && x.Id > 10
-                    && x.Id > new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id < 3 && x.Id < y.Id).Sum<News>(y => y.Id)
+                    && x.Id > new QuerySet<News>(conn, new MsSqlProvider()).Where(y => y.Id < 3 && x.Id < y.Id).Sum<News>(y => y.Id)
                     )
                     .From<Comment, News>()
                     .OrderBy<News>(x => x.Id)
@@ -82,7 +93,7 @@ namespace Kogel.Dapper.Extension.Test
                         test = new List<int>() { 3, 3, 1 }.FirstOrDefault(y => y == 1),
                         aaa = "6666" + "777",
                         Content = a.Content + "'test'" + b.Headlines + a.IdentityId,
-                        bbb = new QuerySet<Comment>(conn, new MySqlProvider())
+                        bbb = new QuerySet<Comment>(conn, new MsSqlProvider())
                                 .Where(y => y.ArticleId == b.Id && y.Content.Contains("test"))
                                 .Sum<Comment>(x => x.Id),
                         ccc = a.IdentityId,

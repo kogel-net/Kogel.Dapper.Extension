@@ -66,5 +66,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 
 
         #endregion
+
+        QuerySet<T> AsTableName(Type type, string tableName);
     }
 }

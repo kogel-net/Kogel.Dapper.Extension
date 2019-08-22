@@ -18,5 +18,21 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         int Delete();
 
         Task<int> DeleteAsync();
+        #region insert
+        int Insert(T entity);
+
+        Task<int> InsertAsync(T entity);
+
+        int InsertIdentity(T entity);
+        /// <summary>
+        /// 批量新增
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
+        int BatchInsert(IEnumerable<T> entities, int timeout = 120);
+
+        Task<int> BatchInsertAsync(IEnumerable<T> entities, int timeout = 120);
+        #endregion
     }
 }

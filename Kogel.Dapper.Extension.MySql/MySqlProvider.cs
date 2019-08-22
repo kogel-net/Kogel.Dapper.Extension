@@ -140,7 +140,7 @@ namespace Kogel.Dapper.Extension.MySql
         public override SqlProvider FormatInsertIdentity<T>(T entity)
         {
             var paramsAndValuesSql = FormatInsertParamsAndValues(entity);
-            SqlString = $"INSERT INTO {FormatTableName(false, false)} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]}) SELECT @@IDENTITY";
+            SqlString = $"INSERT INTO {FormatTableName(false, false)} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]}); SELECT @@IDENTITY";
             return this;
         }
 

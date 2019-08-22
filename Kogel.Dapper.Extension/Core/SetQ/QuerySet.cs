@@ -67,7 +67,13 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 
             sqlProvider.Context = SetContext;
         }
-
+        #region 基础函数
+        public  QuerySet<T> AsTableName(Type type, string tableName)
+        {
+            SqlProvider.AsTableNameDic.Add(type, tableName);
+            return this;
+        }
+        #endregion
         public QuerySet<T> Where(Expression<Func<T, bool>> predicate)
         {
             WhereExpressionList.Add(predicate);

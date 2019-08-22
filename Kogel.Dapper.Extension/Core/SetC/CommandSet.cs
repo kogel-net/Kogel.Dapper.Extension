@@ -65,6 +65,12 @@ namespace Kogel.Dapper.Extension.Core.SetC
             Params = new DynamicParameters();
         }
 
+        public ICommand<T> AsTableName(Type type, string tableName)
+        {
+            SqlProvider.AsTableNameDic.Add(type, tableName);
+            return this;
+        }
+
         public ICommand<T> Where(Expression<Func<T, bool>> predicate)
         {
             //WhereExpression = WhereExpression == null ? predicate : ((Expression<Func<T, bool>>)WhereExpression).And(predicate);

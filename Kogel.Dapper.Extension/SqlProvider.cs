@@ -20,6 +20,7 @@ namespace Kogel.Dapper.Extension
         {
             Params = new DynamicParameters();
             JoinList = new List<JoinAssTable>();
+            AsTableNameDic = new Dictionary<Type, string>();
         }
 
         public abstract IProviderOption ProviderOption { get; set; }
@@ -33,8 +34,14 @@ namespace Kogel.Dapper.Extension
         /// 连接对象集合
         /// </summary>
         public List<JoinAssTable> JoinList { get; set; }
-
+        /// <summary>
+        /// 参数对象
+        /// </summary>
         public DynamicParameters Params { get; set; }
+        /// <summary>
+        /// 重命名目录
+        /// </summary>
+        public Dictionary<Type, string> AsTableNameDic { get; set; }
 
         public abstract SqlProvider FormatGet<T>();
 
@@ -63,8 +70,15 @@ namespace Kogel.Dapper.Extension
             var entity = EntityCache.QueryEntity(Context.Set.TableType);
             string schema = string.IsNullOrEmpty(entity.Schema) ? "" : ProviderOption.CombineFieldName(entity.Schema) + ".";
             string fromName = entity.Name;
+            //函数AsTableName优先级大于一切
+            string asTableName;
+            if (AsTableNameDic.TryGetValue(entity.Type, out asTableName))
+            {
+                fromName = asTableName;
+            }
+            //是否存在实体特性中的AsName标记
             if (isAsName)
-                fromName = entity.AsName.Equals(entity.Name) ? ProviderOption.CombineFieldName(entity.Name) : $"{ProviderOption.CombineFieldName(entity.Name)} {entity.AsName}";
+                fromName = entity.AsName.Equals(fromName) ? ProviderOption.CombineFieldName(fromName) : $"{ProviderOption.CombineFieldName(fromName)} {entity.AsName}";
             SqlString = $" {schema}{fromName} ";
             if (isNeedFrom)
                 SqlString = " FROM " + SqlString;
