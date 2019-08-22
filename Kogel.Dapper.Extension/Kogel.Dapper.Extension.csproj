@@ -5,7 +5,7 @@
     <Title>Dapper</Title>
     <Description>Kogel.Dapper.Extension</Description>
     <Authors>Kogel</Authors>
-    <TargetFrameworks>net451;netstandard1.3;netstandard2.0;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>net451;netstandard2.0;netcoreapp2.1</TargetFrameworks>
     <Company>Kogel.Dapper.ExtensionKogel.Dapper.Extension</Company>
     <Product>Kogel.Dapper.Extension</Product>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -18,11 +18,9 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' OR '$(TargetFramework)' == 'netstandard2.0'">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Dapper" Version="1.60.1" />

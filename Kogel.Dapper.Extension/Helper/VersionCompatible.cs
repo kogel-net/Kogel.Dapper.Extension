@@ -5,7 +5,7 @@ using System.Linq;
 namespace Kogel.Dapper.Extension.Helper
 {
     /// <summary>
-    /// 版本兼容类(兼容.netstandard1.3的语法)
+    /// [已弃用]版本兼容类(兼容.netstandard1.3的语法)
     /// </summary>
     public static class VersionCompatible
     {
