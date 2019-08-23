@@ -1,10 +1,7 @@
-﻿using Kogel.Dapper.Extension.Attributes;
-using System.Linq;
+﻿using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using Dapper;
-using Kogel.Dapper.Extension.Extension;
-using Kogel.Dapper.Extension.Helper;
 using Kogel.Dapper.Extension.Model;
 using Kogel.Dapper.Extension.Core.Interfaces;
 
@@ -20,9 +17,6 @@ namespace Kogel.Dapper.Extension.Expressions
         public string SqlCmd => _sqlCmd.ToString();
 
         public new DynamicParameters Param;
-
-        private IProviderOption providerOption;
-
         #endregion
         #region 当前解析的对象
         private EntityObject entity { get; }

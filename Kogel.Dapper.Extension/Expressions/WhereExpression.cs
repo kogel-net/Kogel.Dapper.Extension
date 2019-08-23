@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.Linq;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Text;
 using Dapper;
 using Kogel.Dapper.Extension.Core.Interfaces;
-using Kogel.Dapper.Extension.Exception;
-using Kogel.Dapper.Extension.Extension;
-using Kogel.Dapper.Extension.Helper;
-using Kogel.Dapper.Extension.Model;
 
 namespace Kogel.Dapper.Extension.Expressions
 {

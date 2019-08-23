@@ -4,7 +4,6 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using Dapper;
-using Kogel.Dapper.Extension.Helper;
 
 namespace Kogel.Dapper.Extension.Extension
 {

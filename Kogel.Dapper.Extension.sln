@@ -19,7 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{E1D84770-977
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{56AB7E02-01B7-4689-A44B-4711A3D9DF79}"
 	ProjectSection(SolutionItems) = preProject
-		..\test.sql = ..\test.sql
+		..\mssql.sql = ..\mssql.sql
+		E:\Tools\mysql-5.7.27-winx64\mysql-5.7.27-winx64\bin\mysql.sql = E:\Tools\mysql-5.7.27-winx64\mysql-5.7.27-winx64\bin\mysql.sql
 	EndProjectSection
 EndProject
 Global
