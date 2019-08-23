@@ -34,6 +34,13 @@ namespace Kogel.Dapper.Extension.Test
             mysqlCommand.Test();
             #endregion
 
+            #region oracle单元测试
+            var oracleQuery = new UnitTest.Oracle.Query();
+            oracleQuery.Test();
+
+            var oracleCommand = new UnitTest.Oracle.Command();
+            oracleCommand.Test();
+            #endregion
         }
     }
 }
