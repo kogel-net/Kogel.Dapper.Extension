@@ -18,7 +18,7 @@ namespace Kogel.Dapper.Extension.Test
     {
         static void Main(string[] args)
         {
-            #region mssql测试
+            #region mssql单元测试
             var mssqlQuery = new UnitTest.Mssql.Query();
             mssqlQuery.Test();
 
@@ -26,13 +26,14 @@ namespace Kogel.Dapper.Extension.Test
             mssqlCommand.Test();
             #endregion
 
-            #region mysql测试
+            #region mysql单元测试
             var mysqlQuery = new UnitTest.Mysql.Query();
             mysqlQuery.Test();
 
             var mysqlCommand = new UnitTest.Mysql.Command();
             mysqlCommand.Test();
             #endregion
+
         }
     }
 }

@@ -30,8 +30,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                     .Join<Comment, News>((a, b) => a.ArticleId == b.Id)
                     .Where(x => x.Id.Between(80, 100)
                     && x.SubTime.AddDays(-10) < DateTime.Now && x.Id > 10
-                    && x.Id > new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id < 3 && x.Id < y.Id).Sum<News>(y => y.Id)
-                    )
+                    && x.Id > new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id < 3 && x.Id < y.Id).Sum<News>(y => y.Id))
                     .From<Comment, News>()
                     .OrderBy<News>(x => x.Id)
                     .PageList(1, 1, (a, b) => new

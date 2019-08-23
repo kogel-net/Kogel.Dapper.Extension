@@ -62,8 +62,16 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                         PId = 0,
                         RefCommentId = 0
                     });
-                //删除
+                //批量新增
                 var result4 = conn.CommandSet<Comment>()
+                    .BatchInsert(new List<Comment>()
+                    {
+                        commne,
+                        commne,
+                        commne
+                    });
+                //删除
+                var result5 = conn.CommandSet<Comment>()
                     .Where(x => x.Id == result3)
                     .Delete();
             }
