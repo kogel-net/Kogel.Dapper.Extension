@@ -54,9 +54,13 @@ namespace Kogel.Dapper.Extension.Test
                     .Where(x => x.Id > 0)
                     .Get();
 
-               var identity = conn.CommandSet<Comment>()
-                    .AsTableName(typeof(Comment), "Comment_1")
-                    .InsertIdentity(commne);
+                var identity = conn.CommandSet<Comment>()
+                     .Where(x => x.Id > commne.Id || x.Id < commne.Id)
+                     .Update(x => new Comment()
+                     {
+                         Content = commne.Content,
+                         SubTime = commne.SubTime
+                     });
 
                 //Comment comment = new Comment();
                 ////初始化
@@ -86,19 +90,19 @@ namespace Kogel.Dapper.Extension.Test
                     && x.Id > new QuerySet<News>(conn, new MsSqlProvider()).Where(y => y.Id < 3 && x.Id < y.Id).Sum<News>(y => y.Id)
                     )
                     .From<Comment, News>()
-                    .OrderBy<News>(x => x.Id)
+                    .OrderBy<News>(x => x.Id) 
                     .PageList(1, 1, (a, b) => new
                     {
-                        isxxx = true,
-                        test = new List<int>() { 3, 3, 1 }.FirstOrDefault(y => y == 1),
-                        aaa = "6666" + "777",
-                        Content = a.Content + "'test'" + b.Headlines + a.IdentityId,
-                        bbb = new QuerySet<Comment>(conn, new MsSqlProvider())
-                                .Where(y => y.ArticleId == b.Id && y.Content.Contains("test"))
-                                .Sum<Comment>(x => x.Id),
-                        ccc = a.IdentityId,
-                        ddd = Convert.ToInt32("(select count(1) from Comment)"),
-                        a.Id,
+                        //    isxxx = true,
+                        //    test = new List<int>() { 3, 3, 1 }.FirstOrDefault(y => y == 1),
+                        //    aaa = "6666" + "777",
+                        //    Content = a.Content + "'test'" + b.Headlines + a.IdentityId,
+                        //    bbb = new QuerySet<Comment>(conn, new MsSqlProvider())
+                        //            .Where(y => y.ArticleId == b.Id && y.Content.Contains("test"))
+                        //            .Sum<Comment>(x => x.Id),
+                        //    ccc = a.IdentityId,
+                        //ddd = Convert.ToInt32($"(select count(1) from Comment)"),
+                         a.Id,
                     });
 
 

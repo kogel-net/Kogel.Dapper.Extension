@@ -123,12 +123,12 @@ namespace Kogel.Dapper.Extension.MsSql
 
         public override SqlProvider FormatDelete()
         {
-            var fromTableSql = FormatTableName();
+            var fromTableSql = FormatTableName(false, false);
 
             var whereSql = string.Empty;
 
             //表查询条件
-            var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
+            var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null, false);
 
             SqlString = $"DELETE {fromTableSql} {whereSql }";
 
@@ -155,7 +155,7 @@ namespace Kogel.Dapper.Extension.MsSql
             var whereSql = string.Empty;
 
             //表查询条件
-            var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
+            var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null, false);
             Params.AddDynamicParams(update.Param);
 
             SqlString = $"UPDATE {FormatTableName(false, false)} {update.SqlCmd} {whereSql}";

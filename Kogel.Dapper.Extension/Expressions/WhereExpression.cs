@@ -35,7 +35,7 @@ namespace Kogel.Dapper.Extension.Expressions
         /// <param name="expression">表达式</param>
         /// <param name="prefix">参数标记</param>
         /// <param name="providerOption"></param>
-        public WhereExpression(LambdaExpression expression, string prefix, IProviderOption providerOption) : base(providerOption)
+        public WhereExpression(LambdaExpression expression, string prefix, IProviderOption providerOption, bool IsAsName = true) : base(providerOption, IsAsName)
         {
             this._sqlCmd = new StringBuilder(100);
             this.Param = new DynamicParameters();
@@ -68,7 +68,7 @@ namespace Kogel.Dapper.Extension.Expressions
         /// <returns></returns>
         protected override Expression VisitBinary(BinaryExpression node)
         {
-            var binaryWhere = new BinaryExpressionVisitor(node, providerOption);
+            var binaryWhere = new BinaryExpressionVisitor(node, providerOption, IsAsName);
             this._sqlCmd.Append(binaryWhere.SpliceField);
             base.Param.AddDynamicParams(binaryWhere.Param);
             return node;

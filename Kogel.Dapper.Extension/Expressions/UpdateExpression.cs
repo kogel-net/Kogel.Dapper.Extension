@@ -59,8 +59,8 @@ namespace Kogel.Dapper.Extension.Expressions
                 }
                 else
                 {
-                    var ParamName = "UPDATE_" + providerOption.CombineFieldName(field);
-                    _sqlCmd.Append(field + "=" + providerOption.ParameterPrefix + ParamName);
+                    var ParamName = $"UPDATE_{field}_{i}";
+                    _sqlCmd.Append($"{field}={providerOption.ParameterPrefix + ParamName}");
                     Param.Add(ParamName, value);
                 }
             }

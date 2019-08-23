@@ -21,12 +21,17 @@ namespace Kogel.Dapper.Extension.Expressions
         /// </summary>
         internal List<string> FieldList { get; set; }
         protected DynamicParameters Param { get; set; }
-        private IProviderOption providerOption { get; set; }
-        public BaseExpressionVisitor(IProviderOption providerOption)
+        protected IProviderOption providerOption { get; set; }
+        /// <summary>
+        /// 是否显示重命名
+        /// </summary>
+        protected bool IsAsName { get; set; }
+        public BaseExpressionVisitor(IProviderOption providerOption, bool IsAsName = true)
         {
             this.FieldList = new List<string>();
             this.Param = new DynamicParameters();
             this.providerOption = providerOption;
+            this.IsAsName = IsAsName;
         }
         /// <summary>
         /// 有+ - * /需要拼接的对象
@@ -57,10 +62,18 @@ namespace Kogel.Dapper.Extension.Expressions
         /// <returns></returns>
         protected override Expression VisitMember(MemberExpression node)
         {
-            var member = EntityCache.QueryEntity(node.Member.DeclaringType);
-            string fieldName = member.FieldPairs[node.Member.Name];
-            string field = member.AsName + "." + fieldName;
-            GenerateField(field);
+            //需要计算的字段值
+            if (node.Type == typeof(DateTime) || (node.Expression != null && node.Expression.GetType().FullName == "System.Linq.Expressions.FieldExpression"))
+            {
+                GenerateField(GetFieldValue(node));
+            }
+            else
+            {
+                var member = EntityCache.QueryEntity(node.Member.DeclaringType);
+                string fieldName = member.FieldPairs[node.Member.Name];
+                string field = (IsAsName ? member.AsName + "." : "")+ fieldName;
+                GenerateField(field);
+            }
             return node;
         }
 
@@ -121,10 +134,8 @@ namespace Kogel.Dapper.Extension.Expressions
         private string ParamName { get => (providerOption.ParameterPrefix + FieldName.Replace(".", "_") + "_" + Param.ParameterNames.Count()); }//带参数标识的
         internal StringBuilder SpliceField { get; set; }
         internal new DynamicParameters Param { get; set; }
-        internal IProviderOption providerOption { get; set; }
-        public WhereExpressionVisitor(IProviderOption providerOption) : base(providerOption)
+        public WhereExpressionVisitor(IProviderOption providerOption, bool IsAsName = true) : base(providerOption, IsAsName)
         {
-            this.providerOption = providerOption;
             this.SpliceField = new StringBuilder();
             this.Param = new DynamicParameters();
         }
@@ -163,15 +174,18 @@ namespace Kogel.Dapper.Extension.Expressions
         /// <returns></returns>
         protected override Expression VisitMember(MemberExpression node)
         {
-            var member = EntityCache.QueryEntity(node.Member.DeclaringType);
-            string fieldName = member.FieldPairs[node.Member.Name];
-            this.FieldName = member.AsName + "." + fieldName;
-            SpliceField.Append(this.FieldName);
-
-            //时间类型有时会进入此处
-            if (node.Type == typeof(DateTime))
+            //需要计算的字段值
+            if (node.Type == typeof(DateTime)|| (node.Expression != null && node.Expression.GetType().FullName == "System.Linq.Expressions.FieldExpression"))
             {
-                SpliceField = SpliceField.Replace("DateTime.Now", providerOption.GetDate());
+                SpliceField.Append(ParamName);
+                Param.Add(ParamName, node.ToConvertAndGetValue());
+            }
+            else
+            {
+                var member = EntityCache.QueryEntity(node.Member.DeclaringType);
+                string fieldName = member.FieldPairs[node.Member.Name];
+                this.FieldName = (IsAsName ? member.AsName + "." : "") + fieldName;
+                SpliceField.Append(this.FieldName);
             }
             return node;
         }
@@ -297,9 +311,8 @@ namespace Kogel.Dapper.Extension.Expressions
     /// </summary>
     public class BinaryExpressionVisitor : WhereExpressionVisitor
     {
-        public BinaryExpressionVisitor(BinaryExpression expression, IProviderOption providerOption) : base(providerOption)
+        public BinaryExpressionVisitor(BinaryExpression expression, IProviderOption providerOption, bool IsAsName = true) : base(providerOption, IsAsName)
         {
-
             SpliceField = new StringBuilder();
             Param = new DynamicParameters();
             SpliceField.Append("(");
