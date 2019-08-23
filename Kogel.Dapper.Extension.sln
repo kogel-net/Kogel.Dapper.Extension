@@ -17,8 +17,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kogel.Dapper.Extension.MySq
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{E1D84770-977A-4B19-8631-6FB0BF7EA019}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kogel.Dapper.Extension.Core.Test", "Kogel.Dapper.Extension.Core.Test\Kogel.Dapper.Extension.Core.Test.csproj", "{84435FB0-7A77-435E-A79F-37778C30CFF9}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,17 +47,12 @@ Global
 		{1E431FF9-D7F5-4A31-8A1D-CD30AD7EBE6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E431FF9-D7F5-4A31-8A1D-CD30AD7EBE6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E431FF9-D7F5-4A31-8A1D-CD30AD7EBE6A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{84435FB0-7A77-435E-A79F-37778C30CFF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{84435FB0-7A77-435E-A79F-37778C30CFF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{84435FB0-7A77-435E-A79F-37778C30CFF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{84435FB0-7A77-435E-A79F-37778C30CFF9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5E18BE03-03CE-4732-AA33-7978859BCFEB} = {E1D84770-977A-4B19-8631-6FB0BF7EA019}
-		{84435FB0-7A77-435E-A79F-37778C30CFF9} = {E1D84770-977A-4B19-8631-6FB0BF7EA019}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8BCD242F-5A4F-46C1-8180-A7300CE27088}

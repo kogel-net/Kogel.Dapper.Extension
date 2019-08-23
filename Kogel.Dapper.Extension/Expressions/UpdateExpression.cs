@@ -33,7 +33,7 @@ namespace Kogel.Dapper.Extension.Expressions
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateExpression(LambdaExpression expression, IProviderOption providerOption) : base(providerOption)
+        public UpdateExpression(LambdaExpression expression, IProviderOption providerOption) : base(providerOption, false)
         {
             this._sqlCmd = new StringBuilder(100);
             this.Param = new DynamicParameters();

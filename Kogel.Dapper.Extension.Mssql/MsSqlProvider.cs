@@ -168,7 +168,7 @@ namespace Kogel.Dapper.Extension.MsSql
             var update = ResolveExpression.ResolveUpdates<T>(entity, Params);
             var whereSql = string.Empty;
             //表查询条件
-            var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
+            var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null, false);
 
             SqlString = $"UPDATE {FormatTableName(false, false)} {update} {whereSql}";
             return this;

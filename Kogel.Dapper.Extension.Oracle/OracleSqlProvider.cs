@@ -163,16 +163,12 @@ namespace Kogel.Dapper.Extension.Oracle
 
         public override SqlProvider FormatUpdate<T>(T entity)
         {
-            var update = ResolveExpression.ResolveUpdate<T>(a => entity);
-
+            var update = ResolveExpression.ResolveUpdates<T>(entity, Params);
             var whereSql = string.Empty;
-
             //表查询条件
             var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null, false);
-            Params.AddDynamicParams(update.Param);
 
-            SqlString = $"UPDATE {FormatTableName(false, false)} {update.SqlCmd} {whereSql}";
-
+            SqlString = $"UPDATE {FormatTableName(false, false)} {update} {whereSql}";
             return this;
         }
 

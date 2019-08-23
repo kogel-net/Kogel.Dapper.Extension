@@ -40,7 +40,7 @@ namespace Kogel.Dapper.Extension.Expressions
         /// <returns></returns>
         protected override Expression VisitBinary(BinaryExpression node)
         {
-            var binary = new BinaryExpressionVisitor(node, providerOption);
+            var binary = new BinaryExpressionVisitor(node, providerOption, IsAsName);
             GenerateField(binary.SpliceField.ToString());
             this.Param.AddDynamicParams(binary.Param);
             return node;
@@ -125,6 +125,10 @@ namespace Kogel.Dapper.Extension.Expressions
             {
                 value = expression.ToConvertAndGetValue();
             }
+            if (value == null)
+            {
+                value = "NULL";
+            }
             return value.ToString();
         }
     }
@@ -176,6 +180,11 @@ namespace Kogel.Dapper.Extension.Expressions
         {
             //需要计算的字段值
             if (node.Type == typeof(DateTime)|| (node.Expression != null && node.Expression.GetType().FullName == "System.Linq.Expressions.FieldExpression"))
+            {
+                SpliceField.Append(ParamName);
+                Param.Add(ParamName, node.ToConvertAndGetValue());
+            }
+            else if (node.Expression!=null && node.Expression is ConstantExpression)
             {
                 SpliceField.Append(ParamName);
                 Param.Add(ParamName, node.ToConvertAndGetValue());
