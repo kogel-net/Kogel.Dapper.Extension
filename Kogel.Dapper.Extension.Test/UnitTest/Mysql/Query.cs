@@ -17,9 +17,10 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
         {
             using (var conn = new OracleConnection())
             {
+                DateTime dateTime = DateTime.Now.AddDays(-10);
                 //单个属性返回
                 var ContentList = conn.QuerySet<Comment>()
-                     .Where(x => x.Id > 0)
+                     .Where(x => x.Id > 0 && x.SubTime > dateTime)
                      .ToList(x => x.Content);
 
                 var commne = conn.QuerySet<Comment>()

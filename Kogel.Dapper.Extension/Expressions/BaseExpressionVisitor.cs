@@ -62,7 +62,12 @@ namespace Kogel.Dapper.Extension.Expressions
         protected override Expression VisitMember(MemberExpression node)
         {
             //需要计算的字段值
-            if (node.Type == typeof(DateTime) || (node.Expression != null && node.Expression.GetType().FullName == "System.Linq.Expressions.FieldExpression"))
+            var expTypeName = node.Expression?.GetType().FullName ?? "";
+            if (expTypeName == "System.Linq.Expressions.FieldExpression")
+            {
+                GenerateField(GetFieldValue(node));
+            }
+            else if (node.Expression != null && node.Expression is ConstantExpression)
             {
                 GenerateField(GetFieldValue(node));
             }
@@ -70,7 +75,14 @@ namespace Kogel.Dapper.Extension.Expressions
             {
                 var member = EntityCache.QueryEntity(node.Member.DeclaringType);
                 string fieldName = member.FieldPairs[node.Member.Name];
-                string field = (IsAsName ? member.AsName + "." : "")+ fieldName;
+                string field = (IsAsName ? member.AsName + "." : "") + fieldName;
+
+                //DateTime.Now和DateTime.Now不同，属于成员对象
+                if (node.Type == typeof(DateTime))
+                {
+                    field = field.Replace("DateTime.Now", providerOption.GetDate());
+                }
+
                 GenerateField(field);
             }
             return node;
@@ -178,12 +190,13 @@ namespace Kogel.Dapper.Extension.Expressions
         protected override Expression VisitMember(MemberExpression node)
         {
             //需要计算的字段值
-            if (node.Type == typeof(DateTime)|| (node.Expression != null && node.Expression.GetType().FullName == "System.Linq.Expressions.FieldExpression"))
+            var expTypeName = node.Expression?.GetType().FullName ?? "";
+            if (expTypeName == "System.Linq.Expressions.FieldExpression")
             {
                 SpliceField.Append(ParamName);
                 Param.Add(ParamName, node.ToConvertAndGetValue());
             }
-            else if (node.Expression!=null && node.Expression is ConstantExpression)
+            else if (node.Expression != null && node.Expression is ConstantExpression)
             {
                 SpliceField.Append(ParamName);
                 Param.Add(ParamName, node.ToConvertAndGetValue());
@@ -194,6 +207,12 @@ namespace Kogel.Dapper.Extension.Expressions
                 string fieldName = member.FieldPairs[node.Member.Name];
                 this.FieldName = (IsAsName ? member.AsName + "." : "") + fieldName;
                 SpliceField.Append(this.FieldName);
+
+                //DateTime.Now和DateTime.Now不同，属于成员对象
+                if (node.Type == typeof(DateTime))
+                {
+                    SpliceField = SpliceField.Replace("DateTime.Now", providerOption.GetDate());
+                }
             }
             return node;
         }
