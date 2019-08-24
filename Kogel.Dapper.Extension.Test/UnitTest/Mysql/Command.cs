@@ -24,7 +24,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                 PId = 0,
                 RefCommentId = 0
             };
-
+            DateTime dateTime = DateTime.Now;
             using (var conn = new MySqlConnection(mysqlConnection))
             {
                 //根据成员修改
@@ -32,8 +32,8 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                 .Where(x => x.Id > commne.Id || x.Id < commne.Id)
                 .Update(x => new Comment()
                 {
-                    Content = commne.Content,
-                    SubTime = commne.SubTime
+                   // Content = commne.Content,
+                    SubTime = dateTime
                 });
                 //全部修改
                 var result1 = conn.CommandSet<Comment>()
