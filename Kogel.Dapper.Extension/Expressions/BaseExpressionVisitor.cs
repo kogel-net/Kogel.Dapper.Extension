@@ -75,14 +75,12 @@ namespace Kogel.Dapper.Extension.Expressions
             {
                 var member = EntityCache.QueryEntity(node.Member.DeclaringType);
                 string fieldName = member.FieldPairs[node.Member.Name];
-                string field = (IsAsName ? member.AsName + "." : "") + fieldName;
-
+                string field  = (IsAsName ? member.GetAsName(providerOption) : "") + providerOption.CombineFieldName(fieldName);
                 //DateTime.Now和DateTime.Now不同，属于成员对象
                 if (node.Type == typeof(DateTime))
                 {
-                    field = field.Replace("DateTime.Now", providerOption.GetDate());
+                    field = field.Replace($"{providerOption.CombineFieldName("DateTime")}.{providerOption.CombineFieldName("Now")}", providerOption.GetDate());
                 }
-
                 GenerateField(field);
             }
             return node;
@@ -204,15 +202,23 @@ namespace Kogel.Dapper.Extension.Expressions
             else
             {
                 var member = EntityCache.QueryEntity(node.Member.DeclaringType);
-                string fieldName = member.FieldPairs[node.Member.Name];
-                this.FieldName = (IsAsName ? member.AsName + "." : "") + fieldName;
-                SpliceField.Append(this.FieldName);
-
-                //DateTime.Now和DateTime.Now不同，属于成员对象
+                string asName = string.Empty;
+                if (IsAsName)
+                {
+                    this.FieldName = member.AsName + "." + member.FieldPairs[node.Member.Name];
+                    asName = member.GetAsName(providerOption);
+                }
+                else
+                {
+                    this.FieldName = member.FieldPairs[node.Member.Name];
+                }
+                string fieldName = asName + providerOption.CombineFieldName(member.FieldPairs[node.Member.Name]);
+                //DateTime.Now和DateTime.Now.Add(-1)不同，属于成员对象
                 if (node.Type == typeof(DateTime))
                 {
-                    SpliceField = SpliceField.Replace("DateTime.Now", providerOption.GetDate());
+                    fieldName = fieldName.Replace($"{providerOption.CombineFieldName("DateTime")}.{providerOption.CombineFieldName("Now")}", providerOption.GetDate());
                 }
+                SpliceField.Append(fieldName);
             }
             return node;
         }
@@ -320,7 +326,8 @@ namespace Kogel.Dapper.Extension.Expressions
                             var entity = EntityCache.QueryEntity(member.Member.DeclaringType);
                             var dateOption = (DateOption)Enum.Parse(typeof(DateOption), node.Method.Name);
                             string fieldName = entity.FieldPairs[member.Member.Name];
-                            string sqlCombine = providerOption.CombineDate(dateOption, entity.AsName, fieldName, node.Arguments[0].ToConvertAndGetValue().ToString());
+                            string sqlCombine = providerOption.CombineDate(dateOption, entity.GetAsName(providerOption, true, false),
+                                providerOption.CombineFieldName(fieldName), node.Arguments[0].ToConvertAndGetValue().ToString());
                             this.SpliceField.Append(sqlCombine);
                             //重新计算参数名称
                             FieldName = entity.AsName + "_" + fieldName;

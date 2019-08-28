@@ -11,7 +11,8 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 {
    public class Command
     {
-        string oraclesqlConnection = "Server=localhost;Database=Qx_Sport_Common;Uid=root;Pwd=A5101264a;";
+        string oracleConnection = @"Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))
+                    (CONNECT_DATA=(SERVICE_NAME=ORCL)));User Id=system;Password=A5101264a";
         public void Test()
         {
             var commne = new Comment()
@@ -25,7 +26,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
                 RefCommentId = 0
             };
 
-            using (var conn = new OracleConnection(oraclesqlConnection))
+            using (var conn = new OracleConnection(oracleConnection))
             {
                 //根据成员修改
                 var result = conn.CommandSet<Comment>()
@@ -35,10 +36,10 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
                     Content = commne.Content,
                     SubTime = commne.SubTime
                 });
-                //全部修改
-                var result1 = conn.CommandSet<Comment>()
-                    .Where(x => x.Id == commne.Id)
-                    .Update(commne);
+                ////全部修改
+                //var result1 = conn.CommandSet<Comment>()
+                //    .Where(x => x.Id == commne.Id)
+                //    .Update(commne);
 
                 //新增
                 var result2 = conn.CommandSet<Comment>()

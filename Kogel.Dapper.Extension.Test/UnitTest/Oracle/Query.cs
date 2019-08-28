@@ -40,11 +40,10 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                         test = new List<int>() { 3, 3, 1 }.FirstOrDefault(y => y == 1),
                         aaa = "6666" + "777",
                         Content = a.Content + "'test'" + b.Headlines + a.IdentityId,
-                        bbb = new QuerySet<Comment>(conn, new MySqlProvider())
+                        bbb = new QuerySet<Comment1>(conn, new MySqlProvider())
                                     .Where(y => y.ArticleId == b.Id && y.Content.Contains("test"))
-                                    .Sum<Comment>(x => x.Id),
+                                    .Sum<Comment1>(x => x.Id),
                         ccc = a.IdentityId,
-                        ddd = Convert.ToInt32("(select count(1) from Comment)"),
                         a.Id,
                         times = DateTime.Now
                     });

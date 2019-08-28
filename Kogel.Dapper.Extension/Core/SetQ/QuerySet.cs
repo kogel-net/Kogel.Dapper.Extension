@@ -232,10 +232,11 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         {
             var joinWhere = new WhereExpression(exp, $"Where_{Params.ParameterNames.Count()}_", SqlProvider.ProviderOption);
             Regex whereRex = new Regex("AND");
+            string tableName= SqlProvider.FormatTableName(false, true, typeof(TInner));
             SqlProvider.JoinList.Add(new JoinAssTable()
             {
                 Action = JoinAction.sqlJoin,
-                JoinSql = $"{joinMode.ToString()} JOIN {EntityCache.QueryEntity(typeof(TInner)).AsName} ON {  whereRex.Replace(joinWhere.SqlCmd, "", 1)}",
+                JoinSql = $"{joinMode.ToString()} JOIN {tableName} ON {  whereRex.Replace(joinWhere.SqlCmd, "", 1)}",
                 TableType = (IsDisField ? typeof(TInner) : null)
             });
             if (joinWhere.Param != null)

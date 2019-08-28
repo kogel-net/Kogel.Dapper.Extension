@@ -64,10 +64,17 @@ namespace Kogel.Dapper.Extension
         public abstract SqlProvider FormatSum(LambdaExpression sumExpression);
 
         public abstract SqlProvider FormatUpdateSelect<T>(Expression<Func<T, T>> updator);
+        /// <summary>
+        /// 获取表名称
+        /// </summary>
+        /// <param name="isNeedFrom"></param>
+        /// <param name="isAsName"></param>
+        /// <param name="tableType">连接查询时会用到</param>
+        /// <returns></returns>
 
-        protected string FormatTableName(bool isNeedFrom = true, bool isAsName = true)
+        public string FormatTableName(bool isNeedFrom = true, bool isAsName = true, Type tableType = null)
         {
-            var entity = EntityCache.QueryEntity(Context.Set.TableType);
+            var entity = EntityCache.QueryEntity(tableType == null ? Context.Set.TableType : tableType);
             string schema = string.IsNullOrEmpty(entity.Schema) ? "" : ProviderOption.CombineFieldName(entity.Schema) + ".";
             string fromName = entity.Name;
             //函数AsTableName优先级大于一切

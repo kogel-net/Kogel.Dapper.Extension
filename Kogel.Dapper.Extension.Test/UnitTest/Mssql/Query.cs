@@ -48,6 +48,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
                         ccc = a.IdentityId,
                         ddd = Convert.ToInt32("(select count(1) from Comment)"),
                         a.Id,
+                        cccTime = DateTime.Now
                     });
 
                 //计总

@@ -86,7 +86,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
             {
                 var entity = EntityCache.QueryEntity(a.Key.Type.GenericTypeArguments[0]);
                 var columnName = a.Key.Body.GetCorrectPropertyName();
-                return $"{entity.AsName}." + providerOption.CombineFieldName(columnName) + (a.Value == EOrderBy.Asc ? " ASC " : " DESC ");
+                return $"{entity.GetAsName(providerOption)}" + providerOption.CombineFieldName(columnName) + (a.Value == EOrderBy.Asc ? " ASC " : " DESC ");
             }) ?? new List<string>();
             if (!orderByList.Any() && (abstractSet.OrderbyBuilder == null || abstractSet.OrderbyBuilder.Length == 0))
                 return "";
@@ -176,7 +176,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
                 {
                     builder.Append(",");
                 }
-                builder.Append($"{name}={providerOption.ParameterPrefix}Update_{name}");
+                builder.Append($"{providerOption.CombineFieldName(name)}={providerOption.ParameterPrefix}Update_{name}");
                 Param.Add($"{providerOption.ParameterPrefix}Update_{name}", value);
             }
             builder.Insert(0, " SET ");

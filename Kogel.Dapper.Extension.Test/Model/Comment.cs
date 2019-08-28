@@ -35,9 +35,9 @@ namespace Kogel.Dapper.Extension.Test.Model
         /// <summary>
         /// 关联的评论id
         /// </summary>
-        public long RefCommentId { get; set; }
+        public int RefCommentId { get; set; }
     }
-    [Display(Rename = "Comment_1")]
+    [Display(Rename = "Comment", AsName ="commm5")]
     public class Comment1 : Comment
     {
 

@@ -12,12 +12,17 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 {
    public class Query
     {
-        string oracleConnection = "Server=localhost;Database=Qx_Sport_Common;Uid=root;Pwd=A5101264a;";
+        string oracleConnection = @"Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))
+                    (CONNECT_DATA=(SERVICE_NAME=ORCL)));User Id=system;Password=A5101264a";
         public void Test()
         {
-            using (var conn = new OracleConnection())
+            using (var conn = new OracleConnection(oracleConnection))
             {
                 DateTime dateTime = DateTime.Now.AddDays(-10);
+
+                var test = conn.QuerySet<Comment>()
+                    .ToList();
+
                 //单个属性返回
                 var ContentList = conn.QuerySet<Comment>()
                      .Where(x => x.Id > 0 && x.SubTime > dateTime)
@@ -39,11 +44,10 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
                         test = new List<int>() { 3, 3, 1 }.FirstOrDefault(y => y == 1),
                         aaa = "6666" + "777",
                         Content = a.Content + "'test'" + b.Headlines + a.IdentityId,
-                        bbb = new QuerySet<Comment>(conn, new OracleSqlProvider())
+                        bbb = new QuerySet<Comment1>(conn, new OracleSqlProvider())
                                     .Where(y => y.ArticleId == b.Id && y.Content.Contains("test"))
-                                    .Sum<Comment>(x => x.Id),
+                                    .Sum<Comment1>(x => x.Id),
                         ccc = a.IdentityId,
-                        ddd = Convert.ToInt32("(select count(1) from Comment)"),
                         a.Id,
                     });
 
@@ -60,7 +64,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
                      {
                          id = a.Id,
                          name = b.NewsLabel,
-                         resource = c.RPath,
+                         resources = c.RPath,
                      });
 
                 //计总

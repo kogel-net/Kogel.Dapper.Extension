@@ -8,8 +8,8 @@ namespace Kogel.Dapper.Extension.Oracle
 {
     public class OracleSqlProvider : SqlProvider
     {
-        private const string OpenQuote = "";
-        private const string CloseQuote = "";
+        private const string OpenQuote = "\"";
+        private const string CloseQuote = "\"";
         private const char ParameterPrefix = ':';
         private IResolveExpression ResolveExpression;
         public OracleSqlProvider()
@@ -120,29 +120,27 @@ namespace Kogel.Dapper.Extension.Oracle
 
         public override SqlProvider FormatDelete()
         {
-            var fromTableSql = FormatTableName(false, false);
-
+            var fromTableSql = ProviderOption.CombineFieldName(FormatTableName(false, false).Trim());
             var whereSql = string.Empty;
-
             //表查询条件
             var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null, false);
-
-            SqlString = $"DELETE {fromTableSql} {whereSql }";
-
+            SqlString = $"DELETE {fromTableSql} {whereSql}";
             return this;
         }
 
         public override SqlProvider FormatInsert<T>(T entity)
         {
+            var fromTableSql = ProviderOption.CombineFieldName(FormatTableName(false, false).Trim());
             var paramsAndValuesSql = FormatInsertParamsAndValues(entity);
-            SqlString = $"INSERT INTO {FormatTableName(false, false)} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]})";
+            SqlString = $"INSERT INTO {fromTableSql} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]})";
             return this;
         }
 
         public override SqlProvider FormatInsertIdentity<T>(T entity)
         {
+            var fromTableSql = ProviderOption.CombineFieldName(FormatTableName(false, false).Trim());
             var paramsAndValuesSql = FormatInsertParamsAndValues(entity);
-            SqlString = $"INSERT INTO {FormatTableName(false, false)} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]}) SELECT @@IDENTITY";
+            SqlString = $"INSERT INTO {fromTableSql} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]}) SELECT @@IDENTITY";
             return this;
         }
 
@@ -150,13 +148,15 @@ namespace Kogel.Dapper.Extension.Oracle
         {
             var update = ResolveExpression.ResolveUpdate(updateExpression);
 
+            var fromTableSql = ProviderOption.CombineFieldName(FormatTableName(false, false).Trim());
+
             var whereSql = string.Empty;
 
             //表查询条件
-            var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
+            var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null, false);
             Params.AddDynamicParams(update.Param);
 
-            SqlString = $"UPDATE {FormatTableName(false, false)} {update.SqlCmd} {whereSql}";
+            SqlString = $"UPDATE {fromTableSql} {update.SqlCmd} {whereSql}";
 
             return this;
         }
@@ -164,11 +164,12 @@ namespace Kogel.Dapper.Extension.Oracle
         public override SqlProvider FormatUpdate<T>(T entity)
         {
             var update = ResolveExpression.ResolveUpdates<T>(entity, Params);
+            var fromTableSql = ProviderOption.CombineFieldName(FormatTableName(false, false).Trim());
             var whereSql = string.Empty;
             //表查询条件
             var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null, false);
 
-            SqlString = $"UPDATE {FormatTableName(false, false)} {update} {whereSql}";
+            SqlString = $"UPDATE {fromTableSql} {update} {whereSql}";
             return this;
         }
 
@@ -195,15 +196,16 @@ namespace Kogel.Dapper.Extension.Oracle
         {
             var update = ResolveExpression.ResolveUpdate(updator);
 
+            var fromTableSql = ProviderOption.CombineFieldName(FormatTableName(false, false).Trim());
             var selectSql = ResolveExpression.ResolveSelectOfUpdate(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression);
 
             var whereSql = string.Empty;
 
             //表查询条件
-            var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
+            var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null, false);
             Params.AddDynamicParams(update.Param);
 
-            SqlString = $"UPDATE {FormatTableName(false, false)} {update.SqlCmd} {selectSql} {whereSql}";
+            SqlString = $"UPDATE {fromTableSql} {update.SqlCmd} {selectSql} {whereSql}";
 
             return this;
         }

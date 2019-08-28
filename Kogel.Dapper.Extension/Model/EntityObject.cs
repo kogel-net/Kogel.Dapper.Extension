@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Linq;
 using Kogel.Dapper.Extension.Attributes;
 using Kogel.Dapper.Extension.Helper;
+using Kogel.Dapper.Extension.Core.Interfaces;
 
 namespace Kogel.Dapper.Extension.Model
 {
@@ -105,5 +106,25 @@ namespace Kogel.Dapper.Extension.Model
         /// 字段目录(属性名称和实体名称)
         /// </summary>
         public Dictionary<string,string> FieldPairs { get; set; }
+        /// <summary>
+        /// 获取asname
+        /// </summary>
+        /// <param name="IsAsName"></param>
+        /// <returns></returns>
+        public string GetAsName(IProviderOption providerOption, bool IsAsName=true,bool IsSuffix=true)
+        {
+            string asName = string.Empty;
+            if (IsAsName)
+            {
+                asName = this.AsName;
+                //如果没有as name，则需要给表带上标记
+                if (asName.Equals(this.Name))
+                    asName = providerOption.CombineFieldName(asName);
+                //是否需要后缀
+                if (IsSuffix)
+                    asName += ".";
+            }
+            return asName;     
+        }
     }
 }

@@ -23,7 +23,6 @@ namespace Kogel.Dapper.Extension.Oracle
         {
             var selectFormat = " SELECT {0} ";
             var selectSql = "";
-
             if (selector == null)
             {
                 var propertyBuilder = GetTableField(entityObject);
@@ -33,8 +32,8 @@ namespace Kogel.Dapper.Extension.Oracle
             {
                 var selectExp = new SelectExpression(selector, "", providerOption);
                 selectSql = string.Format(selectFormat, selectExp.SqlCmd);
+                Param.AddDynamicParams(selectExp.Param);
             }
-
             return selectSql;
         }
 
@@ -51,7 +50,8 @@ namespace Kogel.Dapper.Extension.Oracle
                     {
                         EntityObject entityObject = EntityCache.QueryEntity(selector.Parameters[0].Type);
                         var memberName = selector.Body.GetCorrectPropertyName();
-                        selectSql = $" SELECT NVL(SUM({entityObject.AsName}.{providerOption.CombineFieldName(entityObject.FieldPairs[memberName])}),0)  ";
+                        selectSql = $@" SELECT NVL(SUM({entityObject.GetAsName(providerOption)}
+                                 {providerOption.CombineFieldName(entityObject.FieldPairs[memberName])}),0)  ";
                     }
                     break;
                 case ExpressionType.MemberInit:
