@@ -28,7 +28,8 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         public virtual string GetTableField(EntityObject entityObject)
         {
             var propertyInfos = entityObject.Properties;
-            string property = string.Join(",", entityObject.FieldPairs.Select(field => $"{entityObject.AsName}.{providerOption.CombineFieldName(field.Value) }"));
+			string asName = entityObject.Name == entityObject.AsName ? providerOption.CombineFieldName(entityObject.AsName) : entityObject.AsName;
+			string property = string.Join(",", entityObject.FieldPairs.Select(field => $"{asName}.{providerOption.CombineFieldName(field.Value) }"));
             return property;
         }
         /// <summary>
