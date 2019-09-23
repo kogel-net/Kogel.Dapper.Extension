@@ -19,11 +19,11 @@ namespace Kogel.Dapper.Extension.Test
         static void Main(string[] args)
         {
             #region mssql单元测试
-            var mssqlQuery = new UnitTest.Mssql.Query();
-            mssqlQuery.Test();
+            //var mssqlQuery = new UnitTest.Mssql.Query();
+            //mssqlQuery.Test();
 
-            var mssqlCommand = new UnitTest.Mssql.Command();
-            mssqlCommand.Test();
+            //var mssqlCommand = new UnitTest.Mssql.Command();
+            //mssqlCommand.Test();
             #endregion
 
             #region mysql单元测试
@@ -35,11 +35,11 @@ namespace Kogel.Dapper.Extension.Test
             #endregion
 
             #region oracle单元测试
-            var oracleQuery = new UnitTest.Oracle.Query();
-            oracleQuery.Test();
+            //var oracleQuery = new UnitTest.Oracle.Query();
+            //oracleQuery.Test();
 
-            var oracleCommand = new UnitTest.Oracle.Command();
-            oracleCommand.Test();
+            //var oracleCommand = new UnitTest.Oracle.Command();
+            //oracleCommand.Test();
             #endregion
         }
     }
