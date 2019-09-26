@@ -36,7 +36,7 @@ namespace Kogel.Dapper.Core.Test
 
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 			//注入连接对象
-			services.AddTransient<IDbConnection>(x => new SqlConnection("Data Source=10.105.0.133;Database=Fresh;UID=sa;PWD=123;"));
+			services.AddTransient<IDbConnection>(x => new SqlConnection("Data Source=10.105.0.133;Database=Fresh_Copy;UID=sa;PWD=123;"));
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

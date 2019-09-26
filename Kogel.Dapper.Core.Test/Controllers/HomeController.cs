@@ -20,8 +20,7 @@ namespace Kogel.Dapper.Core.Test.Controllers
 		}
 		public IActionResult Index()
 		{
-			var list = dbConnection.QuerySet<Order>().ToList();
-
+			var list = dbConnection.QuerySet<Product>().ToList();
 			return View();
 		}
 

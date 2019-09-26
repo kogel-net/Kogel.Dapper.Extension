@@ -71,5 +71,8 @@ namespace Kogel.Dapper.Core.Test.Models.Model
 		/// 1：已推送
 		/// </summary>
 		public int SIMPush { get; set; }
+
+		[Display(IsField = false)]
+		public List<string> test { get; set; }
 	}
 }
