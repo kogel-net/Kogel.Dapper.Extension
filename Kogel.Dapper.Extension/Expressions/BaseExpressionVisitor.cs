@@ -79,7 +79,9 @@ namespace Kogel.Dapper.Extension.Expressions
                 //DateTime.Now和DateTime.Now不同，属于成员对象
                 if (node.Type == typeof(DateTime))
                 {
-                    field = field.Replace($"{providerOption.CombineFieldName("DateTime")}.{providerOption.CombineFieldName("Now")}", providerOption.GetDate());
+					field = field.Replace($"{providerOption.CombineFieldName("DateTime")}.{providerOption.CombineFieldName("Now")}", providerOption.GetDate())
+						.Replace(providerOption.CombineFieldName("Now"), providerOption.GetDate());
+					
                 }
                 GenerateField(field);
             }
@@ -233,24 +235,30 @@ namespace Kogel.Dapper.Extension.Expressions
             Param.Add(ParamName, node.ToConvertAndGetValue());
             return node;
         }
+		private object GetValue(Expression expression)
+		{
+			object value = expression is ConditionalExpression ? ((ConditionalExpression)expression).ToConvertAndGetValue() : expression.ToConvertAndGetValue();
+			return value;
+		}
+
         private void Operation(MethodCallExpression node)
         {
             switch (node.Method.Name)
             {
                 case "Contains":
-                    {
-                        Visit(node.Object);
-                        this.SpliceField.Append($" LIKE {ParamName}");
-                        var argumentExpression = (ConstantExpression)node.Arguments[0];
-                        Param.Add(ParamName, "%" + argumentExpression.ToConvertAndGetValue() + "%");
-                    }
+					{
+						Visit(node.Object);
+						this.SpliceField.Append($" LIKE {ParamName}");
+						var value = GetValue(node.Arguments[0]);
+						Param.Add(ParamName, "%" + value + "%");
+					}
                     break;
                 case "Equals":
                     {
                         Visit(node.Object);
                         this.SpliceField.Append($" = {ParamName}");
-                        var argumentExpression = (ConstantExpression)node.Arguments[0];
-                        Param.Add(ParamName, argumentExpression.ToConvertAndGetValue());
+						var value = GetValue(node.Arguments[0]);
+						Param.Add(ParamName, value);
                     }
                     break;
                 case "In":

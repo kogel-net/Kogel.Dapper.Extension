@@ -46,17 +46,17 @@ namespace Kogel.Dapper.Extension.Expressions
                     _sqlCmd.Append(",");
                 string field = fieldArr[i];
                 string value = base.FieldList[i];
-                //判断是不是包含字段的值，如果是就不放入Param中
-                if (value.Contains(entity.AsName))
-                {
-                    _sqlCmd.Append(field + "=" + value);
-                }
-                else
-                {
-                    var ParamName = $"UPDATE_{field}_{i}";
-                    _sqlCmd.Append($"{providerOption.CombineFieldName(field)}={providerOption.ParameterPrefix + ParamName}");
-                    Param.Add(ParamName, value);
-                }
+				//判断是不是包含字段的值，如果是就不放入Param中
+				if (value.Contains(entity.AsName) || value == providerOption.GetDate())
+				{
+					_sqlCmd.Append(field + "=" + value);
+				}
+				else
+				{
+					var ParamName = $"UPDATE_{field}_{i}";
+					_sqlCmd.Append($"{providerOption.CombineFieldName(field)}={providerOption.ParameterPrefix + ParamName}");
+					Param.Add(ParamName, value);
+				}
             }
             //加入条件参数
             Param.AddDynamicParams(base.Param);
