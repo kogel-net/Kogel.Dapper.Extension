@@ -41,7 +41,15 @@ namespace Kogel.Dapper.Extension.Core.SetC
             return DbCon.Execute(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
         }
 
-        public async Task<int> UpdateAsync(T entity)
+		public int Update(IEnumerable<T> entities, int timeout = 120)
+		{
+			SqlProvider.FormatUpdate(entities.FirstOrDefault());
+			//批量修改不需要别名（暂时有点小bug，先勉强使用下）
+			SqlProvider.SqlString = SqlProvider.SqlString.Replace("Update_", "").Replace("_0","").Replace("_1", "");
+			return DbCon.Execute(SqlProvider.SqlString, entities, DbTransaction, timeout);
+		}
+
+		public async Task<int> UpdateAsync(T entity)
         {
             SqlProvider.FormatUpdate(entity);
             return await DbCon.ExecuteAsync(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
@@ -90,16 +98,16 @@ namespace Kogel.Dapper.Extension.Core.SetC
             return result != null ? Convert.ToInt32(result) : 0;
         }
 
-        public int BatchInsert(IEnumerable<T> entities, int timeout = 120)
+        public int Insert(IEnumerable<T> entities, int timeout = 120)
         {
             SqlProvider.FormatInsert(entities.FirstOrDefault());
             return DbCon.Execute(SqlProvider.SqlString, entities, DbTransaction, timeout);
         }
 
-        public async Task<int> BatchInsertAsync(IEnumerable<T> entities, int timeout = 120)
+        public async Task<int> InsertAsync(IEnumerable<T> entities, int timeout = 120)
         {
             SqlProvider.FormatInsert(entities.FirstOrDefault());
             return await DbCon.ExecuteAsync(SqlProvider.SqlString, entities, DbTransaction, timeout);
         }
-    }
+	}
 }
