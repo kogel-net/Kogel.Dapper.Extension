@@ -141,8 +141,13 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 					DynamicTree tree = dynamicTree[key];
 					if (tree != null && !string.IsNullOrEmpty(tree.Value))
 					{
+						Type tableType = typeof(T);
+						if (!string.IsNullOrEmpty(tree.Table))
+						{
+							tableType = EntityCache.QueryEntity(tree.Table).Type;
+						}
 						//如果不存在对应表就使用默认表
-						ParameterExpression param = Expression.Parameter(typeof(T), "param");
+						ParameterExpression param = Expression.Parameter(tableType, "param");
 						object value = tree.Value;
 						if (value == null)
 						{
@@ -189,7 +194,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 								whereExpress = Expression.Equal(Expression.Property(param, tree.Field), Expression.Constant(value));
 								break;
 						}
-						WhereExpressionList.Add(Expression.Lambda<Func<T, bool>>(TrimExpression.Trim(whereExpress), param));
+						WhereExpressionList.Add(Expression.Lambda(TrimExpression.Trim(whereExpress), param));
 					}
 				}
 			}

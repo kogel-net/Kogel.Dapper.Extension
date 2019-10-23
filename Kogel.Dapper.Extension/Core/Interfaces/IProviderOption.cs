@@ -39,7 +39,18 @@
         /// <param name="value">值</param>
         /// <returns></returns>
         public abstract string CombineDate(DateOption dateOption, string table, string field, string value);
-    }
+		/// <summary>
+		/// 模糊转义
+		/// </summary>
+		/// <param name="value"></param>
+		/// <param name="param"></param>
+		/// <returns></returns>
+		public virtual object FuzzyEscaping(object value,ref string param)
+		{
+			value = $"%{value}%";
+			return value;
+		}
+	}
     public enum DateOption
     {
         AddYears,

@@ -248,9 +248,14 @@ namespace Kogel.Dapper.Extension.Expressions
                 case "Contains":
 					{
 						Visit(node.Object);
-						this.SpliceField.Append($" LIKE {ParamName}");
+						//this.SpliceField.Append($" LIKE {ParamName}");
+						//var value = GetValue(node.Arguments[0]);
+						//Param.Add(ParamName, "%" + value + "%");
 						var value = GetValue(node.Arguments[0]);
-						Param.Add(ParamName, "%" + value + "%");
+						string param = ParamName;
+						value = providerOption.FuzzyEscaping(value,ref param);
+						this.SpliceField.Append($" LIKE {param}");
+						Param.Add(ParamName, value);
 					}
                     break;
                 case "Equals":
