@@ -148,7 +148,7 @@ namespace Kogel.Dapper.Extension.Extension
 		/// <param name="param"></param>
 		/// <param name="property"></param>
 		/// <param name="navigationEnum"></param>
-		public static void Set<T>(object data, IDbConnection dbCon, string sql, DynamicParameters param, PropertyInfo property, NavigationEnum navigationEnum)
+		private static void Set<T>(object data, IDbConnection dbCon, string sql, DynamicParameters param, PropertyInfo property, NavigationEnum navigationEnum)
 		{
 			//property.SetValue(data,)
 			if (navigationEnum == NavigationEnum.List)
