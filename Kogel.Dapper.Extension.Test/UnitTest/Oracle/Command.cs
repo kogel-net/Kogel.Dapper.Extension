@@ -65,7 +65,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
                     });
                 //批量新增
                 var result4 = conn.CommandSet<Comment>()
-                    .BatchInsert(new List<Comment>()
+                    .Insert(new List<Comment>()
                     {
                         commne,
                         commne,
