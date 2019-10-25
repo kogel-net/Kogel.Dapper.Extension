@@ -31,7 +31,7 @@ namespace Kogel.Dapper.Extension.Test
             mysqlQuery.Test();
 
             var mysqlCommand = new UnitTest.Mysql.Command();
-            mysqlCommand.Test();
+            //mysqlCommand.Test();
             #endregion
 
             #region oracle单元测试

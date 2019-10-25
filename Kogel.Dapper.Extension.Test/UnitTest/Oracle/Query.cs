@@ -18,11 +18,9 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
             using (var conn = new MySqlConnection(mysqlConnection))
             {
                 DateTime dateTime = DateTime.Now.AddDays(-10);
-                //单个属性返回
-                var ContentList = conn.QuerySet<Comment>()
-                     .Where(x => x.Id > 0 && x.SubTime > dateTime)
-                     .Where(x => x.SubTime > DateTime.Now)
-                     .ToList(x => x.Content);
+				//单个属性返回
+				var ContentList = conn.QuerySet<Comment>()
+					 .ToList();
 
                 var commne = conn.QuerySet<Comment>()
                     .Where(x => x.Id > 0)

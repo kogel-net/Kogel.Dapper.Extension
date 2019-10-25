@@ -50,34 +50,84 @@ namespace Kogel.Dapper.Extension.Model
             //反射实体类属性
             this.Properties = type.GetProperties();
             List<PropertyInfo> PropertyInfoList = new List<PropertyInfo>();
+			//字段字典
             this.FieldPairs = new Dictionary<string, string>();
-            //反射实体类字段
-            foreach (var item in this.Properties)
-            {
-                var fieldAttribute = item.GetCustomAttributes(true).FirstOrDefault(x => x.GetType().Equals(typeof(Display)));
-                if (fieldAttribute != null)
-                {
-                    var display = fieldAttribute as Display;
-                    //获取是否是表关系隐射字段
-                    if (display.IsField)
-                    {
-                        this.FieldPairs.Add(item.Name, item.Name);
-                        //获取是否有重命名
-                        if (!string.IsNullOrEmpty(display.Rename))
-                        {
-                            this.FieldPairs[item.Name] = display.Rename;
-                        }
-                        PropertyInfoList.Add(item);
-                    }
-                }
-                else
-                {
-                    this.FieldPairs.Add(item.Name, item.Name);
-                    PropertyInfoList.Add(item);
-                }
-            }
+			//导航列表
+			this.Navigations = new List<Navigation>();
+			//反射实体类字段
+			foreach (var item in this.Properties)
+			{
+				//当前字段是导航属性
+				var foreignKey = item.GetCustomAttributes(true).FirstOrDefault(x => x.GetType().Equals(typeof(ForeignKey)));
+				if (foreignKey != null)
+				{
+					var navigation = new Navigation();
+					//获取写入值的字段
+					navigation.AssoField = item.Name;
+					//获取当前表关联的字段
+					navigation.CurrentAssoField = (foreignKey as ForeignKey).Name;
+					//获取关联表类型
+					if (item.PropertyType.FullName.Contains("System.Collections.Generic.List"))
+					{
+						//集合(列表)
+						navigation.NavigationType = NavigationEnum.List;
+						var modelType = item.PropertyType.GenericTypeArguments.FirstOrDefault();
+						//获取关联表的实体
+						navigation.JsonAssoTable = modelType;
+						//获取关联表的主键
+						navigation.JoinAssoField = EntityCache.QueryEntity(modelType).Identitys;
+					}
+					else
+					{
+						//实体(单个)
+						navigation.NavigationType = NavigationEnum.Model;
+						//获取关联表的实体
+						navigation.JsonAssoTable = item.PropertyType;
+						//获取关联表的主键
+						navigation.JoinAssoField = EntityCache.QueryEntity(item.PropertyType).Identitys;
+					}
+					this.Navigations.Add(navigation);
+					continue;
+				}
+				//当前字段属性设置
+				var fieldAttribute = item.GetCustomAttributes(true).FirstOrDefault(x => x.GetType().Equals(typeof(Display)));
+				if (fieldAttribute != null)
+				{
+					var display = fieldAttribute as Display;
+					//获取是否是表关系隐射字段
+					if (display.IsField)
+					{
+						this.FieldPairs.Add(item.Name, item.Name);
+						//获取是否有重命名
+						if (!string.IsNullOrEmpty(display.Rename))
+						{
+							this.FieldPairs[item.Name] = display.Rename;
+						}
+						PropertyInfoList.Add(item);
+					}
+				}
+				else
+				{
+					this.FieldPairs.Add(item.Name, item.Name);
+					PropertyInfoList.Add(item);
+				}
+				//获取主键
+				if (string.IsNullOrEmpty(Identitys))
+				{
+					//当前字段是主键
+					var identityAttribute = item.GetCustomAttributes(true).FirstOrDefault(x => x.GetType().Equals(typeof(Identity)));
+					if (identityAttribute != null)
+					{
+						this.Identitys = this.FieldPairs[item.Name];
+					}
+				}
+			}
             this.Properties = PropertyInfoList.ToArray();
         }
+		/// <summary>
+		/// 主键名称
+		/// </summary>
+		public string Identitys { get; set; }
         /// <summary>
         /// 类名(表名称)
         /// </summary>
@@ -106,6 +156,10 @@ namespace Kogel.Dapper.Extension.Model
         /// 字段目录(属性名称和实体名称)
         /// </summary>
         public Dictionary<string,string> FieldPairs { get; set; }
+		/// <summary>
+		/// 导航属性列表
+		/// </summary>
+		public List<Navigation> Navigations { get; set; }
         /// <summary>
         /// 获取asname
         /// </summary>

@@ -36,7 +36,7 @@ namespace Kogel.Dapper.Extension.Attributes
         {
             this.Name = Name;
             this.Description = Description;
-            this.IsField = IsField;
+        
             this.Rename = string.IsNullOrEmpty(Rename) ? Name : Rename;
             this.Schema = Schema;
             this.AsName = AsName;

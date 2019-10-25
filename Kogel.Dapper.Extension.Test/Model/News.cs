@@ -20,6 +20,7 @@ namespace Kogel.Dapper.Extension.Test.Model
         /// <summary>
 		/// 新闻主键
         /// </summary>
+		[Identity]
         public long Id { get; set; }
         /// <summary>
         /// 新闻标签
