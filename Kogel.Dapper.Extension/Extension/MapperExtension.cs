@@ -48,18 +48,19 @@ namespace Kogel.Dapper.Extension.Extension
                 noParameterConstructorInfo = constructorInfoArray.FirstOrDefault();
                 using (var reader = conn.ExecuteReader(sql, param, transaction))
                 {
-                    var properties = EntityCache.QueryEntity(type).Properties;
-                    while (reader.Read())
-                    {
-                        object[] array = new object[properties.Length];
-                        for (var i = 0; i < properties.Length; i++)
-                        {
-                            var item = properties[i];
-                            array[i] = Convert.ChangeType(reader[item.Name], item.PropertyType);
-                        }
-                        t = (T)noParameterConstructorInfo.Invoke(array);
-                        data.Add(t);
-                    }
+					//var properties = EntityCache.QueryEntity(type).Properties;
+					//while (reader.Read())
+					//{
+					//    object[] array = new object[properties.Length];
+					//    for (var i = 0; i < properties.Length; i++)
+					//    {
+					//        var item = properties[i];
+					//        array[i] = Convert.ChangeType(reader[item.Name], item.PropertyType);
+					//    }
+					//    t = (T)noParameterConstructorInfo.Invoke(array);
+					//    data.Add(t);
+					//}
+					data = reader.Parse<T>().ToList();
                 }
             }
             else

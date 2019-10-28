@@ -22,9 +22,13 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				var ContentList = conn.QuerySet<Comment>()
 					 .ToList();
 
-                var commne = conn.QuerySet<Comment>()
-                    .Where(x => x.Id > 0)
-                    .Get();
+				var commne = conn.QuerySet<Comment>()
+					.Where(x => x.Id > 0)
+					.Get(x => new
+					{
+						x.Id,
+						x.Content
+					});
                 //翻页
                 var comment1 = conn.QuerySet<Comment>()
                     .Join<Comment, News>((a, b) => a.ArticleId == b.Id)

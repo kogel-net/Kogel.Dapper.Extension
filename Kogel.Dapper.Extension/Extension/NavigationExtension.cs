@@ -108,7 +108,8 @@ namespace Kogel.Dapper.Extension.Extension
 					//设置导航属性的值
 					var property = properties.FirstOrDefault(x => x.Name == navigation.AssoField);
 					//反射写入实际值
-					typeof(NavigationExtension).GetMethod("Set").MakeGenericMethod(navigation.JsonAssoTable).Invoke(null,
+					
+					typeof(NavigationExtension).GetMethod("SetValue").MakeGenericMethod(navigation.JsonAssoTable).Invoke(null,
 						new object[]
 						{
 							data,DbCon,sql,param,property,navigation.NavigationType
@@ -148,7 +149,7 @@ namespace Kogel.Dapper.Extension.Extension
 		/// <param name="param"></param>
 		/// <param name="property"></param>
 		/// <param name="navigationEnum"></param>
-		private static void Set<T>(object data, IDbConnection dbCon, string sql, DynamicParameters param, PropertyInfo property, NavigationEnum navigationEnum)
+		public static void SetValue<T>(object data, IDbConnection dbCon, string sql, DynamicParameters param, PropertyInfo property, NavigationEnum navigationEnum)
 		{
 			//property.SetValue(data,)
 			if (navigationEnum == NavigationEnum.List)
