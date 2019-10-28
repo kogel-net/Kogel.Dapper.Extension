@@ -36,12 +36,6 @@ namespace Kogel.Dapper.Extension.Test.Model
         /// 关联的评论id
         /// </summary>
         public int RefCommentId { get; set; }
-
-		/// <summary>
-		/// 新闻列表
-		/// </summary>
-		[ForeignKey("ArticleId")]
-		public List<News> NewsList { get; set; }
     }
     [Display(Rename = "Comment", AsName ="commm5")]
     public class Comment1 : Comment

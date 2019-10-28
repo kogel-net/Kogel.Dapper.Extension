@@ -50,7 +50,37 @@ namespace Kogel.Dapper.Extension.Expressions
             //判断是不是实体类
             if (expression.Body is MemberInitExpression)
             {
-                fieldArr = ((MemberInitExpression)expression.Body).Bindings.AsList().Select(x => entity.FieldPairs[x.Member.Name]).ToArray();
+				var bingings = ((MemberInitExpression)expression.Body).Bindings;
+				//fieldArr = bingings
+				//	.AsList()
+				//	.Where(x => entity.FieldPairs.Any(y => y.Key.Equals(x.Member.Name)))
+				//	.Select(x => entity.FieldPairs[x.Member.Name])
+				//	.ToArray();
+				List<string> fieldList = new List<string>();
+				foreach (var bind in bingings)
+				{
+					if (bind is MemberAssignment)
+					{
+						//必须存在实体类中
+						if (entity.FieldPairs.Any(x=>x.Key.Equals(bind.Member.Name)))
+						{
+							var assignment = (bind as MemberAssignment);
+							if (assignment.Expression.Type.FullName.Contains("System.Collections.Generic.List"))
+							{
+								providerOption.NavigationList.Add(new NavigationMemberAssign()
+								{
+									MemberAssign = assignment,
+									MemberAssignName = bind.Member.Name
+								});
+							}
+							else
+							{
+								fieldList.Add(entity.FieldPairs[bind.Member.Name]);
+							}
+						}
+					}
+				}
+				fieldArr = fieldList.ToArray();
             }
             else//匿名类
             {
@@ -58,21 +88,26 @@ namespace Kogel.Dapper.Extension.Expressions
             }
             //开始解析对象
             Visit(expression);
-            if (!expression.Body.NodeType.Equals(ExpressionType.MemberAccess))
-            {
-                //开始拼接成查询字段
-                for (var i = 0; i < fieldArr.Length; i++)
-                {
-                    if (_sqlCmd.Length != 0)
-                        _sqlCmd.Append(",");
-                    _sqlCmd.Append(base.FieldList[i] + " as " + fieldArr[i]);
-                }
-            }
-            else
-            {
-                //单个字段返回
-                _sqlCmd.Append(base.FieldList[0]);
-            }
+			if (!expression.Body.NodeType.Equals(ExpressionType.MemberAccess))
+			{
+				//开始拼接成查询字段
+				for (var i = 0; i < fieldArr.Length; i++)
+				{
+					if (i < base.FieldList.Count)
+					{
+						if (_sqlCmd.Length != 0)
+							_sqlCmd.Append(",");
+						_sqlCmd.Append(base.FieldList[i] + " as " + fieldArr[i]);
+						//记录隐射对象
+						providerOption.MappingList.Add(base.FieldList[i], fieldArr[i]);
+					}
+				}
+			}
+			else
+			{
+				//单个字段返回
+				_sqlCmd.Append(base.FieldList[0]);
+			}
             this.Param.AddDynamicParams(base.Param);
         }
     }

@@ -39,13 +39,13 @@ namespace Kogel.Dapper.Extension.Extension.From
 		{
 			querySet.SqlProvider.Context.Set.SelectExpression = exp;
 			querySet.SqlProvider.FormatGet<T>();
-			return querySet.DbCon.QueryFirst_1<TReturn>(querySet.SqlProvider.SqlString, querySet.SqlProvider.Params, querySet.DbTransaction);
+			return querySet.DbCon.QueryFirst_1<TReturn>(querySet.SqlProvider.SqlString, querySet.SqlProvider.ProviderOption, querySet.SqlProvider.Params, querySet.DbTransaction);
 		}
 		public IEnumerable<TReturn> ToList<TReturn>(LambdaExpression exp)
 		{
 			querySet.SqlProvider.Context.Set.SelectExpression = exp;
 			querySet.SqlProvider.FormatToList<T>();
-			return querySet.DbCon.Query_1<TReturn>(querySet.SqlProvider.SqlString, querySet.SqlProvider.Params, querySet.DbTransaction);
+			return querySet.DbCon.Query_1<TReturn>(querySet.SqlProvider.SqlString, querySet.SqlProvider.ProviderOption, querySet.SqlProvider.Params, querySet.DbTransaction);
 		}
 		public ISelect<T> OrderBy<TProperty>(Expression<Func<TProperty, object>> field)
 		{
@@ -73,7 +73,7 @@ namespace Kogel.Dapper.Extension.Extension.From
 			//查询数据
 			querySet.SqlProvider.Context.Set.SelectExpression = exp;
 			querySet.SqlProvider.FormatToPageList<T>(pageIndex, pageSize, false);
-			var itemList = querySet.DbCon.Query_1<TReturn>(querySet.SqlProvider.SqlString, querySet.SqlProvider.Params, querySet.DbTransaction);
+			var itemList = querySet.DbCon.Query_1<TReturn>(querySet.SqlProvider.SqlString, querySet.SqlProvider.ProviderOption, querySet.SqlProvider.Params, querySet.DbTransaction);
 			return new PageList<TReturn>(pageIndex, pageSize, pageTotal, itemList);
 		}
 	}

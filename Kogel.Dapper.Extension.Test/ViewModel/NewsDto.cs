@@ -9,7 +9,8 @@ namespace Kogel.Dapper.Extension.Test.ViewModel
 {
 	public class NewsDto
 	{
-		[Identity]
 		public long Id { get; set; }
+
+		public string Contents { get; set; }
 	}
 }

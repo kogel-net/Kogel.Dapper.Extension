@@ -186,5 +186,10 @@ namespace Kogel.Dapper.Extension.Extension
             Param = subquery.Param;
             return subquery.SqlCmd;
         }
-    }
+
+		public static LambdaExpression GetLambdaExpression(this Expression expression)
+		{
+			return (LambdaExpression)(((UnaryExpression)(expression)).Operand);
+		}
+	}
 }

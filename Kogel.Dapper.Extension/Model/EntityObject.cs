@@ -5,6 +5,7 @@ using System.Linq;
 using Kogel.Dapper.Extension.Attributes;
 using Kogel.Dapper.Extension.Helper;
 using Kogel.Dapper.Extension.Core.Interfaces;
+using System.Linq.Expressions;
 
 namespace Kogel.Dapper.Extension.Model
 {
@@ -57,38 +58,44 @@ namespace Kogel.Dapper.Extension.Model
 			//反射实体类字段
 			foreach (var item in this.Properties)
 			{
-				//当前字段是导航属性
-				var foreignKey = item.GetCustomAttributes(true).FirstOrDefault(x => x.GetType().Equals(typeof(ForeignKey)));
-				if (foreignKey != null)
-				{
-					var navigation = new Navigation();
-					//获取写入值的字段
-					navigation.AssoField = item.Name;
-					//获取当前表关联的字段
-					navigation.CurrentAssoField = (foreignKey as ForeignKey).Name;
-					//获取关联表类型
-					if (item.PropertyType.FullName.Contains("System.Collections.Generic.List"))
-					{
-						//集合(列表)
-						navigation.NavigationType = NavigationEnum.List;
-						var modelType = item.PropertyType.GenericTypeArguments.FirstOrDefault();
-						//获取关联表的实体
-						navigation.JsonAssoTable = modelType;
-						//获取关联表的主键
-						navigation.JoinAssoField = EntityCache.QueryEntity(modelType).Identitys;
-					}
-					else
-					{
-						//实体(单个)
-						navigation.NavigationType = NavigationEnum.Model;
-						//获取关联表的实体
-						navigation.JsonAssoTable = item.PropertyType;
-						//获取关联表的主键
-						navigation.JoinAssoField = EntityCache.QueryEntity(item.PropertyType).Identitys;
-					}
-					this.Navigations.Add(navigation);
-					continue;
-				}
+				////当前字段是导航属性
+				//var foreignKey = item.GetCustomAttributes(true).FirstOrDefault(x => x.GetType().Equals(typeof(ForeignKey)));
+				//if (foreignKey != null)
+				//{
+				//	var navigation = new Navigation();
+				//	//获取写入值的字段
+				//	navigation.AssoField = item.Name;
+				//	//获取当前表关联的字段
+				//	string currentAssoField = (foreignKey as ForeignKey).Name;
+				//	//获取关联表类型
+				//	if (item.PropertyType.FullName.Contains("System.Collections.Generic.List"))
+				//	{
+				//		//集合(列表)
+				//		navigation.NavigationType = NavigationEnum.List;
+				//		var modelType = item.PropertyType.GenericTypeArguments.FirstOrDefault();
+				//		//获取关联表的实体
+				//		navigation.JsonAssoTable = modelType;
+				//		//获取关联表的主键
+				//		string whereField = EntityCache.QueryEntity(modelType).Identitys;
+				//		////写入条件
+				//		//typeof(EntityObject).GetMethod("SetWhere")
+				//		//	.MakeGenericMethod(navigation.JsonAssoTable)
+				//		//	.Invoke(this, new object[] {
+				//		//		navigation.WhereExpressionList,$"x=>x.{new int []{ 1 }}.Contains({whereField})"
+				//		//	});
+				//	}
+				//	else
+				//	{
+				//		//实体(单个)
+				//		navigation.NavigationType = NavigationEnum.Model;
+				//		//获取关联表的实体
+				//		navigation.JsonAssoTable = item.PropertyType;
+				//		//获取关联表的主键
+				//		//navigation.JoinAssoField = EntityCache.QueryEntity(item.PropertyType).Identitys;
+				//	}
+				//	this.Navigations.Add(navigation);
+				//	continue;
+				//}
 				//当前字段属性设置
 				var fieldAttribute = item.GetCustomAttributes(true).FirstOrDefault(x => x.GetType().Equals(typeof(Display)));
 				if (fieldAttribute != null)
@@ -180,5 +187,16 @@ namespace Kogel.Dapper.Extension.Model
             }
             return asName;     
         }
+		/// <summary>
+		/// 写入导航属性关联条件
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="WhereExpressionList"></param>
+		/// <param name="sqlWhere"></param>
+		public void SetWhere<T>(List<LambdaExpression> WhereExpressionList, string sqlWhere)
+		{
+			var whereExpression = StringToLambda.LambdaParser.Parse<Func<T, bool>>(sqlWhere);
+			WhereExpressionList.Add(whereExpression);
+		}
     }
 }

@@ -88,30 +88,35 @@ namespace Kogel.Dapper.Extension.Expressions
             return node;
         }
 
-        /// <summary>
-        /// 待执行的方法对象
-        /// </summary>
-        /// <param name="node"></param>
-        /// <returns></returns>
-        protected override Expression VisitMethodCall(MethodCallExpression node)
-        {
-            if (node.Method.DeclaringType.FullName.Contains("Convert"))//使用convert函数里待执行的sql数据
-            {
-                Visit(node.Arguments[0]);
-            }
-            else if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension"))
-            {
-                DynamicParameters parameters = new DynamicParameters();
-                GenerateField("(" + node.MethodCallExpressionToSql(ref parameters) + ")");
+		/// <summary>
+		/// 待执行的方法对象
+		/// </summary>
+		/// <param name="node"></param>
+		/// <returns></returns>
+		protected override Expression VisitMethodCall(MethodCallExpression node)
+		{
+			//保存导航查询的属性
+			if (node.Method.ReturnType.FullName.Contains("System.Collections.Generic.List"))
+			{
+				return node;
+			}
+			if (node.Method.DeclaringType.FullName.Contains("Convert"))//使用convert函数里待执行的sql数据
+			{
+				Visit(node.Arguments[0]);
+			}
+			else if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension"))
+			{
+				DynamicParameters parameters = new DynamicParameters();
+				GenerateField("(" + node.MethodCallExpressionToSql(ref parameters) + ")");
 
-                Param.AddDynamicParams(parameters);
-            }
-            else
-            {
-                GenerateField(GetFieldValue(node));
-            }
-            return node;
-        }
+				Param.AddDynamicParams(parameters);
+			}
+			else
+			{
+				GenerateField(GetFieldValue(node));
+			}
+			return node;
+		}
         /// <summary>
         /// 生成字段
         /// </summary>

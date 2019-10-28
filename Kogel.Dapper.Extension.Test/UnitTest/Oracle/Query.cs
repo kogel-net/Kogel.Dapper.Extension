@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Kogel.Dapper.Extension.Core.SetQ;
 using Kogel.Dapper.Extension.MySql;
 using Kogel.Dapper.Extension.Test.Model;
+using Kogel.Dapper.Extension.Test.ViewModel;
 using MySql.Data.MySqlClient;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
@@ -20,7 +21,17 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                 DateTime dateTime = DateTime.Now.AddDays(-10);
 				//单个属性返回
 				var ContentList = conn.QuerySet<Comment>()
-					 .ToList();
+					 .ToList(x => new CommentDto()
+					 {
+						 Id = x.Id,
+						 ArticleIds = x.ArticleId,
+						 count = new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id == x.ArticleId).Count(),
+						 NewsList = new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id > 0 && y.Id == x.ArticleId).ToList(y => new NewsDto()
+						 {
+							 Id = y.Id,
+							 Contents = y.Content
+						 }).ToList()
+					 });
 
 				var commne = conn.QuerySet<Comment>()
 					.Where(x => x.Id > 0)

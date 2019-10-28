@@ -50,7 +50,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 		{
 			SqlProvider.Context.Set.SelectExpression = select;
 			SqlProvider.FormatGet<T>();
-			return DbCon.QueryFirst_1<TReturn>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
+			return DbCon.QueryFirst_1<TReturn>(SqlProvider.SqlString, SqlProvider.ProviderOption, SqlProvider.Params, DbTransaction);
 		}
 		public async Task<T> GetAsync()
 		{
@@ -72,7 +72,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 		{
 			SqlProvider.Context.Set.SelectExpression = select;
 			SqlProvider.FormatToList<T>();
-			return DbCon.Query_1<TReturn>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
+			return DbCon.Query_1<TReturn>(SqlProvider.SqlString, SqlProvider.ProviderOption, SqlProvider.Params, DbTransaction);
 		}
 		public async Task<IEnumerable<T>> ToListAsync()
 		{
@@ -129,7 +129,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			//查询数据
 			SqlProvider.Context.Set.SelectExpression = select;
 			SqlProvider.FormatToPageList<T>(pageIndex, pageSize, false);
-			var itemList = DbCon.Query_1<TReturn>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
+			var itemList = DbCon.Query_1<TReturn>(SqlProvider.SqlString, SqlProvider.ProviderOption, SqlProvider.Params, DbTransaction);
 			return new PageList<TReturn>(pageIndex, pageSize, pageTotal, itemList);
 		}
 	}

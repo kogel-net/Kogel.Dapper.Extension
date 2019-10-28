@@ -14,7 +14,15 @@ namespace Kogel.Dapper.Extension.Test.ViewModel
 		/// <summary>
 		/// 
 		/// </summary>
+		public int ArticleIds { get; set; }
+		/// <summary>
+		/// 
+		/// </summary>
 		public string Content { get; set; }
+		/// <summary>
+		/// 
+		/// </summary>
+		public int count { get; set; }
 
 		public List<NewsDto> NewsList { get; set; }
 	}

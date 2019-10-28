@@ -28,7 +28,7 @@ namespace Kogel.Dapper.Extension.Extension
 		/// <returns></returns>
 		public static T QueryFirstOrDefaults<T>(this IDbConnection DbCon, string sql, object param, IDbTransaction transaction, IProviderOption providerOption)
 		{
-			return DbCon.QueryFirstOrDefault<T>(sql, param, transaction).SetNavigation(DbCon, providerOption);
+			return DbCon.QueryFirstOrDefault<T>(sql, param, transaction);
 		}
 		/// <summary>
 		/// 单个异步返回
@@ -54,7 +54,7 @@ namespace Kogel.Dapper.Extension.Extension
 		/// <returns></returns>
 		public static IEnumerable<T> Querys<T>(this IDbConnection DbCon, string sql, object param, IDbTransaction transaction, IProviderOption providerOption)
 		{
-			return DbCon.Query<T>(sql, param, transaction).SetNavigationList(DbCon, providerOption);
+			return DbCon.Query<T>(sql, param, transaction);
 		}
 		/// <summary>
 		/// 列表异步返回
@@ -79,89 +79,6 @@ namespace Kogel.Dapper.Extension.Extension
 		public static T QuerySingles<T>(this IDbConnection DbCon, string sql, object param, IDbTransaction transaction)
 		{
 			return DbCon.QuerySingle<T>(sql, param, transaction);
-		}
-		/// <summary>
-		/// 写入导航属性到实体(单条)
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="data"></param>
-		/// <param name="DbCon"></param>
-		/// <returns></returns>
-		private static T SetNavigation<T>(this T data, IDbConnection DbCon, IProviderOption providerOption)
-		{
-			//当前实体的类型
-			var entity = EntityCache.QueryEntity(typeof(T));
-			if (entity.Navigations.Any())
-			{
-				//当前实体反射的属性
-				var properties = data.GetType().GetProperties();
-				//循环设置导航属性
-				foreach (var navigation in entity.Navigations)
-				{
-					//获取当前关联字段的值
-					object value = properties.FirstOrDefault(x => x.Name == navigation.CurrentAssoField).GetValue(data);
-					DynamicParameters param = new DynamicParameters();
-					param.Add(navigation.JoinAssoField, value);
-					//sql
-					string sql = $@"SELECT * FROM { providerOption.CombineFieldName(EntityCache.QueryEntity(navigation.JsonAssoTable).Name)} 
-                                    WHERE {navigation.JoinAssoField}={providerOption.ParameterPrefix + navigation.JoinAssoField}";
-					//设置导航属性的值
-					var property = properties.FirstOrDefault(x => x.Name == navigation.AssoField);
-					//反射写入实际值
-					
-					typeof(NavigationExtension).GetMethod("SetValue").MakeGenericMethod(navigation.JsonAssoTable).Invoke(null,
-						new object[]
-						{
-							data,DbCon,sql,param,property,navigation.NavigationType
-						});
-				}
-			}
-			return data;
-		}
-		/// <summary>
-		/// 写入导航属性到实体(列表)
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="data"></param>
-		/// <param name="DbCon"></param>
-		/// <returns></returns>
-		private static IEnumerable<T> SetNavigationList<T>(this IEnumerable<T> data, IDbConnection DbCon, IProviderOption providerOption)
-		{
-			//当前实体的类型
-			var entity = EntityCache.QueryEntity(typeof(T));
-			if (entity.Navigations.Any())
-			{
-				//暂时用循环（可能性能有点差,有更好的解决办法可以一起交流）
-				foreach (var item in data)
-				{
-					item.SetNavigation(DbCon, providerOption);
-				}
-			}
-			return data;
-		}
-		/// <summary>
-		/// 写入导航属性的值
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="data"></param>
-		/// <param name="dbCon"></param>
-		/// <param name="sql"></param>
-		/// <param name="param"></param>
-		/// <param name="property"></param>
-		/// <param name="navigationEnum"></param>
-		public static void SetValue<T>(object data, IDbConnection dbCon, string sql, DynamicParameters param, PropertyInfo property, NavigationEnum navigationEnum)
-		{
-			//property.SetValue(data,)
-			if (navigationEnum == NavigationEnum.List)
-			{
-				var naviData = dbCon.Query<T>(sql, param);
-				property.SetValue(data, naviData);
-			}
-			else
-			{
-				var naviData = dbCon.QueryFirstOrDefault<T>(sql, param);
-				property.SetValue(data, naviData);
-			}
 		}
 	}
 }
