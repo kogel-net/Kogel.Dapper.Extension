@@ -26,11 +26,11 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 						 Id = x.Id,
 						 ArticleIds = x.ArticleId,
 						 count = new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id == x.ArticleId).Count(),
-						 //NewsList = new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id == x.ArticleId).ToList(y => new NewsDto()
-						 //{
-						 // Id = y.Id,
-						 // Contents = y.Content
-						 //}).ToList()
+						 NewsList = new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id == x.ArticleId).ToList(y => new NewsDto()
+						 {
+							 Id = y.Id,
+							 Contents = y.Content
+						 }).ToList(),
 						 NewsDto = new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id == x.ArticleId).Get(y => new NewsDto()
 						 {
 							 Id = y.Id,

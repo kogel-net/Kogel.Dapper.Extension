@@ -39,7 +39,7 @@ namespace Kogel.Dapper.Extension.Extension
 		/// <returns></returns>
 		private static List<T> QueryRowImpl<T>(IDbConnection conn, string sql, object param = null, IDbTransaction transaction = null)
 		{
-			List<T> data = new List<T>();
+			List<T> data = default(List<T>);
 			Type type = typeof(T);
 			ConstructorInfo[] constructorInfoArray = type.GetConstructors(BindingFlags.Instance
 			| BindingFlags.NonPublic
@@ -70,25 +70,30 @@ namespace Kogel.Dapper.Extension.Extension
 		/// <returns></returns>
 		private static T SetNavigation<T>(this T data, IDbConnection dbCon, IProviderOption providerOption)
 		{
-			foreach (var navigation in providerOption.NavigationList)
+			if (providerOption.NavigationList.Any())
 			{
-				var navigationExpression = new NavigationExpression(navigation.MemberAssign.Expression);
-				//根据得知的映射列表获取条件值
-				foreach (var mapp in providerOption.MappingList)
+				//写入值方法
+				var setValueMethod = typeof(MapperExtension).GetMethod("SetValue");
+				foreach (var navigation in providerOption.NavigationList)
 				{
-					//根据映射的键设置实际的值
-					if (navigationExpression.SqlCmd.IndexOf($"= {mapp.Key}") != -1)
+					var navigationExpression = new NavigationExpression(navigation.MemberAssign.Expression);
+					//根据得知的映射列表获取条件值
+					foreach (var mapp in providerOption.MappingList)
 					{
-						string param = $"{providerOption.ParameterPrefix}{mapp.Value}";
-						navigationExpression.SqlCmd = navigationExpression.SqlCmd.Replace($"= {mapp.Key}", $"= {param}");
-						//获取实体类的值
-						object paramValue = EntityCache.QueryEntity(typeof(T)).Properties.FirstOrDefault(x => x.Name == mapp.Value).GetValue(data);
-						navigationExpression.Param.Add(param, paramValue);
+						//根据映射的键设置实际的值
+						if (navigationExpression.SqlCmd.IndexOf($"= {mapp.Key}") != -1)
+						{
+							string param = $"{providerOption.ParameterPrefix}{mapp.Value}";
+							navigationExpression.SqlCmd = navigationExpression.SqlCmd.Replace($"= {mapp.Key}", $"= {param}");
+							//获取实体类的值
+							object paramValue = EntityCache.QueryEntity(typeof(T)).Properties.FirstOrDefault(x => x.Name == mapp.Value).GetValue(data);
+							navigationExpression.Param.Add(param, paramValue);
+						}
 					}
+					setValueMethod
+						.MakeGenericMethod(new Type[] { typeof(T), navigationExpression.ReturnType })
+						.Invoke(null, new object[] { data, dbCon, navigationExpression.SqlCmd, navigationExpression.Param, navigation.MemberAssignName });
 				}
-				typeof(MapperExtension).GetMethod("SetValue")
-					.MakeGenericMethod(new Type[] { typeof(T), navigationExpression.ReturnType })
-					.Invoke(null, new object[] { data, dbCon, navigationExpression.SqlCmd, navigationExpression.Param, navigation.MemberAssignName });
 			}
 			return data;
 		}
@@ -119,6 +124,7 @@ namespace Kogel.Dapper.Extension.Extension
 		{
 			if (providerOption.NavigationList.Any())
 			{
+				var setListMethod = typeof(MapperExtension).GetMethod("SetListValue");
 				foreach (var navigation in providerOption.NavigationList)
 				{
 					StringBuilder sqlBuilder = new StringBuilder();
@@ -134,17 +140,17 @@ namespace Kogel.Dapper.Extension.Extension
 							foreach (var item in data)
 							{
 								string param = $"{providerOption.ParameterPrefix}{mapp.Value}_{paramCount++}";
-								sqlBuilder.Append(navigationExpression.SqlCmd.Replace($"= {mapp.Key}", $"= {param}")+$";{Environment.NewLine}");
+								sqlBuilder.Append(navigationExpression.SqlCmd.Replace($"= {mapp.Key}", $"= {param}") + $";{Environment.NewLine}");
 								//获取实体类的值
 								object paramValue = EntityCache.QueryEntity(typeof(T)).Properties.FirstOrDefault(x => x.Name == mapp.Value).GetValue(item);
 								navigationExpression.Param.Add(param, paramValue);
-							}	
+							}
 						}
 					}
-					typeof(MapperExtension).GetMethod("SetListValue")
-					.MakeGenericMethod(new Type[] { typeof(T), navigationExpression.ReturnType })
-					.Invoke(null, new object[] { data, dbCon, sqlBuilder.ToString(), navigationExpression.Param,
-						navigation.MemberAssignName });
+					setListMethod
+					   .MakeGenericMethod(new Type[] { typeof(T), navigationExpression.ReturnType })
+					   .Invoke(null, new object[] { data, dbCon, sqlBuilder.ToString(), navigationExpression.Param,
+						    navigation.MemberAssignName });
 				}
 			}
 			return data;
