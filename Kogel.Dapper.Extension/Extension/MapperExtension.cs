@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using Dapper;
 using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension.Expressions;
+using System.Text;
 
 namespace Kogel.Dapper.Extension.Extension
 {
@@ -113,19 +115,66 @@ namespace Kogel.Dapper.Extension.Extension
 		/// <param name="data"></param>
 		/// <param name="DbCon"></param>
 		/// <returns></returns>
-		private static List<T> SetNavigationList<T>(this List<T> data, IDbConnection DbCon, IProviderOption providerOption)
+		private static List<T> SetNavigationList<T>(this List<T> data, IDbConnection dbCon, IProviderOption providerOption)
 		{
 			if (providerOption.NavigationList.Any())
 			{
-				//暂时用循环（可能性能有点差,有更好的解决办法可以一起交流）
-				foreach (var item in data)
+				foreach (var navigation in providerOption.NavigationList)
 				{
-					item.SetNavigation(DbCon, providerOption);
+					StringBuilder sqlBuilder = new StringBuilder();
+					var navigationExpression = new NavigationExpression(navigation.MemberAssign.Expression);
+					//参数数
+					int paramCount = 0;
+					//根据得知的映射列表获取条件值
+					foreach (var mapp in providerOption.MappingList)
+					{
+						//根据映射的键设置实际的值
+						if (navigationExpression.SqlCmd.IndexOf($"= {mapp.Key}") != -1)
+						{
+							foreach (var item in data)
+							{
+								string param = $"{providerOption.ParameterPrefix}{mapp.Value}_{paramCount++}";
+								sqlBuilder.Append(navigationExpression.SqlCmd.Replace($"= {mapp.Key}", $"= {param}")+$";{Environment.NewLine}");
+								//获取实体类的值
+								object paramValue = EntityCache.QueryEntity(typeof(T)).Properties.FirstOrDefault(x => x.Name == mapp.Value).GetValue(item);
+								navigationExpression.Param.Add(param, paramValue);
+							}	
+						}
+					}
+					typeof(MapperExtension).GetMethod("SetListValue")
+					.MakeGenericMethod(new Type[] { typeof(T), navigationExpression.ReturnType })
+					.Invoke(null, new object[] { data, dbCon, sqlBuilder.ToString(), navigationExpression.Param,
+						navigation.MemberAssignName, navigationExpression.WhereExpression });
 				}
 			}
 			return data;
 		}
-		
+		/// <summary>
+		/// 执行对象并写入值到对象中
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <typeparam name="T1"></typeparam>
+		/// <param name="data"></param>
+		/// <param name="dbCon"></param>
+		/// <param name="sql"></param>
+		/// <param name="param"></param>
+		/// <param name="memberName"></param>
+		/// <param name="lambdas"></param>
+		public static void SetListValue<T, T1>(List<T> data, IDbConnection dbCon, string sql, DynamicParameters param, string memberName, List<LambdaExpression> lambdas)
+		{
+			//执行sql
+			var mapperGridList = dbCon.QueryMultiple(sql, param);
+			var mapperDataList = default(IEnumerable<T1>);
+			var count = 0;
+			foreach (var item in data)
+			{
+				mapperDataList = mapperGridList.Read<T1>();
+				//根据list关联的条件把值分配回去
+				PropertyInfo property = EntityCache.QueryEntity(typeof(T)).Properties.FirstOrDefault(x => x.Name.Equals(memberName));
+				property.SetValue(data[count], mapperDataList);
+				count++;
+			}
+		}
 		#endregion
 	}
 }

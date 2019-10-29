@@ -187,16 +187,16 @@ namespace Kogel.Dapper.Extension.Model
             }
             return asName;     
         }
-		/// <summary>
-		/// 写入导航属性关联条件
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="WhereExpressionList"></param>
-		/// <param name="sqlWhere"></param>
-		public void SetWhere<T>(List<LambdaExpression> WhereExpressionList, string sqlWhere)
-		{
-			var whereExpression = StringToLambda.LambdaParser.Parse<Func<T, bool>>(sqlWhere);
-			WhereExpressionList.Add(whereExpression);
-		}
+		///// <summary>
+		///// 写入导航属性关联条件
+		///// </summary>
+		///// <typeparam name="T"></typeparam>
+		///// <param name="WhereExpressionList"></param>
+		///// <param name="sqlWhere"></param>
+		//public void SetWhere<T>(List<LambdaExpression> WhereExpressionList, string sqlWhere)
+		//{
+		//	var whereExpression = StringToLambda.LambdaParser.Parse<Func<T, bool>>(sqlWhere);
+		//	WhereExpressionList.Add(whereExpression);
+		//}
     }
 }

@@ -31,12 +31,17 @@ namespace Kogel.Dapper.Extension.Expressions
 		/// 返回类型
 		/// </summary>
 		public Type ReturnType { get; set; }
+		/// <summary>
+		/// 条件表达式
+		/// </summary>
+		public List<LambdaExpression> WhereExpression { get; set; }
 
         public SubqueryExpression(MethodCallExpression methodCallExpression)
         {
             this.expression = methodCallExpression;
             this._sqlCmd = new StringBuilder();
             this.Param = new DynamicParameters();
+			this.WhereExpression = new List<LambdaExpression>();
 			this.AnalysisExpression();	
         }
         /// <summary>
@@ -50,17 +55,16 @@ namespace Kogel.Dapper.Extension.Expressions
             //获取queryset的类型
             var querySetEntity = EntityCache.QueryEntity(methodCall.Object.Type).Properties;
             //获取paramerer对象
-            List<LambdaExpression> lambdaList = new List<LambdaExpression>();
             foreach (UnaryExpression exp in methodCall.Arguments)
             {
                 this.parameterExpressions = new List<ParameterExpression>();
                 Visit(exp);
                 var lambda = Expression.Lambda(exp, parameterExpressions.ToList());
-                lambdaList.Add(lambda);
+				WhereExpression.Add(lambda);
             }
             //写入条件集合
             var WhereExpressionList = querySetEntity.FirstOrDefault(x => x.Name.Equals("WhereExpressionList"));
-            WhereExpressionList.SetValue(querySet, lambdaList);
+            WhereExpressionList.SetValue(querySet, WhereExpression);
             dynamic querySetDynamic = querySet;
             //执行指定函数
             var newExpression = ((NewExpression)methodCall.Object).Arguments[1];
