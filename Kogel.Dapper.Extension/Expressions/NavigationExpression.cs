@@ -33,7 +33,7 @@ namespace Kogel.Dapper.Extension.Expressions
 
 		protected override Expression VisitMethodCall(MethodCallExpression node)
 		{
-			var subquery = new SubqueryExpression(node.Arguments[0] as MethodCallExpression);
+			var subquery = new SubqueryExpression(node.Arguments[0] as MethodCallExpression ?? node);
 			this.SqlCmd = subquery.SqlCmd;
 			this.Param = subquery.Param;
 			this.ReturnType = subquery.ReturnType;

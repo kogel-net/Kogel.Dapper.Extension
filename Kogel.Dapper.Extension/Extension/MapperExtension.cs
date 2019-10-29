@@ -144,7 +144,7 @@ namespace Kogel.Dapper.Extension.Extension
 					typeof(MapperExtension).GetMethod("SetListValue")
 					.MakeGenericMethod(new Type[] { typeof(T), navigationExpression.ReturnType })
 					.Invoke(null, new object[] { data, dbCon, sqlBuilder.ToString(), navigationExpression.Param,
-						navigation.MemberAssignName, navigationExpression.WhereExpression });
+						navigation.MemberAssignName });
 				}
 			}
 			return data;
@@ -159,19 +159,28 @@ namespace Kogel.Dapper.Extension.Extension
 		/// <param name="sql"></param>
 		/// <param name="param"></param>
 		/// <param name="memberName"></param>
-		/// <param name="lambdas"></param>
-		public static void SetListValue<T, T1>(List<T> data, IDbConnection dbCon, string sql, DynamicParameters param, string memberName, List<LambdaExpression> lambdas)
+		public static void SetListValue<T, T1>(List<T> data, IDbConnection dbCon, string sql, DynamicParameters param, string memberName)
 		{
+			//得到需要分配值得对象
+			PropertyInfo property = EntityCache.QueryEntity(typeof(T)).Properties.FirstOrDefault(x => x.Name.Equals(memberName));
 			//执行sql
 			var mapperGridList = dbCon.QueryMultiple(sql, param);
-			var mapperDataList = default(IEnumerable<T1>);
 			var count = 0;
 			foreach (var item in data)
 			{
-				mapperDataList = mapperGridList.Read<T1>();
 				//根据list关联的条件把值分配回去
-				PropertyInfo property = EntityCache.QueryEntity(typeof(T)).Properties.FirstOrDefault(x => x.Name.Equals(memberName));
-				property.SetValue(data[count], mapperDataList);
+				//ToList
+				if (property.PropertyType.FullName.Contains("System.Collections.Generic.List"))
+				{
+					var mapperDataList = mapperGridList.Read<T1>();
+					property.SetValue(data[count], mapperDataList);
+				}
+				else
+				{
+					//Get
+					var mapperData = mapperGridList.ReadSingle<T1>();
+					property.SetValue(data[count], mapperData);
+				}
 				count++;
 			}
 		}

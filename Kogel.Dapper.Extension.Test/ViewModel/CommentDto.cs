@@ -25,5 +25,7 @@ namespace Kogel.Dapper.Extension.Test.ViewModel
 		public int count { get; set; }
 
 		public List<NewsDto> NewsList { get; set; }
+
+		public NewsDto NewsDto { get; set; }
 	}
 }

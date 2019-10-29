@@ -51,21 +51,18 @@ namespace Kogel.Dapper.Extension.Expressions
             if (expression.Body is MemberInitExpression)
             {
 				var bingings = ((MemberInitExpression)expression.Body).Bindings;
-				//fieldArr = bingings
-				//	.AsList()
-				//	.Where(x => entity.FieldPairs.Any(y => y.Key.Equals(x.Member.Name)))
-				//	.Select(x => entity.FieldPairs[x.Member.Name])
-				//	.ToArray();
 				List<string> fieldList = new List<string>();
 				foreach (var bind in bingings)
 				{
 					if (bind is MemberAssignment)
 					{
 						//必须存在实体类中
-						if (entity.FieldPairs.Any(x=>x.Key.Equals(bind.Member.Name)))
+						if (entity.FieldPairs.Any(x => x.Key.Equals(bind.Member.Name)))
 						{
 							var assignment = (bind as MemberAssignment);
-							if (assignment.Expression.Type.FullName.Contains("System.Collections.Generic.List"))
+							//判断是列表还是不是系统函数
+							if (assignment.Expression.Type.FullName.Contains("System.Collections.Generic.List") 
+								|| assignment.Expression.Type.BaseType.FullName.Contains("Kogel.Dapper.Extension.IBaseEntity"))
 							{
 								providerOption.NavigationList.Add(new NavigationMemberAssign()
 								{
@@ -82,9 +79,29 @@ namespace Kogel.Dapper.Extension.Expressions
 				}
 				fieldArr = fieldList.ToArray();
             }
-            else//匿名类
+            else//匿名类（暂时不支持子导航属性查询）
             {
-                fieldArr = entity.Properties.Select(x => x.Name).ToArray();
+				//List<string> fieldList = new List<string>();
+				//var bingings = expression.Body as NewExpression;
+			    //  //Expression.Lambda
+				//for (var i = 0; i < bingings.Arguments.Count; i++)
+				//{
+				//	var bind = bingings.Arguments[i];
+				//	//判断是列表还是不是系统函数
+				//	if (bind.Type.FullName.Contains("System.Collections.Generic.List") || bind.Type.Namespace != "System")
+				//	{
+				//		//providerOption.NavigationList.Add(new NavigationMemberAssign()
+				//		//{
+				//		//	MemberAssign = bind,
+				//		//	MemberAssignName = bind.Member.Name
+				//		//});
+				//	}
+				//	else
+				//	{
+				//		//fieldList.Add(entity.FieldPairs[bind.Member.Name]);
+				//	}
+				//}
+				fieldArr = entity.Properties.Select(x => x.Name).ToArray();
             }
             //开始解析对象
             Visit(expression);

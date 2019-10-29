@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Kogel.Dapper.Extension.Test.ViewModel
 {
-	public class NewsDto
+	public class NewsDto: IBaseEntity<NewsDto>
 	{
 		public long Id { get; set; }
 

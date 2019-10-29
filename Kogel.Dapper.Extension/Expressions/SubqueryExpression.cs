@@ -129,6 +129,15 @@ namespace Kogel.Dapper.Extension.Expressions
 				
 					}
 					break;
+				case "Get":
+					{
+						//加上自定义实体返回
+						var lambda = this.expression.Arguments[0].GetLambdaExpression();
+						this.ReturnType = lambda.ReturnType;
+						sqlProvider.Context.Set.SelectExpression = lambda;
+						sqlProvider.FormatGet<T>();
+					}
+					break;
 				case "ToList":
 					{
 						//加上自定义实体返回
