@@ -228,7 +228,7 @@ namespace Kogel.Dapper.Extension.Expressions
         }
 		private object GetValue(Expression expression)
 		{
-			object value = expression is ConditionalExpression ? ((ConditionalExpression)expression).ToConvertAndGetValue() : expression.ToConvertAndGetValue();
+			object value = expression.ToConvertAndGetValue();
 			return value;
 		}
 

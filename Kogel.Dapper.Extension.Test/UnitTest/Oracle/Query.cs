@@ -8,6 +8,7 @@ using Kogel.Dapper.Extension.MySql;
 using Kogel.Dapper.Extension.Test.Model;
 using Kogel.Dapper.Extension.Test.ViewModel;
 using MySql.Data.MySqlClient;
+using Dapper;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 {
@@ -19,6 +20,11 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
             using (var conn = new MySqlConnection(mysqlConnection))
             {
                 DateTime dateTime = DateTime.Now.AddDays(-10);
+
+				conn.QuerySet<Comment>().FieldMatch<Comment>();
+				var comments = conn.Query<Comment>("Select * from Comment").ToList();
+
+
 				//单个属性返回
 				var ContentList = conn.QuerySet<Comment>()
 					 .Where(x => x.Content.IsNotNull() && x.Content != "")
