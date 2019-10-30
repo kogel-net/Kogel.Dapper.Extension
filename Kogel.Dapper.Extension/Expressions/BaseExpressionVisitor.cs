@@ -76,7 +76,7 @@ namespace Kogel.Dapper.Extension.Expressions
                 var member = EntityCache.QueryEntity(node.Member.DeclaringType);
                 string fieldName = member.FieldPairs[node.Member.Name];
                 string field  = (IsAsName ? member.GetAsName(providerOption) : "") + providerOption.CombineFieldName(fieldName);
-                //DateTime.Now和DateTime.Now不同，属于成员对象
+                //DateTime.Now和DateTime.Now.Add(-1)不同，属于成员对象
                 if (node.Type == typeof(DateTime))
                 {
 					field = field.Replace($"{providerOption.CombineFieldName("DateTime")}.{providerOption.CombineFieldName("Now")}", providerOption.GetDate())
@@ -125,29 +125,33 @@ namespace Kogel.Dapper.Extension.Expressions
         {
             FieldList.Add(field);
         }
-        /// <summary>
-        /// 获取字段的值
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        protected virtual string GetFieldValue(Expression expression)
-        {
-            object value;
-            if (expression is ConstantExpression)
-            {
-                value = ((ConstantExpression)expression).Value;
-            }
-            else
-            {
-                value = expression.ToConvertAndGetValue();
-            }
-            if (value == null)
-            {
-                value = "NULL";
-            }
-            return value.ToString();
-        }
-    }
+		/// <summary>
+		/// 获取字段的值
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		protected virtual string GetFieldValue(Expression expression)
+		{
+			object value;
+			if (expression is ConstantExpression)
+			{
+				value = ((ConstantExpression)expression).Value;
+			}
+			else
+			{
+				value = expression.ToConvertAndGetValue();
+				if (expression.Type == typeof(DateTime))
+				{
+					value = ((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss");
+				}
+			}
+			if (value == null)
+			{
+				value = "NULL";
+			}
+			return value.ToString();
+		}
+	}
     public class WhereExpressionVisitor : BaseExpressionVisitor
     {
         private string FieldName { get; set; }//字段

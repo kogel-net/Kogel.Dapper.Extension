@@ -159,9 +159,9 @@ namespace Kogel.Dapper.Extension.MySql
             return this;
         }
 
-        public override SqlProvider FormatUpdate<T>(T entity)
+        public override SqlProvider FormatUpdate<T>(T entity, string[] excludeFields)
         {
-            var update = ResolveExpression.ResolveUpdates<T>(entity, Params);
+            var update = ResolveExpression.ResolveUpdates<T>(entity, Params, excludeFields);
             var whereSql = string.Empty;
             //表查询条件
             var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null, false);

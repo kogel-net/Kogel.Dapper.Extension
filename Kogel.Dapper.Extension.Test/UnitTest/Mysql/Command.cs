@@ -35,10 +35,10 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                    // Content = commne.Content,
                     SubTime = dateTime
                 });
-                //全部修改
-                var result1 = conn.CommandSet<Comment>()
-                    .Where(x => x.Id == commne.Id)
-                    .Update(commne);
+				//全部修改
+				var result1 = conn.CommandSet<Comment>()
+					.Where(x => x.Id == commne.Id)
+					.Update(commne, new string[] { "ArticleId" });
 
                 //新增
                 var result2 = conn.CommandSet<Comment>()

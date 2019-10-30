@@ -161,9 +161,9 @@ namespace Kogel.Dapper.Extension.Oracle
             return this;
         }
 
-        public override SqlProvider FormatUpdate<T>(T entity)
+        public override SqlProvider FormatUpdate<T>(T entity, string[] excludeFields)
         {
-            var update = ResolveExpression.ResolveUpdates<T>(entity, Params);
+			var update = ResolveExpression.ResolveUpdates<T>(entity, Params, excludeFields);
             var fromTableSql = ProviderOption.CombineFieldName(FormatTableName(false, false).Trim());
             var whereSql = string.Empty;
             //表查询条件

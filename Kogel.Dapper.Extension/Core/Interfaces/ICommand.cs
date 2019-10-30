@@ -7,7 +7,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 {
     public interface ICommand<T>
     {
-        int Update(T entity);
+		int Update(T entity, string[] excludeFields = null);
 
 		int Update(IEnumerable<T> entities, int timeout = 120);
 

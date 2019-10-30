@@ -146,43 +146,50 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         {
             return new UpdateExpression(updateExpression, providerOption);
         }
-        /// <summary>
-        /// 解析更新
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="t"></param>
-        /// <param name="Param"></param>
-        /// <returns></returns>
-        public virtual string ResolveUpdates<T>(T t, DynamicParameters Param)
-        {
-            var entity = EntityCache.QueryEntity(t.GetType());
-            var properties = entity.Properties;
-            StringBuilder builder = new StringBuilder();
-            foreach (var propertiy in properties)
-            {
-                //主键标识
-                var typeAttribute = propertiy.GetCustomAttributess(true).FirstOrDefault(x => x.GetType().Equals(typeof(Identity)));
-                if (typeAttribute != null)
-                {
-                    var identity = typeAttribute as Identity;
-                    //是否自增
-                    if (identity.IsIncrease)
-                    {
-                        continue;
-                    }
-                }
-                object value = propertiy.GetValue(t);
-                string name = entity.FieldPairs[propertiy.Name];
-                if (builder.Length != 0)
-                {
-                    builder.Append(",");
-                }
-                builder.Append($"{providerOption.CombineFieldName(name)}={providerOption.ParameterPrefix}Update_{name}");
-                Param.Add($"{providerOption.ParameterPrefix}Update_{name}", value);
-            }
-            builder.Insert(0, " SET ");
-            return builder.ToString();
-        }
+		/// <summary>
+		/// 解析更新语句
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="t"></param>
+		/// <param name="Param"></param>
+		/// <param name=""></param>
+		/// <param name="excludeFields"></param>
+		/// <returns></returns>
+		public virtual string ResolveUpdates<T>(T t, DynamicParameters Param, string[] excludeFields)
+		{
+			var entity = EntityCache.QueryEntity(t.GetType());
+			var properties = entity.Properties;
+			StringBuilder builder = new StringBuilder();
+			foreach (var propertiy in properties)
+			{
+				//是否是排除字段
+				if (excludeFields != null && excludeFields.Contains(propertiy.Name))
+				{
+					continue;
+				}
+				//主键标识
+				var typeAttribute = propertiy.GetCustomAttributess(true).FirstOrDefault(x => x.GetType().Equals(typeof(Identity)));
+				if (typeAttribute != null)
+				{
+					var identity = typeAttribute as Identity;
+					//是否自增
+					if (identity.IsIncrease)
+					{
+						continue;
+					}
+				}
+				object value = propertiy.GetValue(t);
+				string name = entity.FieldPairs[propertiy.Name];
+				if (builder.Length != 0)
+				{
+					builder.Append(",");
+				}
+				builder.Append($"{providerOption.CombineFieldName(name)}={providerOption.ParameterPrefix}Update_{name}");
+				Param.Add($"{providerOption.ParameterPrefix}Update_{name}", value);
+			}
+			builder.Insert(0, " SET ");
+			return builder.ToString();
+		}
         public virtual string ResolveWithNoLock(bool nolock)
         {
             return nolock ? "(NOLOCK)" : "";

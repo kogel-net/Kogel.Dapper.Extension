@@ -35,15 +35,15 @@ namespace Kogel.Dapper.Extension.Core.SetC
             DbTransaction = dbTransaction;
         }
 
-        public int Update(T entity)
+        public int Update(T entity, string[] excludeFields = null)
         {
-            SqlProvider.FormatUpdate(entity);
+            SqlProvider.FormatUpdate(entity, excludeFields);
             return DbCon.Execute(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
         }
 
 		public int Update(IEnumerable<T> entities, int timeout = 120)
 		{
-			SqlProvider.FormatUpdate(entities.FirstOrDefault());
+			SqlProvider.FormatUpdate(entities.FirstOrDefault(), null);
 			//批量修改不需要别名（暂时有点小bug，先勉强使用下）
 			SqlProvider.SqlString = SqlProvider.SqlString.Replace("Update_", "").Replace("_0","").Replace("_1", "");
 			return DbCon.Execute(SqlProvider.SqlString, entities, DbTransaction, timeout);
@@ -51,7 +51,7 @@ namespace Kogel.Dapper.Extension.Core.SetC
 
 		public async Task<int> UpdateAsync(T entity)
         {
-            SqlProvider.FormatUpdate(entity);
+            SqlProvider.FormatUpdate(entity, null);
             return await DbCon.ExecuteAsync(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
         }
 

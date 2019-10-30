@@ -21,6 +21,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                 DateTime dateTime = DateTime.Now.AddDays(-10);
 				//单个属性返回
 				var ContentList = conn.QuerySet<Comment>()
+					 .Where(x => x.Content.IsNotNull() && x.Content != "")
 					 .ToList(x => new CommentDto()
 					 {
 						 Id = x.Id,
