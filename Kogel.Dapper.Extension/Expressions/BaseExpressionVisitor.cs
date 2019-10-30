@@ -54,39 +54,36 @@ namespace Kogel.Dapper.Extension.Expressions
             GenerateField(GetFieldValue(node));
             return node;
         }
-        /// <summary>
-        /// 成员对象
-        /// </summary>
-        /// <param name="node"></param>
-        /// <returns></returns>
-        protected override Expression VisitMember(MemberExpression node)
-        {
-            //需要计算的字段值
-            var expTypeName = node.Expression?.GetType().FullName ?? "";
-            if (expTypeName == "System.Linq.Expressions.FieldExpression")
-            {
-                GenerateField(GetFieldValue(node));
-            }
-            else if (node.Expression != null && node.Expression is ConstantExpression)
-            {
-                GenerateField(GetFieldValue(node));
-            }
-            else
-            {
-                var member = EntityCache.QueryEntity(node.Member.DeclaringType);
-                string fieldName = member.FieldPairs[node.Member.Name];
-                string field  = (IsAsName ? member.GetAsName(providerOption) : "") + providerOption.CombineFieldName(fieldName);
-                //DateTime.Now和DateTime.Now.Add(-1)不同，属于成员对象
-                if (node.Type == typeof(DateTime))
-                {
-					field = field.Replace($"{providerOption.CombineFieldName("DateTime")}.{providerOption.CombineFieldName("Now")}", providerOption.GetDate())
-						.Replace(providerOption.CombineFieldName("Now"), providerOption.GetDate());
-					
-                }
-                GenerateField(field);
-            }
-            return node;
-        }
+		/// <summary>
+		/// 成员对象
+		/// </summary>
+		/// <param name="node"></param>
+		/// <returns></returns>
+		protected override Expression VisitMember(MemberExpression node)
+		{
+			//需要计算的字段值
+			var expTypeName = node.Expression?.GetType().FullName ?? "";
+			if (expTypeName == "System.Linq.Expressions.TypedParameterExpression")
+			{
+				var member = EntityCache.QueryEntity(node.Member.DeclaringType);
+				string fieldName = member.FieldPairs[node.Member.Name];
+				string field = (IsAsName ? member.GetAsName(providerOption) : "") + providerOption.CombineFieldName(fieldName);
+				GenerateField(field);
+			}
+			else
+			{
+				string memberName = node.Member.Name.ToUpper();
+				if (memberName == "NOW" || memberName == "DATETIME")
+				{
+					GenerateField(providerOption.GetDate());
+				}
+				else
+				{
+					GenerateField(GetFieldValue(node));
+				}
+			}
+			return node;
+		}
 
 		/// <summary>
 		/// 待执行的方法对象
@@ -132,19 +129,7 @@ namespace Kogel.Dapper.Extension.Expressions
 		/// <returns></returns>
 		protected virtual string GetFieldValue(Expression expression)
 		{
-			object value;
-			if (expression is ConstantExpression)
-			{
-				value = ((ConstantExpression)expression).Value;
-			}
-			else
-			{
-				value = expression.ToConvertAndGetValue();
-				if (expression.Type == typeof(DateTime))
-				{
-					value = ((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss");
-				}
-			}
+			object value = expression.ToConvertAndGetValue();
 			if (value == null)
 			{
 				value = "NULL";
@@ -191,48 +176,45 @@ namespace Kogel.Dapper.Extension.Expressions
             }
             return node;
         }
-        /// <summary>
-        /// 重写成员对象，得到字段名称
-        /// </summary>
-        /// <param name="node"></param>
-        /// <returns></returns>
-        protected override Expression VisitMember(MemberExpression node)
-        {
-            //需要计算的字段值
-            var expTypeName = node.Expression?.GetType().FullName ?? "";
-            if (expTypeName == "System.Linq.Expressions.FieldExpression")
-            {
-                SpliceField.Append(ParamName);
-                Param.Add(ParamName, node.ToConvertAndGetValue());
-            }
-            else if (node.Expression != null && node.Expression is ConstantExpression)
-            {
-                SpliceField.Append(ParamName);
-                Param.Add(ParamName, node.ToConvertAndGetValue());
-            }
-            else
-            {
-                var member = EntityCache.QueryEntity(node.Member.DeclaringType);
-                string asName = string.Empty;
-                if (IsAsName)
-                {
-                    this.FieldName = member.AsName + "." + member.FieldPairs[node.Member.Name];
-                    asName = member.GetAsName(providerOption);
-                }
-                else
-                {
-                    this.FieldName = member.FieldPairs[node.Member.Name];
-                }
-                string fieldName = asName + providerOption.CombineFieldName(member.FieldPairs[node.Member.Name]);
-                //DateTime.Now和DateTime.Now.Add(-1)不同，属于成员对象
-                if (node.Type == typeof(DateTime))
-                {
-                    fieldName = fieldName.Replace($"{providerOption.CombineFieldName("DateTime")}.{providerOption.CombineFieldName("Now")}", providerOption.GetDate());
-                }
-                SpliceField.Append(fieldName);
-            }
-            return node;
-        }
+		/// <summary>
+		/// 重写成员对象，得到字段名称
+		/// </summary>
+		/// <param name="node"></param>
+		/// <returns></returns>
+		protected override Expression VisitMember(MemberExpression node)
+		{
+			var expTypeName = node.Expression?.GetType().FullName ?? "";
+			if (expTypeName == "System.Linq.Expressions.TypedParameterExpression")
+			{
+				var member = EntityCache.QueryEntity(node.Member.DeclaringType);
+				string asName = string.Empty;
+				if (IsAsName)
+				{
+					this.FieldName = member.AsName + "." + member.FieldPairs[node.Member.Name];
+					asName = member.GetAsName(providerOption);
+				}
+				else
+				{
+					this.FieldName = member.FieldPairs[node.Member.Name];
+				}
+				string fieldName = asName + providerOption.CombineFieldName(member.FieldPairs[node.Member.Name]);
+				SpliceField.Append(fieldName);
+			}
+			else
+			{
+				string memberName = node.Member.Name.ToUpper();
+				if (memberName == "NOW" || memberName == "DATETIME")
+				{
+					SpliceField.Append(providerOption.GetDate());
+				}
+				else
+				{
+					SpliceField.Append(ParamName);
+					Param.Add(ParamName, node.ToConvertAndGetValue());
+				}
+			}
+			return node;
+		}
         /// <summary>
         /// 重写值对象，记录参数
         /// </summary>
@@ -257,9 +239,6 @@ namespace Kogel.Dapper.Extension.Expressions
                 case "Contains":
 					{
 						Visit(node.Object);
-						//this.SpliceField.Append($" LIKE {ParamName}");
-						//var value = GetValue(node.Arguments[0]);
-						//Param.Add(ParamName, "%" + value + "%");
 						var value = GetValue(node.Arguments[0]);
 						string param = ParamName;
 						value = providerOption.FuzzyEscaping(value,ref param);

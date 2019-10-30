@@ -184,7 +184,7 @@ namespace Kogel.Dapper.Extension.Extension
 				else
 				{
 					//Get
-					var mapperData = mapperGridList.ReadSingle<T1>();
+					var mapperData = mapperGridList.ReadSingleOrDefault<T1>();
 					property.SetValue(data[count], mapperData);
 				}
 				count++;
