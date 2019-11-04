@@ -27,7 +27,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				var getIfTest = conn.QuerySet<Comment>()
 					.Get(false, x => new CommentDto()
 					{
-						Id = x.Id,
+						Id = x.Id, 
 						ArticleIds = x.ArticleId
 					}, x => new CommentDto()
 					{
