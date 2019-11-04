@@ -32,7 +32,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 					}, x => new CommentDto()
 					{
 						Id = x.Id,
-						Content = x.Content
+						Content = x.Content 
 					});
 
 				//单个属性返回
