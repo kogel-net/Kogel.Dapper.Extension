@@ -24,7 +24,6 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				conn.QuerySet<Comment>().FieldMatch<Comment>();
 				var comments = conn.Query<Comment>("Select * from Comment").ToList();
 
-
 				//单个属性返回
 				var ContentList = conn.QuerySet<Comment>()
 					 .Where(x => x.Content.IsNotNull() && x.Content != "")

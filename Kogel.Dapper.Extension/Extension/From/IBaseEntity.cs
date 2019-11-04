@@ -14,8 +14,7 @@ using System;
 
 namespace Kogel.Dapper.Extension
 {
-    public class IBaseEntity<T> where T : class
-    {
-       
-    }
+	public class IBaseEntity<T> where T : class
+	{
+	}
 }

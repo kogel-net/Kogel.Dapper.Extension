@@ -14,13 +14,19 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 
         Task<T> GetAsync();
 
-        IEnumerable<T> ToList();
+        IEnumerable<T> ToIEnumerable();
 
-        IEnumerable<TReturn> ToList<TReturn>(Expression<Func<T, TReturn>> select);
+        IEnumerable<TReturn> ToIEnumerable<TReturn>(Expression<Func<T, TReturn>> select);
 
-        Task<IEnumerable<T>> ToListAsync();
+        Task<IEnumerable<T>> ToIEnumerableAsync();
 
-        PageList<T> PageList(int pageIndex, int pageSize);
+		List<T> ToList();
+
+		List<TReturn> ToList<TReturn>(Expression<Func<T, TReturn>> select);
+
+		Task<List<T>> ToListAsync();
+
+		PageList<T> PageList(int pageIndex, int pageSize);
 
         PageList<TReturn> PageList<TReturn>(int pageIndex, int pageSize, Expression<Func<T, TReturn>> select);
     }

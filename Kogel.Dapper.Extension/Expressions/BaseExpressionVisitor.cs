@@ -65,7 +65,8 @@ namespace Kogel.Dapper.Extension.Expressions
 			var expTypeName = node.Expression?.GetType().FullName ?? "";
 			if (expTypeName == "System.Linq.Expressions.TypedParameterExpression")
 			{
-				var member = EntityCache.QueryEntity(node.Member.DeclaringType);
+				//var member = EntityCache.QueryEntity(node.Member.DeclaringType);
+				var member = EntityCache.QueryEntity(node.Expression.Type);
 				string fieldName = member.FieldPairs[node.Member.Name];
 				string field = (IsAsName ? member.GetAsName(providerOption) : "") + providerOption.CombineFieldName(fieldName);
 				GenerateField(field);

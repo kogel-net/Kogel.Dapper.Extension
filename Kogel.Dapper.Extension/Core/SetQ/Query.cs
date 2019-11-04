@@ -57,27 +57,48 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			SqlProvider.FormatGet<T>();
 			return await DbCon.QueryFirstOrDefaultAsyncs<T>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
 		}
-
-		public IEnumerable<T> ToList()
+		public IEnumerable<T> ToIEnumerable()
 		{
 			SqlProvider.FormatToList<T>();
 			return DbCon.Querys<T>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, SqlProvider.ProviderOption);
 		}
-		public IEnumerable<TSource> ToList<TSource>()
+		public IEnumerable<TSource> ToIEnumerable<TSource>()
 		{
 			SqlProvider.FormatToList<T>();
 			return DbCon.Querys<TSource>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, SqlProvider.ProviderOption);
 		}
-		public IEnumerable<TReturn> ToList<TReturn>(Expression<Func<T, TReturn>> select)
+		public IEnumerable<TReturn> ToIEnumerable<TReturn>(Expression<Func<T, TReturn>> select)
 		{
 			SqlProvider.Context.Set.SelectExpression = select;
 			SqlProvider.FormatToList<T>();
 			return DbCon.Query_1<TReturn>(SqlProvider.SqlString, SqlProvider.ProviderOption, SqlProvider.Params, DbTransaction);
 		}
-		public async Task<IEnumerable<T>> ToListAsync()
+		public async Task<IEnumerable<T>> ToIEnumerableAsync()
 		{
 			SqlProvider.FormatToList<T>();
 			return await DbCon.QueryAsyncs<T>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
+		}
+		public List<T> ToList()
+		{
+			SqlProvider.FormatToList<T>();
+			return DbCon.Querys<T>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, SqlProvider.ProviderOption).ToList();
+		}
+		public List<TSource> ToList<TSource>()
+		{
+			SqlProvider.FormatToList<T>();
+			return DbCon.Querys<TSource>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, SqlProvider.ProviderOption).ToList();
+		}
+		public List<TReturn> ToList<TReturn>(Expression<Func<T, TReturn>> select)
+		{
+			SqlProvider.Context.Set.SelectExpression = select;
+			SqlProvider.FormatToList<T>();
+			return DbCon.Query_1<TReturn>(SqlProvider.SqlString, SqlProvider.ProviderOption, SqlProvider.Params, DbTransaction);
+		}
+		public async Task<List<T>> ToListAsync()
+		{
+			SqlProvider.FormatToList<T>();
+			var iEnumerable = await DbCon.QueryAsyncs<T>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
+			return iEnumerable.ToList();
 		}
 
 		public PageList<T> PageList(int pageIndex, int pageSize)

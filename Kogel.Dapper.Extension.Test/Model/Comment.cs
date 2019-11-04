@@ -17,13 +17,6 @@ namespace Kogel.Dapper.Extension.Test.Model
         /// </summary>
         public int PId { get; set; }
         public int UserId { get; set; }
-		/// <summary>
-		/// 
-		/// </summary>
-		[Display(Rename = "Content")]
-		public string test111 { get; set; }
-
-
 		public string Content { get; set; }
         public DateTime SubTime { get; set; } = DateTime.Now;
         public int Type { get; set; }
