@@ -12,22 +12,30 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 
         TReturn Get<TReturn>(Expression<Func<T, TReturn>> select);
 
-        Task<T> GetAsync();
+		TReturn Get<TReturn>(bool where, Expression<Func<T, TReturn>> trueSelect, Expression<Func<T, TReturn>> falseSelect);
+
+		Task<T> GetAsync();
 
         IEnumerable<T> ToIEnumerable();
 
         IEnumerable<TReturn> ToIEnumerable<TReturn>(Expression<Func<T, TReturn>> select);
 
-        Task<IEnumerable<T>> ToIEnumerableAsync();
+		IEnumerable<TReturn> ToIEnumerable<TReturn>(bool where, Expression<Func<T, TReturn>> trueSelect, Expression<Func<T, TReturn>> falseSelect);
+
+		Task<IEnumerable<T>> ToIEnumerableAsync();
 
 		List<T> ToList();
 
 		List<TReturn> ToList<TReturn>(Expression<Func<T, TReturn>> select);
+
+		List<TReturn> ToList<TReturn>(bool where, Expression<Func<T, TReturn>> trueSelect, Expression<Func<T, TReturn>> falseSelect);
 
 		Task<List<T>> ToListAsync();
 
 		PageList<T> PageList(int pageIndex, int pageSize);
 
         PageList<TReturn> PageList<TReturn>(int pageIndex, int pageSize, Expression<Func<T, TReturn>> select);
-    }
+
+		PageList<TReturn> PageList<TReturn>(int pageIndex, int pageSize, bool where, Expression<Func<T, TReturn>> trueSelect, Expression<Func<T, TReturn>> falseSelect);
+	}
 }

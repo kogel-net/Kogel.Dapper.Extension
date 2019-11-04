@@ -19,6 +19,18 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         QuerySet<T> Where(T model);
         QuerySet<T> Where(Dictionary<string, DynamicTree> dynamicTree);
         QuerySet<T> Where(string sqlWhere, object param = null);
+
+
+		/// <summary>
+		/// 带前置条件的Where判断
+		/// </summary>
+		/// <typeparam name="TWhere"></typeparam>
+		/// <param name="where"></param>
+		/// <param name="truePredicate"></param>
+		/// <param name="falsePredicate"></param>
+		/// <returns></returns>
+		QuerySet<T> WhereIf(bool where, Expression<Func<T, bool>> truePredicate, Expression<Func<T, bool>> falsePredicate);
+		QuerySet<T> WhereIf<TWhere>(bool where, Expression<Func<TWhere, bool>> truePredicate, Expression<Func<TWhere, bool>> falsePredicate);
         /// <summary>
         /// 不锁表查询(此方法只支持Mssql)
         /// </summary>

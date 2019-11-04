@@ -24,9 +24,21 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				conn.QuerySet<Comment>().FieldMatch<Comment>();
 				var comments = conn.Query<Comment>("Select * from Comment").ToList();
 
+				var getIfTest = conn.QuerySet<Comment>()
+					.Get(false, x => new CommentDto()
+					{
+						Id = x.Id,
+						ArticleIds = x.ArticleId
+					}, x => new CommentDto()
+					{
+						Id = x.Id,
+						Content = x.Content
+					});
+
 				//单个属性返回
 				var ContentList = conn.QuerySet<Comment>()
 					 .Where(x => x.Content.IsNotNull() && x.Content != "")
+					 .WhereIf(!string.IsNullOrEmpty("aaa"), x => x.ArticleId == 1, x => x.ArticleId == 2)
 					 .ToList(x => new CommentDto()
 					 {
 						 Id = x.Id,

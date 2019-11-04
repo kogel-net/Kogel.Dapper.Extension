@@ -74,6 +74,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			return this;
 		}
 		#endregion
+		#region Where
 		public QuerySet<T> Where(Expression<Func<T, bool>> predicate)
 		{
 			WhereExpressionList.Add(predicate);
@@ -84,15 +85,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			WhereExpressionList.Add(predicate);
 			return this;
 		}
-		/// <summary>
-		/// 不锁表查询(此方法只支持Mssql)
-		/// </summary>
-		/// <returns></returns>
-		public QuerySet<T> WithNoLock()
-		{
-			NoLock = true;
-			return this;
-		}
+	
 
 		public QuerySet<T> Where(T model)
 		{
@@ -226,6 +219,49 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			return this;
 		}
 		/// <summary>
+		/// 带前置条件的Where判断
+		/// </summary>
+		/// <typeparam name="TWhere"></typeparam>
+		/// <param name="where"></param>
+		/// <param name="truePredicate"></param>
+		/// <param name="falsePredicate"></param>
+		/// <returns></returns>
+		public QuerySet<T> WhereIf(bool where, Expression<Func<T, bool>> truePredicate, Expression<Func<T, bool>> falsePredicate)
+		{
+			if (where)
+				WhereExpressionList.Add(truePredicate);
+			else
+				WhereExpressionList.Add(falsePredicate);
+			return this;
+		}
+		/// <summary>
+		/// 带前置条件的Where判断
+		/// </summary>
+		/// <typeparam name="TWhere"></typeparam>
+		/// <param name="where"></param>
+		/// <param name="truePredicate"></param>
+		/// <param name="falsePredicate"></param>
+		/// <returns></returns>
+		public QuerySet<T> WhereIf<TWhere>(bool where, Expression<Func<TWhere, bool>> truePredicate, Expression<Func<TWhere, bool>> falsePredicate)
+		{
+			if (where)
+				WhereExpressionList.Add(truePredicate);
+			else
+				WhereExpressionList.Add(falsePredicate);
+			return this;
+		}
+		#endregion
+		/// <summary>
+		/// 不锁表查询(此方法只支持Mssql)
+		/// </summary>
+		/// <returns></returns>
+		public QuerySet<T> WithNoLock()
+		{
+			NoLock = true;
+			return this;
+		}
+		#region Join
+		/// <summary>
 		/// 连表
 		/// </summary>
 		/// <typeparam name="TOuter">主表</typeparam>
@@ -299,6 +335,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			});
 			return this;
 		}
+		#endregion
 		/// <summary>
 		/// 字段匹配(适用于实体类字段和数据库字段不一致时,返回值为Dynamic类型时不适用)
 		/// </summary>
