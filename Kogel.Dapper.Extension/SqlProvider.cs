@@ -120,6 +120,14 @@ namespace Kogel.Dapper.Extension
 						continue;
 					}
 				}
+				//排除掉时间格式为最小值的字段
+				if (propertiy.PropertyType == typeof(DateTime))
+				{
+					if (Convert.ToDateTime(propertiy.GetValue(t)) == DateTime.MinValue)
+					{
+						continue;
+					}
+				}
 				if (isAppend)
 				{
 					paramSqlBuilder.Append(",");
