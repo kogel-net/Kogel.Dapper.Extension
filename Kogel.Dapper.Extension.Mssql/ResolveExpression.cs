@@ -71,5 +71,61 @@ namespace Kogel.Dapper.Extension.MsSql
 
             return selectSql;
         }
+
+        /// <summary>
+        /// 解析查询最大值
+        /// </summary>
+        /// <param name="selector"></param>
+        /// <returns></returns>
+        public override string ResolveMax(LambdaExpression selector)
+        {
+            if (selector == null)
+                throw new ArgumentException("selector");
+            var selectSql = "";
+
+            switch (selector.NodeType)
+            {
+                case ExpressionType.Lambda:
+                case ExpressionType.MemberAccess:
+                    {
+                        EntityObject entityObject = EntityCache.QueryEntity(selector.Parameters[0].Type);
+                        var memberName = selector.Body.GetCorrectPropertyName();
+                        selectSql = $" SELECT Max({entityObject.AsName}.{providerOption.CombineFieldName(entityObject.FieldPairs[memberName])})  ";
+                    }
+                    break;
+                case ExpressionType.MemberInit:
+                    throw new DapperExtensionException("不支持该表达式类型");
+            }
+
+            return selectSql;
+        }
+
+        /// <summary>
+        /// 解析查询最小值
+        /// </summary>
+        /// <param name="selector"></param>
+        /// <returns></returns>
+        public override string ResolveMin(LambdaExpression selector)
+        {
+            if (selector == null)
+                throw new ArgumentException("selector");
+            var selectSql = "";
+
+            switch (selector.NodeType)
+            {
+                case ExpressionType.Lambda:
+                case ExpressionType.MemberAccess:
+                    {
+                        EntityObject entityObject = EntityCache.QueryEntity(selector.Parameters[0].Type);
+                        var memberName = selector.Body.GetCorrectPropertyName();
+                        selectSql = $" SELECT Min({entityObject.AsName}.{providerOption.CombineFieldName(entityObject.FieldPairs[memberName])})  ";
+                    }
+                    break;
+                case ExpressionType.MemberInit:
+                    throw new DapperExtensionException("不支持该表达式类型");
+            }
+
+            return selectSql;
+        }
     }
 }

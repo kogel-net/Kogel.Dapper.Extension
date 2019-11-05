@@ -129,7 +129,21 @@ namespace Kogel.Dapper.Extension.Expressions
 				
 					}
 					break;
-				case "Get":
+                case "Min":
+                    {
+                        var lambda = this.expression.Arguments[0].GetLambdaExpression();
+                        sqlProvider.FormatMin(lambda);
+
+                    }
+                    break;
+                case "Max":
+                    {
+                        var lambda = this.expression.Arguments[0].GetLambdaExpression();
+                        sqlProvider.FormatMax(lambda);
+
+                    }
+                    break;
+                case "Get":
 					{
 						//加上自定义实体返回
 						var lambda = this.expression.Arguments[0].GetLambdaExpression();
