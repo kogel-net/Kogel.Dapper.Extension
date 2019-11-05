@@ -46,7 +46,8 @@ namespace Kogel.Dapper.Extension.Core.SetC
 			SqlProvider.FormatUpdate(entities.FirstOrDefault(), excludeFields);
 			//批量修改不需要别名（暂时有点小bug，先勉强使用下）
 			SqlProvider.SqlString = SqlProvider.SqlString.Replace("Update_", "").Replace("_0","").Replace("_1", "");
-			//SqlProvider.Params.AddDynamicParams(entities);
+			var identity = EntityCache.QueryEntity(typeof(T)).Identitys;
+			SqlProvider.SqlString += $" AND {identity}={SqlProvider.ProviderOption.ParameterPrefix + identity}";
 			return DbCon.Execute(SqlProvider.SqlString, entities, DbTransaction, timeout);
 		}
 
