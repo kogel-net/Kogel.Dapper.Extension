@@ -25,6 +25,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				var comments = conn.Query<Comment>("Select * from Comment").ToList();
 
 				var getIfTest = conn.QuerySet<Comment>()
+					.Where(x=>x.Content.In(new string[] { "1","2","3"}))
 					.Get(false, x => new CommentDto()
 					{
 						Id = x.Id, 

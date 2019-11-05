@@ -9,7 +9,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
     {
 		int Update(T entity, string[] excludeFields = null);
 
-		int Update(IEnumerable<T> entities, int timeout = 120);
+		int Update(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120);
 
         Task<int> UpdateAsync(T entity);
 
@@ -21,14 +21,14 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 
         Task<int> DeleteAsync();
 
-        int Insert(T entity);
+        int Insert(T entity, string[] excludeFields = null);
 
-        Task<int> InsertAsync(T entity);
+        Task<int> InsertAsync(T entity, string[] excludeFields = null);
 
-        int InsertIdentity(T entity);
+        int InsertIdentity(T entity, string[] excludeFields = null);
 
-        int Insert(IEnumerable<T> entities, int timeout = 120);
+        int Insert(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120);
 
-        Task<int> InsertAsync(IEnumerable<T> entities, int timeout = 120);
+        Task<int> InsertAsync(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120);
     }
 }

@@ -130,16 +130,16 @@ namespace Kogel.Dapper.Extension.MySql
             return this;
         }
 
-        public override SqlProvider FormatInsert<T>(T entity)
-        {
-            var paramsAndValuesSql = FormatInsertParamsAndValues(entity);
+        public override SqlProvider FormatInsert<T>(T entity, string[] excludeFields)
+		{
+			var paramsAndValuesSql = FormatInsertParamsAndValues(entity, excludeFields);
             SqlString = $"INSERT INTO {FormatTableName(false, false)} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]})";
             return this;
         }
 
-        public override SqlProvider FormatInsertIdentity<T>(T entity)
-        {
-            var paramsAndValuesSql = FormatInsertParamsAndValues(entity);
+        public override SqlProvider FormatInsertIdentity<T>(T entity, string[] excludeFields)
+		{
+			var paramsAndValuesSql = FormatInsertParamsAndValues(entity, excludeFields);
             SqlString = $"INSERT INTO {FormatTableName(false, false)} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]}); SELECT @@IDENTITY";
             return this;
         }
