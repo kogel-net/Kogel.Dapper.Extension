@@ -4,10 +4,12 @@ using System.Linq.Expressions;
 
 namespace Kogel.Dapper.Extension.Core.Interfaces
 {
-    public interface ICommandSet<T>
-    {
-        ICommand<T> Where(Expression<Func<T, bool>> predicate);
+	public interface ICommandSet<T>
+	{
+		ICommand<T> Where(Expression<Func<T, bool>> predicate);
 
-        ICommand<T> AsTableName(Type type, string tableName);
-    }
+		ICommand<T> WhereIf(bool where, Expression<Func<T, bool>> truePredicate, Expression<Func<T, bool>> falsePredicate);
+
+		ICommand<T> AsTableName(Type type, string tableName);
+	}
 }
