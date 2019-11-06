@@ -66,8 +66,8 @@ namespace Kogel.Dapper.Extension.Expressions
             var WhereExpressionList = querySetEntity.FirstOrDefault(x => x.Name.Equals("WhereExpressionList"));
             WhereExpressionList.SetValue(querySet, WhereExpression);
             dynamic querySetDynamic = querySet;
-            //执行指定函数
-            var newExpression = ((NewExpression)methodCall.Object).Arguments[1];
+            ////执行指定函数
+            //var newExpression = ((NewExpression)methodCall.Object).Arguments[1];
             var sqlProvider = (SqlProvider)(querySetDynamic.SqlProvider);
 			//动态执行，得到T类型
 			typeof(SubqueryExpression)
