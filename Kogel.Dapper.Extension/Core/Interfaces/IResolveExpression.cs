@@ -66,13 +66,18 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
                     Params.Add(paramKey, whereParam.Param.Get<object>(paramKey));
                 }
             }
-            //添加自定义sql生成的条件和参数
-            if ((abstractSet.WhereBuilder != null && abstractSet.WhereBuilder.Length != 0) || (abstractSet.Params != null && abstractSet.Params.ParameterNames.Count() != 0))
-            {
-                //添加自定义条件sql
-                builder.Append(abstractSet.WhereBuilder);
-                Params.AddDynamicParams(abstractSet.Params);
-            }
+			//添加自定义sql生成的条件和参数
+			if ((abstractSet.WhereBuilder != null && abstractSet.WhereBuilder.Length != 0) || (abstractSet.Params != null && abstractSet.Params.ParameterNames.Count() != 0))
+			{
+				//添加自定义条件sql
+				builder.Append(abstractSet.WhereBuilder);
+				//参数
+				foreach (var paramKey in abstractSet.Params.ParameterNames)
+				{
+					if (!Params.ParameterNames.Contains(paramKey))
+						Params.Add(paramKey, abstractSet.Params.Get<object>(paramKey));
+				}
+			}
             whereSql = builder.ToString();
             return whereExpressionList;
         }

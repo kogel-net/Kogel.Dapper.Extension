@@ -18,6 +18,7 @@ namespace Kogel.Dapper.Extension.Test.Model
         public int PId { get; set; }
         public int UserId { get; set; }
 		public string Content { get; set; }
+		[Display(Rename = "SubTime")]
         public DateTime SubTime { get; set; } = DateTime.Now;
         public int Type { get; set; }
         /// <summary>

@@ -48,7 +48,7 @@ namespace Kogel.Dapper.Extension.Expressions
                 foreach (var paramName in base.Param.ParameterNames)
                 {
                     string newName = paramName + prefix;
-                    object value = this.Param.Get<object>(paramName);
+                    object value = base.Param.Get<object>(paramName);
                     this.SqlCmd = this.SqlCmd.Replace(paramName, newName);
                     this.Param.Add(newName, value);
                 }

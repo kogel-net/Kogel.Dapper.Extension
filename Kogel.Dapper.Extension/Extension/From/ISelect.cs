@@ -88,13 +88,43 @@ namespace Kogel.Dapper.Extension.Extension.From
 			base.Where(exp);
 			return this;
 		}
+		public ISelectFrom<T, T1, T2> WhereIf(bool where, Expression<Func<T1, T2, bool>> trueExp, Expression<Func<T1, T2, bool>> falseExp)
+		{
+			if (where)
+				base.Where(trueExp);
+			else
+				base.Where(falseExp);
+			return this;
+		}
+		public ISelectFrom<T, T1, T2> Where(bool where, Expression<Func<T1, T2, bool>> trueExp, Expression<Func<T1, T2, bool>> falseExp)
+		{
+			if (where)
+				base.Where(trueExp);
+			else
+				base.Where(falseExp);
+			return this;
+		}
 		public TReturn Get<TReturn>(Expression<Func<T1, T2, TReturn>> select)
 		{
 			return base.Get<TReturn>(select);
 		}
-		public IEnumerable<TReturn> ToList<TReturn>(Expression<Func<T1, T2, TReturn>> select)
+		public TReturn Get<TReturn>(bool where, Expression<Func<T1, T2, TReturn>> trueSelect, Expression<Func<T1, T2, TReturn>> falseSelect)
 		{
-			return base.ToList<TReturn>(select);
+			if (where)
+				return base.Get<TReturn>(trueSelect);
+			else
+				return base.Get<TReturn>(falseSelect);
+		}
+		public List<TReturn> ToList<TReturn>(Expression<Func<T1, T2, TReturn>> select)
+		{
+			return base.ToList<TReturn>(select).ToList();
+		}
+		public List<TReturn> ToList<TReturn>(bool where, Expression<Func<T1, T2, TReturn>> trueSelect, Expression<Func<T1, T2, TReturn>> falseSelect)
+		{
+			if (where)
+				return base.ToList<TReturn>(trueSelect).ToList();
+			else
+				return base.ToList<TReturn>(falseSelect).ToList();
 		}
 		public new ISelectFrom<T, T1, T2> OrderBy<TProperty>(Expression<Func<TProperty, object>> field)
 		{
@@ -115,6 +145,13 @@ namespace Kogel.Dapper.Extension.Extension.From
 		{
 			return base.PageList<TReturn>(pageIndex, pageSize, select);
 		}
+		public PageList<TReturn> PageList<TReturn>(int pageIndex, int pageSize, bool where, Expression<Func<T1, T2, TReturn>> trueSelect, Expression<Func<T1, T2, TReturn>> falseSelect)
+		{
+			if (where)
+				return base.PageList<TReturn>(pageIndex, pageSize, trueSelect);
+			else
+				return base.PageList<TReturn>(pageIndex, pageSize, falseSelect);
+		}
 	}
 	public class ISelectFrom<T, T1, T2, T3> : ISelect<T>
 	{
@@ -127,13 +164,35 @@ namespace Kogel.Dapper.Extension.Extension.From
 			base.Where(exp);
 			return this;
 		}
+		public ISelectFrom<T, T1, T2, T3> WhereIf(bool where, Expression<Func<T1, T2, T3, bool>> trueExp, Expression<Func<T1, T2, T3, bool>> falseExp)
+		{
+			if (where)
+				base.Where(trueExp);
+			else
+				base.Where(falseExp);
+			return this;
+		}
 		public TReturn Get<TReturn>(Expression<Func<T1, T2, T3, TReturn>> select)
 		{
 			return base.Get<TReturn>(select);
 		}
-		public IEnumerable<TReturn> ToList<TReturn>(Expression<Func<T1, T2, T3, TReturn>> select)
+		public TReturn Get<TReturn>(bool where, Expression<Func<T1, T2, T3, TReturn>> trueSelect, Expression<Func<T1, T2, T3, TReturn>> falseSelect)
 		{
-			return base.ToList<TReturn>(select);
+			if (where)
+				return base.Get<TReturn>(trueSelect);
+			else
+				return base.Get<TReturn>(falseSelect);
+		}
+		public List<TReturn> ToList<TReturn>(Expression<Func<T1, T2, T3, TReturn>> select)
+		{
+			return base.ToList<TReturn>(select).ToList();
+		}
+		public List<TReturn> ToList<TReturn>(bool where, Expression<Func<T1, T2, T3, TReturn>> trueSelect, Expression<Func<T1, T2, T3, TReturn>> falseSelect)
+		{
+			if (where)
+				return base.ToList<TReturn>(trueSelect).ToList();
+			else
+				return base.ToList<TReturn>(falseSelect).ToList();
 		}
 		public new ISelectFrom<T, T1, T2, T3> OrderBy<TProperty>(Expression<Func<TProperty, object>> field)
 		{
@@ -154,6 +213,13 @@ namespace Kogel.Dapper.Extension.Extension.From
 		{
 			return base.PageList<TReturn>(pageIndex, pageSize, select);
 		}
+		public PageList<TReturn> PageList<TReturn>(int pageIndex, int pageSize, bool where, Expression<Func<T1, T2, T3, TReturn>> trueSelect, Expression<Func<T1, T2, T3, TReturn>> falseSelect)
+		{
+			if (where)
+				return base.PageList<TReturn>(pageIndex, pageSize, trueSelect);
+			else
+				return base.PageList<TReturn>(pageIndex, pageSize, falseSelect);
+		}
 	}
 	public class ISelectFrom<T, T1, T2, T3, T4> : ISelect<T>
 	{
@@ -166,13 +232,35 @@ namespace Kogel.Dapper.Extension.Extension.From
 			base.Where(exp);
 			return this;
 		}
+		public ISelectFrom<T, T1, T2, T3, T4> WhereIf(bool where, Expression<Func<T1, T2, T3, T4, bool>> trueExp, Expression<Func<T1, T2, T3, T4, bool>> falseExp)
+		{
+			if (where)
+				base.Where(trueExp);
+			else
+				base.Where(falseExp);
+			return this;
+		}
 		public TReturn Get<TReturn>(Expression<Func<T1, T2, T3, T4, TReturn>> select)
 		{
 			return base.Get<TReturn>(select);
 		}
-		public IEnumerable<TReturn> ToList<TReturn>(Expression<Func<T1, T2, T3, T4, TReturn>> select)
+		public TReturn Get<TReturn>(bool where, Expression<Func<T1, T2, T3, T4, TReturn>> trueSelect, Expression<Func<T1, T2, T3, T4, TReturn>> falseSelect)
 		{
-			return base.ToList<TReturn>(select);
+			if (where)
+				return base.Get<TReturn>(trueSelect);
+			else
+				return base.Get<TReturn>(falseSelect);
+		}
+		public List<TReturn> ToList<TReturn>(Expression<Func<T1, T2, T3, T4, TReturn>> select)
+		{
+			return base.ToList<TReturn>(select).ToList();
+		}
+		public List<TReturn> ToList<TReturn>(bool where, Expression<Func<T1, T2, T3, T4, TReturn>> trueSelect, Expression<Func<T1, T2, T3, T4, TReturn>> falseSelect)
+		{
+			if (where)
+				return base.ToList<TReturn>(trueSelect).ToList();
+			else
+				return base.ToList<TReturn>(falseSelect).ToList();
 		}
 		public new ISelectFrom<T, T1, T2, T3, T4> OrderBy<TProperty>(Expression<Func<TProperty, object>> field)
 		{
@@ -192,6 +280,13 @@ namespace Kogel.Dapper.Extension.Extension.From
 		public PageList<TReturn> PageList<TReturn>(int pageIndex, int pageSize, Expression<Func<T1, T2, T3, T4, TReturn>> select)
 		{
 			return base.PageList<TReturn>(pageIndex, pageSize, select);
+		}
+		public PageList<TReturn> PageList<TReturn>(int pageIndex, int pageSize, bool where, Expression<Func<T1, T2, T3, T4, TReturn>> trueSelect, Expression<Func<T1, T2, T3, T4, TReturn>> falseSelect)
+		{
+			if (where)
+				return base.PageList<TReturn>(pageIndex, pageSize, trueSelect);
+			else
+				return base.PageList<TReturn>(pageIndex, pageSize, falseSelect);
 		}
 	}
 }
