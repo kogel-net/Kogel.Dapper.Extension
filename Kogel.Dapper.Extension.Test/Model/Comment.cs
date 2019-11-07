@@ -28,7 +28,9 @@ namespace Kogel.Dapper.Extension.Test.Model
         public int StarCount { get; set; } = 0;
         public bool IsDeleted { get; set; } = false;
         public int ArticleUserId { get; set; }
-        public int ReplayCount { get; set; }
+
+		[Display(Rename = "ReplayCount")]
+        public int ReplayCount111 { get; set; }
         public int LikeCount { get; set; }
         public bool IsRobot { get; set; }
         public string IdentityId { get; set; }

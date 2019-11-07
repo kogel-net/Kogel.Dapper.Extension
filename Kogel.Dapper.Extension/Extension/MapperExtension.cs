@@ -47,9 +47,23 @@ namespace Kogel.Dapper.Extension.Extension
 			ConstructorInfo noParameterConstructorInfo = constructorInfoArray.FirstOrDefault(x => x.GetParameters().Length == 0);
 			if (null == noParameterConstructorInfo && type.FullName.Contains("AnonymousType"))//匿名类型
 			{
+				data = new List<T>();
+				T t = default(T);
+				noParameterConstructorInfo = constructorInfoArray.FirstOrDefault();
 				using (var reader = conn.ExecuteReader(sql, param, transaction))
 				{
-					data = reader.Parse<T>().ToList();
+					var properties = EntityCache.QueryEntity(type).Properties;
+					while (reader.Read())
+					{
+						object[] array = new object[properties.Length];
+						for (var i = 0; i < properties.Length; i++)
+						{
+							var item = properties[i];
+							array[i] = Convert.ChangeType(reader[item.Name], item.PropertyType);
+						}
+						t = (T)noParameterConstructorInfo.Invoke(array);
+						data.Add(t);
+					}
 				}
 			}
 			else

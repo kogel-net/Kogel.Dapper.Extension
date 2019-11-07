@@ -3,13 +3,13 @@
     <PackageId>Kogel.Dapper.Extension.Mssql</PackageId>
     <PackageTags>orm;sql;micro-orm</PackageTags>
     <Title>Dapper</Title>
-    <Description>Kogel.Dapper.Extension.Mssql</Description>
+    <Description>3.1.7.2增加WhereIf,并且支持自定义导航查询</Description>
     <Authors>Kogel</Authors>
     <TargetFrameworks>net451;netstandard2.0;netcoreapp2.1</TargetFrameworks>
     <Company>Kogel.Dapper.Extension.Mssql</Company>
     <Product>Kogel.Dapper.Extension.Mssql</Product>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>3.1.7.1</Version>
+    <Version>3.1.7.2</Version>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net451'">
     <Reference Include="System" />
