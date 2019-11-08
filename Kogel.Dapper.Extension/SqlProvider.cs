@@ -63,20 +63,18 @@ namespace Kogel.Dapper.Extension
 
 		public abstract SqlProvider FormatSum(LambdaExpression sumExpression);
 
-		public abstract SqlProvider FormatUpdateSelect<T>(Expression<Func<T, T>> updator);
+        public abstract SqlProvider FormatMin(LambdaExpression MinExpression);
 
-		/// <summary>
-		/// 业务公共抽离模块
-		/// </summary>
-		[ThreadStatic]
-		public static AopProvider Aop = new AopProvider();
-		/// <summary>
-		/// 获取表名称
-		/// </summary>
-		/// <param name="isNeedFrom"></param>
-		/// <param name="isAsName"></param>
-		/// <param name="tableType">连接查询时会用到</param>
-		/// <returns></returns>
+        public abstract SqlProvider FormatMax(LambdaExpression MaxExpression);
+
+        public abstract SqlProvider FormatUpdateSelect<T>(Expression<Func<T, T>> updator);
+        /// <summary>
+        /// 获取表名称
+        /// </summary>
+        /// <param name="isNeedFrom"></param>
+        /// <param name="isAsName"></param>
+        /// <param name="tableType">连接查询时会用到</param>
+        /// <returns></returns>
 
 		public string FormatTableName(bool isNeedFrom = true, bool isAsName = true, Type tableType = null)
 		{

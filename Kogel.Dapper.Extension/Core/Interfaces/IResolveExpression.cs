@@ -105,6 +105,22 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// <param name="selector"></param>
         /// <returns></returns>
         public abstract string ResolveSum(LambdaExpression selector);
+
+
+        /// <summary>
+        /// 解析查询最小值
+        /// </summary>
+        /// <param name="selector"></param>
+        /// <returns></returns>
+        public abstract string ResolveMax(LambdaExpression selector);
+
+        /// <summary>
+        /// 解析查询最大值
+        /// </summary>
+        /// <param name="selector"></param>
+        /// <returns></returns>
+        public abstract string ResolveMin(LambdaExpression selector);
+
         /// <summary>
         /// 解析查询更新
         /// </summary>

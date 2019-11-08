@@ -61,6 +61,54 @@ namespace Kogel.Dapper.Extension.MySql
             return selectSql;
         }
 
+        public override string ResolveMax(LambdaExpression selector)
+        {
+            if (selector == null)
+                throw new ArgumentException("selector");
+            var selectSql = "";
+
+            switch (selector.NodeType)
+            {
+                case ExpressionType.Lambda:
+                case ExpressionType.MemberAccess:
+                    {
+                        EntityObject entityObject = EntityCache.QueryEntity(selector.Parameters[0].Type);
+                        var memberName = selector.Body.GetCorrectPropertyName();
+                        selectSql = $" SELECT Max({entityObject.AsName}.{providerOption.CombineFieldName(entityObject.FieldPairs[memberName])})  ";
+                    }
+                    break;
+                case ExpressionType.MemberInit:
+                    throw new DapperExtensionException("不支持该表达式类型");
+            }
+
+            return selectSql;
+        }
+
+        public override string ResolveMin(LambdaExpression selector)
+        {
+            if (selector == null)
+                throw new ArgumentException("selector");
+            var selectSql = "";
+
+            switch (selector.NodeType)
+            {
+                case ExpressionType.Lambda:
+                case ExpressionType.MemberAccess:
+                    {
+                        EntityObject entityObject = EntityCache.QueryEntity(selector.Parameters[0].Type);
+                        var memberName = selector.Body.GetCorrectPropertyName();
+                        selectSql = $" SELECT Min({entityObject.AsName}.{providerOption.CombineFieldName(entityObject.FieldPairs[memberName])})  ";
+                    }
+                    break;
+                case ExpressionType.MemberInit:
+                    throw new DapperExtensionException("不支持该表达式类型");
+            }
+
+            return selectSql;
+        }
+       
+
+
         public override string ResolveWithNoLock(bool nolock)
         {
             return "";

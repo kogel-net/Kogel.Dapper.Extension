@@ -1,28 +1,27 @@
-﻿using System;
+﻿using Kogel.Dapper.Extension.Test.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Kogel.Dapper.Extension.Oracle;
+using Oracle.ManagedDataAccess.Client;
 using Kogel.Dapper.Extension.Core.SetQ;
-using Kogel.Dapper.Extension.MySql;
-using Kogel.Dapper.Extension.Test.Model;
-using Kogel.Dapper.Extension.Test.ViewModel;
-using MySql.Data.MySqlClient;
-using Dapper;
 
-namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
+namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 {
    public class Query
     {
-        string mysqlConnection = "Server=localhost;Database=Qx_Sport_Common;Uid=root;Pwd=A5101264a;";
+        string oracleConnection = @"Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))
+                    (CONNECT_DATA=(SERVICE_NAME=ORCL)));User Id=system;Password=A5101264a";
         public void Test()
         {
-            using (var conn = new MySqlConnection(mysqlConnection))
+            using (var conn = new OracleConnection(oracleConnection))
             {
                 DateTime dateTime = DateTime.Now.AddDays(-10);
 
-				conn.QuerySet<Comment>().FieldMatch<Comment>();
-				var comments = conn.Query<Comment>("Select * from Comment").ToList();
+                var test = conn.QuerySet<Comment>()
+                    .ToList();
 
 				var comm = conn.QuerySet<Comment>().PageList(1, 10);
 
@@ -66,26 +65,26 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 						x.Id,
 						x.Content
 					});
-				//翻页
-				var comment1 = conn.QuerySet<Comment>()
-					.Join<Comment, News>((a, b) => a.ArticleId == b.Id)
-					.Where(x => x.Id.Between(80, 100)
-					&& x.SubTime.AddDays(-10) < DateTime.Now && x.Id > 10
-					&& x.Id > new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id < 3 && x.Id < y.Id).Sum<News>(y => y.Id))
-					.From<Comment, News>()
-					.OrderBy<News>(x => x.Id)
-					.PageList(1, 1, (a, b) => new
-					{
-						test = new List<int>() { 3, 3, 1 }.FirstOrDefault(y => y == 1),
-						aaa = "6666" + "777",
-						Content = a.Content + "'test'" + b.Headlines + a.IdentityId,
-						bbb = new QuerySet<Comment1>(conn, new MySqlProvider())
-									.Where(y => y.ArticleId == b.Id && y.Content.Contains("test"))
-									.Sum<Comment1>(x => x.Id),
-						ccc = a.IdentityId,
-						a.Id,
-						times = DateTime.Now
-					});
+                //翻页
+                var comment1 = conn.QuerySet<Comment>()
+                    .Join<Comment, News>((a, b) => a.ArticleId == b.Id)
+                    .Where(x => x.Id.Between(80, 100)
+                    && x.SubTime.AddDays(-10) < DateTime.Now && x.Id > 10
+                    && x.Id > new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id < 3 && x.Id < y.Id).Sum<News>(y => y.Id))
+                    .From<Comment, News>()
+                    .OrderBy<News>(x => x.Id)
+                    .PageList(1, 1, (a, b) => new
+                    {
+                        test = new List<int>() { 3, 3, 1 }.FirstOrDefault(y => y == 1),
+                        aaa = "6666" + "777",
+                        Content = a.Content + "'test'" + b.Headlines + a.IdentityId,
+                        bbb = new QuerySet<Comment1>(conn, new MySqlProvider())
+                                    .Where(y => y.ArticleId == b.Id && y.Content.Contains("test"))
+                                    .Sum<Comment1>(x => x.Id),
+                        ccc = a.IdentityId,
+                        a.Id,
+                        times = DateTime.Now
+                    });
 
 
 				//多视图查询
@@ -100,7 +99,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                      {
                          id = a.Id,
                          name = b.NewsLabel,
-                         resource = c.RPath,
+                         resources = c.RPath,
                      });
 
                 //计总
