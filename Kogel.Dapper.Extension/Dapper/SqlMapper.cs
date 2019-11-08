@@ -3,6 +3,7 @@
  Home page: https://github.com/StackExchange/dapper-dot-net
  */
 
+using Kogel.Dapper.Extension;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -30,8 +31,9 @@ namespace Dapper
     /// </summary>
     public static partial class SqlMapper
     {
-        private class PropertyInfoByNameComparer : IComparer<PropertyInfo>
+		private class PropertyInfoByNameComparer : IComparer<PropertyInfo>
         {
+		
             public int Compare(PropertyInfo x, PropertyInfo y) => string.CompareOrdinal(x.Name, y.Name);
         }
         private static int GetColumnHash(IDataReader reader, int startBound = 0, int length = -1)
@@ -1008,7 +1010,7 @@ namespace Dapper
 
         private static GridReader QueryMultipleImpl(this IDbConnection cnn, ref CommandDefinition command)
         {
-            object param = command.Parameters;
+			object param = command.Parameters;
             var identity = new Identity(command.CommandText, command.CommandType, cnn, typeof(GridReader), param?.GetType(), null);
             CacheInfo info = GetCacheInfo(identity, param, command.AddToCache);
 
@@ -1065,7 +1067,7 @@ namespace Dapper
 
         private static IEnumerable<T> QueryImpl<T>(this IDbConnection cnn, CommandDefinition command, Type effectiveType)
         {
-            object param = command.Parameters;
+			object param = command.Parameters;
             var identity = new Identity(command.CommandText, command.CommandType, cnn, effectiveType, param?.GetType(), null);
             var info = GetCacheInfo(identity, param, command.AddToCache);
 

@@ -84,7 +84,7 @@ namespace Kogel.Dapper.Extension.Extension
 		/// <returns></returns>
 		private static T SetNavigation<T>(this T data, IDbConnection dbCon, IProviderOption providerOption)
 		{
-			if (providerOption.NavigationList.Any())
+			if (providerOption.NavigationList.Any() && data != null)
 			{
 				//写入值方法
 				var setValueMethod = typeof(MapperExtension).GetMethod("SetValue");
@@ -136,7 +136,7 @@ namespace Kogel.Dapper.Extension.Extension
 		/// <returns></returns>
 		private static List<T> SetNavigationList<T>(this List<T> data, IDbConnection dbCon, IProviderOption providerOption)
 		{
-			if (providerOption.NavigationList.Any())
+			if (providerOption.NavigationList.Any() && data != null && data.Any())
 			{
 				var setListMethod = typeof(MapperExtension).GetMethod("SetListValue");
 				foreach (var navigation in providerOption.NavigationList)
@@ -164,7 +164,7 @@ namespace Kogel.Dapper.Extension.Extension
 					setListMethod
 					   .MakeGenericMethod(new Type[] { typeof(T), navigationExpression.ReturnType })
 					   .Invoke(null, new object[] { data, dbCon, sqlBuilder.ToString(), navigationExpression.Param,
-						    navigation.MemberAssignName });
+							navigation.MemberAssignName });
 				}
 			}
 			return data;

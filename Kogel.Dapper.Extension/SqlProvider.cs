@@ -64,6 +64,12 @@ namespace Kogel.Dapper.Extension
 		public abstract SqlProvider FormatSum(LambdaExpression sumExpression);
 
 		public abstract SqlProvider FormatUpdateSelect<T>(Expression<Func<T, T>> updator);
+
+		/// <summary>
+		/// 业务公共抽离模块
+		/// </summary>
+		[ThreadStatic]
+		public static AopProvider Aop = new AopProvider();
 		/// <summary>
 		/// 获取表名称
 		/// </summary>
