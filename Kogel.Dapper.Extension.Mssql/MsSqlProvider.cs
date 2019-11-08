@@ -194,8 +194,44 @@ namespace Kogel.Dapper.Extension.MsSql
 
 			return this;
 		}
+        public override SqlProvider FormatMin(LambdaExpression minExpression)
+        {
+            var selectSql = ResolveExpression.ResolveMin(minExpression);
 
-		public override SqlProvider FormatUpdateSelect<T>(Expression<Func<T, T>> updator)
+            var fromTableSql = FormatTableName();
+
+            string noneSql = "";
+            var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql, Context.Set.SelectExpression);
+
+            var whereSql = string.Empty;
+
+            //表查询条件
+            var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
+
+            SqlString = $"{selectSql} {fromTableSql}{joinSql} {whereSql} ";
+
+            return this;
+        }
+        public override SqlProvider FormatMax(LambdaExpression maxExpression)
+        {
+            var selectSql = ResolveExpression.ResolveMax(maxExpression);
+
+            var fromTableSql = FormatTableName();
+
+            string noneSql = "";
+            var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql, Context.Set.SelectExpression);
+
+            var whereSql = string.Empty;
+
+            //表查询条件
+            var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
+
+            SqlString = $"{selectSql} {fromTableSql}{joinSql} {whereSql} ";
+
+            return this;
+        }
+
+        public override SqlProvider FormatUpdateSelect<T>(Expression<Func<T, T>> updator)
 		{
 			var update = ResolveExpression.ResolveUpdate(updator);
 

@@ -63,7 +63,11 @@ namespace Kogel.Dapper.Extension
 
 		public abstract SqlProvider FormatSum(LambdaExpression sumExpression);
 
-		public abstract SqlProvider FormatUpdateSelect<T>(Expression<Func<T, T>> updator);
+        public abstract SqlProvider FormatMin(LambdaExpression minExpression);
+
+        public abstract SqlProvider FormatMax(LambdaExpression maxExpression);
+
+        public abstract SqlProvider FormatUpdateSelect<T>(Expression<Func<T, T>> updator);
 		/// <summary>
 		/// 获取表名称
 		/// </summary>
