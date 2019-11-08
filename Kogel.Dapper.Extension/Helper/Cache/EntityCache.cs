@@ -71,13 +71,13 @@ namespace Kogel.Dapper.Extension
             }
         }
 		/// <summary>
-		/// 查询实体类信息（模糊查询）
+		/// 查询实体类信息（）
 		/// </summary>
 		/// <param name="entityFullName"></param>
 		/// <returns></returns>
 		public static EntityObject QueryEntity(string entityFullName)
 		{
-			var entityType = EntitieList.FirstOrDefault(x => x.Type.FullName.Contains(entityFullName));
+			var entityType = EntitieList.FirstOrDefault(x => x.Type.FullName.Equals(entityFullName));
 			return entityType;
 		}
     }
