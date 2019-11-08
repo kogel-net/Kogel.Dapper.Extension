@@ -35,6 +35,8 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 						Content = x.Content 
 					});
 
+				var aaa = conn.QuerySet<Comment>().Where(x => 1 == 1).ToList();
+
 				//单个属性返回
 				var ContentList = conn.QuerySet<Comment>()
 					 .Where(x => x.Content.IsNotNull() && x.Content != "")
@@ -43,8 +45,8 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 					 {
 						 Id = x.Id,
 						 ArticleIds = x.ArticleId,
-						 count = new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id == x.ArticleId).Count(),
-						 NewsList = new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id == x.ArticleId).ToList(y => new NewsDto()
+						 count = conn.QuerySet<News>().Where(y => y.Id == x.ArticleId).Count(),
+						 NewsList = conn.QuerySet<News>().Where(y => y.Id == x.ArticleId).ToList(y => new NewsDto()
 						 {
 							 Id = y.Id,
 							 Contents = y.Content
