@@ -8,10 +8,6 @@ namespace Kogel.Dapper.Extension.MsSql
 {
 	public static class DataBase
 	{
-	    static DataBase()
-		{
-			Aop = new AopProvider();
-		}
 		/// <summary>
 		/// 用来解决表达式树不能使用默认参数
 		/// </summary>

@@ -116,6 +116,8 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                      .Where<News>(x => x.NewsLabel.Contains("足球"))
                      .WithNoLock()
                      .Count();
+
+			
             }
         }
     }
