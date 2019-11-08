@@ -6,24 +6,33 @@ namespace Kogel.Dapper.Extension
 	public class AopProvider
 	{
 		/// <summary>
-		/// 执行事件类型
+		/// 事件模型定义
 		/// </summary>
-		/// <param name="command">执行对象</param>
-		public delegate void AopMethod(CommandDefinition command);
-
+		/// <param name="command"></param>
+		public delegate void EventHander(CommandDefinition command);
 		/// <summary>
-		/// 执行前启动
+		/// 执行前
 		/// </summary>
-		public event AopMethod OnExecuting;
-
+		public event EventHander OnExecuting;
 		/// <summary>
-		/// 执行后启动
+		/// 执行后
 		/// </summary>
-		public event EventHandler<AopMethod> OnExecuted;
-
-		public void Cry(string msg)
+		public event EventHander OnExecuted;
+		/// <summary>
+		/// 触发执行前
+		/// </summary>
+		/// <param name="definition"></param>
+		internal void InvokeExecuting(CommandDefinition definition)
 		{
-			OnExecuting(new CommandDefinition());
+			this.OnExecuting?.Invoke(definition);
+		}
+		/// <summary>
+		/// 触发执行后
+		/// </summary>
+		/// <param name="definition"></param>
+		internal void InvokeExecuted(CommandDefinition definition)
+		{
+			this.OnExecuted?.Invoke(definition);
 		}
 	}
 }

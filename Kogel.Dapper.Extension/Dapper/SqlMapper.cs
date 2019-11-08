@@ -31,10 +31,23 @@ namespace Dapper
     /// </summary>
     public static partial class SqlMapper
     {
+		//[ThreadStatic]
+		private static AopProvider _aop;
+
+		public static AopProvider Aop { get => CreateAop(); }
+
+		private static AopProvider CreateAop()
+		{
+			if (_aop == null)
+			{
+				_aop = new AopProvider();
+			}
+			return _aop;
+		}
+
 		private class PropertyInfoByNameComparer : IComparer<PropertyInfo>
         {
-		
-            public int Compare(PropertyInfo x, PropertyInfo y) => string.CompareOrdinal(x.Name, y.Name);
+			public int Compare(PropertyInfo x, PropertyInfo y) => string.CompareOrdinal(x.Name, y.Name);
         }
         private static int GetColumnHash(IDataReader reader, int startBound = 0, int length = -1)
         {
@@ -1010,6 +1023,8 @@ namespace Dapper
 
         private static GridReader QueryMultipleImpl(this IDbConnection cnn, ref CommandDefinition command)
         {
+			Aop.InvokeExecuting(command);
+
 			object param = command.Parameters;
             var identity = new Identity(command.CommandText, command.CommandType, cnn, typeof(GridReader), param?.GetType(), null);
             CacheInfo info = GetCacheInfo(identity, param, command.AddToCache);
@@ -1045,7 +1060,11 @@ namespace Dapper
                 cmd?.Dispose();
                 if (wasClosed) cnn.Close();
                 throw;
-            }
+			}
+			finally
+			{
+				Aop.InvokeExecuted(command);
+			}
         }
 
         private static IDataReader ExecuteReaderWithFlagsFallback(IDbCommand cmd, bool wasClosed, CommandBehavior behavior)
@@ -1067,6 +1086,8 @@ namespace Dapper
 
         private static IEnumerable<T> QueryImpl<T>(this IDbConnection cnn, CommandDefinition command, Type effectiveType)
         {
+			Aop.InvokeExecuting(command);
+
 			object param = command.Parameters;
             var identity = new Identity(command.CommandText, command.CommandType, cnn, effectiveType, param?.GetType(), null);
             var info = GetCacheInfo(identity, param, command.AddToCache);
@@ -1130,7 +1151,9 @@ namespace Dapper
                 }
                 if (wasClosed) cnn.Close();
                 cmd?.Dispose();
-            }
+
+				Aop.InvokeExecuted(command);
+			}
         }
 
         [Flags]
@@ -1165,7 +1188,9 @@ namespace Dapper
 
         private static T QueryRowImpl<T>(IDbConnection cnn, Row row, ref CommandDefinition command, Type effectiveType)
         {
-            object param = command.Parameters;
+			Aop.InvokeExecuting(command);
+
+			object param = command.Parameters;
             var identity = new Identity(command.CommandText, command.CommandType, cnn, effectiveType, param?.GetType(), null);
             var info = GetCacheInfo(identity, param, command.AddToCache);
 
@@ -1237,7 +1262,9 @@ namespace Dapper
                 }
                 if (wasClosed) cnn.Close();
                 cmd?.Dispose();
-            }
+
+				Aop.InvokeExecuted(command);
+			}
         }
 
         /// <summary>
@@ -1408,7 +1435,9 @@ namespace Dapper
 
         private static IEnumerable<TReturn> MultiMapImpl<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn>(this IDbConnection cnn, CommandDefinition command, Delegate map, string splitOn, IDataReader reader, Identity identity, bool finalize)
         {
-            object param = command.Parameters;
+			Aop.InvokeExecuting(command);
+
+			object param = command.Parameters;
             identity = identity ?? new Identity(command.CommandText, command.CommandType, cnn, typeof(TFirst), param?.GetType(), new[] { typeof(TFirst), typeof(TSecond), typeof(TThird), typeof(TFourth), typeof(TFifth), typeof(TSixth), typeof(TSeventh) });
             CacheInfo cinfo = GetCacheInfo(identity, param, command.AddToCache);
 
@@ -1463,7 +1492,9 @@ namespace Dapper
                     ownedCommand?.Dispose();
                     if (wasClosed) cnn.Close();
                 }
-            }
+
+				Aop.InvokeExecuted(command);
+			}
         }
 
         private static CommandBehavior GetBehavior(bool close, CommandBehavior @default)
@@ -1473,7 +1504,9 @@ namespace Dapper
 
         private static IEnumerable<TReturn> MultiMapImpl<TReturn>(this IDbConnection cnn, CommandDefinition command, Type[] types, Func<object[], TReturn> map, string splitOn, IDataReader reader, Identity identity, bool finalize)
         {
-            if (types.Length < 1)
+			Aop.InvokeExecuting(command);
+
+			if (types.Length < 1)
             {
                 throw new ArgumentException("you must provide at least one type to deserialize");
             }
@@ -1533,7 +1566,9 @@ namespace Dapper
                     ownedCommand?.Dispose();
                     if (wasClosed) cnn.Close();
                 }
-            }
+
+				Aop.InvokeExecuted(command);
+			}
         }
 
         private static Func<IDataReader, TReturn> GenerateMapper<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn>(Func<IDataReader, object> deserializer, Func<IDataReader, object>[] otherDeserializers, object map)
@@ -2820,7 +2855,8 @@ namespace Dapper
 
         private static int ExecuteCommand(IDbConnection cnn, ref CommandDefinition command, Action<IDbCommand, object> paramReader)
         {
-            IDbCommand cmd = null;
+			Aop.InvokeExecuting(command);
+			IDbCommand cmd = null;
             bool wasClosed = cnn.State == ConnectionState.Closed;
             try
             {
@@ -2834,12 +2870,16 @@ namespace Dapper
             {
                 if (wasClosed) cnn.Close();
                 cmd?.Dispose();
-            }
-        }
+
+				Aop.InvokeExecuted(command);
+			}	
+		}
 
         private static T ExecuteScalarImpl<T>(IDbConnection cnn, ref CommandDefinition command)
         {
-            Action<IDbCommand, object> paramReader = null;
+			Aop.InvokeExecuting(command);
+
+			Action<IDbCommand, object> paramReader = null;
             object param = command.Parameters;
             if (param != null)
             {
@@ -2861,13 +2901,17 @@ namespace Dapper
             {
                 if (wasClosed) cnn.Close();
                 cmd?.Dispose();
-            }
+
+				Aop.InvokeExecuted(command);
+			}
             return Parse<T>(result);
         }
 
         private static IDataReader ExecuteReaderImpl(IDbConnection cnn, ref CommandDefinition command, CommandBehavior commandBehavior, out IDbCommand cmd)
         {
-            Action<IDbCommand, object> paramReader = GetParameterReader(cnn, ref command);
+			Aop.InvokeExecuting(command);
+
+			Action<IDbCommand, object> paramReader = GetParameterReader(cnn, ref command);
             cmd = null;
             bool wasClosed = cnn.State == ConnectionState.Closed, disposeCommand = true;
             try
@@ -2884,7 +2928,9 @@ namespace Dapper
             {
                 if (wasClosed) cnn.Close();
                 if (cmd != null && disposeCommand) cmd.Dispose();
-            }
+
+				Aop.InvokeExecuted(command);
+			}
         }
 
         private static Action<IDbCommand, object> GetParameterReader(IDbConnection cnn, ref CommandDefinition command)

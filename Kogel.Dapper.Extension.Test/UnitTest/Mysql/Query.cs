@@ -17,6 +17,8 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
         string mysqlConnection = "Server=localhost;Database=Qx_Sport_Common;Uid=root;Pwd=A5101264a;";
         public void Test()
         {
+			SqlMapper.Aop.OnExecuting += Aop_OnExecuting;
+
             using (var conn = new MySqlConnection(mysqlConnection))
             {
                 DateTime dateTime = DateTime.Now.AddDays(-10);
@@ -117,7 +119,8 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                      .Count();
             }
         }
-        public  void TestMaxAndMin()
+
+		public  void TestMaxAndMin()
         {
             using (var conn = new MySqlConnection(mysqlConnection))
             {
