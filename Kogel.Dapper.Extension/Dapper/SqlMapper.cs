@@ -31,7 +31,7 @@ namespace Dapper
     /// </summary>
     public static partial class SqlMapper
     {
-		//[ThreadStatic]
+		[ThreadStatic]
 		private static AopProvider _aop;
 
 		public static AopProvider Aop { get => CreateAop(); }
