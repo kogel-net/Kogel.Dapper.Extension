@@ -41,11 +41,13 @@ namespace Kogel.Dapper.Extension.Core.SetC
             return DbCon.Execute(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
         }
 
-		public int Update(IEnumerable<T> entities, int timeout = 120)
+		public int Update(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120)
 		{
-			SqlProvider.FormatUpdate(entities.FirstOrDefault(), null);
+			SqlProvider.FormatUpdate(entities.FirstOrDefault(), excludeFields);
 			//批量修改不需要别名（暂时有点小bug，先勉强使用下）
 			SqlProvider.SqlString = SqlProvider.SqlString.Replace("Update_", "").Replace("_0","").Replace("_1", "");
+			var identity = EntityCache.QueryEntity(typeof(T)).Identitys;
+			SqlProvider.SqlString += $" AND {identity}={SqlProvider.ProviderOption.ParameterPrefix + identity}";
 			return DbCon.Execute(SqlProvider.SqlString, entities, DbTransaction, timeout);
 		}
 
@@ -79,34 +81,34 @@ namespace Kogel.Dapper.Extension.Core.SetC
             return await DbCon.ExecuteAsync(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
         }
 
-        public int Insert(T entity)
+        public int Insert(T entity, string[] excludeFields = null)
         {
-            SqlProvider.FormatInsert(entity);
+			SqlProvider.FormatInsert(entity, excludeFields);
             return DbCon.Execute(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
         }
 
-        public async Task<int> InsertAsync(T entity)
+        public async Task<int> InsertAsync(T entity, string[] excludeFields = null)
         {
-            SqlProvider.FormatInsert(entity);
+            SqlProvider.FormatInsert(entity, excludeFields);
             return await DbCon.ExecuteAsync(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
         }
 
-        public int InsertIdentity(T entity)
+        public int InsertIdentity(T entity, string[] excludeFields = null)
         {
-            SqlProvider.FormatInsertIdentity(entity);
+            SqlProvider.FormatInsertIdentity(entity, excludeFields);
             object result= DbCon.ExecuteScalar(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
             return result != null ? Convert.ToInt32(result) : 0;
         }
 
-        public int Insert(IEnumerable<T> entities, int timeout = 120)
-        {
-            SqlProvider.FormatInsert(entities.FirstOrDefault());
-            return DbCon.Execute(SqlProvider.SqlString, entities, DbTransaction, timeout);
-        }
+		public int Insert(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120)
+		{
+			SqlProvider.FormatInsert(entities.FirstOrDefault(), excludeFields);
+			return DbCon.Execute(SqlProvider.SqlString, entities, DbTransaction, timeout);
+		}
 
-        public async Task<int> InsertAsync(IEnumerable<T> entities, int timeout = 120)
+        public async Task<int> InsertAsync(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120)
         {
-            SqlProvider.FormatInsert(entities.FirstOrDefault());
+            SqlProvider.FormatInsert(entities.FirstOrDefault(), excludeFields);
             return await DbCon.ExecuteAsync(SqlProvider.SqlString, entities, DbTransaction, timeout);
         }
 	}

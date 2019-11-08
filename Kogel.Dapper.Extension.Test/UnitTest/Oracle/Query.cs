@@ -1,16 +1,17 @@
-﻿using Kogel.Dapper.Extension.Test.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Data.OracleClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Kogel.Dapper.Extension.Oracle;
-using Oracle.ManagedDataAccess.Client;
 using Kogel.Dapper.Extension.Core.SetQ;
+using Kogel.Dapper.Extension.Oracle;
+using Kogel.Dapper.Extension.Test.Model;
+using Kogel.Dapper.Extension.Test.ViewModel;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 {
-   public class Query
+    public class Query
     {
         string oracleConnection = @"Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))
                     (CONNECT_DATA=(SERVICE_NAME=ORCL)));User Id=system;Password=A5101264a";

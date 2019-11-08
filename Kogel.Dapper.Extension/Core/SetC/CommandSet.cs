@@ -73,9 +73,17 @@ namespace Kogel.Dapper.Extension.Core.SetC
 
         public ICommand<T> Where(Expression<Func<T, bool>> predicate)
         {
-            //WhereExpression = WhereExpression == null ? predicate : ((Expression<Func<T, bool>>)WhereExpression).And(predicate);
             WhereExpressionList.Add(predicate);
             return this;
         }
-    }
+
+		public ICommand<T> WhereIf(bool where, Expression<Func<T, bool>> truePredicate, Expression<Func<T, bool>> falsePredicate)
+		{
+			if (where)
+				WhereExpressionList.Add(truePredicate);
+			else
+				WhereExpressionList.Add(falsePredicate);
+			return this;
+		}
+	}
 }

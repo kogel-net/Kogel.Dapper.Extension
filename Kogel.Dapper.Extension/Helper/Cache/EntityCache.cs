@@ -1,4 +1,6 @@
-﻿using Kogel.Dapper.Extension.Model;
+﻿using Dapper;
+using Kogel.Dapper.Extension.Helper;
+using Kogel.Dapper.Extension.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +25,7 @@ namespace Kogel.Dapper.Extension
             if (!EntitieList.Exists(x => x.AssemblyString.Equals(entityObject.AssemblyString)))
             {
                 EntitieList.Add(entityObject);
+                SqlMapper.SetTypeMap(entityObject.Type, new CustomPropertyTypeMap(entityObject.Type, (type, column) => type.GetPropertys(entityObject.FieldPairs.FirstOrDefault(x => x.Value.Equals(column)).Key)));
             }
             return entityObject;
         }
@@ -68,13 +71,13 @@ namespace Kogel.Dapper.Extension
             }
         }
 		/// <summary>
-		/// 查询实体类信息（模糊查询）
+		/// 查询实体类信息（）
 		/// </summary>
 		/// <param name="entityFullName"></param>
 		/// <returns></returns>
 		public static EntityObject QueryEntity(string entityFullName)
 		{
-			var entityType = EntitieList.FirstOrDefault(x => x.Type.FullName.Contains(entityFullName));
+			var entityType = EntitieList.FirstOrDefault(x => x.Type.FullName.Equals(entityFullName));
 			return entityType;
 		}
     }

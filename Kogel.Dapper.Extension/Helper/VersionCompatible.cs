@@ -46,6 +46,7 @@ namespace Kogel.Dapper.Extension.Helper
 #if NETSTANDARD1_3
            return PropertyType.GetTypeInfo().GetDeclaredProperty(name);
 #else
+            if (string.IsNullOrEmpty(name)) { return null; }
             return PropertyType.GetProperty(name);
 #endif
         }
@@ -54,6 +55,7 @@ namespace Kogel.Dapper.Extension.Helper
 #if NETSTANDARD1_3
            return PropertyType.GetTypeInfo().GetDeclaredMethod(name);
 #else
+            if (string.IsNullOrEmpty(name)) { return null; }
             return PropertyType.GetMethod(name);
 #endif
         }

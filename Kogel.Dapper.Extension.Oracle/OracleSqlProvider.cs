@@ -128,16 +128,16 @@ namespace Kogel.Dapper.Extension.Oracle
             return this;
         }
 
-        public override SqlProvider FormatInsert<T>(T entity)
-        {
+        public override SqlProvider FormatInsert<T>(T entity, string[] excludeFields)
+		{
             var fromTableSql = ProviderOption.CombineFieldName(FormatTableName(false, false).Trim());
             var paramsAndValuesSql = FormatInsertParamsAndValues(entity);
             SqlString = $"INSERT INTO {fromTableSql} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]})";
             return this;
         }
 
-        public override SqlProvider FormatInsertIdentity<T>(T entity)
-        {
+        public override SqlProvider FormatInsertIdentity<T>(T entity, string[] excludeFields)
+		{
             var fromTableSql = ProviderOption.CombineFieldName(FormatTableName(false, false).Trim());
             var paramsAndValuesSql = FormatInsertParamsAndValues(entity);
             SqlString = $"INSERT INTO {fromTableSql} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]}) SELECT @@IDENTITY";
