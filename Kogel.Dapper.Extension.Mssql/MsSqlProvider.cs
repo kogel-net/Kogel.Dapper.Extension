@@ -68,7 +68,7 @@ namespace Kogel.Dapper.Extension.MsSql
 			return this;
 		}
 
-		public override SqlProvider FormatToPageList<T>(int pageIndex, int pageSize, bool IsSelectCount = true)
+		public override SqlProvider FormatToPageList<T>(int pageIndex, int pageSize)
 		{
 			var orderbySql = ResolveExpression.ResolveOrderBy(Context.Set);
 			if (string.IsNullOrEmpty(orderbySql))
@@ -85,10 +85,7 @@ namespace Kogel.Dapper.Extension.MsSql
 			var whereSql = string.Empty;
 			//表查询条件
 			var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
-			if (IsSelectCount)
-				SqlString = $"SELECT COUNT(1) {fromTableSql} {nolockSql} {joinSql} {whereSql};" + Environment.NewLine;
-			else
-				SqlString = "";
+
 			SqlString += $@"SELECT T.* FROM    ( 
                             SELECT ROW_NUMBER() OVER ( {orderbySql} ) AS ROWNUMBER,
                             {(new Regex("SELECT").Replace(selectSql, "", 1))}

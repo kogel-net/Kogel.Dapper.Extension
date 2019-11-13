@@ -18,8 +18,10 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
         {
             using (var conn = new SqlConnection(mssqlConnection))
             {
-                //单个属性返回
-                var ContentList = conn.QuerySet<Comment>()
+				var aaa = conn.QuerySet<Comment>().Where(x => 1 == 1).ToList();
+
+				//单个属性返回
+				var ContentList = conn.QuerySet<Comment>()
                      .AsTableName(typeof(Comment), "Comment_4")
                      .Where(x => x.Id > 0)
                      .ToList(x => x.Content);

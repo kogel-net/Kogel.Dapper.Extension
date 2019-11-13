@@ -8,8 +8,8 @@ namespace Kogel.Dapper.Extension.MySql
 {
     public class MySqlProvider : SqlProvider
     {
-        private const string OpenQuote = "";
-        private const string CloseQuote = "";
+        private const string OpenQuote = "`";
+        private const string CloseQuote = "`";
         private const char ParameterPrefix = '@';
         private IResolveExpression ResolveExpression;
         public MySqlProvider()
@@ -68,7 +68,7 @@ namespace Kogel.Dapper.Extension.MySql
             return this;
         }
 
-        public override SqlProvider FormatToPageList<T>(int pageIndex, int pageSize, bool IsSelectCount = true)
+        public override SqlProvider FormatToPageList<T>(int pageIndex, int pageSize)
         {
             var orderbySql = ResolveExpression.ResolveOrderBy(Context.Set);
             //Oracle可以不用必须排序翻页
@@ -85,11 +85,8 @@ namespace Kogel.Dapper.Extension.MySql
 
             //表查询条件
             var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
-            if (IsSelectCount)
-                SqlString = $"SELECT COUNT(1) {fromTableSql} {joinSql} {whereSql};" + Environment.NewLine;
-            else
-                SqlString = "";
-            SqlString += $@" SELECT 
+
+            SqlString = $@" SELECT 
                            {(new Regex("SELECT").Replace(selectSql, "", 1))}
                             {fromTableSql} {joinSql} {whereSql} {orderbySql}
                             LIMIT {((pageIndex - 1) * pageSize)},{pageSize};";

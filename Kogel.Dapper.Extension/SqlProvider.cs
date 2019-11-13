@@ -27,10 +27,6 @@ namespace Kogel.Dapper.Extension
 
 		public string SqlString { get; set; }
 		/// <summary>
-		/// 是否在查询分页时查询总数
-		/// </summary>
-		public bool IsSelectCount = false;
-		/// <summary>
 		/// 连接对象集合
 		/// </summary>
 		public List<JoinAssTable> JoinList { get; set; }
@@ -47,7 +43,7 @@ namespace Kogel.Dapper.Extension
 
 		public abstract SqlProvider FormatToList<T>();
 
-		public abstract SqlProvider FormatToPageList<T>(int pageIndex, int pageSize, bool IsSelectCount = true);
+		public abstract SqlProvider FormatToPageList<T>(int pageIndex, int pageSize);
 
 		public abstract SqlProvider FormatCount();
 

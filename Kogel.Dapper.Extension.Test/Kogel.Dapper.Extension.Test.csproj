@@ -57,6 +57,7 @@
     <Compile Include="UnitTest\Mssql\Query.cs" />
     <Compile Include="UnitTest\Mssql\Command.cs" />
     <Compile Include="UnitTest\Mysql\Command.cs" />
+    <Compile Include="UnitTest\Mysql\TestRepository.cs" />
     <Compile Include="UnitTest\Oracle\Query.cs" />
     <Compile Include="UnitTest\Oracle\Command.cs" />
     <Compile Include="UnitTest\Mysql\Query.cs" />
@@ -83,6 +84,10 @@
     <ProjectReference Include="..\Kogel.Dapper.Extension\Kogel.Dapper.Extension.csproj">
       <Project>{87e91d82-ce44-43b0-92b0-f4279a6708d7}</Project>
       <Name>Kogel.Dapper.Extension</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Kogel.Repository\Kogel.Repository.csproj">
+      <Project>{ace6d42e-6830-4733-b5b7-a91e9b9e4451}</Project>
+      <Name>Kogel.Repository</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

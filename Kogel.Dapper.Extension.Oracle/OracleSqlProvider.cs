@@ -68,7 +68,7 @@ namespace Kogel.Dapper.Extension.Oracle
             return this;
         }
 
-        public override SqlProvider FormatToPageList<T>(int pageIndex, int pageSize,bool IsSelectCount=true)
+        public override SqlProvider FormatToPageList<T>(int pageIndex, int pageSize)
         {
             var orderbySql = ResolveExpression.ResolveOrderBy(Context.Set);
             //Oracle可以不用必须排序翻页
@@ -94,8 +94,6 @@ namespace Kogel.Dapper.Extension.Oracle
                             ) T 
                             )T2
                             WHERE ROWNUMS BETWEEN {((pageIndex - 1) * pageSize) + 1} and {pageIndex * pageSize}";
-
-            IsSelectCount = true;
             return this;
         }
 

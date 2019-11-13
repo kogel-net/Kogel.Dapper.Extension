@@ -41,7 +41,7 @@ namespace Dapper
         /// <summary>
         /// The active transaction for the command
         /// </summary>
-        public IDbTransaction Transaction { get; }
+        public IDbTransaction Transaction { get; set; }
 
         /// <summary>
         /// The effective timeout for the command

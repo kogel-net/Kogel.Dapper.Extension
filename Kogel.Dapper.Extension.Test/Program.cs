@@ -18,30 +18,33 @@ namespace Kogel.Dapper.Extension.Test
     {
         static void Main(string[] args)
         {
-            #region mssql单元测试
-            //var mssqlQuery = new UnitTest.Mssql.Query();
-            //mssqlQuery.Test();
+			#region mssql单元测试
+			//var mssqlQuery = new UnitTest.Mssql.Query();
+			//mssqlQuery.Test();
 
-            //var mssqlCommand = new UnitTest.Mssql.Command();
-            //mssqlCommand.Test();
-            #endregion
+			//var mssqlCommand = new UnitTest.Mssql.Command();
+			//mssqlCommand.Test();
+			#endregion
 
-            #region mysql单元测试
-            var mysqlQuery = new UnitTest.Mysql.Query();
+			#region mysql单元测试
+			var mysqlQuery = new UnitTest.Mysql.Query();
             mysqlQuery.Test();
-            //mysqlQuery.TestMaxAndMin();
 
-            //var mysqlCommand = new UnitTest.Mysql.Command();
-            //mysqlCommand.Test();
-            #endregion
+			//var mysqlResQuery = new UnitTest.Mysql.TestRepositoryQuery();
+			//mysqlResQuery.Test();
+			//mysqlQuery.TestMaxAndMin();
 
-            #region oracle单元测试
-            //var oracleQuery = new UnitTest.Oracle.Query();
-            //oracleQuery.Test();
+			var mysqlCommand = new UnitTest.Mysql.Command();
+			mysqlCommand.Test();
+			#endregion
 
-            //var oracleCommand = new UnitTest.Oracle.Command();
-            //oracleCommand.Test();
-            #endregion
-        }
+			#region oracle单元测试
+			//var oracleQuery = new UnitTest.Oracle.Query();
+			//oracleQuery.Test();
+
+			//var oracleCommand = new UnitTest.Oracle.Command();
+			//oracleCommand.Test();
+			#endregion
+		}
     }
 }
