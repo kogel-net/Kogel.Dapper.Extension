@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data;
 
-namespace Kogel.Repository.UnitOfWork
+namespace Kogel.Repository.Interfaces
 {
 	public interface IUnitOfWork: IDisposable
 	{

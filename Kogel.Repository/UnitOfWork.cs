@@ -5,8 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
+using Kogel.Repository.Interfaces;
 
-namespace Kogel.Repository.UnitOfWork
+namespace Kogel.Repository
 {
 	public class UnitOfWork : IUnitOfWork
 	{

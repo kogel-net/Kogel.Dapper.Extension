@@ -4,12 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data;
+using Kogel.Dapper.Extension;
 
 namespace Kogel.Repository
 {
 	public class RepositoryOptionsBuilder
 	{
-		internal IDbConnection connection { get; private set; }
+		/// <summary>
+		/// 数据库连接
+		/// </summary>
+		internal IDbConnection Connection { get; private set; }
+		/// <summary>
+		/// 数据提供者
+		/// </summary>
+		internal SqlProvider Provider { get; private set; }
 		/// <summary>
 		/// 配置连接方式
 		/// </summary>
@@ -17,32 +25,18 @@ namespace Kogel.Repository
 		/// <returns></returns>
 		public RepositoryOptionsBuilder BuildConnection(IDbConnection connection)
 		{
-			this.connection = connection;
+			this.Connection = connection;
 			return this;
 		}
-		///// <summary>
-		///// 仓储连接对象注入方式
-		///// </summary>
-		///// <param name="repositoryDI"></param>
-		///// <returns></returns>
-		//public RepositoryOptionsBuilder BuildRepositoryDI(RepositoryDI repositoryDI)
-		//{
-		//	this.repositoryDI = repositoryDI;
-		//	return this;
-		//}
-	}
-	/// <summary>
-	/// 仓储连接对象注入方式
-	/// </summary>
-	public enum RepositoryDI
-	{
 		/// <summary>
-		/// 每次创建对象获取一次连接对象
+		/// 配置数据库提供者
 		/// </summary>
-		Transient = 0,
-		/// <summary>
-		/// 同一线程内获取一次连接对象
-		/// </summary>
-		Scoped = 1,
+		/// <param name="provider"></param>
+		/// <returns></returns>
+		public RepositoryOptionsBuilder BuildProvider(SqlProvider provider)
+		{
+			this.Provider = provider;
+			return this;
+		}
 	}
 }
