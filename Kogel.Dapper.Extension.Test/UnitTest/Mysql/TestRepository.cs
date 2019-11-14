@@ -12,7 +12,7 @@ using Kogel.Dapper.Extension.Test.Model;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 {
-	public class TestRepository : BaseRepository
+	public class TestRepository : BaseRepository<Comment>
 	{
 		public override void OnConfiguring(RepositoryOptionsBuilder builder)
 		{
