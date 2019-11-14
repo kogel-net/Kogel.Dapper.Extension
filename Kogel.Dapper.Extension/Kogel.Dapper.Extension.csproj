@@ -3,10 +3,10 @@
     <PackageId>Kogel.Dapper.Extension</PackageId>
     <PackageTags>orm;sql;micro-orm</PackageTags>
     <Title>Dapper</Title>
-    <Description>Kogel.Dapper.Extension</Description>
+    <Description>3.1.8增加仓储模式</Description>
     <Authors>Kogel</Authors>
     <TargetFrameworks>net451;netstandard2.0;netcoreapp2.1</TargetFrameworks>
-    <Company>Kogel.Dapper.ExtensionKogel.Dapper.Extension</Company>
+    <Company>Kogel.Dapper.Extension</Company>
     <Product>Kogel.Dapper.Extension</Product>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>3.1.7</Version>

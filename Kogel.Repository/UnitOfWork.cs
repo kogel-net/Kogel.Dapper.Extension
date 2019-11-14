@@ -33,12 +33,16 @@ namespace Kogel.Repository
 			{
 				transactionMethod.Invoke();
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
-				transaction.Rollback();
+				if (transaction != null)
+					transaction.Rollback();
 				throw ex;
 			}
-			SqlMapper.Aop.OnExecuting -= Aop_OnExecuting;
+			finally
+			{
+				SqlMapper.Aop.OnExecuting -= Aop_OnExecuting;
+			}
 			return this;
 		}
 		/// <summary>
