@@ -44,7 +44,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				{
 
 				}
-				testRepository.UnitOfWork.Rollback();
+				testRepository.UnitOfWork.Commit();
 			}
 		}
 	}

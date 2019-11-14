@@ -27,9 +27,16 @@ namespace Kogel.Repository.UnitOfWork
 			if (connection.State == ConnectionState.Closed)
 				connection.Open();
 			transaction = connection.BeginTransaction(IsolationLevel);
-			//解析方法里的访问对象
 			SqlMapper.Aop.OnExecuting += Aop_OnExecuting;
-			transactionMethod.Invoke();
+			try
+			{
+				transactionMethod.Invoke();
+			}
+			catch(Exception ex)
+			{
+				transaction.Rollback();
+				throw ex;
+			}
 			SqlMapper.Aop.OnExecuting -= Aop_OnExecuting;
 			return this;
 		}
