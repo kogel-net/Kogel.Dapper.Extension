@@ -19,6 +19,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml;
 using System.Xml.Linq;
+using System.Threading.Tasks;
 
 #if NETSTANDARD1_3
 using DataException = System.InvalidOperationException;
@@ -31,20 +32,22 @@ namespace Dapper
     /// </summary>
     public static partial class SqlMapper
     {
+		#region Aop
 		[ThreadStatic]
-		private static AopProvider _aop;
+		private static ThreadLocal<AopProvider> _aop;
 
-		public static AopProvider Aop { get => CreateAop(); }
+		public static AopProvider Aop { get => GetAop(); }
 
-		private static AopProvider CreateAop()
+		private static AopProvider GetAop()
 		{
 			if (_aop == null)
 			{
-				_aop = new AopProvider();
+				_aop = new ThreadLocal<AopProvider>();
+				_aop.Value = new AopProvider();
 			}
-			return _aop;
+			return _aop.Value;
 		}
-
+		#endregion
 		private class PropertyInfoByNameComparer : IComparer<PropertyInfo>
         {
 			public int Compare(PropertyInfo x, PropertyInfo y) => string.CompareOrdinal(x.Name, y.Name);
