@@ -28,7 +28,6 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 			{
 				try
 				{
-
 					testRepository.UnitOfWork.BeginTransaction(() =>
 					{
 						var comment = testRepository.Orm.QuerySet<Comment>().ToList();
@@ -44,7 +43,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				{
 
 				}
-				testRepository.UnitOfWork.Commit();
+				testRepository.UnitOfWork.Rollback();
 			}
 		}
 	}

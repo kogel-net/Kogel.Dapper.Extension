@@ -10,7 +10,7 @@ namespace Kogel.Dapper.Extension
 		/// 事件模型定义
 		/// </summary>
 		/// <param name="command"></param>
-		public delegate void EventHander(ref IDbConnection conn, ref CommandDefinition command);
+		public delegate void EventHander(ref CommandDefinition command);
 		/// <summary>
 		/// 执行前
 		/// </summary>
@@ -23,17 +23,17 @@ namespace Kogel.Dapper.Extension
 		/// 触发执行前
 		/// </summary>
 		/// <param name="definition"></param>
-		internal void InvokeExecuting(ref IDbConnection conn, ref CommandDefinition definition)
+		internal void InvokeExecuting(ref CommandDefinition definition)
 		{
-			this.OnExecuting?.Invoke(ref conn, ref definition);
+			this.OnExecuting?.Invoke(ref definition);
 		}
 		/// <summary>
 		/// 触发执行后
 		/// </summary>
 		/// <param name="definition"></param>
-		internal void InvokeExecuted(ref IDbConnection conn, ref CommandDefinition definition)
+		internal void InvokeExecuted(ref CommandDefinition definition)
 		{
-			this.OnExecuted?.Invoke(ref conn, ref definition);
+			this.OnExecuted?.Invoke(ref definition);
 		}
 	}
 }

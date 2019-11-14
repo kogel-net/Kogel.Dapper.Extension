@@ -40,10 +40,13 @@ namespace Kogel.Repository.UnitOfWork
 			SqlMapper.Aop.OnExecuting -= Aop_OnExecuting;
 			return this;
 		}
-
-		private void Aop_OnExecuting(ref IDbConnection connection,ref CommandDefinition command)
+		/// <summary>
+		/// 工作单元内所有访问数据库操作执行前
+		/// </summary>
+		/// <param name="command"></param>
+		private void Aop_OnExecuting(ref CommandDefinition command)
 		{
-			connection = this.connection;
+			command.Connection = this.connection;
 			command.Transaction = this.transaction;
 		}
 		/// <summary>

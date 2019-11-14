@@ -454,7 +454,7 @@ namespace Dapper
         /// <returns>The number of rows affected.</returns>
         public static int Execute(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
-            var command = new CommandDefinition(sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered);
+            var command = new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered);
             return ExecuteImpl(cnn, ref command);
         }
 
@@ -478,7 +478,7 @@ namespace Dapper
         /// <returns>The first cell selected as <see cref="object"/>.</returns>
         public static object ExecuteScalar(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
-            var command = new CommandDefinition(sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered);
+            var command = new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered);
             return ExecuteScalarImpl<object>(cnn, ref command);
         }
 
@@ -495,7 +495,7 @@ namespace Dapper
         /// <returns>The first cell returned, as <typeparamref name="T"/>.</returns>
         public static T ExecuteScalar<T>(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
-            var command = new CommandDefinition(sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered);
+            var command = new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered);
             return ExecuteScalarImpl<T>(cnn, ref command);
         }
 
@@ -529,26 +529,27 @@ namespace Dapper
 
         private static int ExecuteImpl(this IDbConnection cnn, ref CommandDefinition command)
         {
+			
 			object param = command.Parameters;
             IEnumerable multiExec = GetMultiExec(param);
             Identity identity;
             CacheInfo info = null;
             if (multiExec != null)
             {
-				Aop.InvokeExecuting(ref cnn,ref command);
+				Aop.InvokeExecuting(ref command);
 
 				if ((command.Flags & CommandFlags.Pipelined) != 0)
                 {
                     // this includes all the code for concurrent/overlapped query
-                    return ExecuteMultiImplAsync(cnn, command, multiExec).Result;
+                    return ExecuteMultiImplAsync(command.Connection, command, multiExec).Result;
                 }
                 bool isFirst = true;
                 int total = 0;
-                bool wasClosed = cnn.State == ConnectionState.Closed;
+                bool wasClosed = command.Connection.State == ConnectionState.Closed;
                 try
                 {
-                    if (wasClosed) cnn.Open();
-                    using (var cmd = command.SetupCommand(cnn, null))
+                    if (wasClosed) command.Connection.Open();
+                    using (var cmd = command.SetupCommand(command.Connection, null))
                     {
                         string masterSql = null;
                         foreach (var obj in multiExec)
@@ -557,7 +558,7 @@ namespace Dapper
                             {
                                 masterSql = cmd.CommandText;
                                 isFirst = false;
-                                identity = new Identity(command.CommandText, cmd.CommandType, cnn, null, obj.GetType(), null);
+                                identity = new Identity(command.CommandText, cmd.CommandType, command.Connection, null, obj.GetType(), null);
                                 info = GetCacheInfo(identity, obj, command.AddToCache);
                             }
                             else
@@ -573,9 +574,9 @@ namespace Dapper
                 }
                 finally
                 {
-                    if (wasClosed) cnn.Close();
+                    if (wasClosed) command.Connection.Close();
 
-					Aop.InvokeExecuted(ref cnn,ref command);
+					Aop.InvokeExecuted(ref command);
                 }
                 return total;
             }
@@ -583,10 +584,10 @@ namespace Dapper
             // nice and simple
             if (param != null)
             {
-                identity = new Identity(command.CommandText, command.CommandType, cnn, null, param.GetType(), null);
+                identity = new Identity(command.CommandText, command.CommandType, command.Connection, null, param.GetType(), null);
                 info = GetCacheInfo(identity, param, command.AddToCache);
             }
-            return ExecuteCommand(cnn, ref command, param == null ? null : info.ParamReader);
+            return ExecuteCommand(command.Connection, ref command, param == null ? null : info.ParamReader);
         }
 
         /// <summary>
@@ -616,7 +617,7 @@ namespace Dapper
         /// </example>
         public static IDataReader ExecuteReader(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
-            var command = new CommandDefinition(sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered);
+            var command = new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered);
             var reader = ExecuteReaderImpl(cnn, ref command, CommandBehavior.Default, out IDbCommand dbcmd);
             return new WrappedReader(dbcmd, reader);
         }
@@ -737,7 +738,7 @@ namespace Dapper
         /// </returns>
         public static IEnumerable<T> Query<T>(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
         {
-            var command = new CommandDefinition(sql, param, transaction, commandTimeout, commandType, buffered ? CommandFlags.Buffered : CommandFlags.None);
+            var command = new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, buffered ? CommandFlags.Buffered : CommandFlags.None);
             var data = QueryImpl<T>(cnn, command, typeof(T));
             return command.Buffered ? data.ToList() : data;
         }
@@ -758,7 +759,7 @@ namespace Dapper
         /// </returns>
         public static T QueryFirst<T>(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
-            var command = new CommandDefinition(sql, param, transaction, commandTimeout, commandType, CommandFlags.None);
+            var command = new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.None);
             return QueryRowImpl<T>(cnn, Row.First, ref command, typeof(T));
         }
 
@@ -778,7 +779,7 @@ namespace Dapper
         /// </returns>
         public static T QueryFirstOrDefault<T>(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
-            var command = new CommandDefinition(sql, param, transaction, commandTimeout, commandType, CommandFlags.None);
+            var command = new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.None);
             return QueryRowImpl<T>(cnn, Row.FirstOrDefault, ref command, typeof(T));
         }
 
@@ -798,7 +799,7 @@ namespace Dapper
         /// </returns>
         public static T QuerySingle<T>(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
-            var command = new CommandDefinition(sql, param, transaction, commandTimeout, commandType, CommandFlags.None);
+            var command = new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.None);
             return QueryRowImpl<T>(cnn, Row.Single, ref command, typeof(T));
         }
 
@@ -818,7 +819,7 @@ namespace Dapper
         /// </returns>
         public static T QuerySingleOrDefault<T>(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
-            var command = new CommandDefinition(sql, param, transaction, commandTimeout, commandType, CommandFlags.None);
+            var command = new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.None);
             return QueryRowImpl<T>(cnn, Row.SingleOrDefault, ref command, typeof(T));
         }
 
@@ -841,7 +842,7 @@ namespace Dapper
         public static IEnumerable<object> Query(this IDbConnection cnn, Type type, string sql, object param = null, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
-            var command = new CommandDefinition(sql, param, transaction, commandTimeout, commandType, buffered ? CommandFlags.Buffered : CommandFlags.None);
+            var command = new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, buffered ? CommandFlags.Buffered : CommandFlags.None);
             var data = QueryImpl<object>(cnn, command, type);
             return command.Buffered ? data.ToList() : data;
         }
@@ -864,7 +865,7 @@ namespace Dapper
         public static object QueryFirst(this IDbConnection cnn, Type type, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
-            var command = new CommandDefinition(sql, param, transaction, commandTimeout, commandType, CommandFlags.None);
+            var command = new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.None);
             return QueryRowImpl<object>(cnn, Row.First, ref command, type);
         }
 
@@ -886,7 +887,7 @@ namespace Dapper
         public static object QueryFirstOrDefault(this IDbConnection cnn, Type type, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
-            var command = new CommandDefinition(sql, param, transaction, commandTimeout, commandType, CommandFlags.None);
+            var command = new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.None);
             return QueryRowImpl<object>(cnn, Row.FirstOrDefault, ref command, type);
         }
 
@@ -908,7 +909,7 @@ namespace Dapper
         public static object QuerySingle(this IDbConnection cnn, Type type, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
-            var command = new CommandDefinition(sql, param, transaction, commandTimeout, commandType, CommandFlags.None);
+            var command = new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.None);
             return QueryRowImpl<object>(cnn, Row.Single, ref command, type);
         }
 
@@ -930,7 +931,7 @@ namespace Dapper
         public static object QuerySingleOrDefault(this IDbConnection cnn, Type type, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
-            var command = new CommandDefinition(sql, param, transaction, commandTimeout, commandType, CommandFlags.None);
+            var command = new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.None);
             return QueryRowImpl<object>(cnn, Row.SingleOrDefault, ref command, type);
         }
 
@@ -1013,7 +1014,7 @@ namespace Dapper
         /// <param name="commandType">Is it a stored proc or a batch?</param>
         public static GridReader QueryMultiple(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
-            var command = new CommandDefinition(sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered);
+            var command = new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered);
             return QueryMultipleImpl(cnn, ref command);
         }
 
@@ -1027,19 +1028,19 @@ namespace Dapper
 
         private static GridReader QueryMultipleImpl(this IDbConnection cnn, ref CommandDefinition command)
         {
-			Aop.InvokeExecuting(ref cnn,ref command);
-
+			
+			Aop.InvokeExecuting(ref command);
 			object param = command.Parameters;
-            var identity = new Identity(command.CommandText, command.CommandType, cnn, typeof(GridReader), param?.GetType(), null);
+            var identity = new Identity(command.CommandText, command.CommandType, command.Connection, typeof(GridReader), param?.GetType(), null);
             CacheInfo info = GetCacheInfo(identity, param, command.AddToCache);
 
             IDbCommand cmd = null;
             IDataReader reader = null;
-            bool wasClosed = cnn.State == ConnectionState.Closed;
+            bool wasClosed = command.Connection.State == ConnectionState.Closed;
             try
             {
-                if (wasClosed) cnn.Open();
-                cmd = command.SetupCommand(cnn, info.ParamReader);
+                if (wasClosed) command.Connection.Open();
+                cmd = command.SetupCommand(command.Connection, info.ParamReader);
                 reader = ExecuteReaderWithFlagsFallback(cmd, wasClosed, CommandBehavior.SequentialAccess);
 
                 var result = new GridReader(cmd, reader, identity, command.Parameters as DynamicParameters, command.AddToCache);
@@ -1062,12 +1063,12 @@ namespace Dapper
                     reader.Dispose();
                 }
                 cmd?.Dispose();
-                if (wasClosed) cnn.Close();
+                if (wasClosed) command.Connection.Close();
                 throw;
 			}
 			finally
 			{
-				Aop.InvokeExecuted(ref cnn,ref command);
+				Aop.InvokeExecuted(ref command);
 			}
         }
 
@@ -1090,21 +1091,21 @@ namespace Dapper
 
         private static IEnumerable<T> QueryImpl<T>(this IDbConnection cnn, CommandDefinition command, Type effectiveType)
         {
-			Aop.InvokeExecuting(ref cnn,ref command);
-
+			
+			Aop.InvokeExecuting(ref command);
 			object param = command.Parameters;
-            var identity = new Identity(command.CommandText, command.CommandType, cnn, effectiveType, param?.GetType(), null);
+            var identity = new Identity(command.CommandText, command.CommandType, command.Connection, effectiveType, param?.GetType(), null);
             var info = GetCacheInfo(identity, param, command.AddToCache);
 
             IDbCommand cmd = null;
             IDataReader reader = null;
 
-            bool wasClosed = cnn.State == ConnectionState.Closed;
+            bool wasClosed = command.Connection.State == ConnectionState.Closed;
             try
             {
-                cmd = command.SetupCommand(cnn, info.ParamReader);
+                cmd = command.SetupCommand(command.Connection, info.ParamReader);
 
-                if (wasClosed) cnn.Open();
+                if (wasClosed) command.Connection.Open();
                 reader = ExecuteReaderWithFlagsFallback(cmd, wasClosed, CommandBehavior.SequentialAccess | CommandBehavior.SingleResult);
                 wasClosed = false; // *if* the connection was closed and we got this far, then we now have a reader
                 // with the CloseConnection flag, so the reader will deal with the connection; we
@@ -1153,10 +1154,10 @@ namespace Dapper
                     }
                     reader.Dispose();
                 }
-                if (wasClosed) cnn.Close();
+                if (wasClosed) command.Connection.Close();
                 cmd?.Dispose();
 
-				Aop.InvokeExecuted(ref cnn,ref command);
+				Aop.InvokeExecuted(ref command);
 			}
         }
 
@@ -1192,21 +1193,21 @@ namespace Dapper
 
         private static T QueryRowImpl<T>(IDbConnection cnn, Row row, ref CommandDefinition command, Type effectiveType)
         {
-			Aop.InvokeExecuting(ref cnn,ref command);
-
+			
+			Aop.InvokeExecuting(ref command);
 			object param = command.Parameters;
-            var identity = new Identity(command.CommandText, command.CommandType, cnn, effectiveType, param?.GetType(), null);
+            var identity = new Identity(command.CommandText, command.CommandType, command.Connection, effectiveType, param?.GetType(), null);
             var info = GetCacheInfo(identity, param, command.AddToCache);
 
             IDbCommand cmd = null;
             IDataReader reader = null;
 
-            bool wasClosed = cnn.State == ConnectionState.Closed;
+            bool wasClosed = command.Connection.State == ConnectionState.Closed;
             try
             {
-                cmd = command.SetupCommand(cnn, info.ParamReader);
+                cmd = command.SetupCommand(command.Connection, info.ParamReader);
 
-                if (wasClosed) cnn.Open();
+                if (wasClosed) command.Connection.Open();
                 reader = ExecuteReaderWithFlagsFallback(cmd, wasClosed, (row & Row.Single) != 0
                     ? CommandBehavior.SequentialAccess | CommandBehavior.SingleResult // need to allow multiple rows, to check fail condition
                     : CommandBehavior.SequentialAccess | CommandBehavior.SingleResult | CommandBehavior.SingleRow);
@@ -1264,10 +1265,10 @@ namespace Dapper
                     }
                     reader.Dispose();
                 }
-                if (wasClosed) cnn.Close();
+                if (wasClosed) command.Connection.Close();
                 cmd?.Dispose();
 
-				Aop.InvokeExecuted(ref cnn,ref command);
+				Aop.InvokeExecuted(ref command);
 			}
         }
 
@@ -1424,7 +1425,7 @@ namespace Dapper
         /// <returns>An enumerable of <typeparamref name="TReturn"/>.</returns>
         public static IEnumerable<TReturn> Query<TReturn>(this IDbConnection cnn, string sql, Type[] types, Func<object[], TReturn> map, object param = null, IDbTransaction transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
         {
-            var command = new CommandDefinition(sql, param, transaction, commandTimeout, commandType, buffered ? CommandFlags.Buffered : CommandFlags.None);
+            var command = new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, buffered ? CommandFlags.Buffered : CommandFlags.None);
             var results = MultiMapImpl(cnn, command, types, map, splitOn, null, null, true);
             return buffered ? results.ToList() : results;
         }
@@ -1432,29 +1433,29 @@ namespace Dapper
         private static IEnumerable<TReturn> MultiMap<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn>(
             this IDbConnection cnn, string sql, Delegate map, object param, IDbTransaction transaction, bool buffered, string splitOn, int? commandTimeout, CommandType? commandType)
         {
-            var command = new CommandDefinition(sql, param, transaction, commandTimeout, commandType, buffered ? CommandFlags.Buffered : CommandFlags.None);
+            var command = new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, buffered ? CommandFlags.Buffered : CommandFlags.None);
             var results = MultiMapImpl<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn>(cnn, command, map, splitOn, null, null, true);
             return buffered ? results.ToList() : results;
         }
 
         private static IEnumerable<TReturn> MultiMapImpl<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn>(this IDbConnection cnn, CommandDefinition command, Delegate map, string splitOn, IDataReader reader, Identity identity, bool finalize)
         {
-			Aop.InvokeExecuting(ref cnn,ref command);
-
+			
+			Aop.InvokeExecuting(ref command);
 			object param = command.Parameters;
-            identity = identity ?? new Identity(command.CommandText, command.CommandType, cnn, typeof(TFirst), param?.GetType(), new[] { typeof(TFirst), typeof(TSecond), typeof(TThird), typeof(TFourth), typeof(TFifth), typeof(TSixth), typeof(TSeventh) });
+            identity = identity ?? new Identity(command.CommandText, command.CommandType, command.Connection, typeof(TFirst), param?.GetType(), new[] { typeof(TFirst), typeof(TSecond), typeof(TThird), typeof(TFourth), typeof(TFifth), typeof(TSixth), typeof(TSeventh) });
             CacheInfo cinfo = GetCacheInfo(identity, param, command.AddToCache);
 
             IDbCommand ownedCommand = null;
             IDataReader ownedReader = null;
 
-            bool wasClosed = cnn?.State == ConnectionState.Closed;
+            bool wasClosed = command.Connection?.State == ConnectionState.Closed;
             try
             {
                 if (reader == null)
                 {
-                    ownedCommand = command.SetupCommand(cnn, cinfo.ParamReader);
-                    if (wasClosed) cnn.Open();
+                    ownedCommand = command.SetupCommand(command.Connection, cinfo.ParamReader);
+                    if (wasClosed) command.Connection.Open();
                     ownedReader = ExecuteReaderWithFlagsFallback(ownedCommand, wasClosed, CommandBehavior.SequentialAccess | CommandBehavior.SingleResult);
                     reader = ownedReader;
                 }
@@ -1494,10 +1495,10 @@ namespace Dapper
                 finally
                 {
                     ownedCommand?.Dispose();
-                    if (wasClosed) cnn.Close();
+                    if (wasClosed) command.Connection.Close();
                 }
 
-				Aop.InvokeExecuted(ref cnn,ref command);
+				Aop.InvokeExecuted(ref command);
 			}
         }
 
@@ -1508,27 +1509,27 @@ namespace Dapper
 
         private static IEnumerable<TReturn> MultiMapImpl<TReturn>(this IDbConnection cnn, CommandDefinition command, Type[] types, Func<object[], TReturn> map, string splitOn, IDataReader reader, Identity identity, bool finalize)
         {
-			Aop.InvokeExecuting(ref cnn,ref command);
-
+			
+			Aop.InvokeExecuting(ref command);
 			if (types.Length < 1)
             {
                 throw new ArgumentException("you must provide at least one type to deserialize");
             }
 
             object param = command.Parameters;
-            identity = identity ?? new Identity(command.CommandText, command.CommandType, cnn, types[0], param?.GetType(), types);
+            identity = identity ?? new Identity(command.CommandText, command.CommandType, command.Connection, types[0], param?.GetType(), types);
             CacheInfo cinfo = GetCacheInfo(identity, param, command.AddToCache);
 
             IDbCommand ownedCommand = null;
             IDataReader ownedReader = null;
 
-            bool wasClosed = cnn?.State == ConnectionState.Closed;
+            bool wasClosed = command.Connection?.State == ConnectionState.Closed;
             try
             {
                 if (reader == null)
                 {
-                    ownedCommand = command.SetupCommand(cnn, cinfo.ParamReader);
-                    if (wasClosed) cnn.Open();
+                    ownedCommand = command.SetupCommand(command.Connection, cinfo.ParamReader);
+                    if (wasClosed) command.Connection.Open();
                     ownedReader = ExecuteReaderWithFlagsFallback(ownedCommand, wasClosed, CommandBehavior.SequentialAccess | CommandBehavior.SingleResult);
                     reader = ownedReader;
                 }
@@ -1568,10 +1569,10 @@ namespace Dapper
                 finally
                 {
                     ownedCommand?.Dispose();
-                    if (wasClosed) cnn.Close();
+                    if (wasClosed) command.Connection.Close();
                 }
 
-				Aop.InvokeExecuted(ref cnn,ref command);
+				Aop.InvokeExecuted(ref command);
 			}
         }
 
@@ -2859,61 +2860,62 @@ namespace Dapper
 
         private static int ExecuteCommand(IDbConnection cnn, ref CommandDefinition command, Action<IDbCommand, object> paramReader)
         {
-			Aop.InvokeExecuting(ref cnn,ref command);
+			
+			Aop.InvokeExecuting(ref command);
 			IDbCommand cmd = null;
-            bool wasClosed = cnn.State == ConnectionState.Closed;
+            bool wasClosed = command.Connection.State == ConnectionState.Closed;
             try
             {
-                cmd = command.SetupCommand(cnn, paramReader);
-                if (wasClosed) cnn.Open();
+                cmd = command.SetupCommand(command.Connection, paramReader);
+                if (wasClosed) command.Connection.Open();
                 int result = cmd.ExecuteNonQuery();
                 command.OnCompleted();
                 return result;
             }
             finally
             {
-                if (wasClosed) cnn.Close();
+                if (wasClosed) command.Connection.Close();
                 cmd?.Dispose();
 
-				Aop.InvokeExecuted(ref cnn,ref command);
+				Aop.InvokeExecuted(ref command);
 			}	
 		}
 
         private static T ExecuteScalarImpl<T>(IDbConnection cnn, ref CommandDefinition command)
         {
-			Aop.InvokeExecuting(ref cnn,ref command);
-
+			
+			Aop.InvokeExecuting(ref command);
 			Action<IDbCommand, object> paramReader = null;
             object param = command.Parameters;
             if (param != null)
             {
-                var identity = new Identity(command.CommandText, command.CommandType, cnn, null, param.GetType(), null);
+                var identity = new Identity(command.CommandText, command.CommandType, command.Connection, null, param.GetType(), null);
                 paramReader = GetCacheInfo(identity, command.Parameters, command.AddToCache).ParamReader;
             }
 
             IDbCommand cmd = null;
-            bool wasClosed = cnn.State == ConnectionState.Closed;
+            bool wasClosed = command.Connection.State == ConnectionState.Closed;
             object result;
             try
             {
-                cmd = command.SetupCommand(cnn, paramReader);
-                if (wasClosed) cnn.Open();
+                cmd = command.SetupCommand(command.Connection, paramReader);
+                if (wasClosed) command.Connection.Open();
                 result = cmd.ExecuteScalar();
                 command.OnCompleted();
             }
             finally
             {
-                if (wasClosed) cnn.Close();
+                if (wasClosed) command.Connection.Close();
                 cmd?.Dispose();
 
-				Aop.InvokeExecuted(ref cnn,ref command);
+				Aop.InvokeExecuted(ref command);
 			}
             return Parse<T>(result);
         }
 
         private static IDataReader ExecuteReaderImpl(IDbConnection cnn, ref CommandDefinition command, CommandBehavior commandBehavior, out IDbCommand cmd)
         {
-			Aop.InvokeExecuting(ref cnn,ref command);
+			Aop.InvokeExecuting(ref command);
 
 			Action<IDbCommand, object> paramReader = GetParameterReader(cnn, ref command);
             cmd = null;
@@ -2933,12 +2935,13 @@ namespace Dapper
                 if (wasClosed) cnn.Close();
                 if (cmd != null && disposeCommand) cmd.Dispose();
 
-				Aop.InvokeExecuted(ref cnn,ref command);
+				Aop.InvokeExecuted(ref command);
 			}
         }
 
         private static Action<IDbCommand, object> GetParameterReader(IDbConnection cnn, ref CommandDefinition command)
         {
+			
             object param = command.Parameters;
             IEnumerable multiExec = GetMultiExec(param);
             CacheInfo info = null;
@@ -2950,7 +2953,7 @@ namespace Dapper
             // nice and simple
             if (param != null)
             {
-                var identity = new Identity(command.CommandText, command.CommandType, cnn, null, param.GetType(), null);
+                var identity = new Identity(command.CommandText, command.CommandType, command.Connection, null, param.GetType(), null);
                 info = GetCacheInfo(identity, param, command.AddToCache);
             }
             var paramReader = info?.ParamReader;

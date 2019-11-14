@@ -23,17 +23,11 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 
         public int? TopNum { get; set; }
 
-        /// <inheritdoc />
-        //public virtual Query<TResult> Select<TResult>(Expression<Func<T, TResult>> selector)
-        //{
-        //    SelectExpression = selector;
-
-        //    var currentQuerySet = (QuerySet<T>)this;
-
-        //    return new QuerySet<TResult>(DbCon, SqlProvider, typeof(T), currentQuerySet.WhereExpression, currentQuerySet.SelectExpression, currentQuerySet.TopNum, currentQuerySet.OrderbyExpressionList, DbTransaction, currentQuerySet.NoLock);
-        //}
-
-        /// <inheritdoc />
+        /// <summary>
+		/// 返回对应行数数据（此方法只对mssql有效）
+		/// </summary>
+		/// <param name="num"></param>
+		/// <returns></returns>
         public virtual Option<T> Top(int num)
         {
             TopNum = num;
