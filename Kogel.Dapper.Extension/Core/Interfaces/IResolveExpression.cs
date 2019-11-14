@@ -49,7 +49,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// <param name="Params"></param>
         /// <param name="prefix"></param>
         /// <returns></returns>
-        public virtual List<WhereExpression> ResolveWhereList(AbstractSet abstractSet, ref string whereSql, DynamicParameters Params, string prefix = null, bool IsAsName = true)
+        public virtual List<WhereExpression> ResolveWhereList(AbstractSet abstractSet, ref string whereSql, DynamicParameters Params, string prefix = null)
         {
             //添加Linq生成的sql条件和参数
             List<LambdaExpression> lambdaExpressionList = abstractSet.WhereExpressionList;
@@ -57,7 +57,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
             List<WhereExpression> whereExpressionList = new List<WhereExpression>();
             for (int i = 0; i < lambdaExpressionList.Count; i++)
             {
-                var whereParam = new WhereExpression(lambdaExpressionList[i], prefix, providerOption, IsAsName);
+                var whereParam = new WhereExpression(lambdaExpressionList[i], prefix, providerOption);
                 whereExpressionList.Add(whereParam);
                 builder.Append(whereParam.SqlCmd);
                 //参数

@@ -124,8 +124,9 @@ namespace Kogel.Dapper.Extension.MsSql
 
 			var whereSql = string.Empty;
 
+			ProviderOption.IsAsName = false;
 			//表查询条件
-			var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null, false);
+			var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null);
 
 			SqlString = $"DELETE {fromTableSql} {whereSql }";
 
@@ -151,8 +152,9 @@ namespace Kogel.Dapper.Extension.MsSql
 
 			var whereSql = string.Empty;
 
+			ProviderOption.IsAsName = false;
 			//表查询条件
-			var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null, false);
+			var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null);
 			Params.AddDynamicParams(update.Param);
 
 			SqlString = $"UPDATE {FormatTableName(false, false)} {update.SqlCmd} {whereSql}";
@@ -164,8 +166,10 @@ namespace Kogel.Dapper.Extension.MsSql
 		{
 			var update = ResolveExpression.ResolveUpdates<T>(entity, Params, excludeFields);
 			var whereSql = string.Empty;
+
+			ProviderOption.IsAsName = false;
 			//表查询条件
-			var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null, false);
+			var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null);
 
 			SqlString = $"UPDATE {FormatTableName(false, false)} {update} {whereSql}";
 			return this;

@@ -21,16 +21,11 @@ namespace Kogel.Dapper.Extension.Expressions
         internal List<string> FieldList { get; set; }
         protected DynamicParameters Param { get; set; }
         protected IProviderOption providerOption { get; set; }
-        /// <summary>
-        /// 是否显示重命名
-        /// </summary>
-        protected bool IsAsName { get; set; }
-        public BaseExpressionVisitor(IProviderOption providerOption, bool IsAsName = true)
+        public BaseExpressionVisitor(IProviderOption providerOption)
         {
             this.FieldList = new List<string>();
             this.Param = new DynamicParameters();
             this.providerOption = providerOption;
-            this.IsAsName = IsAsName;
         }
         /// <summary>
         /// 有+ - * /需要拼接的对象
@@ -39,7 +34,7 @@ namespace Kogel.Dapper.Extension.Expressions
         /// <returns></returns>
         protected override Expression VisitBinary(BinaryExpression node)
         {
-            var binary = new BinaryExpressionVisitor(node, providerOption, IsAsName);
+            var binary = new BinaryExpressionVisitor(node, providerOption);
             GenerateField(binary.SpliceField.ToString());
             this.Param.AddDynamicParams(binary.Param);
             return node;
@@ -68,7 +63,7 @@ namespace Kogel.Dapper.Extension.Expressions
 				//var member = EntityCache.QueryEntity(node.Member.DeclaringType);
 				var member = EntityCache.QueryEntity(node.Expression.Type);
 				string fieldName = member.FieldPairs[node.Member.Name];
-				string field = (IsAsName ? member.GetAsName(providerOption) : "") + providerOption.CombineFieldName(fieldName);
+				string field = (providerOption.IsAsName ? member.GetAsName(providerOption) : "") + providerOption.CombineFieldName(fieldName);
 				GenerateField(field);
 			}
 			else
@@ -144,7 +139,7 @@ namespace Kogel.Dapper.Extension.Expressions
         private string ParamName { get => (providerOption.ParameterPrefix + FieldName?.Replace(".", "_") + "_" + Param.ParameterNames.Count()); }//带参数标识的
         internal StringBuilder SpliceField { get; set; }
         internal new DynamicParameters Param { get; set; }
-        public WhereExpressionVisitor(IProviderOption providerOption, bool IsAsName = true) : base(providerOption, IsAsName)
+        public WhereExpressionVisitor(IProviderOption providerOption) : base(providerOption)
         {
             this.SpliceField = new StringBuilder();
             this.Param = new DynamicParameters();
@@ -189,7 +184,7 @@ namespace Kogel.Dapper.Extension.Expressions
 			{
 				var member = EntityCache.QueryEntity(node.Member.DeclaringType);
 				string asName = string.Empty;
-				if (IsAsName)
+				if (providerOption.IsAsName)
 				{
 					this.FieldName = member.AsName + "." + member.FieldPairs[node.Member.Name];
 					asName = member.GetAsName(providerOption);
@@ -347,7 +342,7 @@ namespace Kogel.Dapper.Extension.Expressions
     /// </summary>
     public class BinaryExpressionVisitor : WhereExpressionVisitor
     {
-        public BinaryExpressionVisitor(BinaryExpression expression, IProviderOption providerOption, bool IsAsName = true) : base(providerOption, IsAsName)
+        public BinaryExpressionVisitor(BinaryExpression expression, IProviderOption providerOption) : base(providerOption)
         {
             SpliceField = new StringBuilder();
             Param = new DynamicParameters();

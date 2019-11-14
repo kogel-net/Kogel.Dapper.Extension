@@ -24,26 +24,30 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 	{
 		public void Test()
 		{
-			try
+			using (TestRepository testRepository = new TestRepository())
 			{
-				TestRepository testRepository = new TestRepository();
+				try
+				{
 
-				testRepository.UnitOfWork.BeginTransaction();
-				var comment = testRepository.Orm.QuerySet<Comment>().ToList();
+					testRepository.UnitOfWork.BeginTransaction(() =>
+					{
+						var comment = testRepository.Orm.QuerySet<Comment>().ToList();
 
-				testRepository.Orm.CommandSet<Comment>()
-					.Update(comment);
+						testRepository.Orm.CommandSet<Comment>()
+							.Where(x => x.Id == comment.FirstOrDefault().Id)
+							.Update(comment.FirstOrDefault());
 
-				new TestRepositoryQuery1().Test();
-			}
-			catch(System.Exception ex)
-			{
+						new TestRepositoryQuery1().Test();
+					});
+				}
+				catch (System.Exception ex)
+				{
 
+				}
+				testRepository.UnitOfWork.Rollback();
 			}
 		}
-
 	}
-
 	public class TestRepositoryQuery1
 	{
 		public void Test()

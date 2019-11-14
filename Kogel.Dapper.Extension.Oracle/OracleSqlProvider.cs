@@ -120,8 +120,10 @@ namespace Kogel.Dapper.Extension.Oracle
         {
             var fromTableSql = ProviderOption.CombineFieldName(FormatTableName(false, false).Trim());
             var whereSql = string.Empty;
-            //表查询条件
-            var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null, false);
+
+			ProviderOption.IsAsName = false;
+			//表查询条件
+			var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null);
             SqlString = $"DELETE {fromTableSql} {whereSql}";
             return this;
         }
@@ -150,8 +152,9 @@ namespace Kogel.Dapper.Extension.Oracle
 
             var whereSql = string.Empty;
 
-            //表查询条件
-            var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null, false);
+			ProviderOption.IsAsName = false;
+			//表查询条件
+			var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null);
             Params.AddDynamicParams(update.Param);
 
             SqlString = $"UPDATE {fromTableSql} {update.SqlCmd} {whereSql}";
@@ -164,8 +167,10 @@ namespace Kogel.Dapper.Extension.Oracle
 			var update = ResolveExpression.ResolveUpdates<T>(entity, Params, excludeFields);
             var fromTableSql = ProviderOption.CombineFieldName(FormatTableName(false, false).Trim());
             var whereSql = string.Empty;
-            //表查询条件
-            var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null, false);
+
+			ProviderOption.IsAsName = false;
+			//表查询条件
+			var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null);
 
             SqlString = $"UPDATE {fromTableSql} {update} {whereSql}";
             return this;
@@ -237,8 +242,9 @@ namespace Kogel.Dapper.Extension.Oracle
 
             var whereSql = string.Empty;
 
-            //表查询条件
-            var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null, false);
+			ProviderOption.IsAsName = false;
+			//表查询条件
+			var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null);
             Params.AddDynamicParams(update.Param);
 
             SqlString = $"UPDATE {fromTableSql} {update.SqlCmd} {selectSql} {whereSql}";

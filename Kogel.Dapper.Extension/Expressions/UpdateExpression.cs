@@ -27,11 +27,13 @@ namespace Kogel.Dapper.Extension.Expressions
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public UpdateExpression(LambdaExpression expression, IProviderOption providerOption) : base(providerOption, false)
+        public UpdateExpression(LambdaExpression expression, IProviderOption providerOption) : base(providerOption)
         {
             this._sqlCmd = new StringBuilder(100);
             this.Param = new DynamicParameters();
             this.providerOption = providerOption;
+			//update不需要重命名
+			providerOption.IsAsName = false;
             //当前定义的查询返回对象
             this.entity = EntityCache.QueryEntity(expression.Body.Type);
             //字段数组

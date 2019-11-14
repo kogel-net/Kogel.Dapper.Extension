@@ -13,6 +13,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
             ParameterPrefix = parameterPrefix;
 			NavigationList = new List<NavigationMemberAssign>();
 			MappingList = new Dictionary<string, string>();
+			IsAsName = true;
 		}
 
         public string OpenQuote { get; set; }
@@ -66,6 +67,10 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// 记录映射对象
 		/// </summary>
 		public Dictionary<string,string> MappingList { get; set; }
+		/// <summary>
+		/// 是否重命名   table  as newName
+		/// </summary>
+		public bool IsAsName { get; set; }
 		#endregion
 	}
 	public enum DateOption

@@ -529,13 +529,15 @@ namespace Dapper
 
         private static int ExecuteImpl(this IDbConnection cnn, ref CommandDefinition command)
         {
-            object param = command.Parameters;
+			object param = command.Parameters;
             IEnumerable multiExec = GetMultiExec(param);
             Identity identity;
             CacheInfo info = null;
             if (multiExec != null)
             {
-                if ((command.Flags & CommandFlags.Pipelined) != 0)
+				Aop.InvokeExecuting(ref cnn,ref command);
+
+				if ((command.Flags & CommandFlags.Pipelined) != 0)
                 {
                     // this includes all the code for concurrent/overlapped query
                     return ExecuteMultiImplAsync(cnn, command, multiExec).Result;
@@ -572,6 +574,8 @@ namespace Dapper
                 finally
                 {
                     if (wasClosed) cnn.Close();
+
+					Aop.InvokeExecuted(ref cnn,ref command);
                 }
                 return total;
             }
@@ -1023,7 +1027,7 @@ namespace Dapper
 
         private static GridReader QueryMultipleImpl(this IDbConnection cnn, ref CommandDefinition command)
         {
-			Aop.InvokeExecuting(command);
+			Aop.InvokeExecuting(ref cnn,ref command);
 
 			object param = command.Parameters;
             var identity = new Identity(command.CommandText, command.CommandType, cnn, typeof(GridReader), param?.GetType(), null);
@@ -1063,7 +1067,7 @@ namespace Dapper
 			}
 			finally
 			{
-				Aop.InvokeExecuted(command);
+				Aop.InvokeExecuted(ref cnn,ref command);
 			}
         }
 
@@ -1086,7 +1090,7 @@ namespace Dapper
 
         private static IEnumerable<T> QueryImpl<T>(this IDbConnection cnn, CommandDefinition command, Type effectiveType)
         {
-			Aop.InvokeExecuting(command);
+			Aop.InvokeExecuting(ref cnn,ref command);
 
 			object param = command.Parameters;
             var identity = new Identity(command.CommandText, command.CommandType, cnn, effectiveType, param?.GetType(), null);
@@ -1152,7 +1156,7 @@ namespace Dapper
                 if (wasClosed) cnn.Close();
                 cmd?.Dispose();
 
-				Aop.InvokeExecuted(command);
+				Aop.InvokeExecuted(ref cnn,ref command);
 			}
         }
 
@@ -1188,7 +1192,7 @@ namespace Dapper
 
         private static T QueryRowImpl<T>(IDbConnection cnn, Row row, ref CommandDefinition command, Type effectiveType)
         {
-			Aop.InvokeExecuting(command);
+			Aop.InvokeExecuting(ref cnn,ref command);
 
 			object param = command.Parameters;
             var identity = new Identity(command.CommandText, command.CommandType, cnn, effectiveType, param?.GetType(), null);
@@ -1263,7 +1267,7 @@ namespace Dapper
                 if (wasClosed) cnn.Close();
                 cmd?.Dispose();
 
-				Aop.InvokeExecuted(command);
+				Aop.InvokeExecuted(ref cnn,ref command);
 			}
         }
 
@@ -1435,7 +1439,7 @@ namespace Dapper
 
         private static IEnumerable<TReturn> MultiMapImpl<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn>(this IDbConnection cnn, CommandDefinition command, Delegate map, string splitOn, IDataReader reader, Identity identity, bool finalize)
         {
-			Aop.InvokeExecuting(command);
+			Aop.InvokeExecuting(ref cnn,ref command);
 
 			object param = command.Parameters;
             identity = identity ?? new Identity(command.CommandText, command.CommandType, cnn, typeof(TFirst), param?.GetType(), new[] { typeof(TFirst), typeof(TSecond), typeof(TThird), typeof(TFourth), typeof(TFifth), typeof(TSixth), typeof(TSeventh) });
@@ -1493,7 +1497,7 @@ namespace Dapper
                     if (wasClosed) cnn.Close();
                 }
 
-				Aop.InvokeExecuted(command);
+				Aop.InvokeExecuted(ref cnn,ref command);
 			}
         }
 
@@ -1504,7 +1508,7 @@ namespace Dapper
 
         private static IEnumerable<TReturn> MultiMapImpl<TReturn>(this IDbConnection cnn, CommandDefinition command, Type[] types, Func<object[], TReturn> map, string splitOn, IDataReader reader, Identity identity, bool finalize)
         {
-			Aop.InvokeExecuting(command);
+			Aop.InvokeExecuting(ref cnn,ref command);
 
 			if (types.Length < 1)
             {
@@ -1567,7 +1571,7 @@ namespace Dapper
                     if (wasClosed) cnn.Close();
                 }
 
-				Aop.InvokeExecuted(command);
+				Aop.InvokeExecuted(ref cnn,ref command);
 			}
         }
 
@@ -2855,7 +2859,7 @@ namespace Dapper
 
         private static int ExecuteCommand(IDbConnection cnn, ref CommandDefinition command, Action<IDbCommand, object> paramReader)
         {
-			Aop.InvokeExecuting(command);
+			Aop.InvokeExecuting(ref cnn,ref command);
 			IDbCommand cmd = null;
             bool wasClosed = cnn.State == ConnectionState.Closed;
             try
@@ -2871,13 +2875,13 @@ namespace Dapper
                 if (wasClosed) cnn.Close();
                 cmd?.Dispose();
 
-				Aop.InvokeExecuted(command);
+				Aop.InvokeExecuted(ref cnn,ref command);
 			}	
 		}
 
         private static T ExecuteScalarImpl<T>(IDbConnection cnn, ref CommandDefinition command)
         {
-			Aop.InvokeExecuting(command);
+			Aop.InvokeExecuting(ref cnn,ref command);
 
 			Action<IDbCommand, object> paramReader = null;
             object param = command.Parameters;
@@ -2902,14 +2906,14 @@ namespace Dapper
                 if (wasClosed) cnn.Close();
                 cmd?.Dispose();
 
-				Aop.InvokeExecuted(command);
+				Aop.InvokeExecuted(ref cnn,ref command);
 			}
             return Parse<T>(result);
         }
 
         private static IDataReader ExecuteReaderImpl(IDbConnection cnn, ref CommandDefinition command, CommandBehavior commandBehavior, out IDbCommand cmd)
         {
-			Aop.InvokeExecuting(command);
+			Aop.InvokeExecuting(ref cnn,ref command);
 
 			Action<IDbCommand, object> paramReader = GetParameterReader(cnn, ref command);
             cmd = null;
@@ -2929,7 +2933,7 @@ namespace Dapper
                 if (wasClosed) cnn.Close();
                 if (cmd != null && disposeCommand) cmd.Dispose();
 
-				Aop.InvokeExecuted(command);
+				Aop.InvokeExecuted(ref cnn,ref command);
 			}
         }
 

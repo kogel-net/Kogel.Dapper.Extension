@@ -12,9 +12,9 @@ namespace Kogel.Repository.UnitOfWork
 		/// <summary>
 		/// 开启事务
 		/// </summary>
+		/// <param name="transactionMethod"></param>
 		/// <param name="IsolationLevel"></param>
-		/// <returns></returns>
-		void BeginTransaction(IsolationLevel IsolationLevel= IsolationLevel.Serializable);
+		IUnitOfWork BeginTransaction(Action transactionMethod, IsolationLevel IsolationLevel = IsolationLevel.Serializable);
 		/// <summary>
 		/// 提交
 		/// </summary>

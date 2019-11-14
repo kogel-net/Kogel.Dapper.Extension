@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using System;
+using System.Data;
 
 namespace Kogel.Dapper.Extension
 {
@@ -9,7 +10,7 @@ namespace Kogel.Dapper.Extension
 		/// 事件模型定义
 		/// </summary>
 		/// <param name="command"></param>
-		public delegate void EventHander(CommandDefinition command);
+		public delegate void EventHander(ref IDbConnection conn, ref CommandDefinition command);
 		/// <summary>
 		/// 执行前
 		/// </summary>
@@ -22,17 +23,17 @@ namespace Kogel.Dapper.Extension
 		/// 触发执行前
 		/// </summary>
 		/// <param name="definition"></param>
-		internal void InvokeExecuting(CommandDefinition definition)
+		internal void InvokeExecuting(ref IDbConnection conn, ref CommandDefinition definition)
 		{
-			this.OnExecuting?.Invoke(definition);
+			this.OnExecuting?.Invoke(ref conn, ref definition);
 		}
 		/// <summary>
 		/// 触发执行后
 		/// </summary>
 		/// <param name="definition"></param>
-		internal void InvokeExecuted(CommandDefinition definition)
+		internal void InvokeExecuted(ref IDbConnection conn, ref CommandDefinition definition)
 		{
-			this.OnExecuted?.Invoke(definition);
+			this.OnExecuted?.Invoke(ref conn, ref definition);
 		}
 	}
 }

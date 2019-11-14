@@ -19,16 +19,16 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
         string mysqlConnection = "Server=localhost;Database=Qx_Sport_Common;Uid=root;Pwd=A5101264a;";
         public void Test()
         {
-			//执行前
-			SqlMapper.Aop.OnExecuting += (CommandDefinition Command)=> 
-			{
+			////执行前
+			//SqlMapper.Aop.OnExecuting += (ref CommandDefinition Command)=> 
+			//{
 
-			};
-			//执行后
-			SqlMapper.Aop.OnExecuted+= (CommandDefinition Command) =>
-			{
+			//};
+			////执行后
+			//SqlMapper.Aop.OnExecuted+= (ref CommandDefinition Command) =>
+			//{
 
-			};
+			//};
 
 			//Thread thread = new Thread(() =>
 			//{

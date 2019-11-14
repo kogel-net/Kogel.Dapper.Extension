@@ -9,10 +9,9 @@ using Kogel.Repository.UnitOfWork;
 
 namespace Kogel.Repository
 {
-	public abstract class BaseRepository
+	public abstract class BaseRepository: IDisposable
 	{
-		[ThreadStatic]
-		internal static IDbConnection _orm;
+		internal IDbConnection _orm;
 		/// <summary>
 		/// 连接对象
 		/// </summary>
@@ -22,31 +21,28 @@ namespace Kogel.Repository
 		{
 			RepositoryOptionsBuilder builder = new RepositoryOptionsBuilder();
 			OnConfiguring(builder);
-			if (_orm == null)
-			{
-				_orm = builder.connection;
-				UnitOfWork = new UnitOfWork.UnitOfWork(_orm);
-			}
-			else
-			{
-				//关闭多余的连接
-				if (builder.connection != null)
-					builder.connection.Dispose();
-			}
+			this._orm = builder.connection;
+			UnitOfWork = new UnitOfWork.UnitOfWork(_orm);
 		}
 
 		~BaseRepository()
 		{
-			if (_orm != null)
-			{
-				_orm.Dispose();
-			}
+			Dispose();
 		}
 		/// <summary>
 		/// 配置连接信息
 		/// </summary>
 		/// <param name="connectionFactory"></param>
 		public abstract void OnConfiguring(RepositoryOptionsBuilder builder);
+
+		public void Dispose()
+		{
+			if (_orm != null)
+				_orm.Dispose();
+			if (UnitOfWork != null)
+				UnitOfWork.Dispose();
+		}
+
 		/// <summary>
 		/// 工作单元
 		/// </summary>

@@ -11,46 +11,63 @@ namespace Kogel.Repository.UnitOfWork
 	public class UnitOfWork : IUnitOfWork
 	{
 		private IDbConnection connection { get; }
-
 		private IDbTransaction transaction { get; set; }
-
 		public UnitOfWork(IDbConnection connection)
 		{
 			this.connection = connection;
 		}
-
-		public void BeginTransaction(IsolationLevel IsolationLevel)
+		/// <summary>
+		/// 开始事务
+		/// </summary>
+		/// <param name="transactionMethod"></param>
+		/// <param name="IsolationLevel"></param>
+		/// <returns></returns>
+		public IUnitOfWork BeginTransaction(Action transactionMethod, IsolationLevel IsolationLevel = IsolationLevel.Serializable)
 		{
 			if (connection.State == ConnectionState.Closed)
 				connection.Open();
 			transaction = connection.BeginTransaction(IsolationLevel);
-			//事务注入
+			//解析方法里的访问对象
 			SqlMapper.Aop.OnExecuting += Aop_OnExecuting;
+			transactionMethod.Invoke();
+			SqlMapper.Aop.OnExecuting -= Aop_OnExecuting;
+			return this;
 		}
 
-		private void Aop_OnExecuting(CommandDefinition command)
+		private void Aop_OnExecuting(ref IDbConnection connection,ref CommandDefinition command)
 		{
-			command.Transaction = transaction;
+			connection = this.connection;
+			command.Transaction = this.transaction;
 		}
-
+		/// <summary>
+		/// 提交
+		/// </summary>
 		public void Commit()
 		{
 			if (transaction != null)
 				transaction.Commit();
 		}
-
+		/// <summary>
+		/// 回滚
+		/// </summary>
 		public void Rollback()
 		{
 			if (transaction != null)
-				transaction.Commit();
+				transaction.Rollback();
 		}
-
+		/// <summary>
+		/// 释放对象
+		/// </summary>
 		public void Dispose()
 		{
 			if (transaction != null)
 				transaction.Dispose();
-			//取消事务注入
-			SqlMapper.Aop.OnExecuting -= Aop_OnExecuting;
+			if (connection != null)
+			{
+				if (connection.State == ConnectionState.Open)
+					connection.Close();
+				connection.Dispose();
+			}
 		}
 
 		~UnitOfWork()
