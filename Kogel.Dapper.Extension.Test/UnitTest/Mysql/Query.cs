@@ -11,6 +11,7 @@ using MySql.Data.MySqlClient;
 using Dapper;
 using System.Threading;
 using System.Diagnostics;
+using Kogel.Dapper.Extension.Model;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 {
@@ -26,6 +27,8 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				var sql = command.CommandText;
 				//生成的参数
 				var param = command.Parameters;
+
+				Console.WriteLine(sql);
 			};
 			//Sql执行后
 			SqlMapper.Aop.OnExecuted += (ref CommandDefinition command) =>
@@ -34,6 +37,8 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				 var sql = command.CommandText;
 				 //生成的参数
 				 var param = command.Parameters;
+
+				 Console.WriteLine(sql);
 			 };
 
 			//Thread thread = new Thread(() =>
@@ -58,23 +63,23 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
 			using (var conn = new MySqlConnection(mysqlConnection))
 			{
-				DateTime dateTime = DateTime.Now.AddDays(-10);
+				//DateTime dateTime = DateTime.Now.AddDays(-10);
 
-				conn.QuerySet<Comment>().FieldMatch<Comment>();
-				var comments = conn.Query<Comment>("Select * from Comment").ToList();
+				//conn.QuerySet<Comment>().FieldMatch<Comment>();
+				//var comments = conn.Query<Comment>("Select * from Comment").ToList();
 
-				var getIfTest = conn.QuerySet<Comment>()
-					.Get(false, x => new CommentDto()
-					{
-						Id = x.Id,
-						ArticleIds = x.ArticleId
-					}, x => new CommentDto()
-					{
-						Id = x.Id,
-						Content = x.Content
-					});
+				//var getIfTest = conn.QuerySet<Comment>()
+				//	.Get(false, x => new CommentDto()
+				//	{
+				//		Id = x.Id,
+				//		ArticleIds = x.ArticleId
+				//	}, x => new CommentDto()
+				//	{
+				//		Id = x.Id,
+				//		Content = x.Content
+				//	});
 
-				var aaa = conn.QuerySet<Comment>().Where(x => !x.CurrentUserLikes).ToList();
+				//var aaa = conn.QuerySet<Comment>().Where(x => !x.CurrentUserLikes).ToList();
 
 				//单个属性返回
 				var ContentList = conn.QuerySet<Comment>()
@@ -85,8 +90,12 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 					 {
 						 Id = x.Id,
 						 ArticleIds = x.ArticleId,
-						 count = conn.QuerySet<News>().Where(y => y.Id == x.ArticleId).Count(),
-						 NewsList = conn.QuerySet<News>().Where(y => y.Id == x.ArticleId).ToList(y => new NewsDto()
+						 //count = conn.QuerySet<News>().Where(y => y.Id == x.ArticleId).Count(),
+						 NewsList = conn.QuerySet<News>()
+						 .Join<News, Comment>((a, b) => a.Id == b.ArticleId, JoinMode.LEFT, true)
+						 .Where(y => y.Id == x.ArticleId)
+						 .OrderBy(y => y.Id)
+						 .ToList(y => new NewsDto()
 						 {
 							 Id = y.Id,
 							 Contents = y.Content

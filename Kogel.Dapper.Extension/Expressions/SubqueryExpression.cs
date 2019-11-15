@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System;
 using Kogel.Dapper.Extension.Core.SetQ;
+using System.Collections.ObjectModel;
 
 namespace Kogel.Dapper.Extension.Expressions
 {
@@ -30,16 +31,32 @@ namespace Kogel.Dapper.Extension.Expressions
 		/// 返回类型
 		/// </summary>
 		public Type ReturnType { get; set; }
+		#region Kogel对象
+		/// <summary>
+		/// 查询对象
+		/// </summary>
+		public object QuerySet { get; set; }
+		/// <summary>
+		/// 排序对象
+		/// </summary>
+		public List<LambdaExpression> OrderBy { get; set; }
+		/// <summary>
+		/// 排序对象[倒叙]
+		/// </summary>
+		public List<LambdaExpression> OrderByDescing { get; set; }
 		/// <summary>
 		/// 条件表达式
 		/// </summary>
 		public List<LambdaExpression> WhereExpression { get; set; }
+		#endregion
 
 		public SubqueryExpression(MethodCallExpression methodCallExpression)
 		{
 			this.expression = methodCallExpression;
 			this._sqlCmd = new StringBuilder();
 			this.Param = new DynamicParameters();
+			this.OrderBy = new List<LambdaExpression>();
+			this.OrderByDescing = new List<LambdaExpression>();
 			this.WhereExpression = new List<LambdaExpression>();
 			this.AnalysisExpression();
 		}
@@ -48,22 +65,84 @@ namespace Kogel.Dapper.Extension.Expressions
 		/// </summary>
 		public void AnalysisExpression()
 		{
-			MethodCallExpression methodCall = (MethodCallExpression)(expression.Object);
-			//获取queryset对象
-			var querySet = methodCall.Object.ToConvertAndGetValue();
-			//获取paramerer对象
-			foreach (UnaryExpression exp in methodCall.Arguments)
-			{
-				this.parameterExpressions = new List<ParameterExpression>();
-				Visit(exp);
-				var lambda = Expression.Lambda(exp, parameterExpressions.ToList());
-				WhereExpression.Add(lambda);
-			}
+			//MethodCallExpression methodCall = (MethodCallExpression)(expression.Object);
+			////获取queryset对象
+			//var querySet = methodCall.Object.ToConvertAndGetValue();
+			////获取paramerer对象
+			//foreach (UnaryExpression exp in methodCall.Arguments)
+			//{
+			//	this.parameterExpressions = new List<ParameterExpression>();
+			//	Visit(exp);
+			//	var lambda = Expression.Lambda(exp, parameterExpressions.ToList());
+			//	WhereExpression.Add(lambda);
+			//}
+			AnalysisKogelExpression(expression);
+
 			//动态执行，得到T类型
 			typeof(SubqueryExpression)
 						.GetMethod("FormatSend")
-						.MakeGenericMethod(querySet.GetType().GenericTypeArguments[0])
-						.Invoke(this, new object[] { querySet, this.expression.Method.Name });
+						.MakeGenericMethod(QuerySet.GetType().GenericTypeArguments[0])
+						.Invoke(this, new object[] { QuerySet, this.expression.Method.Name });
+		}
+		/// <summary>
+		/// 递归解析导航查询表达式
+		/// </summary>
+		/// <param name="methodCallExpression"></param>
+		/// <returns></returns>
+		public void AnalysisKogelExpression(MethodCallExpression methodCallExpression)
+		{
+			switch (methodCallExpression.Method.Name)
+			{
+				case "QuerySet":
+					{
+						if (this.QuerySet == null)
+							this.QuerySet = methodCallExpression.ToConvertAndGetValue();
+						break;
+					}
+				case "Join":
+					{
+						this.QuerySet = methodCallExpression.ToConvertAndGetValue();
+						//methodCallExpression.Method.Invoke(this.QuerySet, methodCallExpression.Arguments.Select(x => x.ToConvertAndGetValue()).ToArray());
+						break;
+					}
+				case "Where":
+					{
+						foreach (UnaryExpression exp in methodCallExpression.Arguments)
+						{
+							this.parameterExpressions = new List<ParameterExpression>();
+							Visit(exp);
+							var lambda = Expression.Lambda(exp, parameterExpressions.ToList());
+							this.WhereExpression.Add(lambda);
+						}
+						break;
+					}
+				case "OrderBy":
+					{
+						foreach (UnaryExpression exp in methodCallExpression.Arguments)
+						{
+							var lambda = exp.GetLambdaExpression();
+							this.OrderBy.Add(lambda);
+						}
+						break;
+					}
+				case "OrderByDescing":
+					{
+						foreach (UnaryExpression exp in methodCallExpression.Arguments)
+						{
+							var lambda = exp.GetLambdaExpression();
+							this.OrderByDescing.Add(lambda);
+						}
+						break;
+					}
+			}
+			if (methodCallExpression.Object != null)
+			{
+				if (methodCallExpression.Object is MethodCallExpression)
+				{
+					var objectCallExpression = methodCallExpression.Object as MethodCallExpression;
+					AnalysisKogelExpression(objectCallExpression);
+				}
+			}
 		}
 		/// <summary>
 		/// 解析参数
@@ -110,6 +189,18 @@ namespace Kogel.Dapper.Extension.Expressions
 			if (WhereExpression != null && WhereExpression.Any())
 			{
 				querySet.WhereExpressionList.AddRange(WhereExpression);
+			}
+			//写入排序
+			if (OrderBy != null && OrderBy.Any())
+			{
+				foreach (LambdaExpression exp in OrderBy)
+					querySet.OrderbyExpressionList.Add(exp, Model.EOrderBy.Asc);
+			}
+			//写入倒序
+			if (OrderByDescing != null && OrderByDescing.Any())
+			{
+				foreach (LambdaExpression exp in OrderByDescing)
+					querySet.OrderbyExpressionList.Add(exp, Model.EOrderBy.Asc);
 			}
 			switch (methodName)
 			{
