@@ -12,11 +12,14 @@ using Kogel.Dapper.Extension.Test.Model;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 {
-	public class TestRepository : BaseRepository<Comment>
+	public class TestRepository : BaseRepository<Comment>//Comment为实体类
 	{
 		public override void OnConfiguring(RepositoryOptionsBuilder builder)
 		{
-			builder.BuildConnection(new MySqlConnection("Server=localhost;Database=Qx_Sport_Common;Uid=root;Pwd=A5101264a;"));
+			builder
+				.BuildConnection(new MySqlConnection("Server=localhost;Database=Qx_Sport_Common;Uid=root;Pwd=A5101264a;"))//配置连接方式
+				.BuildProvider(new MySqlProvider());//配置数据库提供者
+
 		}
 	}
 
@@ -26,24 +29,25 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 		{
 			using (TestRepository testRepository = new TestRepository())
 			{
-				try
+				var querySet = testRepository.QuerySet();//查询对象
+				var commandSet = testRepository.CommandSet();//执行对象
+			}
+
+			using (TestRepository testRepository = new TestRepository())
+			{
+				//开始事务
+				testRepository.UnitOfWork.BeginTransaction(() =>
 				{
-					testRepository.UnitOfWork.BeginTransaction(() =>
-					{
-						var comment = testRepository.Orm.QuerySet<Comment>().ToList();
+					var comment = testRepository.Orm.QuerySet<Comment>().ToList();
 
-						testRepository.Orm.CommandSet<Comment>()
-							.Where(x => x.Id == comment.FirstOrDefault().Id)
-							.Update(comment.FirstOrDefault());
-
-						new TestRepositoryQuery1().Test();
-					});
-				}
-				catch (System.Exception ex)
-				{
-
-				}
-				testRepository.UnitOfWork.Rollback();
+					testRepository.Orm.CommandSet<Comment>()
+						.Where(x => x.Id == comment.FirstOrDefault().Id)
+						.Update(comment.FirstOrDefault());
+					//其他仓储类代码块
+					new TestRepositoryQuery1().Test();
+				});
+				//提交
+				testRepository.UnitOfWork.Commit();
 			}
 		}
 	}

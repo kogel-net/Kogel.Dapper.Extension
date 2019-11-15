@@ -57,7 +57,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
             List<WhereExpression> whereExpressionList = new List<WhereExpression>();
             for (int i = 0; i < lambdaExpressionList.Count; i++)
             {
-                var whereParam = new WhereExpression(lambdaExpressionList[i], prefix, providerOption);
+				var whereParam = new WhereExpression(lambdaExpressionList[i], $"{prefix}_{i}", providerOption);
                 whereExpressionList.Add(whereParam);
                 builder.Append(whereParam.SqlCmd);
                 //参数

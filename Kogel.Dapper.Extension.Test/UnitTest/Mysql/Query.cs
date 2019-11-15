@@ -19,16 +19,22 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
         string mysqlConnection = "Server=localhost;Database=Qx_Sport_Common;Uid=root;Pwd=A5101264a;";
         public void Test()
         {
-			////执行前
-			//SqlMapper.Aop.OnExecuting += (ref CommandDefinition Command)=> 
-			//{
-
-			//};
-			////执行后
-			//SqlMapper.Aop.OnExecuted+= (ref CommandDefinition Command) =>
-			//{
-
-			//};
+			//Sql执行前
+			SqlMapper.Aop.OnExecuting += (ref CommandDefinition command) =>
+			{
+				//生成的sql
+				var sql = command.CommandText;
+				//生成的参数
+				var param = command.Parameters;
+			};
+			//Sql执行后
+			SqlMapper.Aop.OnExecuted += (ref CommandDefinition command) =>
+			 {
+				 //生成的sql
+				 var sql = command.CommandText;
+				 //生成的参数
+				 var param = command.Parameters;
+			 };
 
 			//Thread thread = new Thread(() =>
 			//{
@@ -68,7 +74,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 						Content = x.Content
 					});
 
-				var aaa = conn.QuerySet<Comment>().Where(x => 1 == 1).ToList();
+				var aaa = conn.QuerySet<Comment>().Where(x => !x.CurrentUserLikes).ToList();
 
 				//单个属性返回
 				var ContentList = conn.QuerySet<Comment>()
