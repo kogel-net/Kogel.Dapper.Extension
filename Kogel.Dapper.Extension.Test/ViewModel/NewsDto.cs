@@ -12,5 +12,7 @@ namespace Kogel.Dapper.Extension.Test.ViewModel
 		public long Id { get; set; }
 
 		public string Contents { get; set; }
+
+		public List<CommentDto> Comments { get; set; }
 	}
 }
