@@ -66,5 +66,21 @@ namespace Kogel.Dapper.Extension.Expressions
             base.Param.AddDynamicParams(binaryWhere.Param);
             return node;
         }
+
+        /// <summary>
+        /// 解析!不等于(!里只能包含一个条件)
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        protected override Expression VisitUnary(UnaryExpression node)
+        {
+            if (node.NodeType == ExpressionType.Not)
+            {
+                this._sqlCmd.Append(" Not (");
+                Visit(node.Operand);
+                this._sqlCmd.Append(") ");
+            }
+            return node;
+        }
     }
 }
