@@ -83,7 +83,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
 				//单个属性返回
 				var ContentList = conn.QuerySet<Comment>()
-					 .Where(x => x.Content.IsNotNull() && x.Content != "")
+					 .Where(x => x.Content.IsNotNull() && !(x.Content == ""))
 					 .WhereIf(!string.IsNullOrEmpty("aaa"), x => x.ArticleId == 1, x => x.ArticleId == 2)
 					 .Top(100)
 					 .ToList(x => new CommentDto()

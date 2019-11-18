@@ -173,6 +173,25 @@ namespace Kogel.Dapper.Extension.Expressions
             return node;
         }
 		/// <summary>
+		/// 处理判断字符
+		/// </summary>
+		/// <param name="node"></param>
+		/// <returns></returns>
+		protected override Expression VisitUnary(UnaryExpression node)
+		{
+			if (node.NodeType == ExpressionType.Not)
+			{
+				SpliceField.Append("NOT(");
+				Visit(node.Operand);
+				SpliceField.Append(")");
+			}
+			else
+			{
+				Visit(node.Operand);
+			}
+			return node;
+		}
+		/// <summary>
 		/// 重写成员对象，得到字段名称
 		/// </summary>
 		/// <param name="node"></param>
