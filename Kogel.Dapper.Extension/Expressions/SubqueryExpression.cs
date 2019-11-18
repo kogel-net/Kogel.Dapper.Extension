@@ -37,14 +37,6 @@ namespace Kogel.Dapper.Extension.Expressions
 		/// </summary>
 		public object QuerySet { get; set; }
 		/// <summary>
-		/// 排序对象
-		/// </summary>
-		public List<LambdaExpression> OrderBy { get; set; }
-		/// <summary>
-		/// 排序对象[倒叙]
-		/// </summary>
-		public List<LambdaExpression> OrderByDescing { get; set; }
-		/// <summary>
 		/// 条件表达式
 		/// </summary>
 		public List<LambdaExpression> WhereExpression { get; set; }
@@ -55,8 +47,6 @@ namespace Kogel.Dapper.Extension.Expressions
 			this.expression = methodCallExpression;
 			this._sqlCmd = new StringBuilder();
 			this.Param = new DynamicParameters();
-			this.OrderBy = new List<LambdaExpression>();
-			this.OrderByDescing = new List<LambdaExpression>();
 			this.WhereExpression = new List<LambdaExpression>();
 			this.AnalysisExpression();
 		}
@@ -76,6 +66,8 @@ namespace Kogel.Dapper.Extension.Expressions
 			//	var lambda = Expression.Lambda(exp, parameterExpressions.ToList());
 			//	WhereExpression.Add(lambda);
 			//}
+
+			AnalysisKogelQuerySet(expression);
 			AnalysisKogelExpression(expression);
 
 			//动态执行，得到T类型
@@ -85,6 +77,34 @@ namespace Kogel.Dapper.Extension.Expressions
 						.Invoke(this, new object[] { QuerySet, this.expression.Method.Name });
 		}
 		/// <summary>
+		/// 递归得到QuerySet
+		/// </summary>
+		/// <param name="methodCallExpression"></param>
+		public void AnalysisKogelQuerySet(MethodCallExpression methodCallExpression)
+		{
+			switch (methodCallExpression.Method.Name)
+			{
+				case "QuerySet":
+					{
+						this.QuerySet = methodCallExpression.ToConvertAndGetValue();
+						break;
+					}
+			}
+			if (methodCallExpression.Object != null)
+			{
+				if (methodCallExpression.Object is MethodCallExpression)
+				{
+					var objectCallExpression = methodCallExpression.Object as MethodCallExpression;
+					AnalysisKogelQuerySet(objectCallExpression);
+				}
+				else if (methodCallExpression.Object.Type.FullName.Contains("QuerySet"))
+				{
+					this.QuerySet = methodCallExpression.Object.ToConvertAndGetValue();
+				}
+			}
+		}
+
+		/// <summary>
 		/// 递归解析导航查询表达式
 		/// </summary>
 		/// <param name="methodCallExpression"></param>
@@ -93,18 +113,6 @@ namespace Kogel.Dapper.Extension.Expressions
 		{
 			switch (methodCallExpression.Method.Name)
 			{
-				case "QuerySet":
-					{
-						if (this.QuerySet == null)
-							this.QuerySet = methodCallExpression.ToConvertAndGetValue();
-						break;
-					}
-				case "Join":
-					{
-						this.QuerySet = methodCallExpression.ToConvertAndGetValue();
-						//methodCallExpression.Method.Invoke(this.QuerySet, methodCallExpression.Arguments.Select(x => x.ToConvertAndGetValue()).ToArray());
-						break;
-					}
 				case "Where":
 					{
 						foreach (UnaryExpression exp in methodCallExpression.Arguments)
@@ -116,21 +124,12 @@ namespace Kogel.Dapper.Extension.Expressions
 						}
 						break;
 					}
-				case "OrderBy":
+				default:
 					{
-						foreach (UnaryExpression exp in methodCallExpression.Arguments)
+						string[] methodArr = new string[] { "Count", "Sum", "Min", "Max", "Get", "ToList", "PageList" };
+						if (!methodArr.Contains(methodCallExpression.Method.Name))
 						{
-							var lambda = exp.GetLambdaExpression();
-							this.OrderBy.Add(lambda);
-						}
-						break;
-					}
-				case "OrderByDescing":
-					{
-						foreach (UnaryExpression exp in methodCallExpression.Arguments)
-						{
-							var lambda = exp.GetLambdaExpression();
-							this.OrderByDescing.Add(lambda);
+							methodCallExpression.Method.Invoke(this.QuerySet, methodCallExpression.Arguments.Select(x => x.ToConvertAndGetValue()).ToArray());
 						}
 						break;
 					}
@@ -190,18 +189,7 @@ namespace Kogel.Dapper.Extension.Expressions
 			{
 				querySet.WhereExpressionList.AddRange(WhereExpression);
 			}
-			//写入排序
-			if (OrderBy != null && OrderBy.Any())
-			{
-				foreach (LambdaExpression exp in OrderBy)
-					querySet.OrderbyExpressionList.Add(exp, Model.EOrderBy.Asc);
-			}
-			//写入倒序
-			if (OrderByDescing != null && OrderByDescing.Any())
-			{
-				foreach (LambdaExpression exp in OrderByDescing)
-					querySet.OrderbyExpressionList.Add(exp, Model.EOrderBy.Asc);
-			}
+	
 			switch (methodName)
 			{
 				case "Count":
