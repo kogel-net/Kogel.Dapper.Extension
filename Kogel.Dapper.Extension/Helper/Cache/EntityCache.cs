@@ -1,4 +1,6 @@
-﻿using Kogel.Dapper.Extension.Model;
+﻿using Dapper;
+using Kogel.Dapper.Extension.Helper;
+using Kogel.Dapper.Extension.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +24,9 @@ namespace Kogel.Dapper.Extension
             EntityObject entityObject = new EntityObject(entity);
             if (!EntitieList.Exists(x => x.AssemblyString.Equals(entityObject.AssemblyString)))
             {
-                EntitieList.Add(entityObject);
+				SqlMapper.SetTypeMap(entityObject.Type, new CustomPropertyTypeMap(entityObject.Type, 
+					(type, column) => type.GetPropertys(entityObject.FieldPairs.FirstOrDefault(x => x.Value.Equals(column)).Key)));
+				EntitieList.Add(entityObject);
             }
             return entityObject;
         }

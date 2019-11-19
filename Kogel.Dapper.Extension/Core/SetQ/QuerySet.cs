@@ -337,7 +337,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 		}
 		#endregion
 		/// <summary>
-		/// 字段匹配(适用于实体类字段和数据库字段不一致时,返回值为Dynamic类型时不适用)
+		/// 字段匹配[已弃用]
 		/// </summary>
 		/// <typeparam name="TSource"></typeparam>
 		/// <returns></returns>
