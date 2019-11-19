@@ -87,21 +87,21 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				var ContentList = conn.QuerySet<Comment>()
 					 .Where(x => x.Content.IsNotNull() && !(x.Content == ""))
 					 .WhereIf(!string.IsNullOrEmpty("aaa"), x => x.ArticleId == 1, x => x.ArticleId == 2)
-					 .PageList(1,20,x => new CommentDto()
+					 .PageList(1, 20, x => new CommentDto()
 					 {
 						 Id = x.Id,
 						 ArticleIds = x.ArticleId,
 						 //count = conn.QuerySet<News>().Where(y => y.Id == x.ArticleId).Count(),
 						 NewsList = conn.QuerySet<News>()
-						 .Join<News, Comment>((a, b) => a.Id == b.ArticleId, JoinMode.LEFT, true)
-						 .Where(y => y.Id == x.ArticleId)
-						 .OrderBy(y => y.Id)
-						 .ToList(y => new NewsDto()
-						 {
-							 Id = y.Id,
-							 Contents = y.Content,
+						   .Join<News, Comment>((a, b) => a.Id == b.ArticleId, JoinMode.LEFT, true)
+						   .Where(y => y.Id == x.ArticleId)
+						   .From<News, Comment>()
+						   .ToList((y, z) => new NewsDto()
+						   {
+							   Id = y.Id,
+							   Contents = y.Content,
 
-						 }).ToList(),
+						   }).ToList(),
 						 NewsDto = new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id == x.ArticleId).Get(y => new NewsDto()
 						 {
 							 Id = y.Id,

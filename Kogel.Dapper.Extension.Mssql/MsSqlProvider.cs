@@ -86,7 +86,7 @@ namespace Kogel.Dapper.Extension.MsSql
 			//表查询条件
 			var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
 
-			SqlString += $@"SELECT T.* FROM    ( 
+			SqlString = $@"SELECT T.* FROM    ( 
                             SELECT ROW_NUMBER() OVER ( {orderbySql} ) AS ROWNUMBER,
                             {(new Regex("SELECT").Replace(selectSql, "", 1))}
                             {fromTableSql} {nolockSql}{joinSql}

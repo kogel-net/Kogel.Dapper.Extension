@@ -103,7 +103,6 @@ namespace Kogel.Dapper.Extension.Expressions
 				}
 			}
 		}
-
 		/// <summary>
 		/// 递归解析导航查询表达式
 		/// </summary>
@@ -126,10 +125,30 @@ namespace Kogel.Dapper.Extension.Expressions
 					}
 				default:
 					{
+						if ((methodCallExpression.Method.Name == "OrderBy" || methodCallExpression.Method.Name == "OrderByDescing"))
+						{
+							//设置参数和参数类型
+							var method = methodCallExpression.Method;
+							if (methodCallExpression.Arguments.Count != 0)
+							{
+								var paramType = (methodCallExpression.Arguments.First() as UnaryExpression).Operand.Type.GenericTypeArguments[0];
+								if (paramType != typeof(string))
+								{
+									var lambda = methodCallExpression.Arguments[0].GetLambdaExpression();
+									typeof(SubqueryExpression)
+										.GetMethod("FormatSendOrder")
+										.MakeGenericMethod(new Type[] { QuerySet.GetType().GenericTypeArguments[0] })
+										.Invoke(this, new object[] { QuerySet, lambda, methodCallExpression.Method.Name });
+									break;
+								}
+							}
+						}
+						//正常方法
 						string[] methodArr = new string[] { "Count", "Sum", "Min", "Max", "Get", "ToList", "PageList" };
 						if (!methodArr.Contains(methodCallExpression.Method.Name))
 						{
-							methodCallExpression.Method.Invoke(this.QuerySet, methodCallExpression.Arguments.Select(x => x.ToConvertAndGetValue()).ToArray());
+							object[] parameters = methodCallExpression.Arguments.Select(x => x.ToConvertAndGetValue()).ToArray();
+							methodCallExpression.Method.Invoke(this.QuerySet, parameters);
 						}
 						break;
 					}
@@ -189,7 +208,7 @@ namespace Kogel.Dapper.Extension.Expressions
 			{
 				querySet.WhereExpressionList.AddRange(WhereExpression);
 			}
-	
+
 			switch (methodName)
 			{
 				case "Count":
@@ -220,7 +239,6 @@ namespace Kogel.Dapper.Extension.Expressions
 					break;
 				case "Get":
 					{
-						//加上自定义实体返回
 						var lambda = this.expression.Arguments[0].GetLambdaExpression();
 						this.ReturnType = lambda.ReturnType;
 						sqlProvider.Context.Set.SelectExpression = lambda;
@@ -229,7 +247,6 @@ namespace Kogel.Dapper.Extension.Expressions
 					break;
 				case "ToList":
 					{
-						//加上自定义实体返回
 						var lambda = this.expression.Arguments[0].GetLambdaExpression();
 						this.ReturnType = lambda.ReturnType;
 						sqlProvider.Context.Set.SelectExpression = lambda;
@@ -244,6 +261,21 @@ namespace Kogel.Dapper.Extension.Expressions
 			var param = ToSubqueryParam(sqlProvider.Params, ref sql);
 			_sqlCmd.Append(sql);
 			this.Param.AddDynamicParams(param);
+		}
+
+		/// <summary>
+		/// 反射执行多表联查的排序
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="querySet"></param>
+		/// <param name="orderExpression"></param>
+		/// <param name="methodName"></param>
+		public void FormatSendOrder<T>(QuerySet<T> querySet, LambdaExpression orderExpression, string methodName)
+		{
+			if (methodName == "OrderBy")
+				querySet.OrderbyExpressionList.Add(orderExpression, Model.EOrderBy.Asc);
+			else
+				querySet.OrderbyExpressionList.Add(orderExpression, Model.EOrderBy.Desc);
 		}
 	}
 }
