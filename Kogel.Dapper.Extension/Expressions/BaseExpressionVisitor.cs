@@ -387,6 +387,10 @@ namespace Kogel.Dapper.Extension.Expressions
                 Visit(node.Operand);
                 this.SpliceField.Append(") ");
             }
+            else
+            {
+                Visit(node.Operand);
+            }
             return node;
         }
     }
