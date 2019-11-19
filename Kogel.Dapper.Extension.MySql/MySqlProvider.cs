@@ -8,8 +8,8 @@ namespace Kogel.Dapper.Extension.MySql
 {
     public class MySqlProvider : SqlProvider
     {
-        private const string OpenQuote = "";
-        private const string CloseQuote = "";
+        private const string OpenQuote = "`";
+        private const string CloseQuote = "`";
         private const char ParameterPrefix = '@';
         private IResolveExpression ResolveExpression;
         public MySqlProvider()

@@ -372,6 +372,27 @@ namespace Kogel.Dapper.Extension.Expressions
                     throw new DapperExtensionException("the expression is no support this function");
             }
         }
+
+
+        /// <summary>
+        /// 解析!不等于(!里只能包含一个条件)
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        protected override Expression VisitUnary(UnaryExpression node)
+        {
+            if (node.NodeType == ExpressionType.Not)
+            {
+                this.SpliceField.Append(" Not(");
+                Visit(node.Operand);
+                this.SpliceField.Append(") ");
+            }
+            else
+            {
+                Visit(node.Operand);
+            }
+            return node;
+        }
     }
     /// <summary>
     /// 转用于解析二元表达式
