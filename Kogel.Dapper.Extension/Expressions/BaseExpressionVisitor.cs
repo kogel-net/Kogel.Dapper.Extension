@@ -253,12 +253,42 @@ namespace Kogel.Dapper.Extension.Expressions
             {
                 case "Contains":
 					{
-						Visit(node.Object);
-						var value = GetValue(node.Arguments[0]);
-						string param = ParamName;
-						value = providerOption.FuzzyEscaping(value,ref param);
-						this.SpliceField.Append($" LIKE {param}");
-						Param.Add(ParamName, value);
+						if (node.Arguments[0].Type.FullName == "System.String")
+						{
+							Visit(node.Object);
+							var value = GetValue(node.Arguments[0]);
+							string param = ParamName;
+							value = providerOption.FuzzyEscaping(value, ref param);
+							this.SpliceField.Append($" LIKE {param}");
+							Param.Add(ParamName, value);
+						}
+						else
+						{
+							if (node.Object != null)
+							{
+								var filed = (node.Arguments[0] as MemberExpression).Member.Name;
+								var type = (node.Arguments[0] as MemberExpression).Expression.Type;
+								var member = EntityCache.QueryEntity(type);
+								var asName = member.AsName;
+								filed = member.FieldPairs[filed];
+								var param = $"{providerOption.ParameterPrefix}{asName}_{filed}_{Param.ParameterNames.Count()}";
+								this.SpliceField.Append($"{asName}.{filed} IN {param}");
+								var value = GetValue(node.Object);
+								Param.Add(param, value);
+							}
+							else
+							{
+								var filed = (node.Arguments[1] as MemberExpression).Member.Name;
+								var type = (node.Arguments[1] as MemberExpression).Expression.Type;
+								var member = EntityCache.QueryEntity(type);
+								var asName = member.AsName;
+								filed = member.FieldPairs[filed];
+								var param = $"{providerOption.ParameterPrefix}{asName}_{filed}_{Param.ParameterNames.Count()}";
+								this.SpliceField.Append($"{asName}.{filed} IN {param}");
+								var value = GetValue(node.Arguments[0]);
+								Param.Add(param, value);
+							}
+						}
 					}
                     break;
                 case "Equals":

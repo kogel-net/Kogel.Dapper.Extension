@@ -110,7 +110,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 					 });
 
 				var commne = conn.QuerySet<Comment>()
-					.Where(x => x.Id > 0)
+					.Where(x => x.Id > 0  && new int[] { 1,2,3,4,5,6,7,8,9,}.Contains(x.Id))
 					.Get(x => new
 					{
 						x.Id,
