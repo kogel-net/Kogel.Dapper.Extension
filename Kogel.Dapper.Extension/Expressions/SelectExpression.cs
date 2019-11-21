@@ -83,7 +83,7 @@ namespace Kogel.Dapper.Extension.Expressions
             {
 				//List<string> fieldList = new List<string>();
 				//var bingings = expression.Body as NewExpression;
-			    //  //Expression.Lambda
+				//  //Expression.Lambda
 				//for (var i = 0; i < bingings.Arguments.Count; i++)
 				//{
 				//	var bind = bingings.Arguments[i];
@@ -101,7 +101,14 @@ namespace Kogel.Dapper.Extension.Expressions
 				//		//fieldList.Add(entity.FieldPairs[bind.Member.Name]);
 				//	}
 				//}
-				fieldArr = entity.Properties.Select(x => x.Name).ToArray();
+				if (entity.Properties.Length == 0 && entity.Type == typeof(bool))
+				{
+					fieldArr = new string[0];
+				}
+				else
+				{
+					fieldArr = entity.Properties.Select(x => x.Name).ToArray();
+				}
             }
             //开始解析对象
             Visit(expression);
@@ -127,5 +134,10 @@ namespace Kogel.Dapper.Extension.Expressions
 			}
             this.Param.AddDynamicParams(base.Param);
         }
-    }
+
+		protected override Expression VisitUnary(UnaryExpression node)
+		{
+			return base.VisitUnary(node);
+		}
+	}
 }

@@ -131,25 +131,23 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 
 		public PageList<T> PageList(int pageIndex, int pageSize)
 		{
+			//查询总行数
+			SqlProvider.FormatCount();
+			var pageTotal = DbCon.QuerySingles<int>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
+			//查询数据
 			SqlProvider.FormatToPageList<T>(pageIndex, pageSize);
-			using (var queryResult = DbCon.QueryMultiples<T>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction))
-			{
-				SqlProvider.FormatCount();
-				var pageTotal = DbCon.QuerySingles<int>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
-				var itemList = queryResult.Read<T>().ToList();
-				return new PageList<T>(pageIndex, pageSize, pageTotal, itemList);
-			}
+			var itemList = DbCon.Query_1<T>(SqlProvider.SqlString, SqlProvider.ProviderOption, SqlProvider.Params, DbTransaction);
+			return new PageList<T>(pageIndex, pageSize, pageTotal, itemList);
 		}
 		public PageList<TSource> PageList<TSource>(int pageIndex, int pageSize)
 		{
+			//查询总行数
+			SqlProvider.FormatCount();
+			var pageTotal = DbCon.QuerySingles<int>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
 			SqlProvider.FormatToPageList<T>(pageIndex, pageSize);
-			using (var queryResult = DbCon.QueryMultiples<TSource>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction))
-			{
-				SqlProvider.FormatCount();
-				var pageTotal = DbCon.QuerySingles<int>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
-				var itemList = queryResult.Read<TSource>().ToList();
-				return new PageList<TSource>(pageIndex, pageSize, pageTotal, itemList);
-			}
+			//查询数据
+			var itemList = DbCon.Query_1<TSource>(SqlProvider.SqlString, SqlProvider.ProviderOption, SqlProvider.Params, DbTransaction);
+			return new PageList<TSource>(pageIndex, pageSize, pageTotal, itemList);
 		}
 
 		public PageList<TReturn> PageList<TReturn>(int pageIndex, int pageSize, Expression<Func<T, TReturn>> select)

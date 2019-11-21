@@ -123,6 +123,25 @@ namespace Kogel.Dapper.Extension.Expressions
 						}
 						break;
 					}
+				case "WhereIf":
+					{
+						this.parameterExpressions = new List<ParameterExpression>();
+						if (methodCallExpression.Arguments[0].ToConvertAndGetValue().Equals(true))
+						{
+							var trueExp = methodCallExpression.Arguments[1];
+							Visit(trueExp);
+							var lambda = Expression.Lambda(trueExp, parameterExpressions.ToList());
+							this.WhereExpression.Add(lambda);
+						}
+						else
+						{
+							var falseExp = methodCallExpression.Arguments[2];
+							Visit(falseExp);
+							var lambda = Expression.Lambda(falseExp, parameterExpressions.ToList());
+							this.WhereExpression.Add(lambda);
+						}
+						break;
+					}
 				default:
 					{
 						if ((methodCallExpression.Method.Name == "OrderBy" || methodCallExpression.Method.Name == "OrderByDescing"))
@@ -239,7 +258,23 @@ namespace Kogel.Dapper.Extension.Expressions
 					break;
 				case "Get":
 					{
-						var lambda = this.expression.Arguments[0].GetLambdaExpression();
+						LambdaExpression lambda = default(LambdaExpression);
+						if (this.expression.Arguments.Count == 1)
+						{
+							lambda = this.expression.Arguments[0].GetLambdaExpression();
+						}
+						else
+						{
+							//带if判断
+							if (this.expression.Arguments[0].ToConvertAndGetValue().Equals(true))
+							{
+								lambda = this.expression.Arguments[1].GetLambdaExpression();
+							}
+							else
+							{
+								lambda = this.expression.Arguments[2].GetLambdaExpression();
+							}
+						}
 						this.ReturnType = lambda.ReturnType;
 						sqlProvider.Context.Set.SelectExpression = lambda;
 						sqlProvider.FormatGet<T>();
@@ -247,7 +282,23 @@ namespace Kogel.Dapper.Extension.Expressions
 					break;
 				case "ToList":
 					{
-						var lambda = this.expression.Arguments[0].GetLambdaExpression();
+						LambdaExpression lambda = default(LambdaExpression);
+						if (this.expression.Arguments.Count == 1)
+						{
+							lambda = this.expression.Arguments[0].GetLambdaExpression();
+						}
+						else
+						{
+							//带if判断
+							if (this.expression.Arguments[0].ToConvertAndGetValue().Equals(true))
+							{
+								lambda = this.expression.Arguments[1].GetLambdaExpression();
+							}
+							else
+							{
+								lambda = this.expression.Arguments[2].GetLambdaExpression();
+							}
+						}
 						this.ReturnType = lambda.ReturnType;
 						sqlProvider.Context.Set.SelectExpression = lambda;
 						sqlProvider.FormatToList<T>();
