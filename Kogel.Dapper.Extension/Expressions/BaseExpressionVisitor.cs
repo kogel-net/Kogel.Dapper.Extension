@@ -230,17 +230,27 @@ namespace Kogel.Dapper.Extension.Expressions
 			}
 			return node;
 		}
-        /// <summary>
-        /// 重写值对象，记录参数
-        /// </summary>
-        /// <param name="node"></param>
-        /// <returns></returns>
-        protected override Expression VisitConstant(ConstantExpression node)
-        {
-            SpliceField.Append(ParamName);
-            Param.Add(ParamName, node.ToConvertAndGetValue());
-            return node;
-        }
+		/// <summary>
+		/// 重写值对象，记录参数
+		/// </summary>
+		/// <param name="node"></param>
+		/// <returns></returns>
+		protected override Expression VisitConstant(ConstantExpression node)
+		{
+			if (FieldName != null)
+			{
+				SpliceField.Append(ParamName);
+				Param.Add(ParamName, node.ToConvertAndGetValue());
+			}
+			else
+			{
+				if (node.ToConvertAndGetValue().Equals(true))
+					SpliceField.Append("1=1");
+				else
+					SpliceField.Append("1!=1");
+			}
+			return node;
+		}
 		private object GetValue(Expression expression)
 		{
 			object value = expression.ToConvertAndGetValue();

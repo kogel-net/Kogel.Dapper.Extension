@@ -79,13 +79,13 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				//		Content = x.Content
 				//	});
 
-				//var aaa = conn.QuerySet<Comment>().Where(x => !x.CurrentUserLikes).ToList();
+				var aaa = conn.QuerySet<Comment>().Where(x => 1 == 1 && true && false).ToList();
 
 				//var count = conn.QuerySet<Comment>().Count();
 
 				//单个属性返回
 				var ContentList = conn.QuerySet<Comment>()
-					 .Where(x => x.Content.IsNotNull() && !(x.Content == ""))
+					 .Where(x => x.Content.IsNotNull() && !(x.Content == "") && x.IsDeleted)
 					 .WhereIf(!string.IsNullOrEmpty("aaa"), x => x.ArticleId == 1, x => x.ArticleId == 2)
 					 .PageList(1, 20, x => new CommentDto()
 					 {

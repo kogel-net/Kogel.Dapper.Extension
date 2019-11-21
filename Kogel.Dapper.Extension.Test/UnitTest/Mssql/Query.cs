@@ -103,9 +103,9 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 				//			OriginalPoint = b.Point,
 				//		}, null)
 				//	});
-				var test = connection.QuerySet<Order>()
-					.OrderBy(x=>x.Id)
-					.PageList(1,10);
+				//var test = connection.QuerySet<Order>()
+				//	.OrderBy(x=>x.Id)
+				//	.PageList(1,10);
 			}
 		}
 

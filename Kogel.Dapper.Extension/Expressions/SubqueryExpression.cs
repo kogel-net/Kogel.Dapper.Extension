@@ -55,21 +55,8 @@ namespace Kogel.Dapper.Extension.Expressions
 		/// </summary>
 		public void AnalysisExpression()
 		{
-			//MethodCallExpression methodCall = (MethodCallExpression)(expression.Object);
-			////获取queryset对象
-			//var querySet = methodCall.Object.ToConvertAndGetValue();
-			////获取paramerer对象
-			//foreach (UnaryExpression exp in methodCall.Arguments)
-			//{
-			//	this.parameterExpressions = new List<ParameterExpression>();
-			//	Visit(exp);
-			//	var lambda = Expression.Lambda(exp, parameterExpressions.ToList());
-			//	WhereExpression.Add(lambda);
-			//}
-
 			AnalysisKogelQuerySet(expression);
 			AnalysisKogelExpression(expression);
-
 			//动态执行，得到T类型
 			typeof(SubqueryExpression)
 						.GetMethod("FormatSend")
@@ -227,7 +214,6 @@ namespace Kogel.Dapper.Extension.Expressions
 			{
 				querySet.WhereExpressionList.AddRange(WhereExpression);
 			}
-
 			switch (methodName)
 			{
 				case "Count":
@@ -239,21 +225,18 @@ namespace Kogel.Dapper.Extension.Expressions
 					{
 						var lambda = this.expression.Arguments[0].GetLambdaExpression();
 						sqlProvider.FormatSum(lambda);
-
 					}
 					break;
 				case "Min":
 					{
 						var lambda = this.expression.Arguments[0].GetLambdaExpression();
 						sqlProvider.FormatMin(lambda);
-
 					}
 					break;
 				case "Max":
 					{
 						var lambda = this.expression.Arguments[0].GetLambdaExpression();
 						sqlProvider.FormatMax(lambda);
-
 					}
 					break;
 				case "Get":
