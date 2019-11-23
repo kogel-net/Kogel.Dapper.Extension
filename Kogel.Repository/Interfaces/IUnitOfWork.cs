@@ -7,8 +7,16 @@ using System.Data;
 
 namespace Kogel.Repository.Interfaces
 {
-	public interface IUnitOfWork: IDisposable
+	public interface IUnitOfWork : IDisposable
 	{
+		/// <summary>
+		/// 数据库连接
+		/// </summary>
+		IDbConnection Connection { get; }
+		/// <summary>
+		/// 工作单元事务
+		/// </summary>
+		IDbTransaction Transaction { get; set; }
 		/// <summary>
 		/// 开启事务
 		/// </summary>

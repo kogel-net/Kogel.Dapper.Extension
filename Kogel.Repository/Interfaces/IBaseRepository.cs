@@ -11,9 +11,47 @@ namespace Kogel.Repository.Interfaces
 {
 	public interface IBaseRepository<T>
 	{
+		/// <summary>
+		/// 获取查询对象
+		/// </summary>
+		/// <returns></returns>
 		QuerySet<T> QuerySet();
+		/// <summary>
+		/// 获取查询对象
+		/// </summary>
+		/// <param name="transaction"></param>
+		/// <returns></returns>
 		QuerySet<T> QuerySet(IDbTransaction transaction);
+		/// <summary>
+		/// 获取编辑对象
+		/// </summary>
+		/// <returns></returns>
 		CommandSet<T> CommandSet();
+		/// <summary>
+		/// 获取编辑对象
+		/// </summary>
+		/// <param name="transaction"></param>
+		/// <returns></returns>
 		CommandSet<T> CommandSet(IDbTransaction transaction);
+		/// <summary>
+		/// 根据主键获取当前实体数据
+		/// </summary>
+		/// <returns></returns>
+		T FindById(int id);
+		/// <summary>
+		/// 增加
+		/// </summary>
+		/// <returns></returns>
+		int Insert(T entity);
+		/// <summary>
+		/// 删除(根据主键)
+		/// </summary>
+		/// <returns></returns>
+		int Delete(int id);
+		/// <summary>
+		/// 修改(根据主键)
+		/// </summary>
+		/// <returns></returns>
+		int Update(T entity);
 	}
 }

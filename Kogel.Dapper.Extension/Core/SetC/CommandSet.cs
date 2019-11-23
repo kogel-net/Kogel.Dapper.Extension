@@ -70,13 +70,38 @@ namespace Kogel.Dapper.Extension.Core.SetC
             SqlProvider.AsTableNameDic.Add(type, tableName);
             return this;
         }
-
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="predicate"></param>
+		/// <returns></returns>
         public ICommand<T> Where(Expression<Func<T, bool>> predicate)
         {
             WhereExpressionList.Add(predicate);
             return this;
         }
-
+		/// <summary>
+		/// 使用sql查询条件
+		/// </summary>
+		/// <param name="sqlWhere"></param>
+		/// <param name="param"></param>
+		/// <returns></returns>
+		public ICommand<T> Where(string sqlWhere, object param = null)
+		{
+			WhereBuilder.Append(" AND " + sqlWhere);
+			if (param != null)
+			{
+				Params.AddDynamicParams(param);
+			}
+			return this;
+		}
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="where"></param>
+		/// <param name="truePredicate"></param>
+		/// <param name="falsePredicate"></param>
+		/// <returns></returns>
 		public ICommand<T> WhereIf(bool where, Expression<Func<T, bool>> truePredicate, Expression<Func<T, bool>> falsePredicate)
 		{
 			if (where)

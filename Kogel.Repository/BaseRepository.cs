@@ -8,6 +8,8 @@ using Kogel.Dapper.Extension.Exception;
 using Kogel.Dapper.Extension.Core.SetC;
 using Kogel.Dapper.Extension.Core.SetQ;
 using Kogel.Repository.Interfaces;
+using Kogel.Dapper.Extension;
+using Dapper;
 
 namespace Kogel.Repository
 {
@@ -68,6 +70,71 @@ namespace Kogel.Repository
 		public CommandSet<T> CommandSet(IDbTransaction transaction)
 		{
 			return new CommandSet<T>(OptionsBuilder.Connection, OptionsBuilder.Provider, transaction);
+		}
+		/// <summary>
+		/// 根据主键获取当前实体数据
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		public T FindById(int id)
+		{
+			var entityObject = EntityCache.QueryEntity(typeof(T));
+			if (string.IsNullOrEmpty(entityObject.Identitys))
+				throw new DapperExtensionException("主键不存在!请前往实体类使用[Identity]特性设置主键。");
+			//设置参数
+			DynamicParameters param = new DynamicParameters();
+			param.Add(entityObject.Identitys, id);
+			return this.QuerySet(this.UnitOfWork.Transaction)
+				.Where($"{entityObject.Identitys}={OptionsBuilder.Provider.ProviderOption.ParameterPrefix}{entityObject.Identitys}", param)
+				.Get();
+		}
+		/// <summary>
+		/// 增加
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <returns></returns>
+		public int Insert(T entity)
+		{
+			return this.CommandSet(this.UnitOfWork.Transaction)
+				.Insert(entity);
+		}
+		/// <summary>
+		/// 删除(根据主键)
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		public int Delete(int id)
+		{
+			var entityObject = EntityCache.QueryEntity(typeof(T));
+			if (string.IsNullOrEmpty(entityObject.Identitys))
+				throw new DapperExtensionException("主键不存在!请前往实体类使用[Identity]特性设置主键。");
+			//设置参数
+			DynamicParameters param = new DynamicParameters();
+			param.Add(entityObject.Identitys, id);
+			return this.CommandSet(this.UnitOfWork.Transaction)
+			.Where($"{entityObject.Identitys}={OptionsBuilder.Provider.ProviderOption.ParameterPrefix}{entityObject.Identitys}", param)
+			.Delete();
+		}
+		/// <summary>
+		/// 修改
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <returns></returns>
+		public int Update(T entity)
+		{
+			var entityObject = EntityCache.QueryEntity(typeof(T));
+			if (string.IsNullOrEmpty(entityObject.Identitys))
+				throw new DapperExtensionException("主键不存在!请前往实体类使用[Identity]特性设置主键。");
+			//获取主键数据
+			var id = entityObject.Properties
+				.FirstOrDefault(x => x.Name == entityObject.Identitys)
+				.GetValue(entity);
+			//设置参数
+			DynamicParameters param = new DynamicParameters();
+			param.Add(entityObject.Identitys, id);
+			return this.CommandSet(this.UnitOfWork.Transaction)
+				.Where($"{entityObject.Identitys}={OptionsBuilder.Provider.ProviderOption.ParameterPrefix}{entityObject.Identitys}", param)
+				.Update(entity);
 		}
 	}
 }

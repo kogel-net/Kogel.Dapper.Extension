@@ -11,11 +11,17 @@ namespace Kogel.Repository
 {
 	public class UnitOfWork : IUnitOfWork
 	{
-		private IDbConnection connection { get; }
-		private IDbTransaction transaction { get; set; }
+		/// <summary>
+		/// 数据库连接
+		/// </summary>
+		public IDbConnection Connection { get; }
+		/// <summary>
+		/// 工作单元事务
+		/// </summary>
+		public IDbTransaction Transaction { get; set; }
 		public UnitOfWork(IDbConnection connection)
 		{
-			this.connection = connection;
+			this.Connection = connection;
 		}
 		/// <summary>
 		/// 开始事务
@@ -25,9 +31,9 @@ namespace Kogel.Repository
 		/// <returns></returns>
 		public IUnitOfWork BeginTransaction(Action transactionMethod, IsolationLevel IsolationLevel = IsolationLevel.Serializable)
 		{
-			if (connection.State == ConnectionState.Closed)
-				connection.Open();
-			transaction = connection.BeginTransaction(IsolationLevel);
+			if (Connection.State == ConnectionState.Closed)
+				Connection.Open();
+			Transaction = Connection.BeginTransaction(IsolationLevel);
 			SqlMapper.Aop.OnExecuting += Aop_OnExecuting;
 			try
 			{
@@ -35,8 +41,8 @@ namespace Kogel.Repository
 			}
 			catch (Exception ex)
 			{
-				if (transaction != null)
-					transaction.Rollback();
+				if (Transaction != null)
+					Transaction.Rollback();
 				throw ex;
 			}
 			finally
@@ -51,37 +57,37 @@ namespace Kogel.Repository
 		/// <param name="command"></param>
 		private void Aop_OnExecuting(ref CommandDefinition command)
 		{
-			command.Connection = this.connection;
-			command.Transaction = this.transaction;
+			command.Connection = this.Connection;
+			command.Transaction = this.Transaction;
 		}
 		/// <summary>
 		/// 提交
 		/// </summary>
 		public void Commit()
 		{
-			if (transaction != null)
-				transaction.Commit();
+			if (Transaction != null)
+				Transaction.Commit();
 		}
 		/// <summary>
 		/// 回滚
 		/// </summary>
 		public void Rollback()
 		{
-			if (transaction != null)
-				transaction.Rollback();
+			if (Transaction != null)
+				Transaction.Rollback();
 		}
 		/// <summary>
 		/// 释放对象
 		/// </summary>
 		public void Dispose()
 		{
-			if (transaction != null)
-				transaction.Dispose();
-			if (connection != null)
+			if (Transaction != null)
+				Transaction.Dispose();
+			if (Transaction != null)
 			{
-				if (connection.State == ConnectionState.Open)
-					connection.Close();
-				connection.Dispose();
+				if (Connection.State == ConnectionState.Open)
+					Connection.Close();
+				Connection.Dispose();
 			}
 		}
 
