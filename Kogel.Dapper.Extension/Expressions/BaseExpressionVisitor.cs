@@ -412,10 +412,12 @@ namespace Kogel.Dapper.Extension.Expressions
 
         protected override Expression VisitBinary(BinaryExpression node)
         {
-            Visit(node.Left);
+			SpliceField.Append("(");
+			Visit(node.Left);
             SpliceField.Append(node.GetExpressionType());
             Visit(node.Right);
-            return node;
+			SpliceField.Append(")");
+			return node;
         }
-    }
+	}
 }
