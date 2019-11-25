@@ -85,7 +85,6 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				DynamicParameters param = new DynamicParameters();
 				param.Add("Id", 1);
 				var comment = conn.QuerySet<Comment>().Where("Id=@Id", param)
-					.Where(x => x.Id.In(new int[] { 1, 2, 3 }) && (x.Content.Contains("t") || x.Content.Contains("x")) && x.IsDeleted == false)
 					.ToList();
 	
 

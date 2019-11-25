@@ -51,22 +51,36 @@ namespace Kogel.Repository
 			if (UnitOfWork != null)
 				UnitOfWork.Dispose();
 		}
-
+		/// <summary>
+		/// 获取查询对象
+		/// </summary>
+		/// <returns></returns>
 		public QuerySet<T> QuerySet()
 		{
 			return new QuerySet<T>(OptionsBuilder.Connection, OptionsBuilder.Provider, null);
 		}
-
+		/// <summary>
+		/// 获取查询对象
+		/// </summary>
+		/// <param name="transaction"></param>
+		/// <returns></returns>
 		public QuerySet<T> QuerySet(IDbTransaction transaction)
 		{
 			return new QuerySet<T>(OptionsBuilder.Connection, OptionsBuilder.Provider, transaction);
 		}
-
+		/// <summary>
+		/// 获取编辑对象
+		/// </summary>
+		/// <returns></returns>
 		public CommandSet<T> CommandSet()
 		{
 			return new CommandSet<T>(OptionsBuilder.Connection, OptionsBuilder.Provider, null);
 		}
-
+		/// <summary>
+		/// 获取编辑对象
+		/// </summary>
+		/// <param name="transaction"></param>
+		/// <returns></returns>
 		public CommandSet<T> CommandSet(IDbTransaction transaction)
 		{
 			return new CommandSet<T>(OptionsBuilder.Connection, OptionsBuilder.Provider, transaction);
@@ -89,14 +103,30 @@ namespace Kogel.Repository
 				.Get();
 		}
 		/// <summary>
-		/// 增加
+		/// 增加(并且返回自增主键到写入到实体中)
 		/// </summary>
 		/// <param name="entity"></param>
 		/// <returns></returns>
 		public int Insert(T entity)
 		{
-			return this.CommandSet(this.UnitOfWork.Transaction)
-				.Insert(entity);
+			var entityObject = EntityCache.QueryEntity(typeof(T));
+			//存在主键写入自增id
+			if (!string.IsNullOrEmpty(entityObject.Identitys))
+			{
+				var id = this.CommandSet(this.UnitOfWork.Transaction)
+			       .InsertIdentity(entity);
+				//写入主键数据
+				entityObject.Properties
+				   .FirstOrDefault(x => x.Name == entityObject.Identitys)
+				   .SetValue(entity, id);
+				return 1;
+			}
+			else
+			{
+				//不存在就直接返回影响行数
+				return this.CommandSet(this.UnitOfWork.Transaction)
+					.Insert(entity);
+			}
 		}
 		/// <summary>
 		/// 删除(根据主键)
@@ -112,8 +142,8 @@ namespace Kogel.Repository
 			DynamicParameters param = new DynamicParameters();
 			param.Add(entityObject.Identitys, id);
 			return this.CommandSet(this.UnitOfWork.Transaction)
-			.Where($"{entityObject.Identitys}={OptionsBuilder.Provider.ProviderOption.ParameterPrefix}{entityObject.Identitys}", param)
-			.Delete();
+				.Where($"{entityObject.Identitys}={OptionsBuilder.Provider.ProviderOption.ParameterPrefix}{entityObject.Identitys}", param)
+			    .Delete();
 		}
 		/// <summary>
 		/// 修改

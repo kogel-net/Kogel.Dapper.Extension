@@ -46,8 +46,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 					//其他仓储类代码块
 					new TestRepositoryQuery1().Test();
 				});
-				//根据主键获取
-				var getComment = testRepository.FindById(1);
+			
 				//提交
 				testRepository.UnitOfWork.Commit();
 			}
@@ -60,8 +59,19 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 			TestRepository testRepository = new TestRepository();
 			var comment = testRepository.Orm.QuerySet<Comment>().PageList(1,10).Items;
 
-			testRepository.Orm.CommandSet<Comment>()
-				.Insert(comment);
+			//testRepository.Orm.CommandSet<Comment>()
+			//	.Insert(comment);
+
+
+			//根据主键获取
+			var getComment = testRepository.FindById(3);
+
+			testRepository.Insert(getComment);
+	
+			testRepository.Update(getComment);
+
+			testRepository.Delete(getComment.Id);
+
 
 		}
 	}

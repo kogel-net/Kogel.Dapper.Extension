@@ -39,7 +39,7 @@ namespace Kogel.Repository.Interfaces
 		/// <returns></returns>
 		T FindById(int id);
 		/// <summary>
-		/// 增加
+		/// 增加(并且返回自增主键到写入到实体中)
 		/// </summary>
 		/// <returns></returns>
 		int Insert(T entity);
