@@ -60,7 +60,6 @@ namespace Kogel.Dapper.Extension.Expressions
 			var expTypeName = node.Expression?.GetType().FullName ?? "";
 			if (expTypeName == "System.Linq.Expressions.TypedParameterExpression")
 			{
-				//var member = EntityCache.QueryEntity(node.Member.DeclaringType);
 				var member = EntityCache.QueryEntity(node.Expression.Type);
 				string fieldName = member.FieldPairs[node.Member.Name];
 				string field = (providerOption.IsAsName ? member.GetAsName(providerOption) : "") + providerOption.CombineFieldName(fieldName);
@@ -68,19 +67,16 @@ namespace Kogel.Dapper.Extension.Expressions
 			}
 			else
 			{
-				string memberName = node.Member.Name.ToUpper();
-				if (memberName == "NOW" || memberName == "DATETIME")
-				{
-					GenerateField(providerOption.GetDate());
-				}
-				else
-				{
-					GenerateField(GetFieldValue(node));
-				}
+				//参数
+				string paramName = $"{providerOption.ParameterPrefix}Member_Param_{Param.ParameterNames.Count()}";
+				//值
+				object nodeValue = node.ToConvertAndGetValue();
+				//设置sql
+				GenerateField(paramName);
+				Param.Add(paramName, nodeValue);
 			}
 			return node;
 		}
-
 		/// <summary>
 		/// 待执行的方法对象
 		/// </summary>
@@ -217,16 +213,9 @@ namespace Kogel.Dapper.Extension.Expressions
 			}
 			else
 			{
-				string memberName = node.Member.Name.ToUpper();
-				if (memberName == "NOW" || memberName == "DATETIME")
-				{
-					SpliceField.Append(providerOption.GetDate());
-				}
-				else
-				{
-					SpliceField.Append(ParamName);
-					Param.Add(ParamName, node.ToConvertAndGetValue());
-				}
+				SpliceField.Append(ParamName);
+				object nodeValue = node.ToConvertAndGetValue();
+				Param.Add(ParamName, nodeValue);
 			}
 			return node;
 		}

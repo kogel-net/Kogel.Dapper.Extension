@@ -63,21 +63,21 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
 			using (var conn = new MySqlConnection(mysqlConnection))
 			{
-				//DateTime dateTime = DateTime.Now.AddDays(-10);
+				DateTime dateTime = DateTime.Now.AddDays(-10);
 
-				//conn.QuerySet<Comment>().FieldMatch<Comment>();
+				conn.QuerySet<Comment>().FieldMatch<Comment>();
 				//var comments = conn.Query<Comment>("Select * from Comment").ToList();
 
-				//var getIfTest = conn.QuerySet<Comment>()
-				//	.Get(false, x => new CommentDto()
-				//	{
-				//		Id = x.Id,
-				//		ArticleIds = x.ArticleId
-				//	}, x => new CommentDto()
-				//	{
-				//		Id = x.Id,
-				//		Content = x.Content
-				//	});
+				var getIfTest = conn.QuerySet<Comment>()
+					.Get(false, x => new CommentDto()
+					{
+						Id = x.Id,
+						ArticleIds = x.ArticleId
+					}, x => new CommentDto()
+					{
+						Id = x.Id,
+						Content = x.Content
+					});
 
 				int[] array = new int[] { 1, 2, 3 };
 
@@ -86,7 +86,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				param.Add("Id", 1);
 				var comment = conn.QuerySet<Comment>().Where("Id=@Id", param)
 					.ToList();
-	
+
 
 				//var count = conn.QuerySet<Comment>().Count();
 
@@ -117,7 +117,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 					 });
 
 				var commne = conn.QuerySet<Comment>()
-					.Where(x => x.Id > 0  && new int[] { 1,2,3,4,5,6,7,8,9,}.Contains(x.Id))
+					.Where(x => x.Id > 0 && new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, }.Contains(x.Id))
 					.Get(x => new
 					{
 						x.Id,

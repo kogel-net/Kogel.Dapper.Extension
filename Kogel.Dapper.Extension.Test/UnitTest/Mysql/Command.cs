@@ -24,17 +24,17 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                 PId = 0,
                 RefCommentId = 0
             };
-            DateTime dateTime = DateTime.Now;
+            DateTime dateTime = DateTime.Now.AddDays(100);
             using (var conn = new MySqlConnection(mysqlConnection))
             {
-                //根据成员修改
-                var result = conn.CommandSet<Comment>()
-                .Where(x => x.Id > commne.Id || x.Id < commne.Id)
-                .Update(x => new Comment()
-                {
-                   // Content = commne.Content,
-                    SubTime = dateTime
-                });
+				//根据成员修改
+				var result = conn.CommandSet<Comment>()
+				.Where(x => x.Id.In(new int[] { 1, 2, 3 }))
+				.Update(x => new Comment()
+				{
+					// Content = commne.Content,
+					SubTime = dateTime
+				});
 				//全部修改
 				var result1 = conn.CommandSet<Comment>()
 					.Where(x => x.Id == commne.Id)

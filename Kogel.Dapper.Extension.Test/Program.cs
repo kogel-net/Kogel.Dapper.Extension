@@ -33,22 +33,22 @@ namespace Kogel.Dapper.Extension.Test
 			//var mssqlCommand = new UnitTest.Mssql.Command();
 			//mssqlCommand.Test();
 			#endregion
-			Stopwatch stopwatch = new Stopwatch();
-			stopwatch.Start();
+			//Stopwatch stopwatch = new Stopwatch();
+			//stopwatch.Start();
 
 			#region mysql单元测试
 			var mysqlQuery = new UnitTest.Mysql.Query();
-            mysqlQuery.Test();
+			mysqlQuery.Test();
 
 			var mysqlResQuery = new UnitTest.Mysql.TestRepositoryQuery();
 			mysqlResQuery.Test();
-			//mysqlQuery.TestMaxAndMin();
+			mysqlQuery.TestMaxAndMin();
 
 			var mysqlCommand = new UnitTest.Mysql.Command();
 			mysqlCommand.Test();
 			#endregion
 
-			stopwatch.Stop();
+			//stopwatch.Stop();
 
 			#region oracle单元测试
 			//var oracleQuery = new UnitTest.Oracle.Query();

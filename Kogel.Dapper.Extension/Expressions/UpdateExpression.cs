@@ -55,13 +55,11 @@ namespace Kogel.Dapper.Extension.Expressions
 				}
 				else
 				{
-					var ParamName = $"UPDATE_{field}_{i}";
-					_sqlCmd.Append($"{providerOption.CombineFieldName(field)}={providerOption.ParameterPrefix + ParamName}");
-					Param.Add(ParamName, value == "NULL" ? null : value);
+					var ParamName = base.FieldList[i];
+					_sqlCmd.Append($"{providerOption.CombineFieldName(field)}={ParamName}");
 				}
             }
-            //加入条件参数
-            Param.AddDynamicParams(base.Param);
+			this.Param.AddDynamicParams(base.Param);
             _sqlCmd.Insert(0, " SET ");
         }
     }
