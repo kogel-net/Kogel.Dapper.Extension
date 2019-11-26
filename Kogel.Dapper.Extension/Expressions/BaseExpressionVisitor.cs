@@ -46,8 +46,14 @@ namespace Kogel.Dapper.Extension.Expressions
         /// <returns></returns>
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            GenerateField(GetFieldValue(node));
-            return node;
+			//参数
+			string paramName = $"{providerOption.ParameterPrefix}Member_Param_{Param.ParameterNames.Count()}";
+			//值
+			object nodeValue = node.ToConvertAndGetValue();
+			//设置sql
+			GenerateField(paramName);
+			Param.Add(paramName, nodeValue);
+			return node;
         }
 		/// <summary>
 		/// 成员对象

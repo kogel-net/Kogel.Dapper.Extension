@@ -73,40 +73,40 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 			//        }
 			SqlMapper.Aop.OnExecuting += Aop_OnExecuting;
 
-			using (var connection = new SqlConnection("server=localhost;database=Lige;user=sa;password=!RisingupTech/././.;max pool size=300"))
-			{
-				var pageList = connection.QuerySet<Lige.Model.Order>()
-					.WhereIf(0 != 0, x => x.IsDelete == false && x.Status == 0, x => x.IsDelete == false)
-					.OrderByDescing(x => x.CreateDate)
-					.PageList(1, 10, x => new OrderResDto()
-					{
-						Id = x.Id,
-						OrderNo = x.OrderNo,
-						OrderTime = x.CreateDate,
-						Status = x.Status,
-						Amount = x.Amount,
-						Point = x.Point,
-						OrderDetailList = connection.QuerySet<OrderDetail>()
-						.Where(y => y.IsDelete == false && y.OrderNo == x.OrderNo)
-						.WhereIf(1 == 1, y => y.IsDelete == false && y.OrderNo == x.OrderNo, y => y.IsDelete == false)
-						.Join<OrderDetail, Product>((a, b) => a.ProductCode == b.ProductCode, JoinMode.LEFT, true)
-						.From<OrderDetail, Product>()
-						.OrderBy<Product>(y => y.Id)
-						.ToList(true, (a, b) => new OrderDetailResDto()
-						{
-							Id = a.Id,
-							Name = a.ProductName,
-							Point = a.Point,
-							Price = a.Price,
-							Qty = a.Qty,
-							OriginalPrice = b.Price,
-							OriginalPoint = b.Point,
-						}, null)
-					});
-				var test = connection.QuerySet<Order>()
-					.OrderBy(x => x.Id)
-					.PageList(1, 10);
-			}
+			//using (var connection = new SqlConnection("server=localhost;database=Lige;user=sa;password=!RisingupTech/././.;max pool size=300"))
+			//{
+			//	var pageList = connection.QuerySet<Lige.Model.Order>()
+			//		.WhereIf(0 != 0, x => x.IsDelete == false && x.Status == 0, x => x.IsDelete == false)
+			//		.OrderByDescing(x => x.CreateDate)
+			//		.PageList(1, 10, x => new OrderResDto()
+			//		{
+			//			Id = x.Id,
+			//			OrderNo = x.OrderNo,
+			//			OrderTime = x.CreateDate,
+			//			Status = x.Status,
+			//			Amount = x.Amount,
+			//			Point = x.Point,
+			//			OrderDetailList = connection.QuerySet<OrderDetail>()
+			//			.Where(y => y.IsDelete == false && y.OrderNo == x.OrderNo)
+			//			.WhereIf(1 == 1, y => y.IsDelete == false && y.OrderNo == x.OrderNo, y => y.IsDelete == false)
+			//			.Join<OrderDetail, Product>((a, b) => a.ProductCode == b.ProductCode, JoinMode.LEFT, true)
+			//			.From<OrderDetail, Product>()
+			//			.OrderBy<Product>(y => y.Id)
+			//			.ToList(true, (a, b) => new OrderDetailResDto()
+			//			{
+			//				Id = a.Id,
+			//				Name = a.ProductName,
+			//				Point = a.Point,
+			//				Price = a.Price,
+			//				Qty = a.Qty,
+			//				OriginalPrice = b.Price,
+			//				OriginalPoint = b.Point,
+			//			}, null)
+			//		});
+			//	var test = connection.QuerySet<Order>()
+			//		.OrderBy(x => x.Id)
+			//		.PageList(1, 10);
+			//}
 		}
 
 		private void Aop_OnExecuting(ref CommandDefinition command)
