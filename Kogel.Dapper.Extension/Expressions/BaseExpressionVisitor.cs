@@ -91,7 +91,7 @@ namespace Kogel.Dapper.Extension.Expressions
 		protected override Expression VisitMethodCall(MethodCallExpression node)
 		{
 			//保存导航查询的属性
-			if (node.Method.ReturnType.FullName.Contains("System.Collections.Generic.List"))
+			if (node.Method.ReturnType.FullName.Contains("System.Collections.Generic.List") || node.Method.ReturnType.BaseType.FullName.Contains("Kogel.Dapper.Extension.IBaseEntity"))
 			{
 				return node;
 			}

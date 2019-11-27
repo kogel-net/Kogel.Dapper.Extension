@@ -93,13 +93,13 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
 				//单个属性返回
 				var ContentList = conn.QuerySet<Comment>()
-					 .Where(x => x.Content.IsNotNull() && !(x.Content == "") && x.IsDeleted)
-					 .WhereIf(!string.IsNullOrEmpty("aaa"), x => x.ArticleId == 1, x => x.ArticleId == 2)
+					 //.Where(x => x.Content.IsNotNull() && !(x.Content == "") && x.IsDeleted)
+					 //.WhereIf(!string.IsNullOrEmpty("aaa"), x => x.ArticleId == 1, x => x.ArticleId == 2)
 					 .PageList(1, 20, x => new CommentDto()
 					 {
 						 Id = x.Id,
 						 ArticleIds = x.ArticleId,
-						 //count = conn.QuerySet<News>().Where(y => y.Id == x.ArticleId).Count(),
+						 ////count = conn.QuerySet<News>().Where(y => y.Id == x.ArticleId).Count(),
 						 NewsList = conn.QuerySet<News>()
 						   .Join<News, Comment>((a, b) => a.Id == b.ArticleId, JoinMode.LEFT, true)
 						   .Where(y => y.Id == x.ArticleId)
@@ -110,11 +110,12 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 							   Contents = y.Content,
 
 						   }).ToList(),
-						 NewsDto = new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id == x.ArticleId).Get(y => new NewsDto()
+						 NewsDto = conn.QuerySet<News>().Where(y => y.Id == x.ArticleId).Get(y => new NewsDto()
 						 {
 							 Id = y.Id,
 							 Contents = y.Content
-						 })
+						 }),
+						 IsClickLike = conn.QuerySet<News>().Where(y => y.Id == x.ArticleId).Get(y => true)
 					 });
 
 				var commne = conn.QuerySet<Comment>()

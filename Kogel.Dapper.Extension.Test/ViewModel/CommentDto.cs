@@ -27,5 +27,7 @@ namespace Kogel.Dapper.Extension.Test.ViewModel
 		public List<NewsDto> NewsList { get; set; }
 
 		public NewsDto NewsDto { get; set; }
+
+		public bool IsClickLike { get; set; }
 	}
 }
