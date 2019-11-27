@@ -18,13 +18,13 @@ namespace Kogel.Dapper.Extension.Test
     {
         static void Main(string[] args)
         {
-			//预热实体类
-			EntityCache.Register(new Type[] {
-				typeof(Comment),
-				typeof(Comment1),
-				typeof(News),
-				typeof(ResourceMapping),
-			});
+			////预热实体类
+			//EntityCache.Register(new Type[] {
+			//	typeof(Comment),
+			//	typeof(Comment1),
+			//	typeof(News),
+			//	typeof(ResourceMapping),
+			//});
 
 			#region mssql单元测试
 			//var mssqlQuery = new UnitTest.Mssql.Query();
@@ -33,12 +33,10 @@ namespace Kogel.Dapper.Extension.Test
 			////var mssqlCommand = new UnitTest.Mssql.Command();
 			////mssqlCommand.Test();
 			//#endregion
-			////Stopwatch stopwatch = new Stopwatch();
-			////stopwatch.Start();
 
 			//#region mysql单元测试
-			//var mysqlQuery = new UnitTest.Mysql.Query();
-			//mysqlQuery.Test();
+			var mysqlQuery = new UnitTest.Mysql.Query();
+			mysqlQuery.Test();
 
 			//var mysqlResQuery = new UnitTest.Mysql.TestRepositoryQuery();
 			//mysqlResQuery.Test();

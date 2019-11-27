@@ -1094,7 +1094,6 @@ namespace Dapper
 
         private static IEnumerable<T> QueryImpl<T>(this IDbConnection cnn, CommandDefinition command, Type effectiveType)
         {
-			
 			Aop.InvokeExecuting(ref command);
 			object param = command.Parameters;
             var identity = new Identity(command.CommandText, command.CommandType, command.Connection, effectiveType, param?.GetType(), null);

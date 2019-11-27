@@ -103,7 +103,7 @@ namespace Kogel.Dapper.Extension.Expressions
 				//}
 				if (entity.Properties.Length == 0 && entity.Type == typeof(bool))
 				{
-					fieldArr = new string[0];
+					fieldArr = new string[] { "field1" };
 				}
 				else
 				{

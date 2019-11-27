@@ -7,7 +7,7 @@ namespace Kogel.Dapper.Extension.Expressions
 {
     /// <inheritdoc />
     /// <summary>
-    /// 修树
+    /// 修树[已弃用]
     /// </summary>
     public class TrimExpression : ExpressionVisitor
     {
