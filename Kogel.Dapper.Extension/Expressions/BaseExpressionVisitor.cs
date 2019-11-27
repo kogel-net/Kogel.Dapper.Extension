@@ -239,10 +239,20 @@ namespace Kogel.Dapper.Extension.Expressions
 			}
 			else
 			{
-				if (node.ToConvertAndGetValue().Equals(true))
+				var nodeValue = node.ToConvertAndGetValue();
+				if (nodeValue.Equals(true))
+				{
 					SpliceField.Append("1=1");
-				else
+				}
+				else if (nodeValue.Equals(false))
+				{
 					SpliceField.Append("1!=1");
+				}
+				else
+				{
+					SpliceField.Append(ParamName);
+					Param.Add(ParamName, nodeValue);
+				}	
 			}
 			return node;
 		}

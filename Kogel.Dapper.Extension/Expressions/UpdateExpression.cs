@@ -38,27 +38,18 @@ namespace Kogel.Dapper.Extension.Expressions
             this.entity = EntityCache.QueryEntity(expression.Body.Type);
             //字段数组
             string[] fieldArr = ((MemberInitExpression)expression.Body).Bindings.AsList().Select(x => entity.FieldPairs[x.Member.Name]).ToArray();
-
             //开始解析对象
             Visit(expression);
-            //开始拼接成查询字段
-            for (var i = 0; i < fieldArr.Length; i++)
-            {
-                if (_sqlCmd.Length != 0)
-                    _sqlCmd.Append(",");
-                string field = fieldArr[i];
-                string value = base.FieldList[i];
-				//判断是不是包含字段的值，如果是就不放入Param中
-				if (value.Contains(entity.AsName) || value == providerOption.GetDate())
-				{
-					_sqlCmd.Append(field + "=" + value);
-				}
-				else
-				{
-					var ParamName = base.FieldList[i];
-					_sqlCmd.Append($"{providerOption.CombineFieldName(field)}={ParamName}");
-				}
-            }
+			//开始拼接成查询字段
+			for (var i = 0; i < fieldArr.Length; i++)
+			{
+				if (_sqlCmd.Length != 0)
+					_sqlCmd.Append(",");
+				string field = fieldArr[i];
+				var ParamName = base.FieldList[i];
+				_sqlCmd.Append($"{providerOption.CombineFieldName(field)}={ParamName}");
+
+			}
 			this.Param.AddDynamicParams(base.Param);
             _sqlCmd.Insert(0, " SET ");
         }

@@ -65,7 +65,6 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 			{
 				DateTime dateTime = DateTime.Now.AddDays(-10);
 
-				conn.QuerySet<Comment>().FieldMatch<Comment>();
 				//var comments = conn.Query<Comment>("Select * from Comment").ToList();
 
 				var getIfTest = conn.QuerySet<Comment>()

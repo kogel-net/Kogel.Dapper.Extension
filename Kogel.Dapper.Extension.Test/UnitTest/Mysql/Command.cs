@@ -29,12 +29,13 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
             {
 				//根据成员修改
 				var result = conn.CommandSet<Comment>()
-				.Where(x => x.Id.In(new int[] { 1, 2, 3 }) && x.IsDeleted==false)
+				.Where(x => x.Id.In(new int[] { 1, 2, 3 }) && x.IsDeleted == false)
 				.Update(x => new Comment()
 				{
 					// Content = commne.Content,
 					SubTime = dateTime,
-					IsDeleted=false
+					IsDeleted = false,
+					Content = "123" + x.Content
 				});
 				//全部修改
 				var result1 = conn.CommandSet<Comment>()
