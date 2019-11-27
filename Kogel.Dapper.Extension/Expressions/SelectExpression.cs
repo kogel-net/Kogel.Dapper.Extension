@@ -81,26 +81,6 @@ namespace Kogel.Dapper.Extension.Expressions
             }
             else//匿名类（暂时不支持子导航属性查询）
             {
-				//List<string> fieldList = new List<string>();
-				//var bingings = expression.Body as NewExpression;
-				//  //Expression.Lambda
-				//for (var i = 0; i < bingings.Arguments.Count; i++)
-				//{
-				//	var bind = bingings.Arguments[i];
-				//	//判断是列表还是不是系统函数
-				//	if (bind.Type.FullName.Contains("System.Collections.Generic.List") || bind.Type.Namespace != "System")
-				//	{
-				//		//providerOption.NavigationList.Add(new NavigationMemberAssign()
-				//		//{
-				//		//	MemberAssign = bind,
-				//		//	MemberAssignName = bind.Member.Name
-				//		//});
-				//	}
-				//	else
-				//	{
-				//		//fieldList.Add(entity.FieldPairs[bind.Member.Name]);
-				//	}
-				//}
 				if (entity.Properties.Length == 0 && entity.Type == typeof(bool))
 				{
 					fieldArr = new string[] { "field1" };

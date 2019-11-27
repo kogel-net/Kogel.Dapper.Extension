@@ -1031,7 +1031,6 @@ namespace Dapper
 
         private static GridReader QueryMultipleImpl(this IDbConnection cnn, ref CommandDefinition command)
         {
-			
 			Aop.InvokeExecuting(ref command);
 			object param = command.Parameters;
             var identity = new Identity(command.CommandText, command.CommandType, command.Connection, typeof(GridReader), param?.GetType(), null);
@@ -1195,7 +1194,6 @@ namespace Dapper
 
         private static T QueryRowImpl<T>(IDbConnection cnn, Row row, ref CommandDefinition command, Type effectiveType)
         {
-			
 			Aop.InvokeExecuting(ref command);
 			object param = command.Parameters;
             var identity = new Identity(command.CommandText, command.CommandType, command.Connection, effectiveType, param?.GetType(), null);
@@ -1442,7 +1440,6 @@ namespace Dapper
 
         private static IEnumerable<TReturn> MultiMapImpl<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn>(this IDbConnection cnn, CommandDefinition command, Delegate map, string splitOn, IDataReader reader, Identity identity, bool finalize)
         {
-			
 			Aop.InvokeExecuting(ref command);
 			object param = command.Parameters;
             identity = identity ?? new Identity(command.CommandText, command.CommandType, command.Connection, typeof(TFirst), param?.GetType(), new[] { typeof(TFirst), typeof(TSecond), typeof(TThird), typeof(TFourth), typeof(TFifth), typeof(TSixth), typeof(TSeventh) });
@@ -1511,7 +1508,6 @@ namespace Dapper
 
         private static IEnumerable<TReturn> MultiMapImpl<TReturn>(this IDbConnection cnn, CommandDefinition command, Type[] types, Func<object[], TReturn> map, string splitOn, IDataReader reader, Identity identity, bool finalize)
         {
-			
 			Aop.InvokeExecuting(ref command);
 			if (types.Length < 1)
             {
