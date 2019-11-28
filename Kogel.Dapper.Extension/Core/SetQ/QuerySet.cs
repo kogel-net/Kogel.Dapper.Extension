@@ -50,23 +50,21 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			Params = new DynamicParameters();
 		}
 
-		internal QuerySet(IDbConnection conn, SqlProvider sqlProvider, Type tableType, LambdaExpression whereExpression, LambdaExpression selectExpression, int? topNum, Dictionary<LambdaExpression, EOrderBy> orderbyExpressionList, IDbTransaction dbTransaction, bool noLock) : base(conn, sqlProvider, dbTransaction)
-		{
-			TableType = tableType;
-			WhereExpression = whereExpression;
-			SelectExpression = selectExpression;
-			TopNum = topNum;
-			OrderbyExpressionList = orderbyExpressionList;
-			NoLock = noLock;
-
-			SetContext = new DataBaseContext<T>
-			{
-				Set = this,
-				OperateType = EOperateType.Query
-			};
-
-			sqlProvider.Context = SetContext;
-		}
+		//internal QuerySet(IDbConnection conn, SqlProvider sqlProvider, Type tableType, LambdaExpression whereExpression, LambdaExpression selectExpression, int? topNum, Dictionary<LambdaExpression, EOrderBy> orderbyExpressionList, IDbTransaction dbTransaction, bool noLock) : base(conn, sqlProvider, dbTransaction)
+		//{
+		//	TableType = tableType;
+		//	WhereExpression = whereExpression;
+		//	SelectExpression = selectExpression;
+		//	TopNum = topNum;
+		//	OrderbyExpressionList = orderbyExpressionList;
+		//	NoLock = noLock;
+		//	SetContext = new DataBaseContext<T>
+		//	{
+		//		Set = this,
+		//		OperateType = EOperateType.Query
+		//	};
+		//	sqlProvider.Context = SetContext;
+		//}
 		
 		#region 基础函数
 		public QuerySet<T> AsTableName(Type type, string tableName)

@@ -67,69 +67,70 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
 				//var comments = conn.Query<Comment>("Select * from Comment").ToList();
 
-				var test1 = conn.QuerySet<Comment>().Where(x => 1 != 1).ToList(x => true);
+				//var test1 = conn.QuerySet<Comment>().Where(x => 1 != 1).ToList(x => true);
 
-				var getIfTest = conn.QuerySet<Comment>()
-					.Get(false, x => new CommentDto()
-					{
-						Id = x.Id,
-						ArticleIds = x.ArticleId
-					}, x => new CommentDto()
-					{
-						Id = x.Id,
-						Content = x.Content
-					});
+				//var getIfTest = conn.QuerySet<Comment>()
+				//	.Get(false, x => new CommentDto()
+				//	{
+				//		Id = x.Id,
+				//		ArticleIds = x.ArticleId
+				//	}, x => new CommentDto()
+				//	{
+				//		Id = x.Id,
+				//		Content = x.Content
+				//	});
 
-				int[] array = new int[] { 1, 2, 3 };
-
-
-				DynamicParameters param = new DynamicParameters();
-				param.Add("Id", 1);
-				var comment = conn.QuerySet<Comment>().Where("Id=@Id", param)
-					.ToList();
+				//int[] array = new int[] { 1, 2, 3 };
 
 
-				//var count = conn.QuerySet<Comment>().Count();
+				//DynamicParameters param = new DynamicParameters();
+				//param.Add("Id", 1);
+				//var comment = conn.QuerySet<Comment>().Where("Id=@Id", param)
+				//	.ToList();
 
-				//单个属性返回
-				var ContentList = conn.QuerySet<Comment>()
-					 //.Where(x => x.Content.IsNotNull() && !(x.Content == "") && x.IsDeleted)
-					 //.WhereIf(!string.IsNullOrEmpty("aaa"), x => x.ArticleId == 1, x => x.ArticleId == 2)
-					 .PageList(1, 20, x => new CommentDto()
-					 {
-						 Id = x.Id,
-						 ArticleIds = x.ArticleId,
-						 ////count = conn.QuerySet<News>().Where(y => y.Id == x.ArticleId).Count(),
-						 NewsList = conn.QuerySet<News>()
-						   .Join<News, Comment>((a, b) => a.Id == b.ArticleId, JoinMode.LEFT, true)
-						   .Where(y => y.Id == x.ArticleId)
-						   .From<News, Comment>()
-						   .ToList((y, z) => new NewsDto()
-						   {
-							   Id = y.Id,
-							   Contents = y.Content,
 
-						   }).ToList(),
-						 NewsDto = conn.QuerySet<News>().Where(y => y.Id == x.ArticleId).Get(y => new NewsDto()
-						 {
-							 Id = y.Id,
-							 Contents = y.Content
-						 }),
-						 IsClickLike = conn.QuerySet<News>().Where(y => y.Id == x.ArticleId).Get(y => true)
-					 });
+				////var count = conn.QuerySet<Comment>().Count();
 
-				var commne = conn.QuerySet<Comment>()
-					.Where(x => x.Id > 0 && new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, }.Contains(x.Id))
-					.Get(x => new
-					{
-						x.Id,
-						x.Content
-					});
+				////单个属性返回
+				//var ContentList = conn.QuerySet<Comment>()
+				//	 //.Where(x => x.Content.IsNotNull() && !(x.Content == "") && x.IsDeleted)
+				//	 //.WhereIf(!string.IsNullOrEmpty("aaa"), x => x.ArticleId == 1, x => x.ArticleId == 2)
+				//	 .PageList(1, 20, x => new CommentDto()
+				//	 {
+				//		 Id = x.Id,
+				//		 ArticleIds = x.ArticleId,
+				//		 ////count = conn.QuerySet<News>().Where(y => y.Id == x.ArticleId).Count(),
+				//		 NewsList = conn.QuerySet<News>()
+				//		   .Join<News, Comment>((a, b) => a.Id == b.ArticleId, JoinMode.LEFT, true)
+				//		   .Where(y => y.Id == x.ArticleId)
+				//		   .From<News, Comment>()
+				//		   .ToList((y, z) => new NewsDto()
+				//		   {
+				//			   Id = y.Id,
+				//			   Contents = y.Content,
+
+				//		   }).ToList(),
+				//		 NewsDto = conn.QuerySet<News>().Where(y => y.Id == x.ArticleId).Get(y => new NewsDto()
+				//		 {
+				//			 Id = y.Id,
+				//			 Contents = y.Content
+				//		 }),
+				//		 IsClickLike = conn.QuerySet<News>().Where(y => y.Id == x.ArticleId).Get(y => true)
+				//	 });
+				//var array1 = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
+				//var commne = conn.QuerySet<Comment>()
+				//	.Where(x => x.Id > 0 && array1.Contains(x.Id))
+				//	.Get(x => new
+				//	{
+				//		x.Id,
+				//		x.Content
+				//	});
 				//翻页
 				var comment1 = conn.QuerySet<Comment>()
 					.Join<Comment, News>((a, b) => a.ArticleId == b.Id)
+					.Where(x=> x.Id.ToString().Equals(3))
 					.Where(x => x.Id.Between(80, 100)
-					&& x.SubTime.AddDays(-10) < DateTime.Now && x.Id > 10
+					&& x.SubTime.AddDays(-10).AddYears(1) < DateTime.Now.AddYears(1) && x.Id > 10
 					&& x.Id > new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id < 3 && x.Id < y.Id).Sum<News>(y => y.Id))
 					.From<Comment, News>()
 					.OrderBy<News>(x => x.Id)

@@ -1,5 +1,6 @@
 ﻿using Kogel.Dapper.Extension.Core.Interfaces;
 using System;
+using System.Text;
 
 namespace Kogel.Dapper.Extension.Oracle.Extension
 {
@@ -13,43 +14,73 @@ namespace Kogel.Dapper.Extension.Oracle.Extension
         {
             return "sysdate";
         }
-        public override string CombineDate(DateOption dateOption, string table, string field, string value)
-        {
-            string result = string.Empty;
+        public override void CombineDate(DateOption dateOption, StringBuilder spliceField, Action fieldInkove, Action valueInkove)
+		{
+            //string result = string.Empty;
             switch (dateOption)
             {
                 case DateOption.AddYears:
                     {
-                        result = $"add_months({table}.{field},{value}*12)";
-                    }
+                        //result = $"add_months({field},{value}*12)";
+						spliceField.Append("add_months(");
+						fieldInkove.Invoke();
+						spliceField.Append(",");
+						valueInkove.Invoke();
+						spliceField.Append("*12)");
+					}
                     break;
                 case DateOption.AddMonths:
                     {
-                        result = $"add_months({table}.{field},{value})";
-                    }
+                        //result = $"add_months({field},{value})";
+						spliceField.Append("add_months(");
+						fieldInkove.Invoke();
+						spliceField.Append(",");
+						valueInkove.Invoke();
+						spliceField.Append(")");
+					}
                     break;
                 case DateOption.AddDays:
                     {
-                        result = $"(({table}.{field})+{value})";
-                    }
+                        //result = $"(({field})+{value})";
+						spliceField.Append("((");
+						fieldInkove.Invoke();
+						spliceField.Append(")+");
+						valueInkove.Invoke();
+						spliceField.Append(")");
+					}
                     break;
                 case DateOption.AddHours:
                     {
-                        result = $"(({table}.{field})+({value}/24))";
-                    }
+                        //result = $"(({field})+({value}/24))";
+						spliceField.Append("((");
+						fieldInkove.Invoke();
+						spliceField.Append(")+");
+						valueInkove.Invoke();
+						spliceField.Append("/24)");
+					}
                     break;
                 case DateOption.AddMinutes:
                     {
-                        result = $"(({table}.{field})+({value}/24/60))";
-                    }
+						//result = $"(({field})+({value}/24/60))";
+						spliceField.Append("((");
+						fieldInkove.Invoke();
+						spliceField.Append(")+");
+						valueInkove.Invoke();
+						spliceField.Append("/24/60)");
+					}
                     break;
                 case DateOption.AddSeconds:
                     {
-                        result = $"(({table}.{field})+({value}/24/60/60))";
-                    }
+						//result = $"(({field})+({value}/24/60/60))";
+						spliceField.Append("((");
+						fieldInkove.Invoke();
+						spliceField.Append(")+");
+						valueInkove.Invoke();
+						spliceField.Append("/24/60/60)");
+					}
                     break;
             }
-            return result;
+            //return result;
         }
     }
 }

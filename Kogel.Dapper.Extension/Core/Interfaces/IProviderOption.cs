@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Text;
 
 namespace Kogel.Dapper.Extension.Core.Interfaces
 {
@@ -37,15 +38,14 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// </summary>
         /// <returns></returns>
         public abstract string GetDate();
-        /// <summary>
-        /// 结合时间处理
-        /// </summary>
-        /// <param name="dateOption">时间操作</param>
-        /// <param name="table">表名</param>
-        /// <param name="field">字段</param>
-        /// <param name="value">值</param>
-        /// <returns></returns>
-        public abstract string CombineDate(DateOption dateOption, string table, string field, string value);
+		/// <summary>
+		/// 结合时间处理
+		/// </summary>
+		/// <param name="dateOption"></param>
+		/// <param name="spliceField"></param>
+		/// <param name="fieldInkove"></param>
+		/// <param name="valueInkove"></param>
+		public abstract void CombineDate(DateOption dateOption, StringBuilder spliceField,  Action fieldInkove, Action valueInkove);
 		/// <summary>
 		/// 模糊转义
 		/// </summary>

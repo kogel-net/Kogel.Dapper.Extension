@@ -1,6 +1,7 @@
 ﻿using Kogel.Dapper.Extension.Core.Interfaces;
 using System;
 using System.Linq.Expressions;
+using System.Text;
 
 namespace Kogel.Dapper.Extension.MsSql.Extension
 {
@@ -26,44 +27,74 @@ namespace Kogel.Dapper.Extension.MsSql.Extension
 		/// <param name="field"></param>
 		/// <param name="value"></param>
 		/// <returns></returns>
-        public override string CombineDate(DateOption dateOption, string table, string field,string value)
+        public override void CombineDate(DateOption dateOption, StringBuilder spliceField, Action fieldInkove, Action valueInkove)
         {
-            string result = string.Empty;
-            switch (dateOption)
-            {
-                case DateOption.AddYears:
-                    {
-                        result = $"dateadd(yy,{value},{table}.{field})";
-                    }
-                    break;
-                case DateOption.AddMonths:
-                    {
-                        result = $"dateadd(mm,{value},{table}.{field})";
-                    }
-                    break;
-                case DateOption.AddDays:
-                    {
-                        result = $"dateadd(dd,{value},{table}.{field})";
-                    }
-                    break;
-                case DateOption.AddHours:
-                    {
-                        result = $"dateadd(hh,{value},{table}.{field})";
-                    }
-                    break;
-                case DateOption.AddMinutes:
-                    {
-                        result = $"dateadd(minute,{value},{table}.{field})";
-                    }
-                    break;
-                case DateOption.AddSeconds:
-                    {
-                        result = $"dateadd(ss,{value},{table}.{field})";
-                    }
-                    break;
-            }
-            return result;
-        }
+            //string result = string.Empty;
+			switch (dateOption)
+			{
+				case DateOption.AddYears:
+					{
+						//result = $"dateadd(yy,{value},{field})";
+						spliceField.Append(" dateadd(yy,");
+						fieldInkove.Invoke();
+						spliceField.Append(",");
+						valueInkove.Invoke();
+						spliceField.Append(" )");
+					}
+					break;
+				case DateOption.AddMonths:
+					{
+						//result = $"dateadd(mm,{value},{field})";
+						spliceField.Append(" dateadd(mm,");
+						fieldInkove.Invoke();
+						spliceField.Append(",");
+						valueInkove.Invoke();
+						spliceField.Append(" )");
+					}
+					break;
+				case DateOption.AddDays:
+					{
+						//result = $"dateadd(dd,{value},{field})";
+						spliceField.Append(" dateadd(dd,");
+						fieldInkove.Invoke();
+						spliceField.Append(",");
+						valueInkove.Invoke();
+						spliceField.Append(" )");
+					}
+					break;
+				case DateOption.AddHours:
+					{
+						//result = $"dateadd(hh,{value},{field})";
+						spliceField.Append(" dateadd(hh,");
+						fieldInkove.Invoke();
+						spliceField.Append(",");
+						valueInkove.Invoke();
+						spliceField.Append(" )");
+					}
+					break;
+				case DateOption.AddMinutes:
+					{
+						//result = $"dateadd(minute,{value},{field})";
+						spliceField.Append(" dateadd(minute,");
+						fieldInkove.Invoke();
+						spliceField.Append(",");
+						valueInkove.Invoke();
+						spliceField.Append(" )");
+					}
+					break;
+				case DateOption.AddSeconds:
+					{
+						//result = $"dateadd(ss,{value},{field})";
+						spliceField.Append(" dateadd(ss,");
+						fieldInkove.Invoke();
+						spliceField.Append(",");
+						valueInkove.Invoke();
+						spliceField.Append(" )");
+					}
+					break;
+			}
+			//return result;
+		}
 		/// <summary>
 		/// 模糊转义
 		/// </summary>
