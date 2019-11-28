@@ -57,7 +57,30 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 			value = $"%{value}%";
 			return value;
 		}
-
+		/// <summary>
+		/// 转小写
+		/// </summary>
+		/// <param name="spliceField"></param>
+		/// <param name="fieldInkove"></param>
+		/// <returns></returns>
+		public virtual void ToLower(StringBuilder spliceField, Action fieldInkove)
+		{
+			spliceField.Append(" lower(");
+			fieldInkove.Invoke();
+			spliceField.Append(") ");
+		}
+		/// <summary>
+		/// 转大写
+		/// </summary>
+		/// <param name="spliceField"></param>
+		/// <param name="fieldInkove"></param>
+		/// <returns></returns>
+		public virtual void ToUpper(StringBuilder spliceField, Action fieldInkove)
+		{
+			spliceField.Append(" upper(");
+			fieldInkove.Invoke();
+			spliceField.Append(") ");
+		}
 		#region 临时属性
 		/// <summary>
 		/// 子查询导航的集合

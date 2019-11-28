@@ -1229,10 +1229,14 @@ namespace Dapper
 
                     var func = tuple.Func;
                     object val = func(reader);
-                    if (val == null || val is T)
+                    if (val == null)
                     {
-                        result = (T)val;
+						result = default(T);
                     }
+					else if(val is T)
+					{
+						result = (T)val;
+					}
                     else
                     {
                         var convertToType = Nullable.GetUnderlyingType(effectiveType) ?? effectiveType;

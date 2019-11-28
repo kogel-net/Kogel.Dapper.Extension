@@ -27,24 +27,24 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         public int Count()
         {
             SqlProvider.FormatCount();
-			return DbCon.QuerySingle<int>(SqlProvider.SqlString, SqlProvider.Params, dbTransaction);
+			return DbCon.QuerySingleOrDefault<int>(SqlProvider.SqlString, SqlProvider.Params, dbTransaction);
         }
 
         /// <inheritdoc />
         public int Sum<TResult>(Expression<Func<TResult, object>> sumExpression)
         {
             SqlProvider.FormatSum(sumExpression);
-            return DbCon.QuerySingle<int>(SqlProvider.SqlString, SqlProvider.Params, dbTransaction);
+            return DbCon.QuerySingleOrDefault<int>(SqlProvider.SqlString, SqlProvider.Params, dbTransaction);
 		}
         public TResult Max<TResult>(Expression<Func<T, TResult>> maxExpression)
         {
             SqlProvider.FormatMax(maxExpression);
-            return DbCon.QuerySingle<TResult>(SqlProvider.SqlString, SqlProvider.Params, dbTransaction);
+            return DbCon.QuerySingleOrDefault<TResult>(SqlProvider.SqlString, SqlProvider.Params, dbTransaction);
 		}
         public TResult Min<TResult>(Expression<Func<T, TResult>> minExpression)
         {
             SqlProvider.FormatMin(minExpression);
-            return DbCon.QuerySingle<TResult>(SqlProvider.SqlString, SqlProvider.Params, dbTransaction);
+            return DbCon.QuerySingleOrDefault<TResult>(SqlProvider.SqlString, SqlProvider.Params, dbTransaction);
 		}
     }
 }

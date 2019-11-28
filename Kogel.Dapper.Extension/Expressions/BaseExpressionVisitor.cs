@@ -39,6 +39,7 @@ namespace Kogel.Dapper.Extension.Expressions
 			this.Param.AddDynamicParams(binary.Param);
 			return node;
 		}
+
 		/// <summary>
 		/// 值对象
 		/// </summary>
@@ -134,6 +135,9 @@ namespace Kogel.Dapper.Extension.Expressions
 			return value.ToString();
 		}
 	}
+	/// <summary>
+	/// 用于解析条件表达式
+	/// </summary>
 	public class WhereExpressionVisitor : BaseExpressionVisitor
 	{
 		private string FieldName { get; set; }//字段
@@ -395,13 +399,51 @@ namespace Kogel.Dapper.Extension.Expressions
 					}
 					break;
 				#endregion
+				#region 字符处理
+				case "ToLower":
+					{
+						providerOption.ToLower(SpliceField,
+							() =>
+							{
+								if (node.Object != null)
+									Visit(node.Object);
+								else
+									Visit(node.Arguments);
+							});
+					}
+					break;
+				case "ToUpper":
+					{
+						providerOption.ToUpper(SpliceField,
+							() =>
+							{
+								if (node.Object != null)
+									Visit(node.Object);
+								else
+									Visit(node.Arguments);
+							});
+					}
+					break;
+				case "Replace":
+					{
+					
+						SpliceField.Append("Replace(");
+						Visit(node.Object);
+						SpliceField.Append(",");
+						Visit(node.Arguments[0]);
+						SpliceField.Append(",");
+						Visit(node.Arguments[1]);
+						SpliceField.Append(")");
+					}
+					break;
+				#endregion
 				default:
 					throw new DapperExtensionException("Kogel.Dapper.Extension不支持此功能");
 			}
 		}
 	}
 	/// <summary>
-	/// 转用于解析二元表达式
+	/// 用于解析二元表达式
 	/// </summary>
 	public class BinaryExpressionVisitor : WhereExpressionVisitor
 	{

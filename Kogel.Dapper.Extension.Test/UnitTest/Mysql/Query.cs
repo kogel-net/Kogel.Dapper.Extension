@@ -117,18 +117,18 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				//		 }),
 				//		 IsClickLike = conn.QuerySet<News>().Where(y => y.Id == x.ArticleId).Get(y => true)
 				//	 });
-				//var array1 = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
-				//var commne = conn.QuerySet<Comment>()
-				//	.Where(x => x.Id > 0 && array1.Contains(x.Id))
-				//	.Get(x => new
-				//	{
-				//		x.Id,
-				//		x.Content
-				//	});
+				var array1 = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
+				var commne = conn.QuerySet<Comment>()
+					.Where(x => x.Id > 0 && array1.Contains(x.Id) && x.Content.Replace("1", "2") == x.Content)
+					.Get(x => new
+					{
+						x.Id,
+						content = x.Content
+					});
 				//翻页
 				var comment1 = conn.QuerySet<Comment>()
 					.Join<Comment, News>((a, b) => a.ArticleId == b.Id)
-					.Where(x=> x.Id.ToString().Equals(3))
+					.Where(x=> x.Id.ToString().ToUpper().Equals("3".ToUpper()))
 					.Where(x => x.Id.Between(80, 100)
 					&& x.SubTime.AddDays(-10).AddYears(1) < DateTime.Now.AddYears(1) && x.Id > 10
 					&& x.Id > new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id < 3 && x.Id < y.Id).Sum<News>(y => y.Id))
@@ -183,7 +183,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
         {
             using (var conn = new MySqlConnection(mysqlConnection))
             {
-                var min = conn.QuerySet<Comment>().Min(x => x.Id);
+				var min = conn.QuerySet<Comment>().Where(x => 1 != 1).Min(x => x.Id);
 
                 var max = conn.QuerySet<Comment>().Max(x => x.Id);
             }

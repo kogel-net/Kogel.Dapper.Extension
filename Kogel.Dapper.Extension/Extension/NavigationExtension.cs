@@ -78,7 +78,7 @@ namespace Kogel.Dapper.Extension.Extension
 
 		public static T QuerySingles<T>(this IDbConnection DbCon, string sql, object param, IDbTransaction transaction)
 		{
-			return DbCon.QuerySingle<T>(sql, param, transaction);
+			return DbCon.QuerySingleOrDefault<T>(sql, param, transaction);
 		}
 	}
 }
