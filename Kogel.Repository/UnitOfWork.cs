@@ -57,8 +57,12 @@ namespace Kogel.Repository
 		/// <param name="command"></param>
 		private void Aop_OnExecuting(ref CommandDefinition command)
 		{
-			command.Connection = this.Connection;
-			command.Transaction = this.Transaction;
+			//相同数据库链接才会进入单元事务
+			if (command.Connection.ConnectionString == this.Connection.ConnectionString)
+			{
+				command.Connection = this.Connection;
+				command.Transaction = this.Transaction;
+			}
 		}
 		/// <summary>
 		/// 提交
