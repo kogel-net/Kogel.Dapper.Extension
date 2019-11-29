@@ -45,10 +45,10 @@ namespace Kogel.Repository
 
 		public void Dispose()
 		{
-			if (OptionsBuilder.Connection != null)
-				OptionsBuilder.Connection.Dispose();
 			if (UnitOfWork != null)
 				UnitOfWork.Dispose();
+			if (OptionsBuilder.Connection != null)
+				OptionsBuilder.Connection.Dispose();
 		}
 		/// <summary>
 		/// 获取查询对象

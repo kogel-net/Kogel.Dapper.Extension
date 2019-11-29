@@ -83,7 +83,7 @@ namespace Kogel.Repository
 		{
 			if (Transaction != null)
 				Transaction.Dispose();
-			if (Transaction != null)
+			if (Connection != null)
 			{
 				if (Connection.State == ConnectionState.Open)
 					Connection.Close();
