@@ -16,6 +16,10 @@ namespace Kogel.Dapper.Extension.Expressions
 	public class BaseExpressionVisitor : ExpressionVisitor
 	{
 		/// <summary>
+		/// 当前组字段解析
+		/// </summary>
+		internal StringBuilder SpliceField { get; set; }
+		/// <summary>
 		/// 字段集合
 		/// </summary>
 		internal List<string> FieldList { get; set; }
@@ -23,6 +27,7 @@ namespace Kogel.Dapper.Extension.Expressions
 		protected IProviderOption providerOption { get; set; }
 		public BaseExpressionVisitor(IProviderOption providerOption)
 		{
+			SpliceField = new StringBuilder();
 			this.FieldList = new List<string>();
 			this.Param = new DynamicParameters();
 			this.providerOption = providerOption;
@@ -35,11 +40,10 @@ namespace Kogel.Dapper.Extension.Expressions
 		protected override Expression VisitBinary(BinaryExpression node)
 		{
 			var binary = new BinaryExpressionVisitor(node, providerOption);
-			GenerateField(binary.SpliceField.ToString());
+			SpliceField.Append(binary.SpliceField);
 			this.Param.AddDynamicParams(binary.Param);
 			return node;
 		}
-
 		/// <summary>
 		/// 值对象
 		/// </summary>
@@ -52,7 +56,7 @@ namespace Kogel.Dapper.Extension.Expressions
 			//值
 			object nodeValue = node.ToConvertAndGetValue();
 			//设置sql
-			GenerateField(paramName);
+			SpliceField.Append(paramName);
 			Param.Add(paramName, nodeValue);
 			return node;
 		}
@@ -70,7 +74,7 @@ namespace Kogel.Dapper.Extension.Expressions
 				var member = EntityCache.QueryEntity(node.Expression.Type);
 				string fieldName = member.FieldPairs[node.Member.Name];
 				string field = (providerOption.IsAsName ? member.GetAsName(providerOption) : "") + providerOption.CombineFieldName(fieldName);
-				GenerateField(field);
+				SpliceField.Append(field);
 			}
 			else
 			{
@@ -79,7 +83,7 @@ namespace Kogel.Dapper.Extension.Expressions
 				//值
 				object nodeValue = node.ToConvertAndGetValue();
 				//设置sql
-				GenerateField(paramName);
+				SpliceField.Append(paramName);
 				Param.Add(paramName, nodeValue);
 			}
 			return node;
@@ -103,36 +107,98 @@ namespace Kogel.Dapper.Extension.Expressions
 			else if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension"))
 			{
 				DynamicParameters parameters = new DynamicParameters();
-				GenerateField("(" + node.MethodCallExpressionToSql(ref parameters) + ")");
+				SpliceField.Append("(" + node.MethodCallExpressionToSql(ref parameters) + ")");
 				Param.AddDynamicParams(parameters);
 			}
 			else
 			{
-				GenerateField(GetFieldValue(node));
+				Operation(node);
 			}
 			return node;
 		}
 		/// <summary>
-		/// 生成字段
+		/// 每组表达式解析
 		/// </summary>
-		/// <param name="field"></param>
-		protected virtual void GenerateField(string field)
+		/// <param name="node"></param>
+		/// <returns></returns>
+		protected override MemberBinding VisitMemberBinding(MemberBinding node)
 		{
-			FieldList.Add(field);
+			SpliceField.Clear();
+			base.VisitMemberBinding(node);
+			FieldList.Add(SpliceField.ToString());
+			return node;
 		}
 		/// <summary>
-		/// 获取字段的值
+		/// 解析函数
 		/// </summary>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		protected virtual string GetFieldValue(Expression expression)
+		/// <param name="node"></param>
+		private void Operation(MethodCallExpression node)
 		{
-			object value = expression.ToConvertAndGetValue();
-			if (value == null)
+			switch (node.Method.Name)
 			{
-				value = "NULL";
+				#region 时间计算
+				case "AddYears":
+				case "AddMonths":
+				case "AddDays":
+				case "AddHours":
+				case "AddMinutes":
+				case "AddSeconds":
+					{
+						var dateOption = (DateOption)Enum.Parse(typeof(DateOption), node.Method.Name);
+						providerOption.CombineDate(dateOption, SpliceField,
+							() =>
+							{
+								Visit(node.Object);
+							},
+							() =>
+							{
+								Visit(node.Arguments);
+							});
+					}
+					break;
+				#endregion
+				#region 字符处理
+				case "ToLower":
+					{
+						providerOption.ToLower(SpliceField,
+							() =>
+							{
+								if (node.Object != null)
+									Visit(node.Object);
+								else
+									Visit(node.Arguments);
+							});
+					}
+					break;
+				case "ToUpper":
+					{
+						providerOption.ToUpper(SpliceField,
+							() =>
+							{
+								if (node.Object != null)
+									Visit(node.Object);
+								else
+									Visit(node.Arguments);
+							});
+					}
+					break;
+				case "Replace":
+					{
+
+						SpliceField.Append("Replace(");
+						Visit(node.Object);
+						SpliceField.Append(",");
+						Visit(node.Arguments[0]);
+						SpliceField.Append(",");
+						Visit(node.Arguments[1]);
+						SpliceField.Append(")");
+					}
+					break;
+				#endregion
+				default:
+					SpliceField.Append(node.ToConvertAndGetValue());
+					break;
 			}
-			return value.ToString();
 		}
 	}
 	/// <summary>
@@ -142,7 +208,7 @@ namespace Kogel.Dapper.Extension.Expressions
 	{
 		private string FieldName { get; set; }//字段
 		private string ParamName { get => (providerOption.ParameterPrefix + FieldName?.Replace(".", "_") + "_" + Param.ParameterNames.Count()); }//带参数标识的
-		internal StringBuilder SpliceField { get; set; }
+		internal new StringBuilder SpliceField { get; set; }
 		internal new DynamicParameters Param { get; set; }
 		public WhereExpressionVisitor(IProviderOption providerOption) : base(providerOption)
 		{
@@ -159,16 +225,12 @@ namespace Kogel.Dapper.Extension.Expressions
 			}
 			else if (node.Method.DeclaringType.FullName.Equals("Kogel.Dapper.Extension.ExpressExpansion"))//自定义扩展方法
 			{
-				//Visit(node.Arguments[0]);
 				Operation(node);
 			}
 			else if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension"))
 			{
 				base.VisitMethodCall(node);
-				foreach (var item in base.FieldList)
-				{
-					SpliceField.Append(item);
-				}
+				this.SpliceField.Append(base.SpliceField);
 				this.Param.AddDynamicParams(base.Param);
 			}
 			else
@@ -426,7 +488,7 @@ namespace Kogel.Dapper.Extension.Expressions
 					break;
 				case "Replace":
 					{
-					
+
 						SpliceField.Append("Replace(");
 						Visit(node.Object);
 						SpliceField.Append(",");

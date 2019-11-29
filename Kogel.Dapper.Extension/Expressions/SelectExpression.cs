@@ -78,7 +78,8 @@ namespace Kogel.Dapper.Extension.Expressions
 					}
 				}
 				fieldArr = fieldList.ToArray();
-            }
+			
+			}
             else//匿名类（暂时不支持子导航属性查询）
             {
 				if (entity.Properties.Length == 0 && entity.Type == typeof(bool))
@@ -90,8 +91,7 @@ namespace Kogel.Dapper.Extension.Expressions
 					fieldArr = entity.Properties.Select(x => x.Name).ToArray();
 				}
             }
-            //开始解析对象
-            Visit(expression);
+			Visit(expression);
 			if (!expression.Body.NodeType.Equals(ExpressionType.MemberAccess))
 			{
 				//开始拼接成查询字段
@@ -114,10 +114,20 @@ namespace Kogel.Dapper.Extension.Expressions
 			}
             this.Param.AddDynamicParams(base.Param);
         }
-
-		protected override Expression VisitUnary(UnaryExpression node)
+		/// <summary>
+		/// 匿名类每组表达式解析
+		/// </summary>
+		/// <param name="node"></param>
+		/// <returns></returns>
+		protected override Expression VisitNew(NewExpression node)
 		{
-			return base.VisitUnary(node);
+			foreach (var argument  in node.Arguments)
+			{
+				base.SpliceField.Clear();
+				base.Visit(argument);
+				base.FieldList.Add(SpliceField.ToString());
+			}
+			return node;
 		}
 	}
 }
