@@ -194,6 +194,13 @@ namespace Kogel.Dapper.Extension.Expressions
 						SpliceField.Append(")");
 					}
 					break;
+				case "Trim":
+					{
+						SpliceField.Append("Trim(");
+						Visit(node.Object);
+						SpliceField.Append(")");
+					}
+					break;
 				#endregion
 				default:
 					SpliceField.Append(node.ToConvertAndGetValue());
@@ -495,6 +502,13 @@ namespace Kogel.Dapper.Extension.Expressions
 						Visit(node.Arguments[0]);
 						SpliceField.Append(",");
 						Visit(node.Arguments[1]);
+						SpliceField.Append(")");
+					}
+					break;
+				case "Trim":
+					{
+						SpliceField.Append("Trim(");
+						Visit(node.Object);
 						SpliceField.Append(")");
 					}
 					break;

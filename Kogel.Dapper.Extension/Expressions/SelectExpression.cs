@@ -78,7 +78,6 @@ namespace Kogel.Dapper.Extension.Expressions
 					}
 				}
 				fieldArr = fieldList.ToArray();
-			
 			}
             else//匿名类（暂时不支持子导航属性查询）
             {

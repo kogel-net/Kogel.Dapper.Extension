@@ -123,7 +123,8 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 					.Get(x => new
 					{
 						x.Id,
-						content = x.Content.ToUpper()
+						content = x.Content.ToUpper(),
+						test = (x.Content + "   "+x.Content).Trim()
 					});
 				//翻页
 				var comment1 = conn.QuerySet<Comment>()
