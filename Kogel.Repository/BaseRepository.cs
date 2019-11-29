@@ -19,8 +19,7 @@ namespace Kogel.Repository
 		/// <summary>
 		/// 连接对象
 		/// </summary>
-		public IDbConnection Orm => OptionsBuilder?.Connection ?? throw new DapperExtensionException("请在 OnConfiguring 中配置Connection");
-
+		public IDbConnection Orm{ get => OptionsBuilder?.Connection ?? throw new DapperExtensionException("请在 OnConfiguring 中配置Connection"); }
 		/// <summary>
 		/// 工作单元
 		/// </summary>

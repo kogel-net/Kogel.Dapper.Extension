@@ -11,6 +11,8 @@ namespace Kogel.Repository.Interfaces
 {
 	public interface IBaseRepository<T>
 	{
+		IDbConnection Orm { get; }
+		IUnitOfWork UnitOfWork { get; set; }
 		/// <summary>
 		/// 获取查询对象
 		/// </summary>
