@@ -119,7 +119,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				//	 });
 				var array1 = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 				var commne = conn.QuerySet<Comment>()
-					.Where(x => x.Id > 0 && array1.Contains(x.Id) && x.Content.Replace("1", "2") == x.Content)
+					.Where(x => x.Id > 0 && array1.Contains(x.Id) && x.Content.Replace("1", "2") == x.Content && x.Content.Contains(null))
 					.Get(x => new
 					{
 						x.Id,

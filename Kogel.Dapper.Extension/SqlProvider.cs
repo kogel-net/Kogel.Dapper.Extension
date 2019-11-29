@@ -146,5 +146,13 @@ namespace Kogel.Dapper.Extension
 		{
 			return (DataBaseContext<T>)Context;
 		}
+		/// <summary>
+		/// 创建副本
+		/// </summary>
+		/// <returns></returns>
+		public SqlProvider Copy()
+		{
+			return Activator.CreateInstance(this.GetType()) as SqlProvider;
+		}
 	}
 }

@@ -341,8 +341,11 @@ namespace Kogel.Dapper.Extension.Expressions
 						if (node.Arguments[0].Type.FullName == "System.String")
 						{
 							Visit(node.Object);
-							this.SpliceField.Append(" LIKE ");
-							Visit(node.Arguments);
+							var value = node.Arguments[0].ToConvertAndGetValue();
+							string param = ParamName;
+							value = providerOption.FuzzyEscaping(value, ref param);
+							this.SpliceField.Append($" LIKE {param}");
+							Param.Add(ParamName, value);
 						}
 						else
 						{

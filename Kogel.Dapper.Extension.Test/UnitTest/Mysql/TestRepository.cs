@@ -64,7 +64,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
 
 			//根据主键获取
-			var getComment = testRepository.FindById(3);
+			var getComment = testRepository.FindById(4);
 
 			testRepository.Insert(getComment);
 	

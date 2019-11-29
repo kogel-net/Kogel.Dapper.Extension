@@ -52,7 +52,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// <param name="value"></param>
 		/// <param name="param"></param>
 		/// <returns></returns>
-		public virtual object FuzzyEscaping(object value,ref string param)
+		public virtual object FuzzyEscaping(object value, ref string param)
 		{
 			value = $"%{value}%";
 			return value;

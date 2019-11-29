@@ -56,7 +56,7 @@ namespace Kogel.Repository
 		/// <returns></returns>
 		public QuerySet<T> QuerySet()
 		{
-			return new QuerySet<T>(OptionsBuilder.Connection, OptionsBuilder.Provider, null);
+			return new QuerySet<T>(OptionsBuilder.Connection, OptionsBuilder.Provider.Copy(), null);
 		}
 		/// <summary>
 		/// 获取查询对象
@@ -65,7 +65,7 @@ namespace Kogel.Repository
 		/// <returns></returns>
 		public QuerySet<T> QuerySet(IDbTransaction transaction)
 		{
-			return new QuerySet<T>(OptionsBuilder.Connection, OptionsBuilder.Provider, transaction);
+			return new QuerySet<T>(OptionsBuilder.Connection, OptionsBuilder.Provider.Copy(), transaction);
 		}
 		/// <summary>
 		/// 获取编辑对象
@@ -73,7 +73,7 @@ namespace Kogel.Repository
 		/// <returns></returns>
 		public CommandSet<T> CommandSet()
 		{
-			return new CommandSet<T>(OptionsBuilder.Connection, OptionsBuilder.Provider, null);
+			return new CommandSet<T>(OptionsBuilder.Connection, OptionsBuilder.Provider.Copy(), null);
 		}
 		/// <summary>
 		/// 获取编辑对象
@@ -82,7 +82,7 @@ namespace Kogel.Repository
 		/// <returns></returns>
 		public CommandSet<T> CommandSet(IDbTransaction transaction)
 		{
-			return new CommandSet<T>(OptionsBuilder.Connection, OptionsBuilder.Provider, transaction);
+			return new CommandSet<T>(OptionsBuilder.Connection, OptionsBuilder.Provider.Copy(), transaction);
 		}
 		/// <summary>
 		/// 根据主键获取当前实体数据
