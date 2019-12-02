@@ -81,7 +81,7 @@ namespace Kogel.Dapper.Extension.Expressions
 			}
             else//匿名类（暂时不支持子导航属性查询）
             {
-				if (entity.Properties.Length == 0 && entity.Type == typeof(bool))
+				if (entity.Properties.Length == 0)
 				{
 					fieldArr = new string[] { "field1" };
 				}
@@ -109,7 +109,10 @@ namespace Kogel.Dapper.Extension.Expressions
 			else
 			{
 				//单个字段返回
-				_sqlCmd.Append(base.FieldList[0]);
+				if (base.FieldList.Any())
+					_sqlCmd.Append(base.FieldList[0]);
+				else
+					_sqlCmd.Append(base.SpliceField);
 			}
             this.Param.AddDynamicParams(base.Param);
         }

@@ -50,6 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\ActivitySendPoints.cs" />
     <Compile Include="Model\Comment.cs" />
     <Compile Include="Model\News.cs" />
     <Compile Include="Model\Order.cs" />
