@@ -96,7 +96,6 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			SqlProvider.FormatToList<T>();
 			return await DbCon.QueryAsyncs<T>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
 		}
-
 		public List<T> ToList()
 		{
 			SqlProvider.FormatToList<T>();

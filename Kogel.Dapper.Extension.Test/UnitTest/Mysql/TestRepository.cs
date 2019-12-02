@@ -9,10 +9,12 @@ using MySql.Data;
 using MySql.Data.MySqlClient;
 using Kogel.Dapper.Extension.MySql;
 using Kogel.Dapper.Extension.Test.Model;
+using System.Data.SqlClient;
+using Kogel.Dapper.Extension.MsSql;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 {
-	public class TestRepository : BaseRepository<Comment>//Comment为实体类
+	public class MysqlRepository : BaseRepository<Comment>//Comment为实体类
 	{
 		public override void OnConfiguring(RepositoryOptionsBuilder builder)
 		{
@@ -23,56 +25,52 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 		}
 	}
 
+	public class SqlServerRepository : BaseRepository<Lige.Model.Order>
+	{
+		public override void OnConfiguring(RepositoryOptionsBuilder builder)
+		{
+			builder
+				.BuildConnection(new SqlConnection("server=localhost;database=Lige;user=sa;password=!RisingupTech/././.;max pool size=300"))
+				.BuildProvider(new MsSqlProvider());
+		}
+	}
+
 	public class TestRepositoryQuery
 	{
 		public void Test()
 		{
-			using (TestRepository testRepository = new TestRepository())
+			using (MysqlRepository mysqlRepository = new MysqlRepository())
 			{
-				var querySet = testRepository.QuerySet();//查询对象
-				var commandSet = testRepository.CommandSet();//执行对象
-			}
-
-			using (TestRepository testRepository = new TestRepository())
-			{
-				//开始事务
-				testRepository.UnitOfWork.BeginTransaction(() =>
+				using (SqlServerRepository sqlServerRepository = new SqlServerRepository())
 				{
-					var comment = testRepository.Orm.QuerySet<Comment>().ToList();
+					try
+					{
+						//开启mysql事务
+						var mysqlUnitWork = mysqlRepository.UnitOfWork.BeginTransaction(() =>
+						{
+							mysqlRepository.Insert(new Comment()
+							{
+								Content = "test"
+							});
+						});
+						//开始sqlserver事务
+						var sqlserverUnitWork = sqlServerRepository.UnitOfWork.BeginTransaction(() =>
+						{
+							sqlServerRepository.Insert(new Lige.Model.Order()
+							{
+								Remark = "test"
+							});
+						});
+						//都完成后一起提交
+						mysqlUnitWork.Commit();
+						sqlserverUnitWork.Commit();
+					}
+					catch (System.Exception ex)
+					{
 
-					testRepository.Orm.CommandSet<Comment>()
-						.Where(x => x.Id == comment.FirstOrDefault().Id)
-						.Update(comment.FirstOrDefault());
-					//其他仓储类代码块
-					new TestRepositoryQuery1().Test();
-				});
-			
-				//提交
-				testRepository.UnitOfWork.Commit();
+					}
+				}
 			}
-		}
-	}
-	public class TestRepositoryQuery1
-	{
-		public void Test()
-		{
-			TestRepository testRepository = new TestRepository();
-			var comment = testRepository.Orm.QuerySet<Comment>().PageList(1,10).Items;
-
-			//testRepository.Orm.CommandSet<Comment>()
-			//	.Insert(comment);
-
-
-			//根据主键获取
-			var getComment = testRepository.FindById(4);
-
-			testRepository.Insert(getComment);
-	
-			testRepository.Update(getComment);
-
-			testRepository.Delete(getComment.Id);
-
-
 		}
 	}
 }

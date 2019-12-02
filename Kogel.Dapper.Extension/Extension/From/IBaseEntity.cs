@@ -11,10 +11,13 @@ using Dapper;
 using Kogel.Dapper.Extension.Exception;
 using System.Linq.Expressions;
 using System;
+using Kogel.Dapper.Extension.Attributes;
 
 namespace Kogel.Dapper.Extension
 {
-	public class IBaseEntity<T> where T : class
+	public class IBaseEntity<T> //where T : class
 	{
+		//[Identity]
+		//public virtual T Id { get; set; }
 	}
 }

@@ -23,14 +23,14 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// </summary>
         public StringBuilder OrderbyBuilder { get; protected set; }
 
-        public LambdaExpression SelectExpression { get; internal set; }
+		public LambdaExpression SelectExpression { get; internal set; }
 
         public bool NoLock { get; protected set; }
 
         #region sql字符串对象
-        public StringBuilder WhereBuilder { get; protected set; }
+        internal StringBuilder WhereBuilder { get; set; }
 
-        public DynamicParameters Params { get; set; }
+		internal DynamicParameters Params { get; set; }
         #endregion
     }
 }

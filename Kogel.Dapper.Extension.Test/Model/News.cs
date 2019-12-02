@@ -15,17 +15,17 @@ namespace Kogel.Dapper.Extension.Test.Model
     /// 描述：新闻实体类
     /// </summary>
     //[Display(Schema ="dbo")]
-    public class News
+    public class News:IBaseEntity<int>
     {
-        /// <summary>
+		/// <summary>
 		/// 新闻主键
-        /// </summary>
+		/// </summary>
 		[Identity]
-        public long Id { get; set; }
-        /// <summary>
-        /// 新闻标签
-        /// </summary>
-        public string NewsLabel { get; set; }
+		public int Id { get; set; }
+		/// <summary>
+		/// 新闻标签
+		/// </summary>
+		public string NewsLabel { get; set; }
         /// <summary>
         /// 头部信息
         /// </summary>

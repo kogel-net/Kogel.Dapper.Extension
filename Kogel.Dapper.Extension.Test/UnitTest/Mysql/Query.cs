@@ -12,6 +12,7 @@ using Dapper;
 using System.Threading;
 using System.Diagnostics;
 using Kogel.Dapper.Extension.Model;
+using System.Data;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 {
@@ -83,10 +84,15 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				//int[] array = new int[] { 1, 2, 3 };
 
 
-				//DynamicParameters param = new DynamicParameters();
-				//param.Add("Id", 1);
-				//var comment = conn.QuerySet<Comment>().Where("Id=@Id", param)
-				//	.ToList();
+				DynamicParameters param = new DynamicParameters();
+				param.Add("Id",10);
+				var comment = conn.QuerySet<Comment>().Where("Id=@Id", param)
+					.ToList();
+
+				////使用导航属性
+				//var list = conn.Query<Comment, News>("SELECT * FROM COMMENT AS A LEFT JOIN NEWS AS B ON A.ArticleId=B.Id", (a, b) => {
+				//	a.News = b;
+    // 				}, splitOn: "Id");
 
 
 				////var count = conn.QuerySet<Comment>().Count();
@@ -199,7 +205,5 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
             public string test2 { set; get; }
         }
-
-     
     }
 }

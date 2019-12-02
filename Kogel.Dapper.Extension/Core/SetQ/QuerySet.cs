@@ -49,32 +49,32 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			WhereBuilder = new StringBuilder();
 			Params = new DynamicParameters();
 		}
-
-		//internal QuerySet(IDbConnection conn, SqlProvider sqlProvider, Type tableType, LambdaExpression whereExpression, LambdaExpression selectExpression, int? topNum, Dictionary<LambdaExpression, EOrderBy> orderbyExpressionList, IDbTransaction dbTransaction, bool noLock) : base(conn, sqlProvider, dbTransaction)
-		//{
-		//	TableType = tableType;
-		//	WhereExpression = whereExpression;
-		//	SelectExpression = selectExpression;
-		//	TopNum = topNum;
-		//	OrderbyExpressionList = orderbyExpressionList;
-		//	NoLock = noLock;
-		//	SetContext = new DataBaseContext<T>
-		//	{
-		//		Set = this,
-		//		OperateType = EOperateType.Query
-		//	};
-		//	sqlProvider.Context = SetContext;
-		//}
-		
 		#region 基础函数
 		public QuerySet<T> AsTableName(Type type, string tableName)
 		{
 			SqlProvider.AsTableNameDic.Add(type, tableName);
 			return this;
 		}
-
+		/// <summary>
+		/// 不锁表查询(此方法只支持Mssql)
+		/// </summary>
+		/// <returns></returns>
+		public QuerySet<T> WithNoLock()
+		{
+			NoLock = true;
+			return this;
+		}
+		/// <summary>
+		/// 字段匹配[已弃用]
+		/// </summary>
+		/// <typeparam name="TSource"></typeparam>
+		/// <returns></returns>
+		public QuerySet<T> FieldMatch<TSource>()
+		{
+			return this;
+		}
 		#endregion
-		#region Where
+		#region 条件
 		public QuerySet<T> Where(Expression<Func<T, bool>> predicate)
 		{
 			WhereExpressionList.Add(predicate);
@@ -251,16 +251,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			return this;
 		}
 		#endregion
-		/// <summary>
-		/// 不锁表查询(此方法只支持Mssql)
-		/// </summary>
-		/// <returns></returns>
-		public QuerySet<T> WithNoLock()
-		{
-			NoLock = true;
-			return this;
-		}
-		#region Join
+		#region 连表
 		/// <summary>
 		/// 连表
 		/// </summary>
@@ -336,18 +327,6 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			return this;
 		}
 		#endregion
-		/// <summary>
-		/// 字段匹配[已弃用]
-		/// </summary>
-		/// <typeparam name="TSource"></typeparam>
-		/// <returns></returns>
-		public QuerySet<T> FieldMatch<TSource>()
-		{
-			EntityObject entity = EntityCache.QueryEntity(typeof(TSource));
-			SqlMapper.SetTypeMap(entity.Type, new CustomPropertyTypeMap(entity.Type, (type, column) => type.GetPropertys(entity.FieldPairs.FirstOrDefault(x => x.Value.Equals(column)).Key)));
-			return this;
-		}
-
 		#region 多表索引扩展
 		public ISelectFrom<T, T1, T2> From<T1, T2>()
 		{
