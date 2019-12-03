@@ -141,7 +141,7 @@ namespace Kogel.Dapper.Extension.Expressions
 						var convertOption = (ConvertOption)Enum.Parse(typeof(ConvertOption), node.Method.Name);
 						providerOption.CombineConvert(convertOption, SpliceField, () =>
 						{
-							Visit(node.Object);
+							Visit(node.Object != null ? node.Object : node.Arguments[0]);
 						});
 					}
 					break;

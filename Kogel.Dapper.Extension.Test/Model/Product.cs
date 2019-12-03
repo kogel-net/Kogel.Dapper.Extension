@@ -144,5 +144,24 @@ namespace Lige.Model
 		public string Ext_F1 { get; set; }
 		#endregion Model
 	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	public class GiftDto
+	{
+		/// <summary>
+		/// 
+		/// </summary>
+		public string ProductCode { get; set; }
+		/// <summary>
+		/// 名称
+		/// </summary>
+		public string Name { get; set; }
+		/// <summary>
+		/// 库存
+		/// </summary>
+		public int Stock { get; set; }
+	}
 }
 
