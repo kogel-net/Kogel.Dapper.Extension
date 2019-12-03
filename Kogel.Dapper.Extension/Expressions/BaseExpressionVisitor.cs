@@ -100,10 +100,6 @@ namespace Kogel.Dapper.Extension.Expressions
 			{
 				return node;
 			}
-			if (node.Method.DeclaringType.FullName.Contains("Convert"))//使用convert函数里待执行的sql数据
-			{
-				Visit(node.Arguments[0]);
-			}
 			else if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension"))
 			{
 				DynamicParameters parameters = new DynamicParameters();
@@ -136,6 +132,20 @@ namespace Kogel.Dapper.Extension.Expressions
 		{
 			switch (node.Method.Name)
 			{
+				#region Convert转换计算
+				case "ToInt32":
+				case "ToString":
+				case "ToDecimal":
+				case "ToDouble":
+					{
+						var convertOption = (ConvertOption)Enum.Parse(typeof(ConvertOption), node.Method.Name);
+						providerOption.CombineConvert(convertOption, SpliceField, () =>
+						{
+							Visit(node.Object);
+						});
+					}
+					break;
+				#endregion
 				#region 时间计算
 				case "AddYears":
 				case "AddMonths":
@@ -226,11 +236,7 @@ namespace Kogel.Dapper.Extension.Expressions
 		protected override Expression VisitMethodCall(MethodCallExpression node)
 		{
 			//使用convert函数里待执行的sql数据
-			if (node.Method.DeclaringType.FullName.Contains("Convert"))
-			{
-				Visit(node.Arguments[0]);
-			}
-			else if (node.Method.DeclaringType.FullName.Equals("Kogel.Dapper.Extension.ExpressExpansion"))//自定义扩展方法
+		    if (node.Method.DeclaringType.FullName.Equals("Kogel.Dapper.Extension.ExpressExpansion"))//自定义扩展方法
 			{
 				Operation(node);
 			}
@@ -436,17 +442,11 @@ namespace Kogel.Dapper.Extension.Expressions
 				case "ToDecimal":
 				case "ToDouble":
 					{
-						Visit(node.Object);
-						if (node.Arguments.Count > 0)//Convert.ToInt32("xxx") or Convert.ToString("xxx")
+						var convertOption = (ConvertOption)Enum.Parse(typeof(ConvertOption), node.Method.Name);
+						providerOption.CombineConvert(convertOption, SpliceField, () =>
 						{
-							this.SpliceField.AppendFormat(" {0}", ParamName);
-							var argumentExpression = (ConstantExpression)node.Arguments[0];
-							Param.Add(ParamName, argumentExpression.ToConvertAndGetValue());
-						}
-						else
-						{
-							//xxx.ToString
-						}
+							Visit(node.Object != null ? node.Object : node.Arguments[0]);
+						});
 					}
 					break;
 				#endregion

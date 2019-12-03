@@ -35,6 +35,10 @@ namespace Lige.ViewModel.APP.Shopping
 		/// </summary>
 		public decimal Point { get; set; }
 		/// <summary>
+		/// 是否存在明细
+		/// </summary>
+		public bool IsAnyOrderDetail { get; set; }
+		/// <summary>
 		/// 订单明细
 		/// </summary>
 		public List<OrderDetailResDto> OrderDetailList { get; set; }

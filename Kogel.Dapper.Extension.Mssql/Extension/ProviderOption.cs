@@ -20,6 +20,52 @@ namespace Kogel.Dapper.Extension.MsSql.Extension
             return "getdate()";
         }
 		/// <summary>
+		/// 结合转换处理
+		/// </summary>
+		/// <param name="convertOption"></param>
+		/// <param name="spliceField"></param>
+		/// <param name="fieldInkove"></param>
+		public override void CombineConvert(ConvertOption convertOption, StringBuilder spliceField, Action fieldInkove)
+		{
+			switch (convertOption)
+			{
+				case ConvertOption.ToBoolean:
+					{
+						fieldInkove.Invoke();
+						//spliceField.Append(" not in ('0',false)");
+					}
+					break;
+				case ConvertOption.ToDecimal:
+					{
+						spliceField.Append(" cast(");
+						fieldInkove.Invoke();
+						spliceField.Append(" as decimal(36,19))");
+					}
+					break;
+				case ConvertOption.ToDouble:
+					{
+						spliceField.Append(" cast(");
+						fieldInkove.Invoke();
+						spliceField.Append(" as decimal(36,16))");
+					}
+					break;
+				case ConvertOption.ToInt32:
+					{
+						spliceField.Append("cast(");
+						fieldInkove.Invoke();
+						spliceField.Append(" as int)");
+					}
+					break;
+				case ConvertOption.ToString:
+					{
+						spliceField.Append("cast(");
+						fieldInkove.Invoke();
+						spliceField.Append(" as nvarchar(2000))");
+					}
+					break;
+			}
+		}
+		/// <summary>
 		/// 时间转义
 		/// </summary>
 		/// <param name="dateOption"></param>
@@ -27,7 +73,7 @@ namespace Kogel.Dapper.Extension.MsSql.Extension
 		/// <param name="field"></param>
 		/// <param name="value"></param>
 		/// <returns></returns>
-        public override void CombineDate(DateOption dateOption, StringBuilder spliceField, Action fieldInkove, Action valueInkove)
+		public override void CombineDate(DateOption dateOption, StringBuilder spliceField, Action fieldInkove, Action valueInkove)
         {
             //string result = string.Empty;
 			switch (dateOption)

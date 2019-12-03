@@ -33,11 +33,19 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         {
             return OpenQuote + field + CloseQuote;
         }
+	
         /// <summary>
         /// 获取当前时间
         /// </summary>
         /// <returns></returns>
         public abstract string GetDate();
+		/// <summary>
+		/// 结合转换处理
+		/// </summary>
+		/// <param name="convertOption"></param>
+		/// <param name="spliceField"></param>
+		/// <param name="fieldInkove"></param>
+		public abstract void CombineConvert(ConvertOption convertOption, StringBuilder spliceField, Action fieldInkove);
 		/// <summary>
 		/// 结合时间处理
 		/// </summary>
@@ -96,6 +104,20 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		public bool IsAsName { get; set; }
 		#endregion
 	}
+	/// <summary>
+	/// 转换处理
+	/// </summary>
+	public enum ConvertOption
+	{
+		ToInt32,
+		ToString,
+		ToDecimal,
+		ToDouble,
+		ToBoolean
+	}
+	/// <summary>
+	/// 时间格式处理
+	/// </summary>
 	public enum DateOption
     {
         AddYears,

@@ -15,11 +15,11 @@ using Lige.ViewModel.APP.Shopping;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 {
-    public class Query
-    {
-        string mssqlConnection = "Data Source=42.157.195.21,4344;Initial Catalog=Qx_Sport_Common;User ID=qxdev;Password=qxdev123456;";
-        public void Test()
-        {
+	public class Query
+	{
+		string mssqlConnection = "Data Source=42.157.195.21,4344;Initial Catalog=Qx_Sport_Common;User ID=qxdev;Password=qxdev123456;";
+		public void Test()
+		{
 			//        using (var conn = new SqlConnection(mssqlConnection))
 			//        {
 			//var aaa = conn.QuerySet<Comment>().Where(x => 1 == 1).ToList();
@@ -75,50 +75,58 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 
 			using (var connection = new SqlConnection("server=risingup.life98.cn,55940;database=Lige;user=sa;password=!RisingupTech/././.;max pool size=300"))
 			{
-				//	var pageList = connection.QuerySet<Lige.Model.Order>()
-				//		.WhereIf(0 != 0, x => x.IsDelete == false && x.Status == 0, x => x.IsDelete == false)
-				//		.OrderByDescing(x => x.CreateDate)
-				//		.PageList(1, 10, x => new OrderResDto()
-				//		{
-				//			Id = x.Id,
-				//			OrderNo = x.OrderNo,
-				//			OrderTime = x.CreateDate,
-				//			Status = x.Status,
-				//			Amount = x.Amount,
-				//			Point = x.Point,
-				//			OrderDetailList = connection.QuerySet<OrderDetail>()
-				//			.Where(y => y.IsDelete == false && y.OrderNo == x.OrderNo)
-				//			.WhereIf(1 == 1, y => y.IsDelete == false && y.OrderNo == x.OrderNo, y => y.IsDelete == false)
-				//			.Join<OrderDetail, Product>((a, b) => a.ProductCode == b.ProductCode, JoinMode.LEFT, true)
-				//			.From<OrderDetail, Product>()
-				//			.OrderBy<Product>(y => y.Id)
-				//			.ToList(true, (a, b) => new OrderDetailResDto()
-				//			{
-				//				Id = a.Id,
-				//				Name = a.ProductName,
-				//				Point = a.Point,
-				//				Price = a.Price,
-				//				Qty = a.Qty,
-				//				OriginalPrice = b.Price,
-				//				OriginalPoint = b.Point,
-				//			}, null)
-				//		});
+				var pageList = connection.QuerySet<Lige.Model.Order>()
+					.WhereIf(0 != 0, x => x.IsDelete == false && x.Status == 0, x => x.IsDelete == false)
+					.OrderByDescing(x => x.CreateDate)
+					.PageList(1, 10, x => new OrderResDto()
+					{
+						Id = x.Id,
+						OrderNo = x.OrderNo,
+						OrderTime = x.CreateDate,
+						Status = x.Status,
+						Amount = x.Amount,
+						Point = x.Point,
+						IsAnyOrderDetail = connection.QuerySet<OrderDetail>().Where(y => y.OrderNo == x.OrderNo).Get(y => true),
+						OrderDetailList = connection.QuerySet<OrderDetail>()
+						.Where(y => y.IsDelete == false && y.OrderNo == x.OrderNo)
+						.WhereIf(1 == 1, y => y.IsDelete == false && y.OrderNo == x.OrderNo, y => y.IsDelete == false)
+						.Join<OrderDetail, Product>((a, b) => a.ProductCode == b.ProductCode, JoinMode.LEFT, true)
+						.From<OrderDetail, Product>()
+						.OrderBy<Product>(y => y.Id)
+						.ToList(true, (a, b) => new OrderDetailResDto()
+						{
+							Id = a.Id,
+							Name = a.ProductName,
+							Point = a.Point,
+							Price = a.Price,
+							Qty = a.Qty,
+							OriginalPrice = b.Price,
+							OriginalPoint = b.Point,
+						}, null)
+					});
 				//	var test = connection.QuerySet<Order>()
 				//		.OrderBy(x => x.Id)
 				//		.PageList(1, 10);
 
-				//获取上次同步成功的最大id
+				////获取上次同步成功的最大id
 				var maxId = connection.QuerySet<Lige.Model.ActivitySendPoints>()
 					.OrderByDescing(x => x.SqlId)
 					.Get(x => x.SqlId);
+				connection.CommandSet<Product>()
+					.Where(x => x.Id == 44)
+					.Update(x => new Product()
+					{
+						Ext_F1 = (Convert.ToInt32(x.Ext_F1) + 1).ToString()
+					});
+
 			}
-			
+
 
 		}
 
 		private void Aop_OnExecuting(ref CommandDefinition command)
 		{
-			
+
 		}
 	}
 }

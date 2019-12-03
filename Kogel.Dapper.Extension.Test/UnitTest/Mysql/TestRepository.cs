@@ -56,10 +56,10 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 						//开始sqlserver事务
 						var sqlserverUnitWork = sqlServerRepository.UnitOfWork.BeginTransaction(() =>
 						{
-							sqlServerRepository.Insert(new Lige.Model.Order()
-							{
-								Remark = "test"
-							});
+							//sqlServerRepository.Insert(new Lige.Model.Order()
+							//{
+							//	Remark = "test"
+							//});
 						});
 						//都完成后一起提交
 						mysqlUnitWork.Commit();

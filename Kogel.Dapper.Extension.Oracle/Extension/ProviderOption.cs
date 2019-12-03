@@ -14,7 +14,60 @@ namespace Kogel.Dapper.Extension.Oracle.Extension
         {
             return "sysdate";
         }
-        public override void CombineDate(DateOption dateOption, StringBuilder spliceField, Action fieldInkove, Action valueInkove)
+		/// <summary>
+		/// 结合转换处理
+		/// </summary>
+		/// <param name="convertOption"></param>
+		/// <param name="spliceField"></param>
+		/// <param name="fieldInkove"></param>
+		public override void CombineConvert(ConvertOption convertOption, StringBuilder spliceField, Action fieldInkove)
+		{
+			switch (convertOption)
+			{
+				case ConvertOption.ToBoolean:
+					{
+						fieldInkove.Invoke();
+						//spliceField.Append(" not in ('0','false')");
+					}
+					break;
+				case ConvertOption.ToDecimal:
+					{
+						spliceField.Append(" cast(");
+						fieldInkove.Invoke();
+						spliceField.Append(" as number)");
+					}
+					break;
+				case ConvertOption.ToDouble:
+					{
+						spliceField.Append(" cast(");
+						fieldInkove.Invoke();
+						spliceField.Append(" as number)");
+					}
+					break;
+				case ConvertOption.ToInt32:
+					{
+						spliceField.Append(" cast(");
+						fieldInkove.Invoke();
+						spliceField.Append(" as number)");
+					}
+					break;
+				case ConvertOption.ToString:
+					{
+						spliceField.Append("to_char(");
+						fieldInkove.Invoke();
+						spliceField.Append(" )");
+					}
+					break;
+			}
+		}
+		/// <summary>
+		/// 结合时间处理
+		/// </summary>
+		/// <param name="dateOption"></param>
+		/// <param name="spliceField"></param>
+		/// <param name="fieldInkove"></param>
+		/// <param name="valueInkove"></param>
+		public override void CombineDate(DateOption dateOption, StringBuilder spliceField, Action fieldInkove, Action valueInkove)
 		{
             //string result = string.Empty;
             switch (dateOption)
