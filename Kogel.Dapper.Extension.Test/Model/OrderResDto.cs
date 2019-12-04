@@ -48,10 +48,14 @@ namespace Lige.ViewModel.APP.Shopping
 		/// </summary>
 		public List<OrderDetailResDto> OrderDetailList { get; set; }
 	}
+	public class test: IBaseEntity<int>
+	{
+
+	}
 	/// <summary>
 	/// 订单明细
 	/// </summary>
-	public class OrderDetailResDto : IBaseEntity<OrderDetailResDto>
+	public class OrderDetailResDto : test
 	{
 		/// <summary>
 		/// 

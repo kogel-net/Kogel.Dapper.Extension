@@ -137,6 +137,7 @@ namespace Kogel.Dapper.Extension.Expressions
 				case "ToString":
 				case "ToDecimal":
 				case "ToDouble":
+				case "ToBoolean":
 					{
 						var convertOption = (ConvertOption)Enum.Parse(typeof(ConvertOption), node.Method.Name);
 						providerOption.CombineConvert(convertOption, SpliceField, () =>
@@ -441,6 +442,7 @@ namespace Kogel.Dapper.Extension.Expressions
 				case "ToString":
 				case "ToDecimal":
 				case "ToDouble":
+				case "ToBoolean":
 					{
 						var convertOption = (ConvertOption)Enum.Parse(typeof(ConvertOption), node.Method.Name);
 						providerOption.CombineConvert(convertOption, SpliceField, () =>

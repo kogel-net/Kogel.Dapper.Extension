@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Model\ActivitySendPoints.cs" />
     <Compile Include="Model\Comment.cs" />
+    <Compile Include="Model\GiftDetail.cs" />
     <Compile Include="Model\News.cs" />
     <Compile Include="Model\Order.cs" />
     <Compile Include="Model\OrderDetail.cs" />

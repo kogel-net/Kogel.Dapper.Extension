@@ -214,6 +214,11 @@ namespace Kogel.Dapper.Extension.Expressions
 			{
 				querySet.WhereExpressionList.AddRange(WhereExpression);
 			}
+			//因为表达式的原因，递归获取连表默认会倒序
+			if (sqlProvider.JoinList.Any())
+			{
+				sqlProvider.JoinList.Reverse();
+			}
 			switch (methodName)
 			{
 				case "Count":

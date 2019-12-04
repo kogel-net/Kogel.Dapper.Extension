@@ -62,7 +62,7 @@ namespace Kogel.Dapper.Extension.Expressions
 							var assignment = (bind as MemberAssignment);
 							//判断是列表还是不是系统函数
 							if (assignment.Expression.Type.FullName.Contains("System.Collections.Generic.List") 
-								|| assignment.Expression.Type.BaseType.FullName.Contains("Kogel.Dapper.Extension.IBaseEntity"))
+								|| ExpressionExtension.IsAnyBaseEntity(assignment.Expression.Type))
 							{
 								providerOption.NavigationList.Add(new NavigationMemberAssign()
 								{

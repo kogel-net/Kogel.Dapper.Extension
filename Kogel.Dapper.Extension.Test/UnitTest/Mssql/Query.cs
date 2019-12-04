@@ -75,36 +75,78 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 
 			using (var connection = new SqlConnection("server=localhost;database=Lige;user=sa;password=!RisingupTech/././.;max pool size=300"))
 			{
-				var pageList = connection.QuerySet<Lige.Model.Order>()
-					.WhereIf(0 != 0, x => x.IsDelete == false && x.Status == 0, x => x.IsDelete == false)
-					.OrderByDescing(x => x.CreateDate)
-					.PageList(1, 10, x => new OrderResDto()
-					{
-						Id = x.Id,
-						OrderNo = x.OrderNo,
-						OrderTime = x.CreateDate,
-						Status = x.Status,
-						Amount = x.Amount,
-						Point = x.Point,
-						IsAnyOrderDetail = connection.QuerySet<OrderDetail>().Where(y => y.OrderNo == x.OrderNo).Get(y => true),
-						OrderDetailList = connection.QuerySet<OrderDetail>()
-						.Where(y => y.IsDelete == false && y.OrderNo == x.OrderNo)
-						.WhereIf(1 == 1, y => y.IsDelete == false && y.OrderNo == x.OrderNo, y => y.IsDelete == false)
-						.Join<OrderDetail, Product>((a, b) => a.ProductCode == b.ProductCode, JoinMode.LEFT, true)
-						.From<OrderDetail, Product>()
-						.OrderBy<Product>(y => y.Id)
-						.ToList(true, (a, b) => new OrderDetailResDto()
-						{
-							Id = a.Id,
-							Name = a.ProductName,
-							Point = a.Point,
-							Price = a.Price,
-							Qty = a.Qty,
-							OriginalPrice = b.Price,
-							OriginalPoint = b.Point,
-						}, null),
-						DetailList = connection.QuerySet<OrderDetail>().Where(y => y.OrderNo == x.OrderNo).Get(),
-					});
+				//var pageList = connection.QuerySet<Lige.Model.Order>()
+				//	.WhereIf(0 != 0, x => x.IsDelete == false && x.Status == 0, x => x.IsDelete == false)
+				//	.OrderByDescing(x => x.CreateDate)
+				//	.PageList(1, 10, x => new OrderResDto()
+				//	{
+				//		Id = x.Id,
+				//		OrderNo = x.OrderNo,
+				//		OrderTime = x.CreateDate,
+				//		Status = x.Status,
+				//		Amount = x.Amount,
+				//		Point = x.Point,
+				//		IsAnyOrderDetail = Convert.ToBoolean(connection.QuerySet<OrderDetail>().Where(y => y.OrderNo == x.OrderNo).Count()),
+				//		//OrderDetailList = connection.QuerySet<OrderDetail>()
+				//		//.Where(y => y.IsDelete == false && y.OrderNo == x.OrderNo)
+				//		//.WhereIf(1 == 1, y => y.IsDelete == false && y.OrderNo == x.OrderNo, y => y.IsDelete == false)
+				//		//.Join<OrderDetail, Product>((a, b) => a.ProductCode == b.ProductCode, JoinMode.LEFT, true)
+				//		//.From<OrderDetail, Product>()
+				//		//.OrderBy<Product>(y => y.Id)
+				//		//.ToList(true, (a, b) => new OrderDetailResDto()
+				//		//{
+				//		//	Id = a.Id,
+				//		//	Name = a.ProductName,
+				//		//	Point = a.Point,
+				//		//	Price = a.Price,
+				//		//	Qty = a.Qty,
+				//		//	OriginalPrice = b.Price,
+				//		//	OriginalPoint = b.Point,
+				//		//}, null),
+				//		//DetailList = connection.QuerySet<OrderDetail>().Where(y => y.OrderNo == x.OrderNo).Get(),
+				//	});
+
+				var pageLists = connection.QuerySet<Order>()
+				   .OrderByDescing(x => x.CreateDate)
+				   .PageList(1, 10, x => new OrderResDto()
+				   {
+					   Id = x.Id,
+					   OrderNo = x.OrderNo,
+					   OrderTime = x.CreateDate,
+					   Status = x.Status,
+					   Amount = x.Amount,
+					   Point = x.Point,
+					   DetailList = connection.QuerySet<OrderDetail>().Where(y => y.OrderNo == x.OrderNo).Get(),
+					   //IsAnyOrderDetail = Convert.ToBoolean(connection.QuerySet<OrderDetail>().Where(y => y.OrderNo == x.OrderNo).Count()),
+					   //OrderDetailList = connection.QuerySet<OrderDetail>()
+					   //.Where(y => y.IsDelete == false && y.OrderNo == x.OrderNo)
+					   //.Join<OrderDetail, Product>((a, b) => a.ProductCode == b.ProductCode, JoinMode.LEFT, true)
+					   //.Join<Product, GiftDetail>((a, b) => a.ProductCode == b.ProductCode, JoinMode.LEFT, true)
+					   //.From<OrderDetail, Product, GiftDetail>()
+					   //.ToList(1 == 1
+					   //, (a, b, c) => new OrderDetailResDto()
+					   //{
+					   // Id = a.Id,
+					   // Name = a.ProductName,
+					   // Point = a.Point,
+					   // Price = a.Price,
+					   // Qty = a.Qty,
+					   // OriginalPrice = b.Price,
+					   // OriginalPoint = b.Point,
+					   // ImgUrl = c.ImgUrl_CN
+					   //}
+					   //, (a, b, c) => new OrderDetailResDto()
+					   //{
+					   // Id = a.Id,
+					   // Name = a.ProductName,
+					   // Point = a.Point,
+					   // Price = a.Price,
+					   // Qty = a.Qty,
+					   // OriginalPrice = b.Price,
+					   // OriginalPoint = b.Point,
+					   // ImgUrl = c.ImgUrl_EN
+					   //})
+				   });
 				////	var test = connection.QuerySet<Order>()
 				////		.OrderBy(x => x.Id)
 				////		.PageList(1, 10);

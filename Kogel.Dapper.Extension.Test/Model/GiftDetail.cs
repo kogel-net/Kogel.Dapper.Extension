@@ -1,21 +1,16 @@
 ﻿using System;
-using System.Data;
+using System.Collections.Generic;
 using System.Text;
-using System.Data.SqlClient;
-using Kogel.Dapper.Extension.Attributes;
 using Kogel.Dapper.Extension;
+using Kogel.Dapper.Extension.Attributes;
 
 namespace Lige.Model
 {
-	public class test:IBaseEntity<int>
-	{
-
-	}
 	/// <summary>
-	/// 類OrderDetail。
+	/// 礼品详情
 	/// </summary>
-	[Display(Rename = "LiGe_OrderDetail")]
-	public partial class OrderDetail: test
+	[Display(Rename = "Lige_GiftDetail")]
+	public class GiftDetail : IBaseEntity<GiftDetail>
 	{
 		/// <summary>
 		/// 
@@ -23,39 +18,35 @@ namespace Lige.Model
 		[Identity]
 		public int Id { get; set; }
 		/// <summary>
-		/// 訂單編號
-		/// </summary>
-		public string OrderNo { get; set; }
-		/// <summary>
-		/// 商品代碼
+		/// 礼品代码
 		/// </summary>
 		public string ProductCode { get; set; }
 		/// <summary>
-		/// 商品名稱
+		/// 简介
 		/// </summary>
-		public string ProductName { get; set; }
+		public string Introduction_CN { get; set; }
 		/// <summary>
-		/// 支付方式
+		/// 简介
 		/// </summary>
-		public string ProductWayCode { get; set; }
+		public string Introduction_EN { get; set; }
 		/// <summary>
-		/// 價錢
+		/// 说明
 		/// </summary>
-		public decimal Price { get; set; }
+		public string Description_CN { get; set; }
 		/// <summary>
-		/// 積分
+		/// 说明
 		/// </summary>
-		public decimal Point { get; set; }
+		public string Description_EN { get; set; }
 		/// <summary>
-		/// 件數
+		/// 中文图片
 		/// </summary>
-		public int Qty { get; set; }
+		public string ImgUrl_CN { get; set; }
+		/// <summary>
+		/// 英文图片
+		/// </summary>
+		public string ImgUrl_EN { get; set; }
 		/// <summary>
 		/// 
-		/// </summary>
-		public int ShoppingCartId { get; set; }
-		/// <summary>
-		/// 創建人
 		/// </summary>
 		public string CreateUser { get; set; }
 		/// <summary>
@@ -76,4 +67,3 @@ namespace Lige.Model
 		public bool IsDelete { get; set; }
 	}
 }
-
