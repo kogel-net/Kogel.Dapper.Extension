@@ -3,6 +3,7 @@ using System.Data;
 using System.Text;
 using System.Data.SqlClient;
 using Kogel.Dapper.Extension.Attributes;
+using Kogel.Dapper.Extension;
 
 namespace Lige.Model
 {
@@ -10,7 +11,7 @@ namespace Lige.Model
 	/// 類OrderDetail。
 	/// </summary>
 	[Display(Rename = "LiGe_OrderDetail")]
-	public partial class OrderDetail
+	public partial class OrderDetail:IBaseEntity<int>
 	{
 		/// <summary>
 		/// 

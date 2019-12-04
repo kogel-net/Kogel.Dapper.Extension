@@ -245,6 +245,12 @@ namespace Kogel.Dapper.Extension.Expressions
 						if (this.expression.Arguments.Count == 1)
 						{
 							lambda = this.expression.Arguments[0].GetLambdaExpression();
+							this.ReturnType = lambda.ReturnType;
+						}
+						else if (this.expression.Arguments.Count == 0)//无自定义列表返回
+						{
+							lambda = null;
+							this.ReturnType = this.expression.Method.ReturnType;
 						}
 						else
 						{
@@ -257,8 +263,8 @@ namespace Kogel.Dapper.Extension.Expressions
 							{
 								lambda = this.expression.Arguments[2].GetLambdaExpression();
 							}
+							this.ReturnType = lambda.ReturnType;
 						}
-						this.ReturnType = lambda.ReturnType;
 						sqlProvider.Context.Set.SelectExpression = lambda;
 						sqlProvider.FormatGet<T>();
 					}
@@ -269,6 +275,12 @@ namespace Kogel.Dapper.Extension.Expressions
 						if (this.expression.Arguments.Count == 1)
 						{
 							lambda = this.expression.Arguments[0].GetLambdaExpression();
+							this.ReturnType = lambda.ReturnType;
+						}
+						else if (this.expression.Arguments.Count == 0)//无自定义列表返回
+						{
+							lambda = null;
+							this.ReturnType = this.expression.Method.ReturnType.GenericTypeArguments[0];
 						}
 						else
 						{
@@ -281,8 +293,8 @@ namespace Kogel.Dapper.Extension.Expressions
 							{
 								lambda = this.expression.Arguments[2].GetLambdaExpression();
 							}
+							this.ReturnType = lambda.ReturnType;
 						}
-						this.ReturnType = lambda.ReturnType;
 						sqlProvider.Context.Set.SelectExpression = lambda;
 						sqlProvider.FormatToList<T>();
 					}

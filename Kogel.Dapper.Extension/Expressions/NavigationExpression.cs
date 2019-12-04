@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Kogel.Dapper.Extension.Expressions
 {
-	public class NavigationExpression: ExpressionVisitor
+	public class NavigationExpression : ExpressionVisitor
 	{
 		/// <summary>
 		/// sql指令
@@ -33,7 +33,16 @@ namespace Kogel.Dapper.Extension.Expressions
 
 		protected override Expression VisitMethodCall(MethodCallExpression node)
 		{
-			var subquery = new SubqueryExpression(node.Arguments[0] as MethodCallExpression ?? node);
+			var nodeExpression = node;
+			if (node.Arguments.Count() != 0)
+			{
+				var argumentExp = node.Arguments[0] as MethodCallExpression;
+				if (argumentExp != null)
+				{
+					nodeExpression = argumentExp;
+				}
+			}
+			var subquery = new SubqueryExpression(nodeExpression);
 			this.SqlCmd = subquery.SqlCmd;
 			this.Param = subquery.Param;
 			this.ReturnType = subquery.ReturnType;

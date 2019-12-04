@@ -1,4 +1,5 @@
 ﻿using Kogel.Dapper.Extension;
+using Lige.Model;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -38,6 +39,10 @@ namespace Lige.ViewModel.APP.Shopping
 		/// 是否存在明细
 		/// </summary>
 		public bool IsAnyOrderDetail { get; set; }
+		/// <summary>
+		/// 
+		/// </summary>
+		public OrderDetail DetailList { get; set; }
 		/// <summary>
 		/// 订单明细
 		/// </summary>
