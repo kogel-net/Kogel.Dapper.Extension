@@ -106,6 +106,11 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 				//		//DetailList = connection.QuerySet<OrderDetail>().Where(y => y.OrderNo == x.OrderNo).Get(),
 				//	});
 
+				var statusArr = new int[] { 0, 2 };
+				var orderList = connection.QuerySet<Order>()
+					.Where(x => statusArr.Contains(x.Status) && x.CreateDate.AddMinutes(15) < DateTime.Now && x.IsDelete == false)
+					.ToList();
+
 				var pageLists = connection.QuerySet<Order>()
 				   .OrderByDescing(x => x.CreateDate)
 				   .PageList(1, 10, x => new OrderResDto()

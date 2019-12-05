@@ -82,9 +82,9 @@ namespace Kogel.Dapper.Extension.MsSql.Extension
 					{
 						//result = $"dateadd(yy,{value},{field})";
 						spliceField.Append(" dateadd(yy,");
-						fieldInkove.Invoke();
-						spliceField.Append(",");
 						valueInkove.Invoke();
+						spliceField.Append(",");
+						fieldInkove.Invoke();
 						spliceField.Append(" )");
 					}
 					break;
@@ -92,9 +92,9 @@ namespace Kogel.Dapper.Extension.MsSql.Extension
 					{
 						//result = $"dateadd(mm,{value},{field})";
 						spliceField.Append(" dateadd(mm,");
-						fieldInkove.Invoke();
-						spliceField.Append(",");
 						valueInkove.Invoke();
+						spliceField.Append(",");
+						fieldInkove.Invoke();
 						spliceField.Append(" )");
 					}
 					break;
@@ -102,9 +102,9 @@ namespace Kogel.Dapper.Extension.MsSql.Extension
 					{
 						//result = $"dateadd(dd,{value},{field})";
 						spliceField.Append(" dateadd(dd,");
-						fieldInkove.Invoke();
-						spliceField.Append(",");
 						valueInkove.Invoke();
+						spliceField.Append(",");
+						fieldInkove.Invoke();
 						spliceField.Append(" )");
 					}
 					break;
@@ -112,9 +112,9 @@ namespace Kogel.Dapper.Extension.MsSql.Extension
 					{
 						//result = $"dateadd(hh,{value},{field})";
 						spliceField.Append(" dateadd(hh,");
-						fieldInkove.Invoke();
-						spliceField.Append(",");
 						valueInkove.Invoke();
+						spliceField.Append(",");
+						fieldInkove.Invoke();
 						spliceField.Append(" )");
 					}
 					break;
@@ -122,9 +122,9 @@ namespace Kogel.Dapper.Extension.MsSql.Extension
 					{
 						//result = $"dateadd(minute,{value},{field})";
 						spliceField.Append(" dateadd(minute,");
-						fieldInkove.Invoke();
-						spliceField.Append(",");
 						valueInkove.Invoke();
+						spliceField.Append(",");
+						fieldInkove.Invoke();
 						spliceField.Append(" )");
 					}
 					break;
@@ -132,9 +132,9 @@ namespace Kogel.Dapper.Extension.MsSql.Extension
 					{
 						//result = $"dateadd(ss,{value},{field})";
 						spliceField.Append(" dateadd(ss,");
-						fieldInkove.Invoke();
-						spliceField.Append(",");
 						valueInkove.Invoke();
+						spliceField.Append(",");
+						fieldInkove.Invoke();
 						spliceField.Append(" )");
 					}
 					break;
