@@ -73,7 +73,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 			//        }
 			SqlMapper.Aop.OnExecuting += Aop_OnExecuting;
 
-			using (var connection = new SqlConnection("server=localhost;database=Lige;user=sa;password=!RisingupTech/././.;max pool size=300"))
+			using (var connection = new SqlConnection("server=risingup.life98.cn,55940;database=Lige;user=sa;password=!RisingupTech/././.;max pool size=300"))
 			{
 				//var pageList = connection.QuerySet<Lige.Model.Order>()
 				//	.WhereIf(0 != 0, x => x.IsDelete == false && x.Status == 0, x => x.IsDelete == false)
@@ -108,7 +108,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 
 				var statusArr = new int[] { 0, 2 };
 				var orderList = connection.QuerySet<Order>()
-					.Where(x => statusArr.Contains(x.Status) && x.CreateDate.AddMinutes(15) < DateTime.Now && x.IsDelete == false)
+					.Where(x => statusArr.Contains(x.Status) && x.CreateDate.AddMinutes(15) < DateTime.Now && x.IsDelete == false && !string.IsNullOrEmpty(x.OrderNo))
 					.ToList();
 
 				var pageLists = connection.QuerySet<Order>()

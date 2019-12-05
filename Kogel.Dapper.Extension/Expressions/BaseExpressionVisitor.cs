@@ -417,6 +417,16 @@ namespace Kogel.Dapper.Extension.Expressions
 						this.SpliceField.Append(" IS NOT NULL");
 					}
 					break;
+				case "IsNullOrEmpty":
+					{
+						this.SpliceField.Append("(");
+						Visit(node.Arguments[0]);
+						this.SpliceField.Append(" IS NULL AND ");
+						Visit(node.Arguments[0]);
+						this.SpliceField.Append(" !=''");
+						this.SpliceField.Append(")");
+					}
+					break;
 				case "Between":
 					{
 						if (node.Object != null)
