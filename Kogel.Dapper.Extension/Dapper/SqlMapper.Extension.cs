@@ -68,5 +68,19 @@ namespace Dapper
 
 		//	return hashes;
 		//}
+
+		public static DataSet QueryDataSet(this IDbConnection cnn, IDbDataAdapter adapter, string sql, object param = null, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
+		{
+			var ds = new DataSet();
+			var command = new CommandDefinition(cnn, sql, (object)param, transaction, commandTimeout, commandType, buffered ? CommandFlags.Buffered : CommandFlags.None);
+			var identity = new Identity(command.CommandText, command.CommandType, cnn, null, param == null ? null : param.GetType(), null);
+			var info = GetCacheInfo(identity, param, command.AddToCache);
+			bool wasClosed = cnn.State == ConnectionState.Closed;
+			if (wasClosed) cnn.Open();
+			adapter.SelectCommand = command.SetupCommand(cnn, info.ParamReader);
+			adapter.Fill(ds);
+			if (wasClosed) cnn.Close();
+			return ds;
+		}
 	}
 }

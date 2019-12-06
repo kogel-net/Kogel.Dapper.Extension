@@ -109,7 +109,11 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 				var statusArr = new int[] { 0, 2 };
 				var orderList = connection.QuerySet<Order>()
 					.Where(x => statusArr.Contains(x.Status) && x.CreateDate.AddMinutes(15) < DateTime.Now && !string.IsNullOrEmpty(x.OrderNo))
-					.ToList();
+					.ToDataSet(x => new
+					{
+						x.Id,
+						x.OrderNo
+					});
 
 				var pageLists = connection.QuerySet<Order>()
 				   .OrderByDescing(x => x.CreateDate)
