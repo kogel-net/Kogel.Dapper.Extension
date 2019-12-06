@@ -9,6 +9,7 @@ using Kogel.Dapper.Extension.Model;
 using Kogel.Dapper.Extension.Attributes;
 using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension.Helper;
+using Kogel.Dapper.Extension.Exception;
 
 namespace Kogel.Dapper.Extension
 {
@@ -55,22 +56,22 @@ namespace Kogel.Dapper.Extension
 
 		public abstract SqlProvider FormatUpdate<T>(Expression<Func<T, T>> updateExpression);
 
-		public abstract SqlProvider FormatUpdate<T>(T entity, string[] excludeFields);
+		public abstract SqlProvider FormatUpdate<T>(T entity, string[] excludeFields, bool isBatch = false);
 
 		public abstract SqlProvider FormatSum(LambdaExpression sumExpression);
 
-        public abstract SqlProvider FormatMin(LambdaExpression MinExpression);
+		public abstract SqlProvider FormatMin(LambdaExpression MinExpression);
 
-        public abstract SqlProvider FormatMax(LambdaExpression MaxExpression);
+		public abstract SqlProvider FormatMax(LambdaExpression MaxExpression);
 
-        public abstract SqlProvider FormatUpdateSelect<T>(Expression<Func<T, T>> updator);
-        /// <summary>
-        /// 获取表名称
-        /// </summary>
-        /// <param name="isNeedFrom"></param>
-        /// <param name="isAsName"></param>
-        /// <param name="tableType">连接查询时会用到</param>
-        /// <returns></returns>
+		public abstract SqlProvider FormatUpdateSelect<T>(Expression<Func<T, T>> updator);
+		/// <summary>
+		/// 获取表名称
+		/// </summary>
+		/// <param name="isNeedFrom"></param>
+		/// <param name="isAsName"></param>
+		/// <param name="tableType">连接查询时会用到</param>
+		/// <returns></returns>
 
 		public string FormatTableName(bool isNeedFrom = true, bool isAsName = true, Type tableType = null)
 		{
@@ -153,6 +154,25 @@ namespace Kogel.Dapper.Extension
 		public SqlProvider Copy()
 		{
 			return Activator.CreateInstance(this.GetType()) as SqlProvider;
+		}
+		/// <summary>
+		/// 根据主键获取条件
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="entity"></param>
+		/// <returns></returns>
+		protected string GetIdentityWhere<T>(T entity, DynamicParameters param)
+		{
+			var entityObject = EntityCache.QueryEntity(typeof(T));
+			if (string.IsNullOrEmpty(entityObject.Identitys))
+				throw new DapperExtensionException("主键不存在!请前往实体类使用[Identity]特性设置主键。");
+			//获取主键数据
+			var id = entityObject.Properties
+				.FirstOrDefault(x => x.Name == entityObject.Identitys)
+				.GetValue(entity);
+			//设置参数
+			param.Add(entityObject.Identitys, id);
+			return $" AND {entityObject.Identitys}={ProviderOption.ParameterPrefix}{entityObject.Identitys} ";
 		}
 	}
 }

@@ -162,7 +162,7 @@ namespace Kogel.Dapper.Extension.MsSql
 			return this;
 		}
 
-		public override SqlProvider FormatUpdate<T>(T entity, string[] excludeFields)
+		public override SqlProvider FormatUpdate<T>(T entity, string[] excludeFields, bool isBatch = false)
 		{
 			var update = ResolveExpression.ResolveUpdates<T>(entity, Params, excludeFields);
 			var whereSql = string.Empty;
@@ -170,6 +170,10 @@ namespace Kogel.Dapper.Extension.MsSql
 			ProviderOption.IsAsName = false;
 			//表查询条件
 			var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null);
+			//如果不存在条件，就用主键作为条件
+			if (!isBatch)
+				if (whereSql.Trim().Equals("WHERE 1=1"))
+					whereSql += GetIdentityWhere(entity, Params);
 
 			SqlString = $"UPDATE {FormatTableName(false, false)} {update} {whereSql}";
 			return this;

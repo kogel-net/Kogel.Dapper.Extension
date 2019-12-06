@@ -162,7 +162,7 @@ namespace Kogel.Dapper.Extension.Oracle
             return this;
         }
 
-        public override SqlProvider FormatUpdate<T>(T entity, string[] excludeFields)
+        public override SqlProvider FormatUpdate<T>(T entity, string[] excludeFields, bool isBatch = false)
         {
 			var update = ResolveExpression.ResolveUpdates<T>(entity, Params, excludeFields);
             var fromTableSql = ProviderOption.CombineFieldName(FormatTableName(false, false).Trim());
@@ -171,8 +171,12 @@ namespace Kogel.Dapper.Extension.Oracle
 			ProviderOption.IsAsName = false;
 			//表查询条件
 			var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null);
+			//如果不存在条件，就用主键作为条件
+			if (!isBatch)
+				if (whereSql.Trim().Equals("WHERE 1=1"))
+					whereSql += GetIdentityWhere(entity, Params);
 
-            SqlString = $"UPDATE {fromTableSql} {update} {whereSql}";
+			SqlString = $"UPDATE {fromTableSql} {update} {whereSql}";
             return this;
         }
 

@@ -39,7 +39,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				});
 				//全部修改
 				var result1 = conn.CommandSet<Comment>()
-					.Where(x => x.Id == commne.Id)
+					//.Where(x => x.Id == commne.Id)
 					.Update(commne, new string[] { "ArticleId" });
 
                 //新增

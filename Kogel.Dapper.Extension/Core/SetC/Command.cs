@@ -43,7 +43,7 @@ namespace Kogel.Dapper.Extension.Core.SetC
 
 		public int Update(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120)
 		{
-			SqlProvider.FormatUpdate(entities.FirstOrDefault(), excludeFields);
+			SqlProvider.FormatUpdate(entities.FirstOrDefault(), excludeFields, true);
 			//批量修改不需要别名（暂时有点小bug，先勉强使用下）
 			SqlProvider.SqlString = SqlProvider.SqlString.Replace("Update_", "").Replace("_0","").Replace("_1", "");
 			var identity = EntityCache.QueryEntity(typeof(T)).Identitys;
