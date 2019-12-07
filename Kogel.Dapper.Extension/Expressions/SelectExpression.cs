@@ -25,9 +25,6 @@ namespace Kogel.Dapper.Extension.Expressions
         /// 参数
         /// </summary>
         public new DynamicParameters Param;
-
-        private IProviderOption providerOption;
-
         #endregion
         #region 当前解析的对象
         private EntityObject entity { get; }

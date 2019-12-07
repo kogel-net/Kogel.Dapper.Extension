@@ -7,18 +7,18 @@ using Kogel.Dapper.Extension.Model;
 
 namespace Kogel.Dapper.Extension.Core.Interfaces
 {
-    public interface IQuerySet<T>
-    {
-        /// <summary>
-        /// 查询条件
-        /// </summary>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
-        QuerySet<T> Where(Expression<Func<T, bool>> predicate);
-        QuerySet<T> Where<TWhere>(Expression<Func<TWhere, bool>> predicate);
-        QuerySet<T> Where(T model);
-        QuerySet<T> Where(Dictionary<string, DynamicTree> dynamicTree);
-        QuerySet<T> Where(string sqlWhere, object param = null);
+	public interface IQuerySet<T>
+	{
+		/// <summary>
+		/// 查询条件
+		/// </summary>
+		/// <param name="predicate"></param>
+		/// <returns></returns>
+		QuerySet<T> Where(Expression<Func<T, bool>> predicate);
+		QuerySet<T> Where<TWhere>(Expression<Func<TWhere, bool>> predicate);
+		QuerySet<T> Where(T model);
+		QuerySet<T> Where(Dictionary<string, DynamicTree> dynamicTree);
+		QuerySet<T> Where(string sqlWhere, object param = null);
 
 
 		/// <summary>
@@ -31,54 +31,82 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// <returns></returns>
 		QuerySet<T> WhereIf(bool where, Expression<Func<T, bool>> truePredicate, Expression<Func<T, bool>> falsePredicate);
 		QuerySet<T> WhereIf<TWhere>(bool where, Expression<Func<TWhere, bool>> truePredicate, Expression<Func<TWhere, bool>> falsePredicate);
-        /// <summary>
-        /// 不锁表查询(此方法只支持Mssql)
-        /// </summary>
-        /// <returns></returns>
-        QuerySet<T> WithNoLock();
-        /// <summary>
-        /// 连表查询
-        /// </summary>
-        /// <typeparam name="TOuter">主表</typeparam>
-        /// <typeparam name="TInner">副表</typeparam>
-        /// <param name="rightField"></param>
-        /// <param name="leftField"></param>
-        /// <returns></returns>
-        QuerySet<T> Join<TOuter, TInner>(Expression<Func<TOuter, object>> rightField, Expression<Func<TInner, object>> leftField, JoinMode joinMode = JoinMode.LEFT);
-        /// <summary>
-        /// 连表查询(任意查)
-        /// </summary>
-        /// <typeparam name="TOuter">主表</typeparam>
-        /// <typeparam name="TInner">副表</typeparam>
-        /// <param name="exp"></param>
-        /// <param name="joinMode">连表方式</param>
-        /// <param name="IsDisField">是否显示字段</param>
-        /// <returns></returns>
-        QuerySet<T> Join<TOuter, TInner>(Expression<Func<TOuter, TInner, bool>> exp, JoinMode joinMode = JoinMode.LEFT, bool IsDisField = true);
-        /// <summary>
-        /// 连接(通过sql连接，不指定表实体默认为不增加该表显示字段)
-        /// </summary>
-        /// <param name="SqlJoin"></param>
-        /// <returns></returns>
-        QuerySet<T> Join(string SqlJoin);
-        /// <summary>
-        /// 连接(通过sql连接，不指定表实体默认为不增加该表显示字段)
-        /// </summary>
-        /// <typeparam name="TInner"></typeparam>
-        /// <param name="sqlJoin"></param>
-        /// <returns></returns>
-        QuerySet<T> Join<TInner>(string SqlJoin);
-        /// <summary>
-        /// 字段匹配(适用于实体类字段和数据库字段不一致时,返回值为Dynamic类型时不适用)
-        /// </summary>
-        /// <returns></returns>
-        QuerySet<T> FieldMatch<TSource>();
+		/// <summary>
+		/// 不锁表查询(此方法只支持Mssql)
+		/// </summary>
+		/// <returns></returns>
+		QuerySet<T> WithNoLock();
+		/// <summary>
+		/// 连表查询
+		/// </summary>
+		/// <typeparam name="TOuter">主表</typeparam>
+		/// <typeparam name="TInner">副表</typeparam>
+		/// <param name="rightField"></param>
+		/// <param name="leftField"></param>
+		/// <returns></returns>
+		QuerySet<T> Join<TOuter, TInner>(Expression<Func<TOuter, object>> rightField, Expression<Func<TInner, object>> leftField, JoinMode joinMode = JoinMode.LEFT);
+		/// <summary>
+		/// 连表查询(任意查)
+		/// </summary>
+		/// <typeparam name="TOuter">主表</typeparam>
+		/// <typeparam name="TInner">副表</typeparam>
+		/// <param name="exp"></param>
+		/// <param name="joinMode">连表方式</param>
+		/// <param name="IsDisField">是否显示字段</param>
+		/// <returns></returns>
+		QuerySet<T> Join<TOuter, TInner>(Expression<Func<TOuter, TInner, bool>> exp, JoinMode joinMode = JoinMode.LEFT, bool IsDisField = true);
+		/// <summary>
+		/// 连接(通过sql连接，不指定表实体默认为不增加该表显示字段)
+		/// </summary>
+		/// <param name="SqlJoin"></param>
+		/// <returns></returns>
+		QuerySet<T> Join(string SqlJoin);
+		/// <summary>
+		/// 连接(通过sql连接，不指定表实体默认为不增加该表显示字段)
+		/// </summary>
+		/// <typeparam name="TInner"></typeparam>
+		/// <param name="sqlJoin"></param>
+		/// <returns></returns>
+		QuerySet<T> Join<TInner>(string SqlJoin);
+		/// <summary>
+		/// 字段匹配(适用于实体类字段和数据库字段不一致时,返回值为Dynamic类型时不适用)
+		/// </summary>
+		/// <returns></returns>
+		QuerySet<T> FieldMatch<TSource>();
 
-        #region 多表索引扩展
+		#region 多表索引扩展
 
 
-        #endregion
+		#endregion
+		/// <summary>
+		/// 根据类型重名表名
+		/// </summary>
+		/// <param name="type"></param>
+		/// <param name="tableName"></param>
+		/// <returns></returns>
+		QuerySet<T> AsTableName(Type type, string tableName);
 
-        QuerySet<T> AsTableName(Type type, string tableName);
-    }
+		/// <summary>
+		/// 分组
+		/// </summary>
+		/// <param name="groupByExp"></param>
+		/// <returns></returns>
+		QuerySet<T> GroupBy(Expression<Func<T, object>> groupByExp);
+		/// <summary>
+		/// 分组(根据指定表)
+		/// </summary>
+		/// <typeparam name="TGroup"></typeparam>
+		/// <param name="groupByExp"></param>
+		/// <returns></returns>
+		QuerySet<T> GroupBy<TGroup>(Expression<Func<TGroup, object>> groupByExp);
+		/// <summary>
+		/// 分组(带判断)
+		/// </summary>
+		/// <typeparam name="TGroup"></typeparam>
+		/// <param name="where"></param>
+		/// <param name="trueGroupByExp"></param>
+		/// <param name="falseGroupByExp"></param>
+		/// <returns></returns>
+		QuerySet<T> GroupByIf<TGroup>(bool where,Expression<Func<TGroup, object>> trueGroupByExp, Expression<Func<TGroup, object>> falseGroupByExp);
+	}
 }

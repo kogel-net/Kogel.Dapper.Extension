@@ -29,7 +29,7 @@ namespace Kogel.Dapper.Extension.Core.SetC
             WhereExpressionList = new List<LambdaExpression>();
             WhereBuilder = new StringBuilder();
             Params = new DynamicParameters();
-        }
+		}
 
         public CommandSet(IDbConnection conn, SqlProvider sqlProvider, IDbTransaction dbTransaction) : base(conn, sqlProvider, dbTransaction)
         {
@@ -41,11 +41,10 @@ namespace Kogel.Dapper.Extension.Core.SetC
             };
 
             sqlProvider.Context = SetContext;
-
             WhereExpressionList = new List<LambdaExpression>();
             WhereBuilder = new StringBuilder();
             Params = new DynamicParameters();
-        }
+		}
 
         internal CommandSet(IDbConnection conn, SqlProvider sqlProvider, Type tableType, LambdaExpression whereExpression) : base(conn, sqlProvider)
         {
@@ -58,7 +57,6 @@ namespace Kogel.Dapper.Extension.Core.SetC
             };
 
             sqlProvider.Context = SetContext;
-
             WhereExpressionList = new List<LambdaExpression>();
             WhereExpressionList.Add(whereExpression);
             WhereBuilder = new StringBuilder();

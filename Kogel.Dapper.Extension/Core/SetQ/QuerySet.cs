@@ -34,6 +34,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			WhereExpressionList = new List<LambdaExpression>();
 			WhereBuilder = new StringBuilder();
 			Params = new DynamicParameters();
+			GroupExpressionList = new List<LambdaExpression>();
 		}
 
 		public QuerySet(IDbConnection conn, SqlProvider sqlProvider, IDbTransaction dbTransaction) : base(conn, sqlProvider, dbTransaction)
@@ -48,6 +49,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			WhereExpressionList = new List<LambdaExpression>();
 			WhereBuilder = new StringBuilder();
 			Params = new DynamicParameters();
+			GroupExpressionList = new List<LambdaExpression>();
 		}
 		#region 基础函数
 		public QuerySet<T> AsTableName(Type type, string tableName)
@@ -339,6 +341,28 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 		public ISelectFrom<T, T1, T2, T3, T4> From<T1, T2, T3, T4>()
 		{
 			return new ISelectFrom<T, T1, T2, T3, T4>(this);
+		}
+		#endregion
+
+		#region 分组
+		public QuerySet<T> GroupBy(Expression<Func<T, object>> groupByExp)
+		{
+			GroupExpressionList.Add(groupByExp);
+			return this;
+		}
+
+		public QuerySet<T> GroupBy<TGroup>(Expression<Func<TGroup, object>> groupByExp)
+		{
+			GroupExpressionList.Add(groupByExp);
+			return this;
+		}
+		public QuerySet<T> GroupByIf<TGroup>(bool where, Expression<Func<TGroup, object>> trueGroupByExp, Expression<Func<TGroup, object>> falseGroupByExp)
+		{
+			if (where)
+				GroupExpressionList.Add(trueGroupByExp);
+			else
+				GroupExpressionList.Add(falseGroupByExp);
+			return this;
 		}
 		#endregion
 	}

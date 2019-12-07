@@ -28,10 +28,7 @@ namespace Kogel.Dapper.Extension.MySql
 
 			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref selectSql, Context.Set.SelectExpression);
 
-			var whereSql = string.Empty;
-
-			//表查询条件
-			var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
+			var whereSql = ResolveExpression.ResolveWhereList(Context.Set, Params);
 
 			var orderbySql = ResolveExpression.ResolveOrderBy(Context.Set);
 
@@ -56,10 +53,7 @@ namespace Kogel.Dapper.Extension.MySql
 
 			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref selectSql, Context.Set.SelectExpression);
 
-			var whereSql = string.Empty;
-
-			//表查询条件
-			var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
+			var whereSql = ResolveExpression.ResolveWhereList(Context.Set, Params);
 
 			var orderbySql = ResolveExpression.ResolveOrderBy(Context.Set);
 
@@ -81,10 +75,7 @@ namespace Kogel.Dapper.Extension.MySql
 
 			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref selectSql, Context.Set.SelectExpression);
 
-			var whereSql = string.Empty;
-
-			//表查询条件
-			var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
+			var whereSql = ResolveExpression.ResolveWhereList(Context.Set, Params);
 
 			SqlString = $@" SELECT 
                            {(new Regex("SELECT").Replace(selectSql, "", 1))}
@@ -103,10 +94,7 @@ namespace Kogel.Dapper.Extension.MySql
 			string noneSql = "";
 			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql, Context.Set.SelectExpression);
 
-			var whereSql = string.Empty;
-
-			//表查询条件
-			var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
+			var whereSql = ResolveExpression.ResolveWhereList(Context.Set, Params);
 
 			SqlString = $"{selectSql} {fromTableSql} {joinSql} {whereSql} ";
 
@@ -117,11 +105,9 @@ namespace Kogel.Dapper.Extension.MySql
 		{
 			var fromTableSql = FormatTableName(false, false);
 
-			var whereSql = string.Empty;
-
 			ProviderOption.IsAsName = false;
-			//表查询条件
-			var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null);
+
+			var whereSql = ResolveExpression.ResolveWhereList(Context.Set, Params);
 
 			SqlString = $"DELETE FROM {fromTableSql} {whereSql}";
 
@@ -146,11 +132,9 @@ namespace Kogel.Dapper.Extension.MySql
 		{
 			var update = ResolveExpression.ResolveUpdate(updateExpression);
 
-			var whereSql = string.Empty;
-
 			ProviderOption.IsAsName = false;
-			//表查询条件
-			var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null);
+
+			var whereSql = ResolveExpression.ResolveWhereList(Context.Set, Params);
 			Params.AddDynamicParams(update.Param);
 
 			SqlString = $"UPDATE {FormatTableName(false, false)} {update.SqlCmd} {whereSql}";
@@ -161,11 +145,10 @@ namespace Kogel.Dapper.Extension.MySql
 		public override SqlProvider FormatUpdate<T>(T entity, string[] excludeFields, bool isBatch = false)
 		{
 			var update = ResolveExpression.ResolveUpdates<T>(entity, Params, excludeFields);
-			var whereSql = string.Empty;
 
 			ProviderOption.IsAsName = false;
-			//表查询条件
-			var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params, null);
+
+			var whereSql = ResolveExpression.ResolveWhereList(Context.Set, Params);
 			//如果不存在条件，就用主键作为条件
 			if (!isBatch)
 				if (whereSql.Trim().Equals("WHERE 1=1"))
@@ -184,10 +167,7 @@ namespace Kogel.Dapper.Extension.MySql
 			string noneSql = "";
 			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql, Context.Set.SelectExpression);
 
-			var whereSql = string.Empty;
-
-			//表查询条件
-			var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
+			var whereSql = ResolveExpression.ResolveWhereList(Context.Set, Params);
 
 			SqlString = $"{selectSql} {fromTableSql}{joinSql} {whereSql} ";
 
@@ -202,10 +182,7 @@ namespace Kogel.Dapper.Extension.MySql
 			string noneSql = "";
 			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql, Context.Set.SelectExpression);
 
-			var whereSql = string.Empty;
-
-			//表查询条件
-			var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
+			var whereSql = ResolveExpression.ResolveWhereList(Context.Set, Params);
 
 			SqlString = $"{selectSql} {fromTableSql}{joinSql} {whereSql} ";
 
@@ -220,10 +197,7 @@ namespace Kogel.Dapper.Extension.MySql
 			string noneSql = "";
 			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql, Context.Set.SelectExpression);
 
-			var whereSql = string.Empty;
-
-			//表查询条件
-			var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
+			var whereSql = ResolveExpression.ResolveWhereList(Context.Set, Params);
 
 			SqlString = $"{selectSql} {fromTableSql}{joinSql} {whereSql} ";
 
@@ -236,10 +210,7 @@ namespace Kogel.Dapper.Extension.MySql
 
 			var selectSql = ResolveExpression.ResolveSelectOfUpdate(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression);
 
-			var whereSql = string.Empty;
-
-			//表查询条件
-			var whereParamsList = ResolveExpression.ResolveWhereList(Context.Set, ref whereSql, Params);
+			var whereSql = ResolveExpression.ResolveWhereList(Context.Set, Params);
 			Params.AddDynamicParams(update.Param);
 
 			SqlString = $"UPDATE {FormatTableName(false, false)} {update.SqlCmd} {selectSql} {whereSql}";
