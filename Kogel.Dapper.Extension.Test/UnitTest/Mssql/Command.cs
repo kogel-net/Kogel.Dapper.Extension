@@ -11,7 +11,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 {
     class Command
     {
-        string mssqlConnection = "Data Source=42.157.195.21,4344;Initial Catalog=Qx_Sport_Common;User ID=qxdev;Password=qxdev123456;";
+        string mssqlConnection = "Data Source=localhost;Initial Catalog=Qx_Sport_Common;User ID=qxdev;Password=qxdev123456;";
         public void Test()
         {
             var commne = new Comment()
