@@ -58,6 +58,13 @@ namespace Kogel.Dapper.Extension.Oracle.Extension
 						spliceField.Append(" )");
 					}
 					break;
+				case ConvertOption.ToDateTime:
+					{
+						spliceField.Append("to_date(");
+						fieldInkove.Invoke();
+						spliceField.Append(",'YYYY-MM-D HH24:MI:SS')");
+					}
+					break;
 			}
 		}
 		/// <summary>

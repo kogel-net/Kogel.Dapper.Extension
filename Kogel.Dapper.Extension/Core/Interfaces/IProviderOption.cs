@@ -113,7 +113,8 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		ToString,
 		ToDecimal,
 		ToDouble,
-		ToBoolean
+		ToBoolean,
+		ToDateTime
 	}
 	/// <summary>
 	/// 时间格式处理

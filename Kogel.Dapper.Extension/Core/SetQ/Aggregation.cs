@@ -31,10 +31,10 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         }
 
         /// <inheritdoc />
-        public int Sum<TResult>(Expression<Func<TResult, object>> sumExpression)
+        public TResult Sum<TResult>(Expression<Func<T, TResult>> sumExpression)
         {
             SqlProvider.FormatSum(sumExpression);
-            return DbCon.QuerySingleOrDefault<int>(SqlProvider.SqlString, SqlProvider.Params, dbTransaction);
+            return DbCon.QuerySingleOrDefault<TResult>(SqlProvider.SqlString, SqlProvider.Params, dbTransaction);
 		}
         public TResult Max<TResult>(Expression<Func<T, TResult>> maxExpression)
         {

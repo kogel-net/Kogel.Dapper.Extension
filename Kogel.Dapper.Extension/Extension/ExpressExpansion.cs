@@ -37,4 +37,30 @@ namespace Kogel.Dapper.Extension
             return true;
         }
     }
+	/// <summary>
+	/// 聚合函数
+	/// </summary>
+	public class Group
+	{
+		public static int Count<T>(T field)
+		{
+			return 0;
+		}
+		public static T Sum<T>(T field)
+		{
+			return default(T);
+		}
+		public static T Max<T>(T field)
+		{
+			return default(T);
+		}
+		public static T Min<T>(T field)
+		{
+			return default(T);
+		}
+		public static T Avg<T>(T field)
+		{
+			return default(T);
+		}
+	}
 }

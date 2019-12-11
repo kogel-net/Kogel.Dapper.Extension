@@ -126,6 +126,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				var array1 = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 				var commne = conn.QuerySet<Comment>()
 					.Where(x => x.Id > 0 && array1.Contains(x.Id) && x.Content.Replace("1", "2") == x.Content && x.Content.Contains(null))
+					.Where(x=>x.Id.In(array1))
 					.Get(x => new
 					{
 						x.Id,
@@ -138,7 +139,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 					.Where(x=> x.Id.ToString().ToUpper().Equals("3".ToUpper()))
 					.Where(x => x.Id.Between(80, 100)
 					&& x.SubTime.AddDays(-10).AddYears(1) < DateTime.Now.AddYears(1) && x.Id > 10
-					&& x.Id > new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id < 3 && x.Id < y.Id).Sum<News>(y => y.Id))
+					&& x.Id > new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id < 3 && x.Id < y.Id).Sum(y => y.Id))
 					.From<Comment, News>()
 					.OrderBy<News>(x => x.Id)
 					.PageList(1, 1, (a, b) => new
@@ -148,7 +149,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 						Content = a.Content + "'test'" + b.Headlines + a.IdentityId,
 						bbb = conn.QuerySet<Comment1>()
 									.Where(y => y.ArticleId == b.Id && y.Content.Contains("test"))
-									.Sum<Comment1>(x => x.Id),
+									.Sum(x => x.Id),
 						ccc = a.IdentityId,
 						a.Id,
 						times = DateTime.Now
@@ -175,7 +176,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 					   .Join<Comment, News>((a, b) => a.ArticleId == b.Id)
 					   .Where(x => x.Content == "test")
 					   .WithNoLock()
-					   .Sum<News>(x => x.Id);
+					   .Sum(x => x.Id);
 				//计数
 				var count = conn.QuerySet<Comment>()
 					 .Join<Comment, News>((a, b) => a.ArticleId == b.Id)

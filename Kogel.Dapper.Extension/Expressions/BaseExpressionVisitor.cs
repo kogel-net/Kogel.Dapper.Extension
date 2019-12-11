@@ -138,6 +138,7 @@ namespace Kogel.Dapper.Extension.Expressions
 				case "ToDecimal":
 				case "ToDouble":
 				case "ToBoolean":
+				case "ToDateTime":
 					{
 						var convertOption = (ConvertOption)Enum.Parse(typeof(ConvertOption), node.Method.Name);
 						providerOption.CombineConvert(convertOption, SpliceField, () =>
@@ -237,7 +238,7 @@ namespace Kogel.Dapper.Extension.Expressions
 		protected override Expression VisitMethodCall(MethodCallExpression node)
 		{
 			//使用convert函数里待执行的sql数据
-		    if (node.Method.DeclaringType.FullName.Equals("Kogel.Dapper.Extension.ExpressExpansion"))//自定义扩展方法
+			if (node.Method.DeclaringType.FullName.Equals("Kogel.Dapper.Extension.ExpressExpansion"))//自定义扩展方法
 			{
 				Operation(node);
 			}
@@ -345,7 +346,7 @@ namespace Kogel.Dapper.Extension.Expressions
 			{
 				case "Contains":
 					{
-						if (node.Arguments[0].Type.FullName == "System.String")
+						if (node.Object != null && !(node.Object.Type.FullName.Contains("System.Collections.Generic")))
 						{
 							Visit(node.Object);
 							var value = node.Arguments[0].ToConvertAndGetValue();
@@ -453,6 +454,7 @@ namespace Kogel.Dapper.Extension.Expressions
 				case "ToDecimal":
 				case "ToDouble":
 				case "ToBoolean":
+				case "ToDateTime":
 					{
 						var convertOption = (ConvertOption)Enum.Parse(typeof(ConvertOption), node.Method.Name);
 						providerOption.CombineConvert(convertOption, SpliceField, () =>
@@ -529,7 +531,7 @@ namespace Kogel.Dapper.Extension.Expressions
 					break;
 				#endregion
 				default:
-					throw new DapperExtensionException("Kogel.Dapper.Extension不支持此功能");
+					throw new DapperExtensionException($"Kogel.Dapper.Extension不支持此功能[{node.Method.Name}]");
 			}
 		}
 	}

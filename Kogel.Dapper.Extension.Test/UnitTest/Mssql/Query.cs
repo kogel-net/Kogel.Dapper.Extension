@@ -75,6 +75,26 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 
 			using (var connection = new SqlConnection("server=localhost;database=Lige;user=sa;password=!RisingupTech/././.;max pool size=300"))
 			{
+				var outStockList = new List<string>()
+				{
+					"6FACCBB4-C378-4CE0-8BAB-37D16B612426",
+"6FACCBB4-C378-4CE0-8BAB-37D16B612426",
+"C7F4300A-5166-4177-A45A-8E77027D6668",
+"97206B94-EEC1-443A-8B37-D359D5206986",
+"19D1D6F9-E311-490B-A692-1B2858C0D9B0",
+"1DBA06C6-DFCA-484C-ABF4-293D7A43ED11",
+"ED761DEA-C57D-4B9C-8000-E434FE280337",
+				}.ToArray();
+				//把有库存的恢复
+				connection.CommandSet<Product>()
+					.Where(x => outStockList.Contains(x.ProductCode))
+					.Update(x => new Product()
+					{
+						IsDelete = false,
+						UpdateUser = "admin sync",
+						UpdateDate = DateTime.Now
+					});
+
 				//var pageList = connection.QuerySet<Lige.Model.Order>()
 				//	.WhereIf(0 != 0, x => x.IsDelete == false && x.Status == 0, x => x.IsDelete == false)
 				//	.OrderByDescing(x => x.CreateDate)
@@ -105,6 +125,22 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 				//		//}, null),
 				//		//DetailList = connection.QuerySet<OrderDetail>().Where(y => y.OrderNo == x.OrderNo).Get(),
 				//	});
+				List<string> N5_ProfileIdList = new List<string>() { "510002443", "510002444", "510002445", "510002446", "510002447", "510002449", "510002458" };
+				var list = connection.QuerySet<PurchaseTransaction>()
+				 .Where(x => x.N5_ProfileId.In(N5_ProfileIdList.ToArray()) && x.TransactionAmount >= 30 && x.SqlId > 0
+				 && x.CreateDateTime >= Convert.ToDateTime("2019-11-28 00:33:33.627") && !(x.InvoiceNumber.Contains("LK")))
+				 .OrderBy(x => x.SqlId)
+				 .ToList(x => new PurchaseTransaction()
+				 {
+					 SqlId = x.SqlId,
+					 PhysicalCardId = x.PhysicalCardId,
+					 TransactionAmount = x.TransactionAmount,
+					 MachineId = x.MachineId,
+					 N5_ProfileId = x.N5_ProfileId,
+					 Point = Convert.ToInt32(x.TransactionAmount / 30),
+					 InvoiceNumber = x.InvoiceNumber
+				 });
+
 
 				var statusArr = new int[] { 0, 2 };
 				var orderList = connection.QuerySet<Order>()

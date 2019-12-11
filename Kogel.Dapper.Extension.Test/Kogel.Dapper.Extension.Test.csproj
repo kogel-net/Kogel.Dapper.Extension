@@ -58,6 +58,7 @@
     <Compile Include="Model\OrderDetail.cs" />
     <Compile Include="Model\OrderResDto.cs" />
     <Compile Include="Model\Product.cs" />
+    <Compile Include="Model\PurchaseTransaction.cs" />
     <Compile Include="Model\ResourceMapping.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

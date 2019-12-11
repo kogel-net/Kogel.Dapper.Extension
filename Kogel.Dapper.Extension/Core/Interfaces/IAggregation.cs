@@ -12,13 +12,13 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// <returns></returns>
         int Count();
 
-        /// <summary>
-        /// 总和
-        /// </summary>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="sumExpression"></param>
-        /// <returns></returns>
-        int Sum<TResult>(Expression<Func<TResult, object>> sumExpression);
+		/// <summary>
+		/// 总和
+		/// </summary>
+		/// <typeparam name="TResult"></typeparam>
+		/// <param name="sumExpression"></param>
+		/// <returns></returns>
+		TResult Sum<TResult>(Expression<Func<T, TResult>> sumExpression);
 
         /// <summary>
         /// 最小值

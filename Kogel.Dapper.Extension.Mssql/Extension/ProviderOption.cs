@@ -63,6 +63,13 @@ namespace Kogel.Dapper.Extension.MsSql.Extension
 						spliceField.Append(" as nvarchar(2000))");
 					}
 					break;
+				case ConvertOption.ToDateTime:
+					{
+						spliceField.Append("cast(");
+						fieldInkove.Invoke();
+						spliceField.Append(" as datetime)");
+					}
+					break;
 			}
 		}
 		/// <summary>

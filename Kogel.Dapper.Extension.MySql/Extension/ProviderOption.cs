@@ -58,6 +58,13 @@ namespace Kogel.Dapper.Extension.MySql.Extension
 						spliceField.Append(" as char)");
 					}
 					break;
+				case ConvertOption.ToDateTime:
+					{
+						spliceField.Append("cast(");
+						fieldInkove.Invoke();
+						spliceField.Append(" as datetime)");
+					}
+					break;
 			}
 		}
 		/// <summary>
