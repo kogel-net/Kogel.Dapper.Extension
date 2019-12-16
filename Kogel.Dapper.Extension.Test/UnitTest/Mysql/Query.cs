@@ -134,6 +134,11 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 						x.ArticleId,
 						test1 = Function.Sum(x.Id)
 					});
+
+				var ids = conn.QuerySet<Comment>()
+				     .Where(x => x.Id > 0 && array1.Contains(x.Id) && x.Content.Replace("1", "2") == x.Content && x.Content.Contains(null))
+					 .Where(x => x.Id.In(array1))
+					 .Get(x => Function.Sum(x.Id));
 				//翻页
 				var comment1 = conn.QuerySet<Comment>()
 					.Join<Comment, News>((a, b) => a.ArticleId == b.Id)
