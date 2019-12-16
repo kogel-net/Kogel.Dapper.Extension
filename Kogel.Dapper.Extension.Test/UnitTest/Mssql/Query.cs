@@ -95,51 +95,51 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 						UpdateDate = DateTime.Now
 					});
 
-				//var pageList = connection.QuerySet<Lige.Model.Order>()
-				//	.WhereIf(0 != 0, x => x.IsDelete == false && x.Status == 0, x => x.IsDelete == false)
-				//	.OrderByDescing(x => x.CreateDate)
-				//	.PageList(1, 10, x => new OrderResDto()
-				//	{
-				//		Id = x.Id,
-				//		OrderNo = x.OrderNo,
-				//		OrderTime = x.CreateDate,
-				//		Status = x.Status,
-				//		Amount = x.Amount,
-				//		Point = x.Point,
-				//		IsAnyOrderDetail = Convert.ToBoolean(connection.QuerySet<OrderDetail>().Where(y => y.OrderNo == x.OrderNo).Count()),
-				//		//OrderDetailList = connection.QuerySet<OrderDetail>()
-				//		//.Where(y => y.IsDelete == false && y.OrderNo == x.OrderNo)
-				//		//.WhereIf(1 == 1, y => y.IsDelete == false && y.OrderNo == x.OrderNo, y => y.IsDelete == false)
-				//		//.Join<OrderDetail, Product>((a, b) => a.ProductCode == b.ProductCode, JoinMode.LEFT, true)
-				//		//.From<OrderDetail, Product>()
-				//		//.OrderBy<Product>(y => y.Id)
-				//		//.ToList(true, (a, b) => new OrderDetailResDto()
-				//		//{
-				//		//	Id = a.Id,
-				//		//	Name = a.ProductName,
-				//		//	Point = a.Point,
-				//		//	Price = a.Price,
-				//		//	Qty = a.Qty,
-				//		//	OriginalPrice = b.Price,
-				//		//	OriginalPoint = b.Point,
-				//		//}, null),
-				//		//DetailList = connection.QuerySet<OrderDetail>().Where(y => y.OrderNo == x.OrderNo).Get(),
-				//	});
-				List<string> N5_ProfileIdList = new List<string>() { "510002443", "510002444", "510002445", "510002446", "510002447", "510002449", "510002458" };
-				var list = connection.QuerySet<PurchaseTransaction>()
-				 .Where(x => x.N5_ProfileId.In(N5_ProfileIdList.ToArray()) && x.TransactionAmount >= 30 && x.SqlId > 0
-				 && x.CreateDateTime >= Convert.ToDateTime("2019-11-28 00:33:33.627") && !(x.InvoiceNumber.Contains("LK")))
-				 .OrderBy(x => x.SqlId)
-				 .ToList(x => new PurchaseTransaction()
-				 {
-					 SqlId = x.SqlId,
-					 PhysicalCardId = x.PhysicalCardId,
-					 TransactionAmount = x.TransactionAmount,
-					 MachineId = x.MachineId,
-					 N5_ProfileId = x.N5_ProfileId,
-					 Point = Convert.ToInt32(x.TransactionAmount / 30),
-					 InvoiceNumber = x.InvoiceNumber
-				 });
+				var pageList = connection.QuerySet<Lige.Model.Order>()
+					.WhereIf(0 != 0, x => x.IsDelete == false && x.Status == 0, x => x.IsDelete == false)
+					.OrderByDescing(x => x.CreateDate)
+					.PageList(1, 10, x => new OrderResDto()
+					{
+						Id = x.Id,
+						OrderNo = x.OrderNo,
+						OrderTime = x.CreateDate,
+						Status = x.Status,
+						Amount = x.Amount,
+						Point = x.Point,
+						IsAnyOrderDetail = Convert.ToBoolean(connection.QuerySet<OrderDetail>().Where(y => y.OrderNo == x.OrderNo).Count()),
+						OrderDetailList = connection.QuerySet<OrderDetail>()
+						.Where(y => y.IsDelete == false && y.OrderNo == x.OrderNo)
+						.WhereIf(1 == 1, y => y.IsDelete == false && y.OrderNo == x.OrderNo, y => y.IsDelete == false)
+						.Join<OrderDetail, Product>((a, b) => a.ProductCode == b.ProductCode, JoinMode.LEFT, true)
+						.From<OrderDetail, Product>()
+						.OrderBy<Product>(y => y.Id)
+						.ToList((a, b) => new OrderDetailResDto()
+						{
+							Id = a.Id,
+							Name = a.ProductName,
+							Point = a.Point,
+							Price = a.Price,
+							Qty = a.Qty,
+							OriginalPrice = b.Price,
+							OriginalPoint = b.Point,
+						}),
+						DetailList = connection.QuerySet<OrderDetail>().Where(y => y.OrderNo == x.OrderNo).Get(),
+					});
+				//List<string> N5_ProfileIdList = new List<string>() { "510002443", "510002444", "510002445", "510002446", "510002447", "510002449", "510002458" };
+				//var list = connection.QuerySet<PurchaseTransaction>()
+				// .Where(x => x.N5_ProfileId.In(N5_ProfileIdList.ToArray()) && x.TransactionAmount >= 30 && x.SqlId > 0
+				// && x.CreateDateTime >= Convert.ToDateTime("2019-11-28 00:33:33.627") && !(x.InvoiceNumber.Contains("LK")))
+				// .OrderBy(x => x.SqlId)
+				// .ToList(x => new PurchaseTransaction()
+				// {
+				//	 SqlId = x.SqlId,
+				//	 PhysicalCardId = x.PhysicalCardId,
+				//	 TransactionAmount = x.TransactionAmount,
+				//	 MachineId = x.MachineId,
+				//	 N5_ProfileId = x.N5_ProfileId,
+				//	 Point = Convert.ToInt32(x.TransactionAmount / 30),
+				//	 InvoiceNumber = x.InvoiceNumber
+				// });
 
 
 				var statusArr = new int[] { 0, 2 };
