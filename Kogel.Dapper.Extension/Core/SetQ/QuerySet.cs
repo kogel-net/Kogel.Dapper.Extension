@@ -35,6 +35,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			WhereBuilder = new StringBuilder();
 			Params = new DynamicParameters();
 			GroupExpressionList = new List<LambdaExpression>();
+			HavingExpressionList = new List<LambdaExpression>();
 		}
 
 		public QuerySet(IDbConnection conn, SqlProvider sqlProvider, IDbTransaction dbTransaction) : base(conn, sqlProvider, dbTransaction)
@@ -50,6 +51,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			WhereBuilder = new StringBuilder();
 			Params = new DynamicParameters();
 			GroupExpressionList = new List<LambdaExpression>();
+			HavingExpressionList = new List<LambdaExpression>();
 		}
 		#region 基础函数
 		public QuerySet<T> AsTableName(Type type, string tableName)
@@ -362,6 +364,45 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 				GroupExpressionList.Add(trueGroupByExp);
 			else
 				GroupExpressionList.Add(falseGroupByExp);
+			return this;
+		}
+
+		/// <summary>
+		/// 分组聚合条件
+		/// </summary>
+		/// <param name="havingExp"></param>
+		/// <returns></returns>
+		public QuerySet<T> Having(Expression<Func<T, object>> havingExp)
+		{
+			HavingExpressionList.Add(havingExp);
+			return this;
+		}
+
+		/// <summary>
+		/// 分组聚合条件(根据指定表)
+		/// </summary>
+		/// <typeparam name="THaving"></typeparam>
+		/// <param name="havingExp"></param>
+		/// <returns></returns>
+		public QuerySet<T> Having<THaving>(Expression<Func<THaving, object>> havingExp)
+		{
+			HavingExpressionList.Add(havingExp);
+			return this;
+		}
+		/// <summary>
+		/// 分组聚合条件(带判断)
+		/// </summary>
+		/// <typeparam name="THaving"></typeparam>
+		/// <param name="where"></param>
+		/// <param name="trueHavingExp"></param>
+		/// <param name="falseHavingExp"></param>
+		/// <returns></returns>
+		public QuerySet<T> HavingIf<THaving>(bool where, Expression<Func<THaving, object>> trueHavingExp, Expression<Func<THaving, object>> falseHavingExp)
+		{
+			if (where)
+				HavingExpressionList.Add(trueHavingExp);
+			else
+				HavingExpressionList.Add(falseHavingExp);
 			return this;
 		}
 		#endregion

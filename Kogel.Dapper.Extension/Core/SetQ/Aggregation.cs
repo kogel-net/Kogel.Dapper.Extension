@@ -36,11 +36,13 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             SqlProvider.FormatSum(sumExpression);
             return DbCon.QuerySingleOrDefault<TResult>(SqlProvider.SqlString, SqlProvider.Params, dbTransaction);
 		}
+
         public TResult Max<TResult>(Expression<Func<T, TResult>> maxExpression)
         {
             SqlProvider.FormatMax(maxExpression);
             return DbCon.QuerySingleOrDefault<TResult>(SqlProvider.SqlString, SqlProvider.Params, dbTransaction);
 		}
+
         public TResult Min<TResult>(Expression<Func<T, TResult>> minExpression)
         {
             SqlProvider.FormatMin(minExpression);

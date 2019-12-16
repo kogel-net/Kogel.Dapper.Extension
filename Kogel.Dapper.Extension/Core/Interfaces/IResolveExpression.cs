@@ -49,10 +49,9 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// </summary>
 		/// <param name="abstractSet"></param>
 		/// <param name="whereSql"></param>
-		/// <param name="Params"></param>
 		/// <param name="prefix"></param>
 		/// <returns></returns>
-		public virtual string ResolveWhereList(AbstractSet abstractSet, DynamicParameters Params, string prefix = null)
+		public virtual string ResolveWhereList(AbstractSet abstractSet, string prefix = null)
 		{
 			//添加Linq生成的sql条件和参数
 			List<LambdaExpression> lambdaExpressionList = abstractSet.WhereExpressionList;
@@ -64,7 +63,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 				//参数
 				foreach (var paramKey in whereParam.Param.ParameterNames)
 				{
-					Params.Add(paramKey, whereParam.Param.Get<object>(paramKey));
+					abstractSet.Params.Add(paramKey, whereParam.Param.Get<object>(paramKey));
 				}
 			}
 			//添加自定义sql生成的条件和参数
@@ -72,12 +71,12 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 			{
 				//添加自定义条件sql
 				builder.Append(abstractSet.WhereBuilder);
-				//参数
-				foreach (var paramKey in abstractSet.Params.ParameterNames)
-				{
-					if (!Params.ParameterNames.Contains(paramKey))
-						Params.Add(paramKey, abstractSet.Params.Get<object>(paramKey));
-				}
+				////参数
+				//foreach (var paramKey in abstractSet.Params.ParameterNames)
+				//{
+				//	if (!Params.ParameterNames.Contains(paramKey))
+				//		Params.Add(paramKey, abstractSet.Params.Get<object>(paramKey));
+				//}
 			}
 			return builder.ToString();
 		}
@@ -87,20 +86,46 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// </summary>
 		/// <param name="abstractSet"></param>
 		/// <returns></returns>
-		public virtual string ResolveGroupBy(AbstractSet abstractSet, string prefix = null)
+		public virtual string ResolveGroupBy(AbstractSet abstractSet)
 		{
 			StringBuilder builder = new StringBuilder();
 			var groupExpression = abstractSet.GroupExpressionList;
 			if (groupExpression != null && groupExpression.Any())
 			{
-				for (int i = 0; i < abstractSet.GroupExpressionList.Count; i++)
+				for (int i = 0; i < groupExpression.Count; i++)
 				{
-					var groupParam = new GroupExpression(groupExpression[i], $"{prefix}_{i}", providerOption);
+					var groupParam = new GroupExpression(groupExpression[i], $"Group_{i}", providerOption);
 					if (builder.Length != 0)
 						builder.Append(",");
 					builder.Append(groupParam.SqlCmd);
 				}
-				builder.Insert(0," GROUP BY ");
+				builder.Insert(0, " GROUP BY ");
+			}
+			return builder.ToString();
+		}
+
+		/// <summary>
+		/// 解析分组聚合条件
+		/// </summary>
+		/// <param name="abstractSet"></param>
+		/// <returns></returns>
+		public virtual string ResolveHaving(AbstractSet abstractSet)
+		{
+			StringBuilder builder = new StringBuilder();
+			var havingExpression = abstractSet.HavingExpressionList;
+			if (havingExpression != null && havingExpression.Any())
+			{
+				for (int i = 0; i < havingExpression.Count; i++)
+				{
+					var whereParam = new WhereExpression(havingExpression[i], $"Having_{i}", providerOption);
+					builder.Append(whereParam.SqlCmd);
+					//参数
+					foreach (var paramKey in whereParam.Param.ParameterNames)
+					{
+						abstractSet.Params.Add(paramKey, whereParam.Param.Get<object>(paramKey));
+					}
+				}
+				builder.Insert(0, " Having 1=1 ");
 			}
 			return builder.ToString();
 		}

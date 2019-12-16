@@ -16,7 +16,7 @@ namespace Kogel.Dapper.Extension.Core.SetC
     /// <typeparam name="T"></typeparam>
     public abstract class Command<T> : AbstractSet, ICommand<T>
     {
-        public readonly SqlProvider SqlProvider;
+   
         public readonly IDbConnection DbCon;
         public readonly IDbTransaction DbTransaction;
 

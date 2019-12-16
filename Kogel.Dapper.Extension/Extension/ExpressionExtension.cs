@@ -191,6 +191,17 @@ namespace Kogel.Dapper.Extension.Extension
 		{
 			return (LambdaExpression)(((UnaryExpression)(expression)).Operand);
 		}
+
+		/// <summary>
+		/// 成员表达式转lambda表达式
+		/// </summary>
+		/// <param name="expression"></param>
+		/// <returns></returns>
+		public static LambdaExpression GetLambdaExpressionByMember(this Expression expression)
+		{
+			var memberExpression = expression as MemberExpression;
+			return Expression.Lambda(memberExpression, memberExpression.Expression as ParameterExpression);
+		}
 		/// <summary>
 		/// 是否继承了IBaseEntity
 		/// </summary>

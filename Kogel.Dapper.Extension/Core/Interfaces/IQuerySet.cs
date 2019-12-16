@@ -107,6 +107,29 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// <param name="trueGroupByExp"></param>
 		/// <param name="falseGroupByExp"></param>
 		/// <returns></returns>
-		QuerySet<T> GroupByIf<TGroup>(bool where,Expression<Func<TGroup, object>> trueGroupByExp, Expression<Func<TGroup, object>> falseGroupByExp);
+		QuerySet<T> GroupByIf<TGroup>(bool where, Expression<Func<TGroup, object>> trueGroupByExp, Expression<Func<TGroup, object>> falseGroupByExp);
+
+		/// <summary>
+		/// 分组聚合条件
+		/// </summary>
+		/// <param name="havingExp"></param>
+		/// <returns></returns>
+		QuerySet<T> Having(Expression<Func<T, object>> havingExp);
+		/// <summary>
+		/// 分组聚合条件(根据指定表)
+		/// </summary>
+		/// <typeparam name="THaving"></typeparam>
+		/// <param name="havingExp"></param>
+		/// <returns></returns>
+		QuerySet<T> Having<THaving>(Expression<Func<THaving, object>> havingExp);
+		/// <summary>
+		/// 分组聚合条件(带判断)
+		/// </summary>
+		/// <typeparam name="THaving"></typeparam>
+		/// <param name="where"></param>
+		/// <param name="trueHavingExp"></param>
+		/// <param name="falseHavingExp"></param>
+		/// <returns></returns>
+		QuerySet<T> HavingIf<THaving>(bool where, Expression<Func<THaving, object>> trueHavingExp, Expression<Func<THaving, object>> falseHavingExp);
 	}
 }

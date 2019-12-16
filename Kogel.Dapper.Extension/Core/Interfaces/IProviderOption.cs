@@ -17,19 +17,27 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 			IsAsName = true;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
         public string OpenQuote { get; set; }
 
+		/// <summary>
+		/// 
+		/// </summary>
         public string CloseQuote { get; set; }
+
         /// <summary>
         /// 参数标识
         /// </summary>
         public char ParameterPrefix { get; set; }
-        /// <summary>
-        /// 字段处理
-        /// </summary>
-        /// <param name="field"></param>
-        /// <returns></returns>
-        public string CombineFieldName(string field)
+
+		/// <summary>
+		/// 字段处理
+		/// </summary>
+		/// <param name="field"></param>
+		/// <returns></returns>
+		public string CombineFieldName(string field)
         {
             return OpenQuote + field + CloseQuote;
         }
@@ -39,6 +47,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// </summary>
         /// <returns></returns>
         public abstract string GetDate();
+
 		/// <summary>
 		/// 结合转换处理
 		/// </summary>
@@ -46,6 +55,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// <param name="spliceField"></param>
 		/// <param name="fieldInkove"></param>
 		public abstract void CombineConvert(ConvertOption convertOption, StringBuilder spliceField, Action fieldInkove);
+
 		/// <summary>
 		/// 结合时间处理
 		/// </summary>
@@ -54,6 +64,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// <param name="fieldInkove"></param>
 		/// <param name="valueInkove"></param>
 		public abstract void CombineDate(DateOption dateOption, StringBuilder spliceField,  Action fieldInkove, Action valueInkove);
+
 		/// <summary>
 		/// 模糊转义
 		/// </summary>
@@ -65,6 +76,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 			value = $"%{value}%";
 			return value;
 		}
+
 		/// <summary>
 		/// 转小写
 		/// </summary>
@@ -77,6 +89,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 			fieldInkove.Invoke();
 			spliceField.Append(") ");
 		}
+
 		/// <summary>
 		/// 转大写
 		/// </summary>
@@ -89,6 +102,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 			fieldInkove.Invoke();
 			spliceField.Append(") ");
 		}
+
 		#region 临时属性
 		/// <summary>
 		/// 子查询导航的集合
@@ -102,6 +116,65 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// 是否重命名   table  as newName
 		/// </summary>
 		public bool IsAsName { get; set; }
+		#endregion
+
+		#region 聚合函数
+		/// <summary>
+		/// 计数
+		/// </summary>
+		/// <param name="spliceField"></param>
+		/// <param name="fieldInkove"></param>
+		/// <returns></returns>
+		public virtual void Count(StringBuilder spliceField, Action fieldInkove)
+		{
+			spliceField.Append(" Count(");
+			fieldInkove.Invoke();
+			spliceField.Append(") ");
+		}
+		/// <summary>
+		/// 计总
+		/// </summary>
+		/// <param name="spliceField"></param>
+		/// <param name="fieldInkove"></param>
+		public virtual void Sum(StringBuilder spliceField, Action fieldInkove)
+		{
+			spliceField.Append(" Sum(");
+			fieldInkove.Invoke();
+			spliceField.Append(") ");
+		}
+		/// <summary>
+		/// 最大值
+		/// </summary>
+		/// <param name="spliceField"></param>
+		/// <param name="fieldInkove"></param>
+		public virtual void Max(StringBuilder spliceField, Action fieldInkove)
+		{
+			spliceField.Append(" Max(");
+			fieldInkove.Invoke();
+			spliceField.Append(") ");
+		}
+		/// <summary>
+		/// 最小值
+		/// </summary>
+		/// <param name="spliceField"></param>
+		/// <param name="fieldInkove"></param>
+		public virtual void Min(StringBuilder spliceField, Action fieldInkove)
+		{
+			spliceField.Append(" Min(");
+			fieldInkove.Invoke();
+			spliceField.Append(") ");
+		}
+		/// <summary>
+		/// 平均值
+		/// </summary>
+		/// <param name="spliceField"></param>
+		/// <param name="fieldInkove"></param>
+		public virtual void Avg(StringBuilder spliceField, Action fieldInkove)
+		{
+			spliceField.Append(" Avg(");
+			fieldInkove.Invoke();
+			spliceField.Append(") ");
+		}
 		#endregion
 	}
 	/// <summary>

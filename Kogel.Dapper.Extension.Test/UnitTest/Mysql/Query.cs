@@ -16,11 +16,11 @@ using System.Data;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 {
-   public class Query
-    {
-        string mysqlConnection = "Server=localhost;Database=Qx_Sport_Common;Uid=root;Pwd=A5101264a;";
-        public void Test()
-        {
+	public class Query
+	{
+		string mysqlConnection = "Server=localhost;Database=Qx_Sport_Common;Uid=root;Pwd=A5101264a;";
+		public void Test()
+		{
 			//Sql执行前
 			SqlMapper.Aop.OnExecuting += (ref CommandDefinition command) =>
 			{
@@ -68,7 +68,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
 				//var comments = conn.Query<Comment>("Select * from Comment").ToList();
 
-				//var test1 = conn.QuerySet<Comment>().Where(x => 1 != 1).ToList(x => true);
+				var test1 = conn.QuerySet<Comment>().Where(x => 1 != 1).ToList(x => true);
 
 				//var getIfTest = conn.QuerySet<Comment>()
 				//	.Get(false, x => new CommentDto()
@@ -85,14 +85,14 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
 
 				DynamicParameters param = new DynamicParameters();
-				param.Add("Id",10);
+				param.Add("Id", 10);
 				var comment = conn.QuerySet<Comment>().Where("Id=@Id", param)
 					.ToList();
 
 				////使用导航属性
 				//var list = conn.Query<Comment, News>("SELECT * FROM COMMENT AS A LEFT JOIN NEWS AS B ON A.ArticleId=B.Id", (a, b) => {
 				//	a.News = b;
-    // 				}, splitOn: "Id");
+				// 				}, splitOn: "Id");
 
 
 				////var count = conn.QuerySet<Comment>().Count();
@@ -126,17 +126,18 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				var array1 = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 				var commne = conn.QuerySet<Comment>()
 					.Where(x => x.Id > 0 && array1.Contains(x.Id) && x.Content.Replace("1", "2") == x.Content && x.Content.Contains(null))
-					.Where(x=>x.Id.In(array1))
-					.Get(x => new
+					.Where(x => x.Id.In(array1))
+					.GroupBy(x => new { x.ArticleId })
+					.Having(x => Function.Sum(x.Id) >= 5)
+					.ToList(x => new
 					{
-						x.Id,
-						content = x.Content.ToUpper(),
-						test = (x.Content + "   "+x.Content).Trim()
+						x.ArticleId,
+						test1 = Function.Sum(x.Id)
 					});
 				//翻页
 				var comment1 = conn.QuerySet<Comment>()
 					.Join<Comment, News>((a, b) => a.ArticleId == b.Id)
-					.Where(x=> x.Id.ToString().ToUpper().Equals("3".ToUpper()))
+					.Where(x => x.Id.ToString().ToUpper().Equals("3".ToUpper()))
 					.Where(x => x.Id.Between(80, 100)
 					&& x.SubTime.AddDays(-10).AddYears(1) < DateTime.Now.AddYears(1) && x.Id > 10
 					&& x.Id > new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id < 3 && x.Id < y.Id).Sum(y => y.Id))
@@ -187,24 +188,24 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 			}
 		}
 
-		public  void TestMaxAndMin()
-        {
-            using (var conn = new MySqlConnection(mysqlConnection))
-            {
+		public void TestMaxAndMin()
+		{
+			using (var conn = new MySqlConnection(mysqlConnection))
+			{
 				var min = conn.QuerySet<Comment>().Where(x => 1 != 1).Min(x => x.Id);
 
-                var max = conn.QuerySet<Comment>().Max(x => x.Id);
-            }
-        }
+				var max = conn.QuerySet<Comment>().Max(x => x.Id);
+			}
+		}
 
-        public class Ormtest
-        {
-            public int id { set; get; }
-        
-            public string test1 { set; get; }
+		public class Ormtest
+		{
+			public int id { set; get; }
+
+			public string test1 { set; get; }
 
 
-            public string test2 { set; get; }
-        }
-    }
+			public string test2 { set; get; }
+		}
+	}
 }

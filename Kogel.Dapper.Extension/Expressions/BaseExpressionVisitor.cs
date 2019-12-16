@@ -100,6 +100,10 @@ namespace Kogel.Dapper.Extension.Expressions
 			{
 				return node;
 			}
+			else if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension.Function"))//系统函数
+			{
+				Operation(node);
+			}
 			else if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension"))
 			{
 				DynamicParameters parameters = new DynamicParameters();
@@ -214,6 +218,48 @@ namespace Kogel.Dapper.Extension.Expressions
 					}
 					break;
 				#endregion
+				#region 聚合函数
+				case "Count":
+					{
+						providerOption.Count(SpliceField, () =>
+						{
+							Visit(node.Arguments);
+						});
+					}
+					break;
+				case "Sum":
+					{
+						providerOption.Sum(SpliceField, () =>
+						{
+							Visit(node.Arguments);
+						});
+					}
+					break;
+				case "Max":
+					{
+						providerOption.Max(SpliceField, () =>
+						{
+							Visit(node.Arguments);
+						});
+					}
+					break;
+				case "Min":
+					{
+						providerOption.Min(SpliceField, () =>
+						{
+							Visit(node.Arguments);
+						});
+					}
+					break;
+				case "Avg":
+					{
+						providerOption.Avg(SpliceField, () =>
+						{
+							Visit(node.Arguments);
+						});
+					}
+					break;
+				#endregion
 				default:
 					SpliceField.Append(node.ToConvertAndGetValue());
 					break;
@@ -239,6 +285,10 @@ namespace Kogel.Dapper.Extension.Expressions
 		{
 			//使用convert函数里待执行的sql数据
 			if (node.Method.DeclaringType.FullName.Equals("Kogel.Dapper.Extension.ExpressExpansion"))//自定义扩展方法
+			{
+				Operation(node);
+			}
+			else if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension.Function"))//系统函数
 			{
 				Operation(node);
 			}
@@ -530,8 +580,56 @@ namespace Kogel.Dapper.Extension.Expressions
 					}
 					break;
 				#endregion
+				#region 聚合函数
+				case "Count":
+					{
+						providerOption.Count(SpliceField, () =>
+						{
+							Visit(node.Arguments);
+						});
+					}
+					break;
+				case "Sum":
+					{
+						providerOption.Sum(SpliceField, () =>
+						{
+							Visit(node.Arguments);
+						});
+					}
+					break;
+				case "Max":
+					{
+						providerOption.Max(SpliceField, () =>
+						{
+							Visit(node.Arguments);
+						});
+					}
+					break;
+				case "Min":
+					{
+						providerOption.Min(SpliceField, () =>
+						{
+							Visit(node.Arguments);
+						});
+					}
+					break;
+				case "Avg":
+					{
+						providerOption.Avg(SpliceField, () =>
+						{
+							Visit(node.Arguments);
+						});
+					}
+					break;
+				#endregion
 				default:
-					throw new DapperExtensionException($"Kogel.Dapper.Extension不支持此功能[{node.Method.Name}]");
+					{
+						if (node.Object != null)
+							Visit(node.Object);
+						else
+							Visit(node.Arguments);
+					}
+					break;
 			}
 		}
 	}

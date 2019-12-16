@@ -16,7 +16,6 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 	/// <typeparam name="T"></typeparam>
 	public abstract class Query<T> : AbstractSet, IQuery<T>
 	{
-		public readonly SqlProvider SqlProvider;
 		public readonly IDbConnection DbCon;
 		public readonly IDbTransaction DbTransaction;
 
