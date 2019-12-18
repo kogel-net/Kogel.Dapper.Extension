@@ -7,11 +7,16 @@ using Kogel.Dapper.Extension.Attributes;
 
 namespace Kogel.Dapper.Extension.Test.Model
 {
-    [Display(AsName ="commm4")]
-    public class Comment:IBaseEntity<int>
-    {
+
+	public class BaseEntity: IBaseEntity<int>
+	{
 		[Identity]
 		public int Id { get; set; }
+	}
+
+
+    public class Comment: BaseEntity
+	{
         /// <summary>
         /// 评论父级id，不为0则是回复评论
         /// </summary>
@@ -44,6 +49,10 @@ namespace Kogel.Dapper.Extension.Test.Model
 		//public News News { get; set; }
 	
     }
+
+
+
+
     [Display(Rename = "Comment", AsName ="commm5")]
     public class Comment1 : Comment
     {
