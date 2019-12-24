@@ -13,6 +13,7 @@ using System.Threading;
 using System.Diagnostics;
 using Kogel.Dapper.Extension.Model;
 using System.Data;
+using static Dapper.SqlMapper;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 {
@@ -68,7 +69,9 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
 				//var comments = conn.Query<Comment>("Select * from Comment").ToList();
 
-				var test1 = conn.QuerySet<Comment>().Where(x => 1 != 1).ToList(x => true);
+				//var lis = conn.Query<News1, List<Comment>, News1, News1, News1, News1>("SELECT * FROM NEWS AS A LEFT JOIN COMMENT AS B ON A.Id=B.ArticleId");
+
+				//var test1 = conn.QuerySet<News1>().Get();
 
 				//var getIfTest = conn.QuerySet<Comment>()
 				//	.Get(false, x => new CommentDto()
@@ -86,8 +89,16 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
 				DynamicParameters param = new DynamicParameters();
 				param.Add("Id", 10);
-				var comment = conn.QuerySet<Comment>().Where("Id=@Id", param)
+
+
+				var comment = conn.QuerySet<Comment2>()
+					.Where(x => x.News.Any(y => y.Id == 1))
 					.ToList();
+
+				//	var list= conn.QueryFirstOrDefault<News1, List<Comment>, DontMap, DontMap, DontMap, DontMap>(@"SELECT
+				//* FROM News AS A LEFT JOIN COMMENT AS B ON A.Id=B.ArticleId");
+
+				//var list1 = conn.Query<Comment2, News>("SELECT * FROM COMMENT AS A LEFT JOIN NEWS AS B ON A.ArticleId=B.Id");
 
 				////使用导航属性
 				//var list = conn.Query<Comment, News>("SELECT * FROM COMMENT AS A LEFT JOIN NEWS AS B ON A.ArticleId=B.Id", (a, b) => {
@@ -136,7 +147,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 					});
 
 				var ids = conn.QuerySet<Comment>()
-				     .Where(x => x.Id > 0 && array1.Contains(x.Id) && x.Content.Replace("1", "2") == x.Content && x.Content.Contains(null))
+					 .Where(x => x.Id > 0 && array1.Contains(x.Id) && x.Content.Replace("1", "2") == x.Content && x.Content.Contains(null))
 					 .Where(x => x.Id.In(array1))
 					 .Get(x => Function.Sum(x.Id));
 				//翻页

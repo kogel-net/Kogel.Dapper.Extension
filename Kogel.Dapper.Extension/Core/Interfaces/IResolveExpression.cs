@@ -272,20 +272,25 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// <param name="sql"></param>
 		/// <param name="selectExp"></param>
 		/// <returns></returns>
-		public virtual string ResolveJoinSql(List<JoinAssTable> joinAssTables, ref string sql, LambdaExpression selectExp)
+		public virtual string ResolveJoinSql(List<JoinAssTable> joinAssTables, ref string sql, AbstractSet abstractSet)
 		{
 			StringBuilder builder = new StringBuilder(Environment.NewLine);
+			var masterEntity = EntityCache.QueryEntity(abstractSet.TableType);
+			if (masterEntity.Navigations.Any())
+			{
+				joinAssTables.AddRange(masterEntity.Navigations.ToArray());
+			}
 			if (joinAssTables.Count != 0)
 			{
-				StringBuilder sqlBuilder = new StringBuilder();
 				//循环拼接连表对象
-				for (var i = 0; i < joinAssTables.Count; i++)
+				for (int i = 0; i < joinAssTables.Count; i++)
 				{
 					var item = joinAssTables[i];
-					if (item.Action == JoinAction.defaults)//默认连表
+					if (item.Action == JoinAction.Default || item.Action == JoinAction.Navigation)//默认连表
 					{
+						string leftTable = providerOption.CombineFieldName(item.LeftTabName);
 						builder.Append($@" {item.JoinMode.ToString()} JOIN 
-                                       {providerOption.CombineFieldName(item.LeftTabName)} ON {providerOption.CombineFieldName(item.LeftTabName)}
+                                       {leftTable} ON {leftTable}
                                       .{providerOption.CombineFieldName(item.LeftAssName)} = {providerOption.CombineFieldName(item.RightTabName)}
                                       .{providerOption.CombineFieldName(item.RightAssName)} " + Environment.NewLine);
 					}
@@ -298,36 +303,38 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 							continue;
 						}
 					}
-					sqlBuilder.Append(GetTableField(EntityCache.QueryEntity(item.TableType)) + (i != joinAssTables.Count - 1 ? "," : ""));
-				}
-
-				if (sqlBuilder.Length != 0 && selectExp == null)//不是自定义返回视图则显示所有字段
-				{
-					sql += "," + sqlBuilder.ToString();
-					//判断是否有前表命名冲突的字段
-					var sqlArray = sql.Split(',').ToList();
-					var changeArray = sqlArray.Select(x =>
-					  new
-					  {
-						  oldValue = x,
-						  newValue = x.Substring(x.IndexOf(".") + 1)
-					  }).GroupBy(x => x.newValue);
-					foreach (var fieldArr in changeArray)
+					StringBuilder sqlBuilder = new StringBuilder();
+					//连表实体
+					var joinEntity = EntityCache.QueryEntity(item.TableType);
+					//表名称
+					string joinTableName = joinEntity.AsName == joinEntity.Name ? providerOption.CombineFieldName(joinEntity.Name) : joinEntity.AsName;
+					foreach (string fieldValue in joinEntity.FieldPairs.Values)
 					{
-						if (fieldArr.Count() > 1)
+						//首先添加表名称
+						sqlBuilder.Append($",{joinTableName}.");
+						//字段
+						string field = providerOption.CombineFieldName(fieldValue);
+						//字符出现的次数
+						int repeatCount = sql.Split(new string[] { field }, StringSplitOptions.None).Length - 1;
+						//添加字段
+						sqlBuilder.Append(field);
+						if (repeatCount > 0)
 						{
-							var fieldList = fieldArr.ToList();
-							for (var i = 1; i < fieldArr.Count(); i++)
-							{
-								var index = sqlArray.IndexOf(fieldList[i].oldValue);
-								if (index != -1)
-								{
-									sqlArray[index] += $" AS {fieldList[i].newValue.Substring(0, fieldList[i].newValue.Length - 1)}_{i + providerOption.CloseQuote}";
-								}
-							}
+							sqlBuilder.Append($" AS {fieldValue}_{repeatCount}");
+							item.MapperList.Add(fieldValue, $"{fieldValue}_{repeatCount}");
+						}
+						else
+						{
+							item.MapperList.Add(fieldValue, fieldValue);
 						}
 					}
-					sql = string.Join(",", sqlArray);
+					//重新注册实体映射
+					SqlMapper.SetTypeMap(joinEntity.Type, new CustomPropertyTypeMap(joinEntity.Type,
+							(type, column) =>
+							type.GetPropertys(item.MapperList.FirstOrDefault(x => x.Value.Equals(column)).Key)
+							));
+					//设置sql字段
+					sql += sqlBuilder;
 				}
 			}
 			return builder.ToString();

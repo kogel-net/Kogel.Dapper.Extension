@@ -14,7 +14,7 @@ namespace Kogel.Dapper.Extension.Model
 	{
 		public Navigation()
 		{
-			WhereExpressionList = new List<LambdaExpression>();
+			//WhereExpressionList = new List<LambdaExpression>();
 		}
 
 		/// <summary>
@@ -24,7 +24,7 @@ namespace Kogel.Dapper.Extension.Model
 		/// <summary>
 		/// 关联条件
 		/// </summary>
-		public List<LambdaExpression> WhereExpressionList { get; set; }
+		public string JoinWhere { get; set; }
 		/// <summary>
 		/// 连接表实体
 		/// </summary>

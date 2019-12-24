@@ -5,42 +5,47 @@ using Dapper;
 
 namespace Kogel.Dapper.Extension.Model
 {
-  
-    public class JoinAssTable
-    {
-        private JoinAction _action;
-        private JoinMode _joinMode;
-        private string _rightTabName;
-        private string _leftTabName;
-        private string _rightAssName;
-        private string _leftAssName;
-        private Type _tableType;
-        private string _joinSql;
-        public DynamicParameters _params;
+	public class JoinAssTable
+	{
+		public JoinAssTable()
+		{
+			MapperList = new Dictionary<string, string>();
+		}
 
+		public JoinAction Action { get; set; }
+		public JoinMode JoinMode { get; set; }
+		public string RightTabName { get; set; }
+		public string LeftTabName { get; set; }
+		public string RightAssName { get; set; }
+		public string LeftAssName { get; set; }
+		public Type TableType { get; set; }
+		public string JoinSql { get; set; }
+		public Type PropertyType { get; set; }
+		/// <summary>
+		/// 表首字段
+		/// </summary>
+		public string FirstFieldName => MapperList.Values.AsList()[0];
+		/// <summary>
+		/// 隐射目录
+		/// </summary>
+		public Dictionary<string, string> MapperList { get; set; }
+	}
 
+	/// <summary>
+	/// 连表方式
+	/// </summary>
+	public enum JoinAction
+	{
+		Default,//默认表达式
+		Sql,//sql查询
+		Navigation//导航属性
+	}
 
-        public JoinAction Action { get => _action; set => _action = value; }
-        public JoinMode JoinMode { get => _joinMode; set => _joinMode = value; }
-        public string RightTabName { get => _rightTabName; set => _rightTabName = value; }
-        public string LeftTabName { get => _leftTabName; set => _leftTabName = value; }
-        public string RightAssName { get => _rightAssName; set => _rightAssName = value; }
-        public string LeftAssName { get => _leftAssName; set => _leftAssName = value; }
-        public Type TableType { get => _tableType; set => _tableType = value; }
-        public string JoinSql { get => _joinSql; set => _joinSql = value; }
-    }
-
-    public enum JoinAction
-    {
-        defaults,
-        sqlJoin,//sql查询
-    }
-
-    public enum JoinMode
-    {
-        LEFT,//左连接
-        RIGHT,//右连接
-        INNER,//内连接
-        FULL,//全连接
-    }
+	public enum JoinMode
+	{
+		LEFT,//左连接
+		RIGHT,//右连接
+		INNER,//内连接
+		FULL,//全连接
+	}
 }

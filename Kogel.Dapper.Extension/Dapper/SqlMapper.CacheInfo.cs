@@ -6,7 +6,7 @@ namespace Dapper
 {
     public static partial class SqlMapper
     {
-        private class CacheInfo
+        internal class CacheInfo
         {
             public DeserializerState Deserializer { get; set; }
             public Func<IDataReader, object>[] OtherDeserializers { get; set; }

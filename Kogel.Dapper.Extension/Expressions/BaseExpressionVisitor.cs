@@ -69,7 +69,7 @@ namespace Kogel.Dapper.Extension.Expressions
 		{
 			//需要计算的字段值
 			var expTypeName = node.Expression?.GetType().FullName ?? "";
-			if (expTypeName == "System.Linq.Expressions.TypedParameterExpression")
+			if (expTypeName == "System.Linq.Expressions.TypedParameterExpression" || expTypeName == "System.Linq.Expressions.PropertyExpression")
 			{
 				var member = EntityCache.QueryEntity(node.Expression.Type);
 				string fieldName = member.FieldPairs[node.Member.Name];
@@ -331,7 +331,7 @@ namespace Kogel.Dapper.Extension.Expressions
 		protected override Expression VisitMember(MemberExpression node)
 		{
 			var expTypeName = node.Expression?.GetType().FullName ?? "";
-			if (expTypeName == "System.Linq.Expressions.TypedParameterExpression")
+			if (expTypeName == "System.Linq.Expressions.TypedParameterExpression" || expTypeName == "System.Linq.Expressions.PropertyExpression")
 			{
 				var member = EntityCache.QueryEntity(node.Expression.Type);
 				string asName = string.Empty;
@@ -495,6 +495,22 @@ namespace Kogel.Dapper.Extension.Expressions
 							Visit(node.Arguments[1]);
 							SpliceField.Append(" AND ");
 							Visit(node.Arguments[2]);
+						}
+					}
+					break;
+				case "Any":
+					{
+						var binaryExp = (node.Arguments[1] as LambdaExpression)?.Body as BinaryExpression;
+						if (binaryExp != null)
+						{
+							var binaryVisitor = new BinaryExpressionVisitor(binaryExp, providerOption);
+							this.SpliceField.Append(binaryVisitor.SpliceField.Replace("=", "In"));
+							//添加参数
+							foreach (string paramName in binaryVisitor.Param.ParameterNames)
+							{
+								var objectParam = new object[] { binaryVisitor.Param.Get<object>(paramName) };
+								this.Param.Add(paramName, objectParam);
+							}
 						}
 					}
 					break;

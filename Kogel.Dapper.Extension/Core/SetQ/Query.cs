@@ -37,14 +37,13 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 		public T Get()
 		{
 			SqlProvider.FormatGet<T>();
-			return DbCon.QueryFirstOrDefaults<T>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, SqlProvider.ProviderOption);
-
+			return DbCon.QueryFirstOrDefaults<T>(SqlProvider, DbTransaction);
 		}
 
 		public TSource Get<TSource>()
 		{
 			SqlProvider.FormatGet<T>();
-			return DbCon.QueryFirstOrDefaults<TSource>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, SqlProvider.ProviderOption);
+			return DbCon.QueryFirstOrDefaults<TSource>(SqlProvider, DbTransaction);
 		}
 
 		public TReturn Get<TReturn>(Expression<Func<T, TReturn>> select)
@@ -67,19 +66,19 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 		public async Task<T> GetAsync()
 		{
 			SqlProvider.FormatGet<T>();
-			return await DbCon.QueryFirstOrDefaultAsyncs<T>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
+			return await DbCon.QueryFirstOrDefaultAsyncs<T>(SqlProvider, DbTransaction);
 		}
 
 		public IEnumerable<T> ToIEnumerable()
 		{
 			SqlProvider.FormatToList<T>();
-			return DbCon.Querys<T>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, SqlProvider.ProviderOption);
+			return DbCon.Querys<T>(SqlProvider, DbTransaction);
 		}
 
 		public IEnumerable<TSource> ToIEnumerable<TSource>()
 		{
 			SqlProvider.FormatToList<T>();
-			return DbCon.Querys<TSource>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, SqlProvider.ProviderOption);
+			return DbCon.Querys<TSource>(SqlProvider, DbTransaction);
 		}
 
 		public IEnumerable<TReturn> ToIEnumerable<TReturn>(Expression<Func<T, TReturn>> select)
@@ -102,19 +101,19 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 		public async Task<IEnumerable<T>> ToIEnumerableAsync()
 		{
 			SqlProvider.FormatToList<T>();
-			return await DbCon.QueryAsyncs<T>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
+			return await DbCon.QueryAsyncs<T>(SqlProvider, DbTransaction);
 		}
 
 		public List<T> ToList()
 		{
 			SqlProvider.FormatToList<T>();
-			return DbCon.Querys<T>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, SqlProvider.ProviderOption).ToList();
+			return DbCon.Querys<T>(SqlProvider, DbTransaction).ToList();
 		}
 
 		public List<TSource> ToList<TSource>()
 		{
 			SqlProvider.FormatToList<T>();
-			return DbCon.Querys<TSource>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, SqlProvider.ProviderOption).ToList();
+			return DbCon.Querys<TSource>(SqlProvider, DbTransaction).ToList();
 		}
 
 		public List<TReturn> ToList<TReturn>(Expression<Func<T, TReturn>> select)
@@ -137,7 +136,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 		public async Task<List<T>> ToListAsync()
 		{
 			SqlProvider.FormatToList<T>();
-			var iEnumerable = await DbCon.QueryAsyncs<T>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
+			var iEnumerable = await DbCon.QueryAsyncs<T>(SqlProvider, DbTransaction);
 			return iEnumerable.ToList();
 		}
 
@@ -145,7 +144,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 		{
 			//查询总行数
 			SqlProvider.FormatCount();
-			var pageTotal = DbCon.QuerySingles<int>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
+			var pageTotal = DbCon.QuerySingles<int>(SqlProvider, DbTransaction);
 			//查询数据
 			SqlProvider.FormatToPageList<T>(pageIndex, pageSize);
 			var itemList = DbCon.Query_1<T>(SqlProvider.SqlString, SqlProvider.ProviderOption, SqlProvider.Params, DbTransaction);
@@ -156,7 +155,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 		{
 			//查询总行数
 			SqlProvider.FormatCount();
-			var pageTotal = DbCon.QuerySingles<int>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
+			var pageTotal = DbCon.QuerySingles<int>(SqlProvider, DbTransaction);
 			SqlProvider.FormatToPageList<T>(pageIndex, pageSize);
 			//查询数据
 			var itemList = DbCon.Query_1<TSource>(SqlProvider.SqlString, SqlProvider.ProviderOption, SqlProvider.Params, DbTransaction);
@@ -167,7 +166,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 		{
 			//查询总行数
 			SqlProvider.FormatCount();
-			var pageTotal = DbCon.QuerySingles<int>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
+			var pageTotal = DbCon.QuerySingles<int>(SqlProvider, DbTransaction);
 			//查询数据
 			SqlProvider.Context.Set.SelectExpression = select;
 			SqlProvider.FormatToPageList<T>(pageIndex, pageSize);
@@ -179,7 +178,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 		{
 			//查询总行数
 			SqlProvider.FormatCount();
-			var pageTotal = DbCon.QuerySingles<int>(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
+			var pageTotal = DbCon.QuerySingles<int>(SqlProvider, DbTransaction);
 			if (where)
 				SqlProvider.Context.Set.SelectExpression = trueSelect;
 			else
@@ -192,14 +191,14 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 		public DataSet ToDataSet(IDbDataAdapter dataAdapter = null)
 		{
 			SqlProvider.FormatToList<T>();
-			return DbCon.QueryDataSets(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, dataAdapter);
+			return DbCon.QueryDataSets(SqlProvider, DbTransaction, dataAdapter);
 		}
 
 		public DataSet ToDataSet<TReturn>(Expression<Func<T, TReturn>> select, IDbDataAdapter dataAdapter = null)
 		{
 			SqlProvider.Context.Set.SelectExpression = select;
 			SqlProvider.FormatToList<T>();
-			return DbCon.QueryDataSets(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, dataAdapter);
+			return DbCon.QueryDataSets(SqlProvider, DbTransaction, dataAdapter);
 		}
 
 		public DataSet ToDataSet<TReturn>(bool where, Expression<Func<T, TReturn>> trueSelect, Expression<Func<T, TReturn>> falseSelect, IDbDataAdapter dataAdapter = null)
@@ -209,7 +208,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			else
 				SqlProvider.Context.Set.SelectExpression = falseSelect;
 			SqlProvider.FormatToList<T>();
-			return DbCon.QueryDataSets(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, dataAdapter);
+			return DbCon.QueryDataSets(SqlProvider, DbTransaction, dataAdapter);
 		}
 	}
 }

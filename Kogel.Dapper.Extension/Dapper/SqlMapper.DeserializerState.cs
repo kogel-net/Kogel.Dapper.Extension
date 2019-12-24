@@ -5,7 +5,7 @@ namespace Dapper
 {
     public static partial class SqlMapper
     {
-        private struct DeserializerState
+        internal struct DeserializerState
         {
             public readonly int Hash;
             public readonly Func<IDataReader, object> Func;

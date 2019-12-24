@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using static Dapper.SqlMapper;
+using static Dapper.SqlMapperExtension;
 
 namespace Kogel.Dapper.Extension.Extension
 {
@@ -19,46 +20,90 @@ namespace Kogel.Dapper.Extension.Extension
 	public static class NavigationExtension
 	{
 		/// <summary>
+		/// 获取导航属性的类型列表
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
+		private static Type[] GetNavigationTypes<T>()
+		{
+			EntityObject entity = EntityCache.QueryEntity(typeof(T));
+			List<Type> typeList = new List<Type>() { entity.Type };
+			for (var i = 0; i < 5; i++)
+			{
+				if (entity.Navigations.Count > i)
+					typeList.Add(entity.Navigations[i].PropertyType);
+				else
+					typeList.Add(typeof(DontMap));
+			}
+			return typeList.ToArray();
+		}
+
+		/// <summary>
 		/// 单个返回
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <param name="dbCon"></param>
-		/// <param name="sql"></param>
-		/// <param name="param"></param>
+		/// <param name="provider"></param>
 		/// <param name="transaction"></param>
 		/// <returns></returns>
-		public static T QueryFirstOrDefaults<T>(this IDbConnection dbCon, string sql, object param, IDbTransaction transaction, IProviderOption providerOption)
+		public static T QueryFirstOrDefaults<T>(this IDbConnection dbCon, SqlProvider provider, IDbTransaction transaction)
 		{
-			return dbCon.QueryFirstOrDefault<T>(sql, param, transaction);
+			return (T)typeof(SqlMapperExtension)
+					.GetMethod("QueryFirstOrDefault")
+					.MakeGenericMethod(GetNavigationTypes<T>())
+					.Invoke(null, new object[] { dbCon, provider, transaction });
 		}
+
 		/// <summary>
 		/// 单个异步返回
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <param name="dbCon"></param>
-		/// <param name="sql"></param>
-		/// <param name="param"></param>
+		/// <param name="provider"></param>
 		/// <param name="transaction"></param>
 		/// <returns></returns>
-		public static Task<T> QueryFirstOrDefaultAsyncs<T>(this IDbConnection dbCon, string sql, object param, IDbTransaction transaction)
+		public static Task<T> QueryFirstOrDefaultAsyncs<T>(this IDbConnection dbCon, SqlProvider provider, IDbTransaction transaction)
 		{
-			return dbCon.QueryFirstOrDefaultAsync<T>(sql, param, transaction);
+			return (Task<T>)typeof(SqlMapperExtension)
+				   .GetMethod("QueryFirstOrDefaultAsync")
+				   .MakeGenericMethod(GetNavigationTypes<T>())
+				   .Invoke(null, new object[] { dbCon, provider, transaction });
 		}
+
 		/// <summary>
 		/// 列表返回
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <param name="dbCon"></param>
-		/// <param name="sql"></param>
-		/// <param name="param"></param>
+		/// <param name="provider"></param>
 		/// <param name="transaction"></param>
 		/// <returns></returns>
-		public static IEnumerable<T> Querys<T>(this IDbConnection dbCon, string sql, object param, IDbTransaction transaction, IProviderOption providerOption)
+		public static IEnumerable<T> Querys<T>(this IDbConnection dbCon, SqlProvider provider, IDbTransaction transaction)
 		{
-			return dbCon.Query<T>(sql, param, transaction);
+			return (IEnumerable<T>)typeof(SqlMapperExtension)
+			.GetMethod("Query")
+			.MakeGenericMethod(GetNavigationTypes<T>())
+			.Invoke(null, new object[] { dbCon, provider, transaction });
 		}
+
 		/// <summary>
 		/// 列表异步返回
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="dbCon"></param>
+		/// <param name="provider"></param>
+		/// <param name="transaction"></param>
+		/// <returns></returns>
+		public static Task<IEnumerable<T>> QueryAsyncs<T>(this IDbConnection dbCon, SqlProvider provider, IDbTransaction transaction)
+		{
+			return (Task<IEnumerable<T>>)typeof(SqlMapperExtension)
+			.GetMethod("QueryAsync")
+			.MakeGenericMethod(GetNavigationTypes<T>())
+			.Invoke(null, new object[] { dbCon, provider, transaction });
+		}
+
+		/// <summary>
+		/// DataReader返回
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <param name="dbCon"></param>
@@ -66,35 +111,37 @@ namespace Kogel.Dapper.Extension.Extension
 		/// <param name="param"></param>
 		/// <param name="transaction"></param>
 		/// <returns></returns>
-		public static Task<IEnumerable<T>> QueryAsyncs<T>(this IDbConnection dbCon, string sql, object param, IDbTransaction transaction)
+		public static GridReader QueryMultiples<T>(this IDbConnection dbCon, SqlProvider provider, IDbTransaction transaction)
 		{
-			return dbCon.QueryAsync<T>(sql, param, transaction);
+			return dbCon.QueryMultiple(provider.SqlString, provider.Params, transaction);
 		}
 
-
-		public static GridReader QueryMultiples<T>(this IDbConnection dbCon, string sql, object param, IDbTransaction transaction)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="dbCon"></param>
+		/// <param name="provider"></param>
+		/// <param name="transaction"></param>
+		/// <returns></returns>
+		public static T QuerySingles<T>(this IDbConnection dbCon, SqlProvider provider, IDbTransaction transaction)
 		{
-			return dbCon.QueryMultiple(sql, param, transaction);
+			return dbCon.QuerySingleOrDefault<T>(provider.SqlString, provider.Params, transaction);
 		}
 
-		public static T QuerySingles<T>(this IDbConnection dbCon, string sql, object param, IDbTransaction transaction)
-		{
-			return dbCon.QuerySingleOrDefault<T>(sql, param, transaction);
-		}
 		/// <summary>
 		/// 数据集返回
 		/// </summary>
 		/// <param name="dbCon"></param>
-		/// <param name="sql"></param>
-		/// <param name="param"></param>
+		/// <param name="provider"></param>
 		/// <param name="transaction"></param>
 		/// <param name="dataAdapter"></param>
 		/// <returns></returns>
-		public static DataSet QueryDataSets(this IDbConnection dbCon, string sql, object param, IDbTransaction transaction, IDbDataAdapter dataAdapter)
+		public static DataSet QueryDataSets(this IDbConnection dbCon, SqlProvider provider, IDbTransaction transaction, IDbDataAdapter dataAdapter)
 		{
 			if (dataAdapter == null)
 				dataAdapter = new SqlDataAdapter();
-			return dbCon.QueryDataSet(dataAdapter, sql, param, transaction);
+			return dbCon.QueryDataSet(dataAdapter, provider.SqlString, provider.Params, transaction);
 		}
 	}
 }

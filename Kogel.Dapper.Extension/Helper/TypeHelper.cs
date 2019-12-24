@@ -56,5 +56,5 @@ namespace Kogel.Dapper.Extension.Helper
             }
             return type;
         }
-    }
+	}
 }

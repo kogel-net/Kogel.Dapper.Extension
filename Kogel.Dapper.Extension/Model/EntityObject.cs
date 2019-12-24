@@ -54,16 +54,31 @@ namespace Kogel.Dapper.Extension.Model
 			//字段字典
 			this.FieldPairs = new Dictionary<string, string>();
 			//导航列表
-			this.Navigations = new List<Navigation>();
+			this.Navigations = new List<JoinAssTable>();
 			//反射实体类字段
 			foreach (var item in this.Properties)
 			{
-				////当前字段是导航属性
-				//var foreignKey = item.GetCustomAttributes(true).FirstOrDefault(x => x.GetType().Equals(typeof(ForeignKey)));
-				//if (foreignKey != null)
-				//{
-				//	continue;
-				//}
+				//当前字段是导航属性
+				var foreignKey = item.GetCustomAttributes(true).FirstOrDefault(x => x.GetType().Equals(typeof(ForeignKey)));
+				if (foreignKey != null)
+				{
+					var foreign = foreignKey as ForeignKey;
+					//导航属性表
+					var navigationTable = !item.PropertyType.FullName.Contains("System.Collections.Generic") ? item.PropertyType : item.PropertyType.GenericTypeArguments[0];
+					this.Navigations.Add(new JoinAssTable()
+					{
+						Action = JoinAction.Navigation,
+						JoinMode = JoinMode.LEFT,
+						RightTabName = this.AsName,
+						RightAssName = foreign.IndexField,
+						LeftTabName = EntityCache.QueryEntity(navigationTable).AsName,
+						LeftAssName = foreign.AssoField,
+						TableType = navigationTable,
+						PropertyType = item.PropertyType
+					});
+					PropertyInfoList.Add(item);
+					continue;
+				}
 				//当前字段属性设置
 				var fieldAttribute = item.GetCustomAttributes(true).FirstOrDefault(x => x.GetType().Equals(typeof(Display)));
 				if (fieldAttribute != null)
@@ -134,7 +149,7 @@ namespace Kogel.Dapper.Extension.Model
 		/// <summary>
 		/// 导航属性列表
 		/// </summary>
-		public List<Navigation> Navigations { get; set; }
+		public List<JoinAssTable> Navigations { get; set; }
 		/// <summary>
 		/// 获取asname
 		/// </summary>

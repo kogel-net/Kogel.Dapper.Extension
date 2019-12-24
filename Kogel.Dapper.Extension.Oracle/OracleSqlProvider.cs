@@ -26,7 +26,7 @@ namespace Kogel.Dapper.Extension.Oracle
 
             var fromTableSql = FormatTableName();
 
-            var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref selectSql, Context.Set.SelectExpression);
+            var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref selectSql, Context.Set);
 
 			var whereSql = ResolveExpression.ResolveWhereList(Context.Set);
 
@@ -57,7 +57,7 @@ namespace Kogel.Dapper.Extension.Oracle
 
             var fromTableSql = FormatTableName();
 
-            var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref selectSql, Context.Set.SelectExpression);
+            var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref selectSql, Context.Set);
 
 			var whereSql = ResolveExpression.ResolveWhereList(Context.Set);
 
@@ -80,7 +80,7 @@ namespace Kogel.Dapper.Extension.Oracle
 
             var fromTableSql = FormatTableName();
 
-            var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref selectSql, Context.Set.SelectExpression);
+            var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref selectSql, Context.Set);
 
 			var whereSql = ResolveExpression.ResolveWhereList(Context.Set);
 
@@ -106,7 +106,7 @@ namespace Kogel.Dapper.Extension.Oracle
             var fromTableSql = FormatTableName();
 
             string noneSql = "";
-            var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql, Context.Set.SelectExpression);
+            var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql, Context.Set);
 
 			var whereSql = ResolveExpression.ResolveWhereList(Context.Set);
 
@@ -182,7 +182,7 @@ namespace Kogel.Dapper.Extension.Oracle
             var fromTableSql = FormatTableName();
 
             string noneSql = "";
-            var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql, Context.Set.SelectExpression);
+            var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql, Context.Set);
 
 			var whereSql = ResolveExpression.ResolveWhereList(Context.Set);
 
@@ -198,7 +198,7 @@ namespace Kogel.Dapper.Extension.Oracle
             var fromTableSql = FormatTableName();
 
             string noneSql = "";
-            var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql, Context.Set.SelectExpression);
+            var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql, Context.Set);
 
 			var whereSql = ResolveExpression.ResolveWhereList(Context.Set);
 
@@ -213,7 +213,7 @@ namespace Kogel.Dapper.Extension.Oracle
             var fromTableSql = FormatTableName();
 
             string noneSql = "";
-            var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql, Context.Set.SelectExpression);
+            var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql, Context.Set);
 
 			var whereSql = ResolveExpression.ResolveWhereList(Context.Set);
 
