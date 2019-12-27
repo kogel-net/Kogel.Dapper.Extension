@@ -47,11 +47,8 @@ namespace Kogel.Dapper.Extension.Expressions
 					//验证是实体类或者是泛型
 					if (ExpressionExtension.IsAnyBaseEntity(memberInit.Expression.Type, out entityType))
 					{
-						var itemJoin = provider.JoinList.FirstOrDefault(x => x.TableType == entityType);
-						if (itemJoin != null)
-						{
-							throw new DapperExtensionException("更新操作不支持导航属性写入");
-						}
+						//throw new DapperExtensionException("更新操作不支持导航属性写入");
+						Console.WriteLine("警告:更新操作不支持导航属性写入!");
 					}
 					else
 					{
