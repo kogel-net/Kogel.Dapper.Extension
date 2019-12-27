@@ -1,9 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Xml.Serialization;
 using Dapper;
 using Kogel.Dapper.Extension.Expressions;
+using Kogel.Dapper.Extension.Model;
 
 namespace Kogel.Dapper.Extension.Extension
 {
@@ -207,19 +213,89 @@ namespace Kogel.Dapper.Extension.Extension
 		/// </summary>
 		/// <param name="type"></param>
 		/// <returns></returns>
-		public static bool IsAnyBaseEntity(Type type)
+		public static bool IsAnyBaseEntity(Type type, out Type entityType)
 		{
 			if (type.BaseType == null)
 			{
+				entityType = type;
 				return false;
+			}
+			else if (type.FullName.Contains("System.Collections.Generic"))//泛型
+			{
+				//不能使用递归。不然可能无法获取到真正的类型
+				//return IsAnyBaseEntity(type.GenericTypeArguments[0], out entityType);
+				if (!IsAnyBaseEntity(type.GenericTypeArguments[0], out entityType))
+				{
+					entityType = null;
+					return false;
+				}
+				entityType = type.GenericTypeArguments[0];
+				return true;
 			}
 			else if (type.BaseType.FullName.Contains("Kogel.Dapper.Extension.IBaseEntity"))
 			{
+				entityType = type;
 				return true;
 			}
 			else
 			{
-				return IsAnyBaseEntity(type.BaseType);
+				return IsAnyBaseEntity(type.BaseType, out entityType);
+			}
+		}
+		/// <summary>
+		/// 克隆list
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="list"></param>
+		/// <returns></returns>
+		public static List<TEntity> Clone<TEntity>(IEnumerable<TEntity> list) where TEntity : ICloneable
+		{
+			return list.Select(item => (TEntity)item.Clone()).ToList();
+		}
+
+		/// <summary>
+		/// 根据名称获取实例值
+		/// </summary>
+		/// <param name="entityObject"></param>
+		/// <param name="name"></param>
+		/// <param name="entityObj"></param>
+		public static object GetPropertyValue(EntityObject entityObject, string name, object entityObj)
+		{
+			PropertyInfo property = entityObject.Properties.FirstOrDefault(x => x.Name == name);
+			return property.GetValue(entityObj);
+		}
+
+		/// <summary>
+		/// 写入值对象
+		/// </summary>
+		/// <typeparam name="TEntity"></typeparam>
+		/// <param name="masterEntity"></param>
+		/// <param name="value"></param>
+		public static void SetProperValue<TEntity>(EntityObject masterEntity, object masterObj, TEntity value)
+		{
+			var entityType = typeof(TEntity);
+			foreach (PropertyInfo property in masterEntity.Properties)
+			{
+				//实体导航属性
+				if (property.PropertyType == entityType)
+				{
+					property.SetValue(masterObj, value);
+					break;
+				}
+				else if (property.PropertyType.GenericTypeArguments.Any(y => y == entityType))//泛型导航属性
+				{
+					List<TEntity> entities = (List<TEntity>)property.GetValue(masterObj);
+					if (entities == null)
+					{
+						entities = new List<TEntity>() { value };
+					}
+					else
+					{
+						entities.Add(value);
+					}
+					property.SetValue(masterObj, entities);
+					break;
+				}
 			}
 		}
 	}

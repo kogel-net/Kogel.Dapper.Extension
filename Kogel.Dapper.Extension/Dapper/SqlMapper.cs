@@ -3068,7 +3068,7 @@ namespace Dapper
 		[ThreadStatic]
 		//private static ThreadLocal<Hashtable> typemaps = new ThreadLocal<Hashtable>();
 		// use Hashtable to get free lockless reading
-		private static Hashtable _typeMaps =new Hashtable();
+		private static Hashtable _typeMaps = new Hashtable();
 
 		/// <summary>
 		/// Set custom mapping for type deserializers

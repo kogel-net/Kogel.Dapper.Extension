@@ -7,134 +7,111 @@ using System.Linq;
 using System.Text;
 using Kogel.Dapper.Extension.Helper;
 using System.Collections.Generic;
+using Kogel.Dapper.Extension.Exception;
+using System;
 
 namespace Kogel.Dapper.Extension.Expressions
 {
-    /// <summary>
-    /// 解析自定义查询字段
-    /// </summary>
-    public class SelectExpression : BaseExpressionVisitor
-    {
-        #region sql指令
-        private readonly StringBuilder _sqlCmd;
-        /// <summary>
-        /// sql指令
-        /// </summary>
-        public string SqlCmd => _sqlCmd.ToString();
-        /// <summary>
-        /// 参数
-        /// </summary>
-        public new DynamicParameters Param;
-        #endregion
-        #region 当前解析的对象
-        private EntityObject entity { get; }
-        #endregion
-        /// <summary>
-        /// 执行解析
-        /// </summary>
-        /// <param name="expression"></param>
-        /// <param name="prefix">字段前缀</param>
-        /// <param name="providerOption"></param>
-        public SelectExpression(LambdaExpression expression, string prefix, IProviderOption providerOption) : base(providerOption)
-        {
-            this._sqlCmd = new StringBuilder(100);
-            this.Param = new DynamicParameters();
-            this.providerOption = providerOption;
-            //当前定义的查询返回对象
-            this.entity = EntityCache.QueryEntity(expression.Body.Type);
-            //字段数组
-            string[] fieldArr;
-            //判断是不是实体类
-            if (expression.Body is MemberInitExpression)
-            {
-				var bingings = ((MemberInitExpression)expression.Body).Bindings;
-				List<string> fieldList = new List<string>();
-				foreach (var bind in bingings)
-				{
-					if (bind is MemberAssignment)
-					{
-						//必须存在实体类中
-						if (entity.FieldPairs.Any(x => x.Key.Equals(bind.Member.Name)))
-						{
-							var assignment = (bind as MemberAssignment);
-							//判断是列表还是不是系统函数
-							if (assignment.Expression.Type.FullName.Contains("System.Collections.Generic.List") 
-								|| ExpressionExtension.IsAnyBaseEntity(assignment.Expression.Type))
-							{
-								providerOption.NavigationList.Add(new NavigationMemberAssign()
-								{
-									MemberAssign = assignment,
-									MemberAssignName = bind.Member.Name
-								});
-							}
-							else
-							{
-								fieldList.Add(entity.FieldPairs[bind.Member.Name]);
-							}
-						}
-					}
-				}
-				fieldArr = fieldList.ToArray();
-			}
-            else//匿名类（暂时不支持子导航属性查询）
-            {
-				if (entity.Properties.Length == 0)
-				{
-					fieldArr = new string[] { "field1" };
-				}
-				else
-				{
-					fieldArr = entity.Properties.Select(x => x.Name).ToArray();
-				}
-            }
-			Visit(expression);
-			if (!expression.Body.NodeType.Equals(ExpressionType.MemberAccess))
-			{
-				//查询指定字段
-				if (base.FieldList.Any())
-				{
-					//开始拼接成查询字段
-					for (var i = 0; i < fieldArr.Length; i++)
-					{
-						if (i < base.FieldList.Count)
-						{
-							if (_sqlCmd.Length != 0)
-								_sqlCmd.Append(",");
-							_sqlCmd.Append(base.FieldList[i] + " as " + fieldArr[i]);
-							//记录隐射对象
-							providerOption.MappingList.Add(base.FieldList[i], fieldArr[i]);
-						}
-					}
-				}
-				else
-				{
-					_sqlCmd.Append(base.SpliceField);
-				}
-			}
-			else
-			{
-				//单个字段返回
-				if (base.FieldList.Any())
-					_sqlCmd.Append(base.FieldList[0]);
-				else
-					_sqlCmd.Append(base.SpliceField);
-			}
-            this.Param.AddDynamicParams(base.Param);
-        }
+	/// <summary>
+	/// 解析自定义查询字段
+	/// </summary>
+	public class SelectExpression : BaseExpressionVisitor
+	{
+		#region sql指令
+		private readonly StringBuilder _sqlCmd;
 		/// <summary>
-		/// 匿名类每组表达式解析
+		/// sql指令
 		/// </summary>
-		/// <param name="node"></param>
-		/// <returns></returns>
-		protected override Expression VisitNew(NewExpression node)
+		public string SqlCmd => _sqlCmd.ToString();
+		/// <summary>
+		/// 参数
+		/// </summary>
+		public new DynamicParameters Param;
+		#endregion
+		/// <summary>
+		/// 执行解析
+		/// </summary>
+		/// <param name="expression"></param>
+		/// <param name="prefix">字段前缀</param>
+		/// <param name="providerOption"></param>
+		public SelectExpression(LambdaExpression expression, string prefix, SqlProvider provider) : base(provider)
 		{
-			foreach (var argument  in node.Arguments)
+			this._sqlCmd = new StringBuilder();
+			this.Param = new DynamicParameters();
+			//判断是不是实体类
+			if (expression.Body is MemberInitExpression)
 			{
-				base.SpliceField.Clear();
-				base.Visit(argument);
-				base.FieldList.Add(SpliceField.ToString());
+				var memberInitExpression = expression.Body as MemberInitExpression;
+				foreach (MemberAssignment memberInit in memberInitExpression.Bindings)
+				{
+					base.SpliceField.Clear();
+					base.Param = new DynamicParameters();
+					if (_sqlCmd.Length != 0)
+						_sqlCmd.Append(",");
+					//实体类型
+					Type entityType;
+					//验证是实体类或者是泛型
+					if (ExpressionExtension.IsAnyBaseEntity(memberInit.Expression.Type, out entityType))
+					{
+						var itemJoin = provider.JoinList.FirstOrDefault(x => x.TableType == entityType);
+						if (itemJoin != null)
+						{
+							itemJoin.IsMapperField = true;
+							//当前定义的查询返回对象
+							EntityObject entity = EntityCache.QueryEntity(entityType);
+							itemJoin.SelectFieldPairs = entity.FieldPairs;
+						}
+					}
+					else
+					{
+						//值对象
+						Visit(memberInit.Expression);
+						_sqlCmd.Append($"{base.SpliceField} AS {memberInit.Member.Name}");
+						Param.AddDynamicParams(base.Param);
+					}
+					base.Index++;
+				}
 			}
-			return node;
+			else//匿名类
+			{
+				//当前定义的查询返回对象
+				EntityObject entity = EntityCache.QueryEntity(expression.Body.Type);
+				var newExpression = expression.Body as NewExpression;
+				if (newExpression != null)
+				{
+					foreach (var argument in newExpression.Arguments)
+					{
+						base.SpliceField.Clear();
+						base.Param = new DynamicParameters();
+						if (_sqlCmd.Length != 0)
+							_sqlCmd.Append(",");
+						//返回类型
+						var returnProperty = entity.Properties[base.Index];
+						//实体类型
+						Type entityType;
+						//验证是实体类或者是泛型
+						if (ExpressionExtension.IsAnyBaseEntity(returnProperty.PropertyType, out entityType))
+						{
+							throw new DapperExtensionException("匿名类型不支持导航属性!");
+						}
+						else
+						{
+							//值对象
+							Visit(argument);
+							_sqlCmd.Append($" {base.SpliceField} AS {returnProperty.Name} ");
+							Param.AddDynamicParams(base.Param);
+						}
+						base.Index++;
+					}
+				}
+				else
+				{
+					//单个属性，例如 .Get(x => x.Id);
+					Visit(expression.Body);
+					_sqlCmd.Append(base.SpliceField);
+					Param.AddDynamicParams(base.Param);
+				}
+			}
 		}
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using Kogel.Dapper.Extension;
+using Kogel.Dapper.Extension.Extension;
 using Kogel.Dapper.Extension.Model;
 using System;
 using System.Collections.Generic;
@@ -40,6 +41,12 @@ namespace Dapper
 		/// <param name="splitOn"></param>
 		/// <returns></returns>
 		public static TFirst QueryFirstOrDefault<TFirst, TSecond, TThird, TFourth, TFifth, TSixth>(this IDbConnection cnn, SqlProvider provider, IDbTransaction transaction = null)
+			where TFirst : IBaseEntity<int>
+			where TSecond : IBaseEntity<int>
+			where TThird : IBaseEntity<int>
+			where TFourth : IBaseEntity<int>
+			where TFifth : IBaseEntity<int>
+			where TSixth : IBaseEntity<int>
 		{
 			return cnn.Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth>(provider, transaction).FirstOrDefault();
 		}
@@ -56,6 +63,12 @@ namespace Dapper
 		/// <param name="splitOn"></param>
 		/// <returns></returns>
 		public static async Task<TFirst> QueryFirstOrDefaultAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth>(this IDbConnection cnn, SqlProvider provider, IDbTransaction transaction = null)
+			where TFirst : IBaseEntity<int>
+			where TSecond : IBaseEntity<int>
+			where TThird : IBaseEntity<int>
+			where TFourth : IBaseEntity<int>
+			where TFifth : IBaseEntity<int>
+			where TSixth : IBaseEntity<int>
 		{
 			return (await cnn.QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth>(provider, transaction)).FirstOrDefault();
 		}
@@ -71,41 +84,44 @@ namespace Dapper
 		/// <param name="splitOn"></param>
 		/// <returns></returns>
 		public static IEnumerable<TFirst> Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth>(this IDbConnection cnn, SqlProvider provider, IDbTransaction transaction = null)
+			where TFirst : IBaseEntity<int>
+			where TSecond : IBaseEntity<int>
+			where TThird : IBaseEntity<int>
+			where TFourth : IBaseEntity<int>
+			where TFifth : IBaseEntity<int>
+			where TSixth : IBaseEntity<int>
 		{
 			EntityObject firstEntity = EntityCache.QueryEntity(typeof(TFirst));
 			string splitOn = GetSplitOn<TFirst>(provider);
 			if (!string.IsNullOrEmpty(splitOn))
 			{
-				return cnn.Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TFirst>(provider.SqlString, (first, second, third, fourth, fifth, sixth) =>
+				var hashes = new HashSet<TFirst>();
+				cnn.Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TFirst>(provider.SqlString, (first, second, third, fourth, fifth, sixth) =>
 				{
-				//设置导航属性对应
-				var secondProper = firstEntity.Properties.FirstOrDefault(x => x.PropertyType == typeof(TSecond) || x.PropertyType.GenericTypeArguments.Any(y => y == typeof(TSecond)));
-					if (secondProper != null)
-					{
-						secondProper.SetValue(first, second);
-					}
-					var thirdProper = firstEntity.Properties.FirstOrDefault(x => x.PropertyType == typeof(TThird));
-					if (thirdProper != null)
-					{
-						thirdProper.SetValue(first, third);
-					}
-					var fourthProper = firstEntity.Properties.FirstOrDefault(x => x.PropertyType == typeof(TFourth));
-					if (fourthProper != null)
-					{
-						fourthProper.SetValue(first, fourth);
-					}
-					var fifthProper = firstEntity.Properties.FirstOrDefault(x => x.PropertyType == typeof(TFifth));
-					if (fifthProper != null)
-					{
-						fifthProper.SetValue(first, fifth);
-					}
-					var sixthProper = firstEntity.Properties.FirstOrDefault(x => x.PropertyType == typeof(TSixth));
-					if (sixthProper != null)
-					{
-						sixthProper.SetValue(first, sixth);
-					}
-					return first;
+					//判断当前主数据是否出现过
+					var lookup = hashes.FirstOrDefault(x => x.Id.Equals(first.Id));
+					if (lookup == null)
+						lookup = first;
+
+					//设置导航属性对应
+					if (second != null)
+						ExpressionExtension.SetProperValue(firstEntity, lookup, second);
+					if (third != null)
+						ExpressionExtension.SetProperValue(firstEntity, lookup, third);
+					if (fourth != null)
+						ExpressionExtension.SetProperValue(firstEntity, lookup, fourth);
+					if (fifth != null)
+						ExpressionExtension.SetProperValue(firstEntity, lookup, fifth);
+					if (sixth != null)
+						ExpressionExtension.SetProperValue(firstEntity, lookup, sixth);
+
+					//不存在的主表数据才添加进来，防止重复
+					if (!hashes.Any(x => x.Id == lookup.Id))
+						hashes.Add(lookup);
+
+					return default(TFirst);
 				}, provider.Params, transaction, true, splitOn);
+				return hashes;
 			}
 			else
 			{
@@ -123,46 +139,49 @@ namespace Dapper
 		/// <param name="transaction"></param>
 		/// <param name="splitOn"></param>
 		/// <returns></returns>
-		public static Task<IEnumerable<TFirst>> QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth>(this IDbConnection cnn, SqlProvider provider, IDbTransaction transaction = null)
+		public static async Task<IEnumerable<TFirst>> QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth>(this IDbConnection cnn, SqlProvider provider, IDbTransaction transaction = null)
+			where TFirst : IBaseEntity<int>
+			where TSecond : IBaseEntity<int>
+			where TThird : IBaseEntity<int>
+			where TFourth : IBaseEntity<int>
+			where TFifth : IBaseEntity<int>
+			where TSixth : IBaseEntity<int>
 		{
 			EntityObject firstEntity = EntityCache.QueryEntity(typeof(TFirst));
 			string splitOn = GetSplitOn<TFirst>(provider);
 			if (!string.IsNullOrEmpty(splitOn))
 			{
-				return cnn.QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TFirst>(provider.SqlString, (first, second, third, fourth, fifth, sixth) =>
+				var hashes = new HashSet<TFirst>();
+				await cnn.QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TFirst>(provider.SqlString, (first, second, third, fourth, fifth, sixth) =>
 				{
+					//判断当前主数据是否出现过
+					var lookup = hashes.FirstOrDefault(x => x.Id.Equals(first.Id));
+					if (lookup == null)
+						lookup = first;
+
 					//设置导航属性对应
-					var secondProper = firstEntity.Properties.FirstOrDefault(x => x.PropertyType == typeof(TSecond) || x.PropertyType.GenericTypeArguments.Any(y => y == typeof(TSecond)));
-					if (secondProper != null)
-					{
-						secondProper.SetValue(first, second);
-					}
-					var thirdProper = firstEntity.Properties.FirstOrDefault(x => x.PropertyType == typeof(TThird));
-					if (thirdProper != null)
-					{
-						thirdProper.SetValue(first, third);
-					}
-					var fourthProper = firstEntity.Properties.FirstOrDefault(x => x.PropertyType == typeof(TFourth));
-					if (fourthProper != null)
-					{
-						fourthProper.SetValue(first, fourth);
-					}
-					var fifthProper = firstEntity.Properties.FirstOrDefault(x => x.PropertyType == typeof(TFifth));
-					if (fifthProper != null)
-					{
-						fifthProper.SetValue(first, fifth);
-					}
-					var sixthProper = firstEntity.Properties.FirstOrDefault(x => x.PropertyType == typeof(TSixth));
-					if (sixthProper != null)
-					{
-						sixthProper.SetValue(first, sixth);
-					}
-					return first;
+					if (second != null)
+						ExpressionExtension.SetProperValue(firstEntity, lookup, second);
+					if (third != null)
+						ExpressionExtension.SetProperValue(firstEntity, lookup, third);
+					if (fourth != null)
+						ExpressionExtension.SetProperValue(firstEntity, lookup, fourth);
+					if (fifth != null)
+						ExpressionExtension.SetProperValue(firstEntity, lookup, fifth);
+					if (sixth != null)
+						ExpressionExtension.SetProperValue(firstEntity, lookup, sixth);
+
+					//不存在的主表数据才添加进来，防止重复
+					if (!hashes.Any(x => x.Id == lookup.Id))
+						hashes.Add(lookup);
+
+					return default(TFirst);
 				}, provider.Params, transaction, true, splitOn);
+				return hashes;
 			}
 			else
 			{
-				return cnn.QueryAsync<TFirst>(provider.SqlString, provider.Params, transaction);
+				return await cnn.QueryAsync<TFirst>(provider.SqlString, provider.Params, transaction);
 			}
 		}
 		/// <summary>

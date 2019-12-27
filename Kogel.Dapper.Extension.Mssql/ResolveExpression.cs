@@ -14,7 +14,7 @@ namespace Kogel.Dapper.Extension.MsSql
 {
     internal class ResolveExpression : IResolveExpression
     {
-        public ResolveExpression(IProviderOption providerOption) : base(providerOption)
+        public ResolveExpression(SqlProvider provider) : base(provider)
         {
 
         }
@@ -28,7 +28,15 @@ namespace Kogel.Dapper.Extension.MsSql
         /// <returns></returns>
         public override string ResolveSelect(EntityObject entityObject, LambdaExpression selector, int? topNum, DynamicParameters Param)
         {
-            var selectFormat = topNum.HasValue ? " SELECT {1} {0} " : " SELECT {0} ";
+			//添加需要连接的导航表
+			var masterEntity = EntityCache.QueryEntity(abstractSet.TableType);
+			var navigationList = masterEntity.Navigations;
+			if (navigationList.Any())
+			{
+				provider.JoinList.AddRange(ExpressionExtension.Clone(navigationList));
+			}
+
+			var selectFormat = topNum.HasValue ? " SELECT {1} {0} " : " SELECT {0} ";
             var selectSql = "";
             //不是自定义返回视图则显示所有字段
             if (selector == null)
@@ -38,7 +46,7 @@ namespace Kogel.Dapper.Extension.MsSql
             }
             else//自定义查询字段
             {
-                var selectExp = new SelectExpression(selector, "", providerOption);
+                var selectExp = new SelectExpression(selector, "", provider);
                 selectSql = string.Format(selectFormat, selectExp.SqlCmd, $" TOP {topNum} ");
                 Param.AddDynamicParams(selectExp.Param);
             }

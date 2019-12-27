@@ -14,6 +14,7 @@ using System.Diagnostics;
 using Kogel.Dapper.Extension.Model;
 using System.Data;
 using static Dapper.SqlMapper;
+using Kogel.Dapper.Extension.Extension;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 {
@@ -90,10 +91,21 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				DynamicParameters param = new DynamicParameters();
 				param.Add("Id", 10);
 
+				//var aaaa = SqlMapper.Query<Comment2, News>(conn,"", (first, second) =>
+				//  {
+				//  };
+				var comment = conn.QuerySet<News1>()
+				.Where(x => x.Comments.Any(y => y.Id != 1))
+				.ToList(x => new News1
+				{
+					Id = x.Id,
+					Content = x.Content,
+					Comments = x.Comments
+				});
 
-				var comment = conn.QuerySet<Comment2>()
-					.Where(x => x.News.Any(y => y.Id == 1))
-					.ToList();
+				var testaa = "123";
+
+
 
 				//	var list= conn.QueryFirstOrDefault<News1, List<Comment>, DontMap, DontMap, DontMap, DontMap>(@"SELECT
 				//* FROM News AS A LEFT JOIN COMMENT AS B ON A.Id=B.ArticleId");

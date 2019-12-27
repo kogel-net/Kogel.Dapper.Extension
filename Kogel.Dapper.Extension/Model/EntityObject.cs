@@ -65,13 +65,14 @@ namespace Kogel.Dapper.Extension.Model
 					var foreign = foreignKey as ForeignKey;
 					//导航属性表
 					var navigationTable = !item.PropertyType.FullName.Contains("System.Collections.Generic") ? item.PropertyType : item.PropertyType.GenericTypeArguments[0];
+					var leftTab = EntityCache.QueryEntity(navigationTable);
 					this.Navigations.Add(new JoinAssTable()
 					{
 						Action = JoinAction.Navigation,
 						JoinMode = JoinMode.LEFT,
 						RightTabName = this.AsName,
 						RightAssName = foreign.IndexField,
-						LeftTabName = EntityCache.QueryEntity(navigationTable).AsName,
+						LeftTabName = leftTab.Name,
 						LeftAssName = foreign.AssoField,
 						TableType = navigationTable,
 						PropertyType = item.PropertyType

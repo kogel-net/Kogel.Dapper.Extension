@@ -11,7 +11,7 @@ namespace Kogel.Dapper.Extension.Test.Model
 	public class BaseEntity : IBaseEntity<int>
 	{
 		[Identity]
-		public int Id { get; set; }
+		public override int Id { get; set; }
 	}
 
 

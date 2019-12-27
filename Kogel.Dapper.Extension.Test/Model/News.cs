@@ -21,7 +21,7 @@ namespace Kogel.Dapper.Extension.Test.Model
 		/// 新闻主键
 		/// </summary>
 		[Identity]
-		public int Id { get; set; }
+		public override int Id { get; set; }
 		/// <summary>
 		/// 新闻标签
 		/// </summary>
@@ -57,7 +57,7 @@ namespace Kogel.Dapper.Extension.Test.Model
 	public class News1 : News
 	{
 		[ForeignKey("Id", "ArticleId")]
-		public List<Comment> Comments { get; set; }
+		public List<Comment2> Comments { get; set; }
 	}
 
 }

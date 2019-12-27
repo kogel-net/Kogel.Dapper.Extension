@@ -60,6 +60,7 @@
     <Compile Include="Model\Product.cs" />
     <Compile Include="Model\PurchaseTransaction.cs" />
     <Compile Include="Model\ResourceMapping.cs" />
+    <Compile Include="Model\TestDto.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UnitTest\Mssql\Query.cs" />

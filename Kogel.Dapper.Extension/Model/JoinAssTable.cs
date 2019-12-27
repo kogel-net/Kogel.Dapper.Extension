@@ -5,7 +5,7 @@ using Dapper;
 
 namespace Kogel.Dapper.Extension.Model
 {
-	public class JoinAssTable
+	public class JoinAssTable : ICloneable
 	{
 		public JoinAssTable()
 		{
@@ -22,13 +22,47 @@ namespace Kogel.Dapper.Extension.Model
 		public string JoinSql { get; set; }
 		public Type PropertyType { get; set; }
 		/// <summary>
+		/// 自定义查询的字段
+		/// </summary>
+		public Dictionary<string, string> SelectFieldPairs { get; set; }
+		/// <summary>
 		/// 表首字段
 		/// </summary>
 		public string FirstFieldName => MapperList.Values.AsList()[0];
 		/// <summary>
+		/// 表尾字段
+		/// </summary>
+		public string LastFieldName => MapperList.Values.AsList()[MapperList.Count - 1];
+		/// <summary>
 		/// 隐射目录
 		/// </summary>
 		public Dictionary<string, string> MapperList { get; set; }
+		/// <summary>
+		/// 是否需要隐射字段
+		/// </summary>
+		public bool IsMapperField { get; set; } = true;
+		/// <summary>
+		/// 克隆
+		/// </summary>
+		/// <returns></returns>
+		public object Clone()
+		{
+			return new JoinAssTable
+			{
+				Action = this.Action,
+				JoinMode = this.JoinMode,
+				RightTabName = this.RightTabName,
+				LeftTabName = this.LeftTabName,
+				RightAssName = this.RightAssName,
+				LeftAssName = this.LeftAssName,
+				TableType = this.TableType,
+				JoinSql = this.JoinSql,
+				PropertyType = this.PropertyType,
+				SelectFieldPairs = new Dictionary<string, string>(),
+				MapperList = new Dictionary<string, string>(),
+				IsMapperField = false
+			};
+		}
 	}
 
 	/// <summary>

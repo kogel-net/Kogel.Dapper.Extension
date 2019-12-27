@@ -10,13 +10,13 @@ namespace Lige.Model
 	/// 礼品详情
 	/// </summary>
 	[Display(Rename = "Lige_GiftDetail")]
-	public class GiftDetail : IBaseEntity<GiftDetail>
+	public class GiftDetail : IBaseEntity<int>
 	{
 		/// <summary>
 		/// 
 		/// </summary>
 		[Identity]
-		public int Id { get; set; }
+		public override int Id { get; set; }
 		/// <summary>
 		/// 礼品代码
 		/// </summary>

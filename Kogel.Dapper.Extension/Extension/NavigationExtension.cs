@@ -31,7 +31,7 @@ namespace Kogel.Dapper.Extension.Extension
 			for (var i = 0; i < 5; i++)
 			{
 				if (entity.Navigations.Count > i)
-					typeList.Add(entity.Navigations[i].PropertyType);
+					typeList.Add(entity.Navigations[i].TableType);
 				else
 					typeList.Add(typeof(DontMap));
 			}
@@ -48,10 +48,13 @@ namespace Kogel.Dapper.Extension.Extension
 		/// <returns></returns>
 		public static T QueryFirstOrDefaults<T>(this IDbConnection dbCon, SqlProvider provider, IDbTransaction transaction)
 		{
-			return (T)typeof(SqlMapperExtension)
+			if (provider.JoinList.Any(x => x.Action == JoinAction.Navigation && x.IsMapperField))
+				return (T)typeof(SqlMapperExtension)
 					.GetMethod("QueryFirstOrDefault")
 					.MakeGenericMethod(GetNavigationTypes<T>())
 					.Invoke(null, new object[] { dbCon, provider, transaction });
+			else
+				return dbCon.QueryFirstOrDefault<T>(provider.SqlString, provider.Params, transaction);
 		}
 
 		/// <summary>
@@ -64,10 +67,13 @@ namespace Kogel.Dapper.Extension.Extension
 		/// <returns></returns>
 		public static Task<T> QueryFirstOrDefaultAsyncs<T>(this IDbConnection dbCon, SqlProvider provider, IDbTransaction transaction)
 		{
-			return (Task<T>)typeof(SqlMapperExtension)
-				   .GetMethod("QueryFirstOrDefaultAsync")
-				   .MakeGenericMethod(GetNavigationTypes<T>())
-				   .Invoke(null, new object[] { dbCon, provider, transaction });
+			if (provider.JoinList.Any(x => x.Action == JoinAction.Navigation && x.IsMapperField))
+				return (Task<T>)typeof(SqlMapperExtension)
+					   .GetMethod("QueryFirstOrDefaultAsync")
+					   .MakeGenericMethod(GetNavigationTypes<T>())
+					   .Invoke(null, new object[] { dbCon, provider, transaction });
+			else
+				return dbCon.QueryFirstOrDefaultAsync<T>(provider.SqlString, provider.Params, transaction);
 		}
 
 		/// <summary>
@@ -80,10 +86,13 @@ namespace Kogel.Dapper.Extension.Extension
 		/// <returns></returns>
 		public static IEnumerable<T> Querys<T>(this IDbConnection dbCon, SqlProvider provider, IDbTransaction transaction)
 		{
-			return (IEnumerable<T>)typeof(SqlMapperExtension)
-			.GetMethod("Query")
-			.MakeGenericMethod(GetNavigationTypes<T>())
-			.Invoke(null, new object[] { dbCon, provider, transaction });
+			if (provider.JoinList.Any(x => x.Action == JoinAction.Navigation && x.IsMapperField))
+				return (IEnumerable<T>)typeof(SqlMapperExtension)
+					   .GetMethod("Query")
+					   .MakeGenericMethod(GetNavigationTypes<T>())
+					   .Invoke(null, new object[] { dbCon, provider, transaction });
+			else
+				return dbCon.Query<T>(provider.SqlString, provider.Params, transaction);
 		}
 
 		/// <summary>
@@ -96,10 +105,13 @@ namespace Kogel.Dapper.Extension.Extension
 		/// <returns></returns>
 		public static Task<IEnumerable<T>> QueryAsyncs<T>(this IDbConnection dbCon, SqlProvider provider, IDbTransaction transaction)
 		{
-			return (Task<IEnumerable<T>>)typeof(SqlMapperExtension)
-			.GetMethod("QueryAsync")
-			.MakeGenericMethod(GetNavigationTypes<T>())
-			.Invoke(null, new object[] { dbCon, provider, transaction });
+			if (provider.JoinList.Any(x => x.Action == JoinAction.Navigation && x.IsMapperField))
+				return (Task<IEnumerable<T>>)typeof(SqlMapperExtension)
+			           .GetMethod("QueryAsync")
+			           .MakeGenericMethod(GetNavigationTypes<T>())
+			           .Invoke(null, new object[] { dbCon, provider, transaction });
+			else
+				return dbCon.QueryAsync<T>(provider.SqlString, provider.Params, transaction);
 		}
 
 		/// <summary>

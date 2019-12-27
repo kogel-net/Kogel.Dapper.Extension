@@ -16,21 +16,32 @@ namespace Kogel.Dapper.Extension.Expressions
 	public class BaseExpressionVisitor : ExpressionVisitor
 	{
 		/// <summary>
-		/// 当前组字段解析
+		/// 字段sql
 		/// </summary>
 		internal StringBuilder SpliceField { get; set; }
 		/// <summary>
-		/// 字段集合
+		/// 参数
 		/// </summary>
-		internal List<string> FieldList { get; set; }
 		protected DynamicParameters Param { get; set; }
-		protected IProviderOption providerOption { get; set; }
-		public BaseExpressionVisitor(IProviderOption providerOption)
+		/// <summary>
+		/// 解析提供方
+		/// </summary>
+		protected SqlProvider Provider { get; set; }
+		/// <summary>
+		/// 解析第n个下标
+		/// </summary>
+		protected int Index { get; set; }
+		/// <summary>
+		/// 提供方选项
+		/// </summary>
+		protected IProviderOption providerOption;
+
+		public BaseExpressionVisitor(SqlProvider provider)
 		{
 			SpliceField = new StringBuilder();
-			this.FieldList = new List<string>();
 			this.Param = new DynamicParameters();
-			this.providerOption = providerOption;
+			this.Provider = provider;
+			this.providerOption = provider.ProviderOption;
 		}
 		/// <summary>
 		/// 有+ - * /需要拼接的对象
@@ -39,7 +50,7 @@ namespace Kogel.Dapper.Extension.Expressions
 		/// <returns></returns>
 		protected override Expression VisitBinary(BinaryExpression node)
 		{
-			var binary = new BinaryExpressionVisitor(node, providerOption);
+			var binary = new BinaryExpressionVisitor(node, Provider);
 			SpliceField.Append(binary.SpliceField);
 			this.Param.AddDynamicParams(binary.Param);
 			return node;
@@ -52,7 +63,7 @@ namespace Kogel.Dapper.Extension.Expressions
 		protected override Expression VisitConstant(ConstantExpression node)
 		{
 			//参数
-			string paramName = $"{providerOption.ParameterPrefix}Member_Param_{Param.ParameterNames.Count()}";
+			string paramName = $"{providerOption.ParameterPrefix}Member_Param_{Index}_{Param.ParameterNames.Count()}";
 			//值
 			object nodeValue = node.ToConvertAndGetValue();
 			//设置sql
@@ -114,18 +125,6 @@ namespace Kogel.Dapper.Extension.Expressions
 			{
 				Operation(node);
 			}
-			return node;
-		}
-		/// <summary>
-		/// 每组表达式解析
-		/// </summary>
-		/// <param name="node"></param>
-		/// <returns></returns>
-		protected override MemberBinding VisitMemberBinding(MemberBinding node)
-		{
-			SpliceField.Clear();
-			base.VisitMemberBinding(node);
-			FieldList.Add(SpliceField.ToString());
 			return node;
 		}
 		/// <summary>
@@ -272,10 +271,10 @@ namespace Kogel.Dapper.Extension.Expressions
 	public class WhereExpressionVisitor : BaseExpressionVisitor
 	{
 		private string FieldName { get; set; }//字段
-		private string ParamName { get => (providerOption.ParameterPrefix + FieldName?.Replace(".", "_") + "_" + Param.ParameterNames.Count()); }//带参数标识的
+		private string ParamName { get => ($"{providerOption.ParameterPrefix}{FieldName?.Replace(".", "_")}_{Param.ParameterNames.Count()}"); }//带参数标识的
 		internal new StringBuilder SpliceField { get; set; }
 		internal new DynamicParameters Param { get; set; }
-		public WhereExpressionVisitor(IProviderOption providerOption) : base(providerOption)
+		public WhereExpressionVisitor(SqlProvider provider) : base(provider)
 		{
 			this.SpliceField = new StringBuilder();
 			this.Param = new DynamicParameters();
@@ -500,17 +499,29 @@ namespace Kogel.Dapper.Extension.Expressions
 					break;
 				case "Any":
 					{
-						var binaryExp = (node.Arguments[1] as LambdaExpression)?.Body as BinaryExpression;
-						if (binaryExp != null)
+						Type entityType;
+						if (ExpressionExtension.IsAnyBaseEntity(node.Arguments[0].Type, out entityType))
 						{
-							var binaryVisitor = new BinaryExpressionVisitor(binaryExp, providerOption);
-							this.SpliceField.Append(binaryVisitor.SpliceField.Replace("=", "In"));
-							//添加参数
-							foreach (string paramName in binaryVisitor.Param.ParameterNames)
+							//导航属性有条件时设置查询该导航属性
+							var joinTable = Provider.JoinList.Find(x => x.TableType == entityType);
+							joinTable.IsMapperField = true;
+							//解析导航属性条件
+							var binaryExp = (node.Arguments[1] as LambdaExpression)?.Body as BinaryExpression;
+							if (binaryExp != null)
 							{
-								var objectParam = new object[] { binaryVisitor.Param.Get<object>(paramName) };
-								this.Param.Add(paramName, objectParam);
+								var binaryVisitor = new BinaryExpressionVisitor(binaryExp, Provider);
+								this.SpliceField.Append(binaryVisitor.SpliceField.Replace("=", "In").Replace("!", "Not "));
+								//添加参数
+								foreach (string paramName in binaryVisitor.Param.ParameterNames)
+								{
+									var objectParam = new object[] { binaryVisitor.Param.Get<object>(paramName) };
+									this.Param.Add(paramName, objectParam);
+								}
 							}
+						}
+						else
+						{
+							throw new DapperExtensionException("导航属性类需要继承IBaseEntity");
 						}
 					}
 					break;
@@ -654,7 +665,7 @@ namespace Kogel.Dapper.Extension.Expressions
 	/// </summary>
 	public class BinaryExpressionVisitor : WhereExpressionVisitor
 	{
-		public BinaryExpressionVisitor(BinaryExpression expression, IProviderOption providerOption) : base(providerOption)
+		public BinaryExpressionVisitor(BinaryExpression expression, SqlProvider provider) : base(provider)
 		{
 			SpliceField = new StringBuilder();
 			Param = new DynamicParameters();

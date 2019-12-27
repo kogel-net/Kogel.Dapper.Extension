@@ -15,7 +15,7 @@ namespace Kogel.Dapper.Extension.MySql
 		public MySqlProvider()
 		{
 			ProviderOption = new ProviderOption(OpenQuote, CloseQuote, ParameterPrefix);
-			ResolveExpression = new ResolveExpression(ProviderOption);
+			ResolveExpression = new ResolveExpression(this);
 		}
 
 		public sealed override IProviderOption ProviderOption { get; set; }
@@ -26,15 +26,15 @@ namespace Kogel.Dapper.Extension.MySql
 
 			var fromTableSql = FormatTableName();
 
-			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref selectSql, Context.Set);
+			var whereSql = ResolveExpression.ResolveWhereList();
 
-			var whereSql = ResolveExpression.ResolveWhereList(Context.Set);
+			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref selectSql);
 
-			var groupSql = ResolveExpression.ResolveGroupBy(Context.Set);
+			var groupSql = ResolveExpression.ResolveGroupBy();
 
-			var havingSql = ResolveExpression.ResolveHaving(Context.Set);
+			var havingSql = ResolveExpression.ResolveHaving();
 
-			var orderbySql = ResolveExpression.ResolveOrderBy(Context.Set);
+			var orderbySql = ResolveExpression.ResolveOrderBy();
 
 			SqlString = $@"SELECT T.* FROM( 
                             {selectSql}
@@ -57,15 +57,15 @@ namespace Kogel.Dapper.Extension.MySql
 
 			var fromTableSql = FormatTableName();
 
-			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref selectSql, Context.Set);
+			var whereSql = ResolveExpression.ResolveWhereList();
 
-			var whereSql = ResolveExpression.ResolveWhereList(Context.Set);
+			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref selectSql);
 
-			var groupSql = ResolveExpression.ResolveGroupBy(Context.Set);
+			var groupSql = ResolveExpression.ResolveGroupBy();
 
-			var havingSql = ResolveExpression.ResolveHaving(Context.Set);
+			var havingSql = ResolveExpression.ResolveHaving();
 
-			var orderbySql = ResolveExpression.ResolveOrderBy(Context.Set);
+			var orderbySql = ResolveExpression.ResolveOrderBy();
 
 			SqlString = $"{selectSql} {fromTableSql} {joinSql} {whereSql} {groupSql} {havingSql} {orderbySql}";
 
@@ -74,7 +74,7 @@ namespace Kogel.Dapper.Extension.MySql
 
 		public override SqlProvider FormatToPageList<T>(int pageIndex, int pageSize)
 		{
-			var orderbySql = ResolveExpression.ResolveOrderBy(Context.Set);
+			var orderbySql = ResolveExpression.ResolveOrderBy();
 			//Oracle可以不用必须排序翻页
 			//if (string.IsNullOrEmpty(orderbySql))
 			//    throw new DapperExtensionException("order by takes precedence over pagelist");
@@ -83,13 +83,13 @@ namespace Kogel.Dapper.Extension.MySql
 
 			var fromTableSql = FormatTableName();
 
-			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref selectSql, Context.Set);
+			var whereSql = ResolveExpression.ResolveWhereList();
 
-			var whereSql = ResolveExpression.ResolveWhereList(Context.Set);
+			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref selectSql);
 
-			var groupSql = ResolveExpression.ResolveGroupBy(Context.Set);
+			var groupSql = ResolveExpression.ResolveGroupBy();
 
-			var havingSql = ResolveExpression.ResolveHaving(Context.Set);
+			var havingSql = ResolveExpression.ResolveHaving();
 
 			SqlString = $@" SELECT 
                            {(new Regex("SELECT").Replace(selectSql, "", 1))}
@@ -106,9 +106,9 @@ namespace Kogel.Dapper.Extension.MySql
 			var fromTableSql = FormatTableName();
 
 			string noneSql = "";
-			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql, Context.Set);
+			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql);
 
-			var whereSql = ResolveExpression.ResolveWhereList(Context.Set);
+			var whereSql = ResolveExpression.ResolveWhereList();
 
 			SqlString = $"{selectSql} {fromTableSql} {joinSql} {whereSql} ";
 
@@ -121,7 +121,7 @@ namespace Kogel.Dapper.Extension.MySql
 
 			ProviderOption.IsAsName = false;
 
-			var whereSql = ResolveExpression.ResolveWhereList(Context.Set);
+			var whereSql = ResolveExpression.ResolveWhereList();
 
 			SqlString = $"DELETE FROM {fromTableSql} {whereSql}";
 
@@ -148,7 +148,7 @@ namespace Kogel.Dapper.Extension.MySql
 
 			ProviderOption.IsAsName = false;
 
-			var whereSql = ResolveExpression.ResolveWhereList(Context.Set);
+			var whereSql = ResolveExpression.ResolveWhereList();
 			Params.AddDynamicParams(update.Param);
 
 			SqlString = $"UPDATE {FormatTableName(false, false)} {update.SqlCmd} {whereSql}";
@@ -162,7 +162,7 @@ namespace Kogel.Dapper.Extension.MySql
 
 			ProviderOption.IsAsName = false;
 
-			var whereSql = ResolveExpression.ResolveWhereList(Context.Set);
+			var whereSql = ResolveExpression.ResolveWhereList();
 			//如果不存在条件，就用主键作为条件
 			if (!isBatch)
 				if (whereSql.Trim().Equals("WHERE 1=1"))
@@ -178,10 +178,10 @@ namespace Kogel.Dapper.Extension.MySql
 
 			var fromTableSql = FormatTableName();
 
-			string noneSql = "";
-			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql, Context.Set);
+			var whereSql = ResolveExpression.ResolveWhereList();
 
-			var whereSql = ResolveExpression.ResolveWhereList(Context.Set);
+			string noneSql = "";
+			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql);
 
 			SqlString = $"{selectSql} {fromTableSql}{joinSql} {whereSql} ";
 
@@ -193,10 +193,10 @@ namespace Kogel.Dapper.Extension.MySql
 
 			var fromTableSql = FormatTableName();
 
-			string noneSql = "";
-			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql, Context.Set);
+			var whereSql = ResolveExpression.ResolveWhereList();
 
-			var whereSql = ResolveExpression.ResolveWhereList(Context.Set);
+			string noneSql = "";
+			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql);
 
 			SqlString = $"{selectSql} {fromTableSql}{joinSql} {whereSql} ";
 
@@ -208,10 +208,10 @@ namespace Kogel.Dapper.Extension.MySql
 
 			var fromTableSql = FormatTableName();
 
-			string noneSql = "";
-			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql, Context.Set);
+			var whereSql = ResolveExpression.ResolveWhereList();
 
-			var whereSql = ResolveExpression.ResolveWhereList(Context.Set);
+			string noneSql = "";
+			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql);
 
 			SqlString = $"{selectSql} {fromTableSql}{joinSql} {whereSql} ";
 
@@ -224,7 +224,7 @@ namespace Kogel.Dapper.Extension.MySql
 
 			var selectSql = ResolveExpression.ResolveSelectOfUpdate(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression);
 
-			var whereSql = ResolveExpression.ResolveWhereList(Context.Set);
+			var whereSql = ResolveExpression.ResolveWhereList();
 			Params.AddDynamicParams(update.Param);
 
 			SqlString = $"UPDATE {FormatTableName(false, false)} {update.SqlCmd} {selectSql} {whereSql}";

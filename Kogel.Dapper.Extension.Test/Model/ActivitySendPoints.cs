@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Kogel.Dapper.Extension;
 using Kogel.Dapper.Extension.Attributes;
 
 namespace Lige.Model
 {
 	[Display(Rename = "Lige_ActivitySendPoints")]
-	public class ActivitySendPoints
+	public class ActivitySendPoints:IBaseEntity<int>
 	{
-		/// <summary>
-		/// 
-		/// </summary>
 		[Identity]
-		public int Id { get; set; }
+		public override int Id { get;set; }
 		/// <summary>
 		/// 
 		/// </summary>

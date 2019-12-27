@@ -15,10 +15,13 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 {
 	public abstract class IResolveExpression
 	{
+		protected SqlProvider provider;
 		protected IProviderOption providerOption;
-		public IResolveExpression(IProviderOption providerOption)
+		protected AbstractSet abstractSet => provider.Context.Set;
+		public IResolveExpression(SqlProvider provider)
 		{
-			this.providerOption = providerOption;
+			this.provider = provider;
+			this.providerOption = provider.ProviderOption;
 		}
 
 		/// <summary>
@@ -51,14 +54,14 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// <param name="whereSql"></param>
 		/// <param name="prefix"></param>
 		/// <returns></returns>
-		public virtual string ResolveWhereList(AbstractSet abstractSet, string prefix = null)
+		public virtual string ResolveWhereList(string prefix = null)
 		{
 			//添加Linq生成的sql条件和参数
 			List<LambdaExpression> lambdaExpressionList = abstractSet.WhereExpressionList;
 			StringBuilder builder = new StringBuilder("WHERE 1=1 ");
 			for (int i = 0; i < lambdaExpressionList.Count; i++)
 			{
-				var whereParam = new WhereExpression(lambdaExpressionList[i], $"{prefix}_{i}", providerOption);
+				var whereParam = new WhereExpression(lambdaExpressionList[i], $"{prefix}_{i}", provider);
 				builder.Append(whereParam.SqlCmd);
 				//参数
 				foreach (var paramKey in whereParam.Param.ParameterNames)
@@ -71,12 +74,6 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 			{
 				//添加自定义条件sql
 				builder.Append(abstractSet.WhereBuilder);
-				////参数
-				//foreach (var paramKey in abstractSet.Params.ParameterNames)
-				//{
-				//	if (!Params.ParameterNames.Contains(paramKey))
-				//		Params.Add(paramKey, abstractSet.Params.Get<object>(paramKey));
-				//}
 			}
 			return builder.ToString();
 		}
@@ -86,7 +83,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// </summary>
 		/// <param name="abstractSet"></param>
 		/// <returns></returns>
-		public virtual string ResolveGroupBy(AbstractSet abstractSet)
+		public virtual string ResolveGroupBy()
 		{
 			StringBuilder builder = new StringBuilder();
 			var groupExpression = abstractSet.GroupExpressionList;
@@ -94,7 +91,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 			{
 				for (int i = 0; i < groupExpression.Count; i++)
 				{
-					var groupParam = new GroupExpression(groupExpression[i], $"Group_{i}", providerOption);
+					var groupParam = new GroupExpression(groupExpression[i], $"Group_{i}", provider);
 					if (builder.Length != 0)
 						builder.Append(",");
 					builder.Append(groupParam.SqlCmd);
@@ -109,7 +106,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// </summary>
 		/// <param name="abstractSet"></param>
 		/// <returns></returns>
-		public virtual string ResolveHaving(AbstractSet abstractSet)
+		public virtual string ResolveHaving()
 		{
 			StringBuilder builder = new StringBuilder();
 			var havingExpression = abstractSet.HavingExpressionList;
@@ -117,7 +114,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 			{
 				for (int i = 0; i < havingExpression.Count; i++)
 				{
-					var whereParam = new WhereExpression(havingExpression[i], $"Having_{i}", providerOption);
+					var whereParam = new WhereExpression(havingExpression[i], $"Having_{i}", provider);
 					builder.Append(whereParam.SqlCmd);
 					//参数
 					foreach (var paramKey in whereParam.Param.ParameterNames)
@@ -135,7 +132,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// </summary>
 		/// <param name="abstractSet"></param>
 		/// <returns></returns>
-		public virtual string ResolveOrderBy(AbstractSet abstractSet)
+		public virtual string ResolveOrderBy()
 		{
 			var orderByList = abstractSet?.OrderbyExpressionList.Select(a =>
 			{
@@ -214,7 +211,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// <returns></returns>
 		public virtual UpdateExpression ResolveUpdate<T>(Expression<Func<T, T>> updateExpression)
 		{
-			return new UpdateExpression(updateExpression, providerOption);
+			return new UpdateExpression(updateExpression, provider);
 		}
 
 		/// <summary>
@@ -265,6 +262,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		{
 			return nolock ? "(NOLOCK)" : "";
 		}
+
 		/// <summary>
 		/// 解析连表查询
 		/// </summary>
@@ -272,25 +270,30 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// <param name="sql"></param>
 		/// <param name="selectExp"></param>
 		/// <returns></returns>
-		public virtual string ResolveJoinSql(List<JoinAssTable> joinAssTables, ref string sql, AbstractSet abstractSet)
+		public virtual string ResolveJoinSql(List<JoinAssTable> joinAssTables, ref string sql)
 		{
 			StringBuilder builder = new StringBuilder(Environment.NewLine);
-			var masterEntity = EntityCache.QueryEntity(abstractSet.TableType);
-			if (masterEntity.Navigations.Any())
-			{
-				joinAssTables.AddRange(masterEntity.Navigations.ToArray());
-			}
 			if (joinAssTables.Count != 0)
 			{
+				sql = sql.TrimEnd();
 				//循环拼接连表对象
 				for (int i = 0; i < joinAssTables.Count; i++)
-				{
+				{	
+					//当前连表对象
 					var item = joinAssTables[i];
-					if (item.Action == JoinAction.Default || item.Action == JoinAction.Navigation)//默认连表
+					if (item.IsMapperField == false)
+					{
+						continue;
+					}
+					item.MapperList.Clear();
+					//连表实体
+					var leftEntity = EntityCache.QueryEntity(item.TableType);
+					//默认连表
+					if (item.Action == JoinAction.Default || item.Action == JoinAction.Navigation)
 					{
 						string leftTable = providerOption.CombineFieldName(item.LeftTabName);
 						builder.Append($@" {item.JoinMode.ToString()} JOIN 
-                                       {leftTable} ON {leftTable}
+                                       {leftTable} {leftEntity.AsName} ON {leftEntity.AsName}
                                       .{providerOption.CombineFieldName(item.LeftAssName)} = {providerOption.CombineFieldName(item.RightTabName)}
                                       .{providerOption.CombineFieldName(item.RightAssName)} " + Environment.NewLine);
 					}
@@ -298,46 +301,61 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 					{
 						builder.Append(" " + item.JoinSql);
 						//判断是否需要显示连表的字段
-						if (item.TableType == null)
+						if (!item.IsMapperField)
 						{
 							continue;
 						}
 					}
-					StringBuilder sqlBuilder = new StringBuilder();
-					//连表实体
-					var joinEntity = EntityCache.QueryEntity(item.TableType);
-					//表名称
-					string joinTableName = joinEntity.AsName == joinEntity.Name ? providerOption.CombineFieldName(joinEntity.Name) : joinEntity.AsName;
-					foreach (string fieldValue in joinEntity.FieldPairs.Values)
-					{
-						//首先添加表名称
-						sqlBuilder.Append($",{joinTableName}.");
-						//字段
-						string field = providerOption.CombineFieldName(fieldValue);
-						//字符出现的次数
-						int repeatCount = sql.Split(new string[] { field }, StringSplitOptions.None).Length - 1;
-						//添加字段
-						sqlBuilder.Append(field);
-						if (repeatCount > 0)
-						{
-							sqlBuilder.Append($" AS {fieldValue}_{repeatCount}");
-							item.MapperList.Add(fieldValue, $"{fieldValue}_{repeatCount}");
-						}
-						else
-						{
-							item.MapperList.Add(fieldValue, fieldValue);
-						}
-					}
-					//重新注册实体映射
-					SqlMapper.SetTypeMap(joinEntity.Type, new CustomPropertyTypeMap(joinEntity.Type,
-							(type, column) =>
-							type.GetPropertys(item.MapperList.FirstOrDefault(x => x.Value.Equals(column)).Key)
-							));
-					//设置sql字段
-					sql += sqlBuilder;
+					FieldDetailWith(ref sql, item, leftEntity);
 				}
 			}
 			return builder.ToString();
+		}
+		/// <summary>
+		/// 字段处理
+		/// </summary>
+		/// <param name="masterSql"></param>
+		/// <param name="joinAssTable"></param>
+		/// <param name="joinEntity"></param>
+		/// <returns></returns>
+		private string FieldDetailWith(ref string masterSql, JoinAssTable joinAssTable,EntityObject joinEntity)
+		{
+			StringBuilder sqlBuilder = new StringBuilder();
+			//表名称
+			string joinTableName = joinEntity.AsName == joinEntity.Name ? providerOption.CombineFieldName(joinEntity.Name) : joinEntity.AsName;
+			//查询的字段
+			var fieldPairs = joinAssTable.SelectFieldPairs != null && joinAssTable.SelectFieldPairs.Any() ? joinAssTable.SelectFieldPairs : joinEntity.FieldPairs;
+			foreach (string fieldValue in fieldPairs.Values)
+			{
+				if (masterSql.LastIndexOf(',') == masterSql.Length - 1 && sqlBuilder.Length == 0)
+					sqlBuilder.Append($"{joinTableName}.");
+				else
+					//首先添加表名称
+					sqlBuilder.Append($",{joinTableName}.");
+				//字段
+				string field = providerOption.CombineFieldName(fieldValue);
+				//字符出现的次数
+				int repeatCount = masterSql.Split(new string[] { field }, StringSplitOptions.None).Length - 1;
+				//添加字段
+				sqlBuilder.Append(field);
+				if (repeatCount > 0)
+				{
+					sqlBuilder.Append($" AS {fieldValue}_{repeatCount}");
+					joinAssTable.MapperList.Add(fieldValue, $"{fieldValue}_{repeatCount}");
+				}
+				else
+				{
+					joinAssTable.MapperList.Add(fieldValue, fieldValue);
+				}
+			}
+			//重新注册实体映射
+			SqlMapper.SetTypeMap(joinEntity.Type, new CustomPropertyTypeMap(joinEntity.Type,
+					(type, column) =>
+					type.GetPropertys(joinAssTable.MapperList.FirstOrDefault(x => x.Value.Equals(column)).Key)
+					));
+			//设置sql字段
+			masterSql += sqlBuilder;
+			return masterSql;
 		}
 	}
 }

@@ -42,8 +42,8 @@ namespace Kogel.Dapper.Extension.Test
 			//mysqlResQuery.Test();
 			//mysqlQuery.TestMaxAndMin();
 
-			//var mysqlCommand = new UnitTest.Mysql.Command();
-			//mysqlCommand.Test();
+			var mysqlCommand = new UnitTest.Mysql.Command();
+			mysqlCommand.Test();
 			#endregion
 
 			//stopwatch.Stop();

@@ -11,7 +11,10 @@ using System.Text;
 
 namespace Kogel.Dapper.Extension.Extension
 {
-	public static class MapperExtension
+	/// <summary>
+	/// 匿名类解析
+	/// </summary>
+	public static class AnonymousExtension
 	{
 		#region 匿名类返回
 		/// <summary>
@@ -20,13 +23,13 @@ namespace Kogel.Dapper.Extension.Extension
 		/// <typeparam name="T"></typeparam>
 		/// <param name="connection"></param>
 		/// <returns></returns>
-		public static T QueryFirst_1<T>(this IDbConnection conn, string sql, IProviderOption providerOption, object param = null, IDbTransaction transaction = null)
+		public static T QueryFirst_1<T>(this IDbConnection conn, SqlProvider provider, IDbTransaction transaction = null)
 		{
-			return QueryRowImpl<T>(conn, sql, param, transaction).FirstOrDefault().SetNavigation(conn, providerOption);
+			return QueryRowImpl<T>(conn, provider, transaction).FirstOrDefault().SetNavigation(conn, provider.ProviderOption);
 		}
-		public static List<T> Query_1<T>(this IDbConnection conn, string sql, IProviderOption providerOption, object param = null, IDbTransaction transaction = null)
+		public static List<T> Query_1<T>(this IDbConnection conn, SqlProvider provider, IDbTransaction transaction = null)
 		{
-			return QueryRowImpl<T>(conn, sql, param, transaction).SetNavigationList(conn, providerOption);
+			return QueryRowImpl<T>(conn, provider, transaction).SetNavigationList(conn, provider.ProviderOption);
 		}
 		/// <summary>
 		/// 查询返回匿名类
@@ -37,7 +40,7 @@ namespace Kogel.Dapper.Extension.Extension
 		/// <param name="param"></param>
 		/// <param name="transaction"></param>
 		/// <returns></returns>
-		private static List<T> QueryRowImpl<T>(IDbConnection conn, string sql, object param = null, IDbTransaction transaction = null)
+		private static List<T> QueryRowImpl<T>(IDbConnection conn, SqlProvider provider, IDbTransaction transaction = null)
 		{
 			List<T> data = default(List<T>);
 			Type type = typeof(T);
@@ -50,7 +53,7 @@ namespace Kogel.Dapper.Extension.Extension
 				data = new List<T>();
 				T t = default(T);
 				noParameterConstructorInfo = constructorInfoArray.FirstOrDefault();
-				using (var reader = conn.ExecuteReader(sql, param, transaction))
+				using (var reader = conn.ExecuteReader(provider.SqlString, provider.Params, transaction))
 				{
 					var properties = EntityCache.QueryEntity(type).Properties;
 					while (reader.Read())
@@ -68,7 +71,7 @@ namespace Kogel.Dapper.Extension.Extension
 			}
 			else
 			{
-				data = conn.Query<T>(sql, param, transaction).ToList();
+				data = conn.Querys<T>(provider, transaction).ToList();
 			}
 			return data;
 		}
@@ -87,7 +90,7 @@ namespace Kogel.Dapper.Extension.Extension
 			if (providerOption.NavigationList.Any() && data != null)
 			{
 				//写入值方法
-				var setValueMethod = typeof(MapperExtension).GetMethod("SetValue");
+				var setValueMethod = typeof(AnonymousExtension).GetMethod("SetValue");
 				foreach (var navigation in providerOption.NavigationList)
 				{
 					var navigationExpression = new NavigationExpression(navigation.MemberAssign.Expression);
@@ -138,7 +141,7 @@ namespace Kogel.Dapper.Extension.Extension
 		{
 			if (providerOption.NavigationList.Any() && data != null && data.Any())
 			{
-				var setListMethod = typeof(MapperExtension).GetMethod("SetListValue");
+				var setListMethod = typeof(AnonymousExtension).GetMethod("SetListValue");
 				foreach (var navigation in providerOption.NavigationList)
 				{
 					StringBuilder sqlBuilder = new StringBuilder();

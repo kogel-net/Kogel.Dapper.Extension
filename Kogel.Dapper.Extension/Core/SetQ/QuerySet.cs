@@ -89,7 +89,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			WhereExpressionList.Add(predicate);
 			return this;
 		}
-	
+
 
 		public QuerySet<T> Where(T model)
 		{
@@ -214,7 +214,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 		}
 		public QuerySet<T> Where<TWhere1, TWhere2>(Expression<Func<TWhere1, TWhere2, bool>> exp)
 		{
-			var sqlWhere = new WhereExpression(exp, $"Where_{Params.ParameterNames.Count()}_", SqlProvider.ProviderOption);
+			var sqlWhere = new WhereExpression(exp, $"Where_{Params.ParameterNames.Count()}_", SqlProvider);
 			WhereBuilder.Append(sqlWhere.SqlCmd);
 			if (sqlWhere.Param != null)
 			{
@@ -290,7 +290,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 		/// <returns></returns>
 		public QuerySet<T> Join<TOuter, TInner>(Expression<Func<TOuter, TInner, bool>> exp, JoinMode joinMode = JoinMode.LEFT, bool IsDisField = true)
 		{
-			var joinWhere = new WhereExpression(exp, $"Where_{Params.ParameterNames.Count()}_", SqlProvider.ProviderOption);
+			var joinWhere = new WhereExpression(exp, $"Where_{Params.ParameterNames.Count()}_", SqlProvider);
 			Regex whereRex = new Regex("AND");
 			string tableName = SqlProvider.FormatTableName(false, true, typeof(TInner));
 			SqlProvider.JoinList.Add(new JoinAssTable()
@@ -311,6 +311,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			{
 				Action = JoinAction.Sql,
 				JoinSql = SqlJoin,
+				IsMapperField = false
 			});
 			return this;
 		}
@@ -326,7 +327,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			{
 				Action = JoinAction.Sql,
 				JoinSql = SqlJoin,
-				TableType = typeof(TInner)
+				TableType = typeof(TInner),
 			});
 			return this;
 		}

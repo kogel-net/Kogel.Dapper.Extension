@@ -1,5 +1,7 @@
 ﻿using Dapper;
 using Kogel.Dapper.Extension.Core.Interfaces;
+using Kogel.Dapper.Extension.Exception;
+using Kogel.Dapper.Extension.Extension;
 using Kogel.Dapper.Extension.Model;
 using System;
 using System.Collections.Generic;
@@ -26,48 +28,37 @@ namespace Kogel.Dapper.Extension.Expressions
 		/// </summary>
 		public new DynamicParameters Param;
 		#endregion
-		#region 当前解析的对象
-		private EntityObject entity { get; }
-		#endregion
-		public GroupExpression(LambdaExpression expression, string prefix, IProviderOption providerOption) : base(providerOption)
+		public GroupExpression(LambdaExpression expression, string prefix, SqlProvider provider) : base(provider)
 		{
-			this._sqlCmd = new StringBuilder(100);
+			this._sqlCmd = new StringBuilder();
 			this.Param = new DynamicParameters();
-			this.providerOption = providerOption;
 			//当前定义的查询返回对象
-			this.entity = EntityCache.QueryEntity(expression.Body.Type);
-			//执行解析
-			Visit(expression);
-			//分组指定字段
-			if (base.FieldList.Any())
-			{
-				//开始拼接成分组字段
-				for (var i = 0; i < base.FieldList.Count; i++)
-				{
-						if (_sqlCmd.Length != 0)
-							_sqlCmd.Append(",");
-						_sqlCmd.Append(base.FieldList[i]);
-				}
-			}
-			else
-			{
-				_sqlCmd.Append(base.SpliceField);
-			}
-		}
-		/// <summary>
-		/// 匿名类每组表达式解析
-		/// </summary>
-		/// <param name="node"></param>
-		/// <returns></returns>
-		protected override Expression VisitNew(NewExpression node)
-		{
-			foreach (var argument in node.Arguments)
+			EntityObject entity = EntityCache.QueryEntity(expression.Body.Type);
+			var newExpression = expression.Body as NewExpression;
+			foreach (var argument in newExpression.Arguments)
 			{
 				base.SpliceField.Clear();
-				base.Visit(argument);
-				base.FieldList.Add(SpliceField.ToString());
+				base.Param = new DynamicParameters();
+				if (_sqlCmd.Length != 0)
+					_sqlCmd.Append(",");
+				//返回类型
+				var returnProperty = entity.Properties[base.Index];
+				//实体类型
+				Type entityType;
+				//验证是实体类或者是泛型
+				if (ExpressionExtension.IsAnyBaseEntity(returnProperty.PropertyType, out entityType))
+				{
+					throw new DapperExtensionException("GroupBy不支持导航属性!");
+				}
+				else
+				{
+					//值对象
+					Visit(argument);
+					_sqlCmd.Append($" {base.SpliceField} ");
+					Param.AddDynamicParams(base.Param);
+				}
+				base.Index++;
 			}
-			return node;
 		}
 	}
 }
