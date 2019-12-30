@@ -110,6 +110,7 @@ namespace Kogel.Dapper.Extension.Oracle
 			string noneSql = "";
 			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql);
 
+			SqlString = $"{selectSql} {fromTableSql} {joinSql} {whereSql} ";
 			return this;
         }
 

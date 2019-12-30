@@ -96,7 +96,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				//  };
 				var comment = conn.QuerySet<News1>()
 				.Where(x => x.Comments.Any(y => y.Id != 1))
-				.ToList(x => new News1
+				.Get(x => new News1
 				{
 					Id = x.Id,
 					Content = x.Content,

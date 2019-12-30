@@ -278,7 +278,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 				sql = sql.TrimEnd();
 				//循环拼接连表对象
 				for (int i = 0; i < joinAssTables.Count; i++)
-				{	
+				{
 					//当前连表对象
 					var item = joinAssTables[i];
 					if (item.IsMapperField == false)
@@ -318,7 +318,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// <param name="joinAssTable"></param>
 		/// <param name="joinEntity"></param>
 		/// <returns></returns>
-		private string FieldDetailWith(ref string masterSql, JoinAssTable joinAssTable,EntityObject joinEntity)
+		private string FieldDetailWith(ref string masterSql, JoinAssTable joinAssTable, EntityObject joinEntity)
 		{
 			StringBuilder sqlBuilder = new StringBuilder();
 			//表名称
@@ -352,7 +352,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 			SqlMapper.SetTypeMap(joinEntity.Type, new CustomPropertyTypeMap(joinEntity.Type,
 					(type, column) =>
 					type.GetPropertys(joinAssTable.MapperList.FirstOrDefault(x => x.Value.Equals(column)).Key)
-					));
+					), true);
 			//设置sql字段
 			masterSql += sqlBuilder;
 			return masterSql;

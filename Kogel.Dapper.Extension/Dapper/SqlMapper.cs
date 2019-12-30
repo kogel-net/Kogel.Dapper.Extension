@@ -3048,6 +3048,14 @@ namespace Dapper
 		public static ITypeMap GetTypeMap(Type type)
 		{
 			if (type == null) throw new ArgumentNullException(nameof(type));
+			//先从临时属性里获取
+			lock (_temporaryTypeMaps)
+			{
+				var temporaryMap = (ITypeMap)_temporaryTypeMaps[type];
+				if (temporaryMap != null)
+					return temporaryMap;
+			}
+			//再从全局缓存中获取
 			var map = (ITypeMap)_typeMaps[type];
 			if (map == null)
 			{
@@ -3065,17 +3073,21 @@ namespace Dapper
 			}
 			return map;
 		}
-		[ThreadStatic]
-		//private static ThreadLocal<Hashtable> typemaps = new ThreadLocal<Hashtable>();
+
 		// use Hashtable to get free lockless reading
 		private static Hashtable _typeMaps = new Hashtable();
-
 		/// <summary>
-		/// Set custom mapping for type deserializers
+		/// 临时属性映射
 		/// </summary>
-		/// <param name="type">Entity type to override</param>
-		/// <param name="map">Mapping rules impementation, null to remove custom map</param>
-		public static void SetTypeMap(Type type, ITypeMap map)
+		[ThreadStatic]
+		private static Hashtable _temporaryTypeMaps = new Hashtable();
+		/// <summary>
+		/// 设置属性映射
+		/// </summary>
+		/// <param name="type">类型</param>
+		/// <param name="map">映射列表</param>
+		/// <param name="isTemporary">是否是临时属性</param>
+		public static void SetTypeMap(Type type, ITypeMap map, bool isTemporary = false)
 		{
 			if (type == null)
 				throw new ArgumentNullException(nameof(type));
@@ -3089,9 +3101,20 @@ namespace Dapper
 			}
 			else
 			{
-				lock (_typeMaps)
+				if (isTemporary == false)
 				{
-					_typeMaps[type] = map;
+					lock (_typeMaps)
+					{
+						_typeMaps[type] = map;
+					}
+				}
+				else
+				{
+					//临时属性
+					lock (_temporaryTypeMaps)
+					{
+						_temporaryTypeMaps[type] = map;
+					}
 				}
 			}
 
