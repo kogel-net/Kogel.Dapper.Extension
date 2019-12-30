@@ -44,12 +44,10 @@ namespace Kogel.Dapper.Extension.Extension
 		{
 			List<T> data = default(List<T>);
 			Type type = typeof(T);
-			ConstructorInfo[] constructorInfoArray = type.GetConstructors(BindingFlags.Instance
-			| BindingFlags.NonPublic
-			| BindingFlags.Public);
-			ConstructorInfo noParameterConstructorInfo = constructorInfoArray.FirstOrDefault(x => x.GetParameters().Length == 0);
-			if (null == noParameterConstructorInfo && type.FullName.Contains("AnonymousType"))//匿名类型
+			if (type.FullName.Contains("AnonymousType"))//匿名类型
 			{
+				ConstructorInfo[] constructorInfoArray = type.GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+				ConstructorInfo noParameterConstructorInfo = constructorInfoArray.FirstOrDefault(x => x.GetParameters().Length == 0);
 				data = new List<T>();
 				T t = default(T);
 				noParameterConstructorInfo = constructorInfoArray.FirstOrDefault();
@@ -94,22 +92,25 @@ namespace Kogel.Dapper.Extension.Extension
 				foreach (var navigation in providerOption.NavigationList)
 				{
 					var navigationExpression = new NavigationExpression(navigation.MemberAssign.Expression);
-					//根据得知的映射列表获取条件值
-					foreach (var mapp in providerOption.MappingList)
+					if (providerOption.MappingList.Any())
 					{
-						//根据映射的键设置实际的值
-						if (navigationExpression.SqlCmd.IndexOf($"= {mapp.Key}") != -1)
+						//根据得知的映射列表获取条件值
+						foreach (var mapp in providerOption.MappingList)
 						{
-							string param = $"{providerOption.ParameterPrefix}{mapp.Value}";
-							navigationExpression.SqlCmd = navigationExpression.SqlCmd.Replace($"= {mapp.Key}", $"= {param}");
-							//获取实体类的值
-							object paramValue = EntityCache.QueryEntity(typeof(T)).Properties.FirstOrDefault(x => x.Name == mapp.Value).GetValue(data);
-							navigationExpression.Param.Add(param, paramValue);
+							//根据映射的键设置实际的值
+							if (navigationExpression.SqlCmd.IndexOf($"= {mapp.Key}") != -1)
+							{
+								string param = $"{providerOption.ParameterPrefix}{mapp.Value}";
+								navigationExpression.SqlCmd = navigationExpression.SqlCmd.Replace($"= {mapp.Key}", $"= {param}");
+								//获取实体类的值
+								object paramValue = EntityCache.QueryEntity(typeof(T)).Properties.FirstOrDefault(x => x.Name == mapp.Value).GetValue(data);
+								navigationExpression.Param.Add(param, paramValue);
+							}
 						}
+						setValueMethod
+							.MakeGenericMethod(new Type[] { typeof(T), navigationExpression.ReturnType })
+							.Invoke(null, new object[] { data, dbCon, navigationExpression.SqlCmd, navigationExpression.Param, navigation.MemberAssignName });
 					}
-					setValueMethod
-						.MakeGenericMethod(new Type[] { typeof(T), navigationExpression.ReturnType })
-						.Invoke(null, new object[] { data, dbCon, navigationExpression.SqlCmd, navigationExpression.Param, navigation.MemberAssignName });
 				}
 			}
 			return data;
@@ -148,26 +149,30 @@ namespace Kogel.Dapper.Extension.Extension
 					var navigationExpression = new NavigationExpression(navigation.MemberAssign.Expression);
 					//参数数
 					int paramCount = 0;
-					//根据得知的映射列表获取条件值
-					foreach (var mapp in providerOption.MappingList)
+					if (providerOption.MappingList.Any())
 					{
-						//根据映射的键设置实际的值
-						if (navigationExpression.SqlCmd.IndexOf($"= {mapp.Key}") != -1)
+						//var whereSql = navigationExpression.SqlCmd.Substring(navigationExpression.SqlCmd.IndexOf("WHERE"));
+						//根据得知的映射列表获取条件值
+						foreach (var mapp in providerOption.MappingList)
 						{
-							foreach (var item in data)
+							//根据映射的键设置实际的值
+							if (navigationExpression.SqlCmd.IndexOf($"= {mapp.Key}") != -1)
 							{
-								string param = $"{providerOption.ParameterPrefix}{mapp.Value}_{paramCount++}";
-								sqlBuilder.Append(navigationExpression.SqlCmd.Replace($"= {mapp.Key}", $"= {param}") + $";{Environment.NewLine}");
-								//获取实体类的值
-								object paramValue = EntityCache.QueryEntity(typeof(T)).Properties.FirstOrDefault(x => x.Name == mapp.Value).GetValue(item);
-								navigationExpression.Param.Add(param, paramValue);
+								foreach (var item in data)
+								{
+									string param = $"{providerOption.ParameterPrefix}{mapp.Value}_{paramCount++}";
+									sqlBuilder.Append(navigationExpression.SqlCmd.Replace($"= {mapp.Key}", $"= {param}") + $";{Environment.NewLine}");
+									//获取实体类的值
+									object paramValue = EntityCache.QueryEntity(typeof(T)).Properties.FirstOrDefault(x => x.Name == mapp.Value).GetValue(item);
+									navigationExpression.Param.Add(param, paramValue);
+								}
 							}
 						}
-					}
-					setListMethod
-					   .MakeGenericMethod(new Type[] { typeof(T), navigationExpression.ReturnType })
-					   .Invoke(null, new object[] { data, dbCon, sqlBuilder.ToString(), navigationExpression.Param,
+						setListMethod
+						   .MakeGenericMethod(new Type[] { typeof(T), navigationExpression.ReturnType })
+						   .Invoke(null, new object[] { data, dbCon, sqlBuilder.ToString(), navigationExpression.Param,
 							navigation.MemberAssignName });
+					}
 				}
 			}
 			return data;

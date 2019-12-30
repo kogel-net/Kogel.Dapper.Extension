@@ -58,6 +58,11 @@ namespace Kogel.Dapper.Extension.Model
 			//反射实体类字段
 			foreach (var item in this.Properties)
 			{
+				//子父类存在相同的字段
+				if (this.FieldPairs.Any(x => x.Key == item.Name))
+				{
+					continue;
+				}
 				//当前字段是导航属性
 				var foreignKey = item.GetCustomAttributes(true).FirstOrDefault(x => x.GetType().Equals(typeof(ForeignKey)));
 				if (foreignKey != null)

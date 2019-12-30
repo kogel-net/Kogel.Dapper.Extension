@@ -106,12 +106,7 @@ namespace Kogel.Dapper.Extension.Expressions
 		/// <returns></returns>
 		protected override Expression VisitMethodCall(MethodCallExpression node)
 		{
-			//保存导航查询的属性
-			if (node.Method.ReturnType.FullName.Contains("System.Collections.Generic.List") || node.Method.ReturnType.BaseType.FullName.Contains("Kogel.Dapper.Extension.IBaseEntity"))
-			{
-				return node;
-			}
-			else if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension.Function"))//系统函数
+            if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension.Function"))//系统函数
 			{
 				Operation(node);
 			}

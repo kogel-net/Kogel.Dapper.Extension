@@ -242,6 +242,15 @@ namespace Kogel.Dapper.Extension.Extension
 				return IsAnyBaseEntity(type.BaseType, out entityType);
 			}
 		}
+		///// <summary>
+		///// 是否存在
+		///// </summary>
+		///// <param name="type"></param>
+		///// <returns></returns>
+		//public static bool IsAnyQuerySet(Type type)
+		//{
+
+		//}
 		/// <summary>
 		/// 克隆list
 		/// </summary>

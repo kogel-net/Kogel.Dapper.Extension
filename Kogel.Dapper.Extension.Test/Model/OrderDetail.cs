@@ -21,7 +21,7 @@ namespace Lige.Model
 		/// 
 		/// </summary>
 		[Identity]
-		public int Id { get; set; }
+		public override int Id { get; set; }
 		/// <summary>
 		/// 訂單編號
 		/// </summary>

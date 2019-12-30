@@ -53,13 +53,27 @@ namespace Kogel.Dapper.Extension.Expressions
 					//验证是实体类或者是泛型
 					if (ExpressionExtension.IsAnyBaseEntity(memberInit.Expression.Type, out entityType))
 					{
-						var itemJoin = provider.JoinList.FirstOrDefault(x => x.TableType == entityType);
-						if (itemJoin != null)
+						if (!memberInit.Expression.ToString().Contains("QuerySet"))
 						{
-							itemJoin.IsMapperField = true;
-							//当前定义的查询返回对象
-							EntityObject entity = EntityCache.QueryEntity(entityType);
-							itemJoin.SelectFieldPairs = entity.FieldPairs;
+							//导航属性
+							var itemJoin = provider.JoinList.FirstOrDefault(x => x.TableType == entityType);
+							if (itemJoin != null)
+							{
+								itemJoin.IsMapperField = true;
+								//当前定义的查询返回对象
+								EntityObject entity = EntityCache.QueryEntity(entityType);
+								itemJoin.SelectFieldPairs = entity.FieldPairs;
+							}
+						}
+						else
+						{
+							_sqlCmd.Remove(_sqlCmd.Length - 1, 1);
+							//自定义查询列表
+							providerOption.NavigationList.Add(new NavigationMemberAssign()
+							{
+								MemberAssign = memberInit,
+								MemberAssignName = memberInit.Member.Name
+							});
 						}
 					}
 					else
@@ -68,6 +82,8 @@ namespace Kogel.Dapper.Extension.Expressions
 						Visit(memberInit.Expression);
 						_sqlCmd.Append($"{base.SpliceField} AS {memberInit.Member.Name}");
 						Param.AddDynamicParams(base.Param);
+						//记录映射字段对应关系
+						providerOption.MappingList.Add(base.SpliceField.ToString(), memberInit.Member.Name);
 					}
 					base.Index++;
 				}
