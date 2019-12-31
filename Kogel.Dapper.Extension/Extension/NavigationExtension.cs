@@ -1,13 +1,10 @@
 ﻿using Dapper;
-using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension.Model;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using static Dapper.SqlMapper;
 using static Dapper.SqlMapperExtension;
@@ -107,9 +104,9 @@ namespace Kogel.Dapper.Extension.Extension
 		{
 			if (provider.JoinList.Any(x => x.Action == JoinAction.Navigation && x.IsMapperField))
 				return (Task<IEnumerable<T>>)typeof(SqlMapperExtension)
-			           .GetMethod("QueryAsync")
-			           .MakeGenericMethod(GetNavigationTypes<T>())
-			           .Invoke(null, new object[] { dbCon, provider, transaction });
+					   .GetMethod("QueryAsync")
+					   .MakeGenericMethod(GetNavigationTypes<T>())
+					   .Invoke(null, new object[] { dbCon, provider, transaction });
 			else
 				return dbCon.QueryAsync<T>(provider.SqlString, provider.Params, transaction);
 		}

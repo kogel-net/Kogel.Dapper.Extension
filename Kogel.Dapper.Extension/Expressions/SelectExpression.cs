@@ -56,7 +56,7 @@ namespace Kogel.Dapper.Extension.Expressions
 						if (!memberInit.Expression.ToString().Contains("QuerySet"))
 						{
 							//导航属性
-							var itemJoin = provider.JoinList.FirstOrDefault(x => x.TableType == entityType);
+							var itemJoin = provider.JoinList.FirstOrDefault(x => x.TableType.IsTypeEquals(entityType));
 							if (itemJoin != null)
 							{
 								itemJoin.IsMapperField = true;

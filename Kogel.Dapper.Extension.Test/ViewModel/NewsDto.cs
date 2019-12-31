@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Kogel.Dapper.Extension.Test.ViewModel
 {
-	public class NewsDto: IBaseEntity<NewsDto>
+	public class NewsDto: IBaseEntity<NewsDto, long>
 	{
-		public long Id { get; set; }
+		public override long Id { get; set; }
 
 		public string Contents { get; set; }
 

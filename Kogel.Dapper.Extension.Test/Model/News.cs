@@ -15,7 +15,7 @@ namespace Kogel.Dapper.Extension.Test.Model
 	/// 描述：新闻实体类
 	/// </summary>
 	//[Display(Schema ="dbo")]
-	public class News : IBaseEntity<int>
+	public class News : IBaseEntity<News, int>
 	{
 		/// <summary>
 		/// 新闻主键

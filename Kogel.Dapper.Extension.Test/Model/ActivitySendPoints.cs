@@ -7,7 +7,7 @@ using Kogel.Dapper.Extension.Attributes;
 namespace Lige.Model
 {
 	[Display(Rename = "Lige_ActivitySendPoints")]
-	public class ActivitySendPoints:IBaseEntity<int>
+	public class ActivitySendPoints: IBaseEntity<ActivitySendPoints, int>
 	{
 		[Identity]
 		public override int Id { get;set; }

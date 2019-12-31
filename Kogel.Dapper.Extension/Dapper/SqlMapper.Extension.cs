@@ -41,12 +41,12 @@ namespace Dapper
 		/// <param name="splitOn"></param>
 		/// <returns></returns>
 		public static TFirst QueryFirstOrDefault<TFirst, TSecond, TThird, TFourth, TFifth, TSixth>(this IDbConnection cnn, SqlProvider provider, IDbTransaction transaction = null)
-			where TFirst : IBaseEntity<int>
-			where TSecond : IBaseEntity<int>
-			where TThird : IBaseEntity<int>
-			where TFourth : IBaseEntity<int>
-			where TFifth : IBaseEntity<int>
-			where TSixth : IBaseEntity<int>
+			where TFirst : IBaseEntity
+			where TSecond : IBaseEntity
+			where TThird : IBaseEntity
+			where TFourth : IBaseEntity
+			where TFifth : IBaseEntity
+			where TSixth : IBaseEntity
 		{
 			return cnn.Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth>(provider, transaction).FirstOrDefault();
 		}
@@ -63,12 +63,12 @@ namespace Dapper
 		/// <param name="splitOn"></param>
 		/// <returns></returns>
 		public static async Task<TFirst> QueryFirstOrDefaultAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth>(this IDbConnection cnn, SqlProvider provider, IDbTransaction transaction = null)
-			where TFirst : IBaseEntity<int>
-			where TSecond : IBaseEntity<int>
-			where TThird : IBaseEntity<int>
-			where TFourth : IBaseEntity<int>
-			where TFifth : IBaseEntity<int>
-			where TSixth : IBaseEntity<int>
+		    where TFirst : IBaseEntity
+			where TSecond : IBaseEntity
+			where TThird : IBaseEntity
+			where TFourth : IBaseEntity
+			where TFifth : IBaseEntity
+			where TSixth : IBaseEntity
 		{
 			return (await cnn.QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth>(provider, transaction)).FirstOrDefault();
 		}
@@ -84,12 +84,12 @@ namespace Dapper
 		/// <param name="splitOn"></param>
 		/// <returns></returns>
 		public static IEnumerable<TFirst> Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth>(this IDbConnection cnn, SqlProvider provider, IDbTransaction transaction = null)
-			where TFirst : IBaseEntity<int>
-			where TSecond : IBaseEntity<int>
-			where TThird : IBaseEntity<int>
-			where TFourth : IBaseEntity<int>
-			where TFifth : IBaseEntity<int>
-			where TSixth : IBaseEntity<int>
+		    where TFirst : IBaseEntity
+			where TSecond : IBaseEntity
+			where TThird : IBaseEntity
+			where TFourth : IBaseEntity
+			where TFifth : IBaseEntity
+			where TSixth : IBaseEntity
 		{
 			EntityObject firstEntity = EntityCache.QueryEntity(typeof(TFirst));
 			string splitOn = GetSplitOn<TFirst>(provider);
@@ -98,8 +98,9 @@ namespace Dapper
 				var hashes = new HashSet<TFirst>();
 				cnn.Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TFirst>(provider.SqlString, (first, second, third, fourth, fifth, sixth) =>
 				{
+					object id = first.GetId();
 					//判断当前主数据是否出现过
-					var lookup = hashes.FirstOrDefault(x => x.Id.Equals(first.Id));
+					var lookup = hashes.FirstOrDefault(x => x.GetId().Equals(id));
 					if (lookup == null)
 						lookup = first;
 
@@ -116,11 +117,12 @@ namespace Dapper
 						ExpressionExtension.SetProperValue(firstEntity, lookup, sixth);
 
 					//不存在的主表数据才添加进来，防止重复
-					if (!hashes.Any(x => x.Id == lookup.Id))
+					if (!hashes.Any(x => x.GetId() == lookup.GetId()))
 						hashes.Add(lookup);
 
 					return default(TFirst);
 				}, provider.Params, transaction, true, splitOn);
+
 				return hashes;
 			}
 			else
@@ -140,12 +142,12 @@ namespace Dapper
 		/// <param name="splitOn"></param>
 		/// <returns></returns>
 		public static async Task<IEnumerable<TFirst>> QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth>(this IDbConnection cnn, SqlProvider provider, IDbTransaction transaction = null)
-			where TFirst : IBaseEntity<int>
-			where TSecond : IBaseEntity<int>
-			where TThird : IBaseEntity<int>
-			where TFourth : IBaseEntity<int>
-			where TFifth : IBaseEntity<int>
-			where TSixth : IBaseEntity<int>
+			where TFirst : IBaseEntity
+			where TSecond : IBaseEntity
+			where TThird : IBaseEntity
+			where TFourth : IBaseEntity
+			where TFifth : IBaseEntity
+			where TSixth : IBaseEntity
 		{
 			EntityObject firstEntity = EntityCache.QueryEntity(typeof(TFirst));
 			string splitOn = GetSplitOn<TFirst>(provider);
@@ -154,8 +156,9 @@ namespace Dapper
 				var hashes = new HashSet<TFirst>();
 				await cnn.QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TFirst>(provider.SqlString, (first, second, third, fourth, fifth, sixth) =>
 				{
+					object id = first.GetId();
 					//判断当前主数据是否出现过
-					var lookup = hashes.FirstOrDefault(x => x.Id.Equals(first.Id));
+					var lookup = hashes.FirstOrDefault(x => x.GetId().Equals(id));
 					if (lookup == null)
 						lookup = first;
 
@@ -172,7 +175,7 @@ namespace Dapper
 						ExpressionExtension.SetProperValue(firstEntity, lookup, sixth);
 
 					//不存在的主表数据才添加进来，防止重复
-					if (!hashes.Any(x => x.Id == lookup.Id))
+					if (!hashes.Any(x => x.GetId() == id))
 						hashes.Add(lookup);
 
 					return default(TFirst);

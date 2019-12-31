@@ -222,19 +222,11 @@ namespace Kogel.Dapper.Extension.Extension
 			}
 			else if (type.FullName.Contains("System.Collections.Generic"))//泛型
 			{
-				//不能使用递归。不然可能无法获取到真正的类型
-				//return IsAnyBaseEntity(type.GenericTypeArguments[0], out entityType);
-				if (!IsAnyBaseEntity(type.GenericTypeArguments[0], out entityType))
-				{
-					entityType = null;
-					return false;
-				}
-				entityType = type.GenericTypeArguments[0];
-				return true;
+				return IsAnyBaseEntity(type.GenericTypeArguments[0], out entityType);
 			}
 			else if (type.BaseType.FullName.Contains("Kogel.Dapper.Extension.IBaseEntity"))
 			{
-				entityType = type;
+				entityType = type.BaseType.GenericTypeArguments[0];
 				return true;
 			}
 			else
@@ -305,6 +297,28 @@ namespace Kogel.Dapper.Extension.Extension
 					property.SetValue(masterObj, entities);
 					break;
 				}
+			}
+		}
+
+		/// <summary>
+		///判断两个类型是否 
+		/// </summary>
+		/// <param name="type1"></param>
+		/// <param name="type2"></param>
+		/// <returns></returns>
+		public static bool IsTypeEquals(this Type type1, Type type2)
+		{
+			if (type1 == type2)
+			{
+				return true;
+			}
+			else if (type2.BaseType == null)
+			{
+				return false;
+			}
+			else
+			{
+				return IsTypeEquals(type1.BaseType, type2);
 			}
 		}
 	}

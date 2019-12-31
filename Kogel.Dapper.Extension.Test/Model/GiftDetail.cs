@@ -10,7 +10,7 @@ namespace Lige.Model
 	/// 礼品详情
 	/// </summary>
 	[Display(Rename = "Lige_GiftDetail")]
-	public class GiftDetail : IBaseEntity<int>
+	public class GiftDetail : IBaseEntity<GiftDetail, int>
 	{
 		/// <summary>
 		/// 

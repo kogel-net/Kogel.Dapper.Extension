@@ -7,15 +7,15 @@ using Kogel.Dapper.Extension;
 
 namespace Lige.Model
 {
-	public class test:IBaseEntity<int>
+	public class test<T> : IBaseEntity<T,int>
 	{
-
+		public override int Id { get; set; }
 	}
 	/// <summary>
 	/// 類OrderDetail。
 	/// </summary>
 	[Display(Rename = "LiGe_OrderDetail")]
-	public partial class OrderDetail: test
+	public partial class OrderDetail: test<OrderDetail>
 	{
 		/// <summary>
 		/// 

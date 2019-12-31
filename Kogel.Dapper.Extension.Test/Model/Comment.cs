@@ -8,14 +8,14 @@ using Kogel.Dapper.Extension.Attributes;
 namespace Kogel.Dapper.Extension.Test.Model
 {
 
-	public class BaseEntity : IBaseEntity<int>
+	public class BaseEntity<T> : IBaseEntity<T, int>
 	{
 		[Identity]
 		public override int Id { get; set; }
 	}
 
 
-	public class Comment : BaseEntity
+	public class Comment : BaseEntity<Comment>
 	{
 		/// <summary>
 		/// 评论父级id，不为0则是回复评论

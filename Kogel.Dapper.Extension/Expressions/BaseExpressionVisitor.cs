@@ -498,7 +498,7 @@ namespace Kogel.Dapper.Extension.Expressions
 						if (ExpressionExtension.IsAnyBaseEntity(node.Arguments[0].Type, out entityType))
 						{
 							//导航属性有条件时设置查询该导航属性
-							var joinTable = Provider.JoinList.Find(x => x.TableType == entityType);
+							var joinTable = Provider.JoinList.Find(x => x.TableType.IsTypeEquals(entityType));
 							joinTable.IsMapperField = true;
 							//解析导航属性条件
 							var binaryExp = (node.Arguments[1] as LambdaExpression)?.Body as BinaryExpression;
