@@ -254,6 +254,13 @@ namespace Kogel.Dapper.Extension.Expressions
 					}
 					break;
 				#endregion
+				#region 导航属性
+				case "Select":
+					{
+						Visit(node.Arguments[1]);
+						break;
+					}
+				#endregion
 				default:
 					SpliceField.Append(node.ToConvertAndGetValue());
 					break;

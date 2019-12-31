@@ -42,6 +42,14 @@ namespace Kogel.Dapper.Extension.Model
 		/// </summary>
 		public bool IsMapperField { get; set; } = true;
 		/// <summary>
+		/// 是否是Dto
+		/// </summary>
+		public bool IsDto { get; set; } = false;
+		/// <summary>
+		/// Dto类
+		/// </summary>
+		public Type DtoType { get; set; }
+		/// <summary>
 		/// 克隆
 		/// </summary>
 		/// <returns></returns>

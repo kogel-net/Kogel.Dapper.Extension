@@ -27,6 +27,8 @@ namespace Kogel.Dapper.Extension.Expressions
 		/// 参数
 		/// </summary>
 		public new DynamicParameters Param;
+
+		protected Dictionary<string, string> SelectFieldPairs;
 		#endregion
 		/// <summary>
 		/// 执行解析
@@ -38,6 +40,7 @@ namespace Kogel.Dapper.Extension.Expressions
 		{
 			this._sqlCmd = new StringBuilder();
 			this.Param = new DynamicParameters();
+			this.SelectFieldPairs = new Dictionary<string, string>();
 			//判断是不是实体类
 			if (expression.Body is MemberInitExpression)
 			{
@@ -76,11 +79,30 @@ namespace Kogel.Dapper.Extension.Expressions
 							});
 						}
 					}
+					else if (memberInit.Expression.Type.FullName.Contains("System.Collections.Generic"))//Select Dto
+					{
+						var selectMethCall = (memberInit.Expression as MethodCallExpression).Arguments[0] as MethodCallExpression;
+						var selectExpression = new SelectExpression(selectMethCall.Arguments[1] as LambdaExpression, prefix + "_Dto", provider);
+						Type selectEntity;
+						if (ExpressionExtension.IsAnyBaseEntity(selectMethCall.Arguments[0].Type, out selectEntity))
+						{
+							//导航属性
+							var itemJoin = provider.JoinList.FirstOrDefault(x => x.TableType.IsTypeEquals(selectEntity));
+							if (itemJoin != null)
+							{
+								itemJoin.IsMapperField = true;
+								itemJoin.IsDto = true;
+								itemJoin.DtoType = memberInit.Expression.Type.GenericTypeArguments[0];
+								itemJoin.SelectFieldPairs = selectExpression.SelectFieldPairs;
+							}
+						}
+					}
 					else
 					{
 						//值对象
 						Visit(memberInit.Expression);
 						_sqlCmd.Append($"{base.SpliceField} AS {memberInit.Member.Name}");
+						this.SelectFieldPairs.Add(base.SpliceField.ToString(), memberInit.Member.Name);
 						Param.AddDynamicParams(base.Param);
 						//记录映射字段对应关系
 						providerOption.MappingList.Add(base.SpliceField.ToString(), memberInit.Member.Name);

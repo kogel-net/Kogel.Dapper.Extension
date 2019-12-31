@@ -58,6 +58,29 @@ namespace Kogel.Dapper.Extension.Test.Model
 	{
 		[ForeignKey("Id", "ArticleId")]
 		public List<Comment2> Comments { get; set; }
+
 	}
 
+	public class NewsDto1 :IBaseEntity
+	{
+		public int Id { get; set; }
+		public string Title { get; set; }
+		public List<CommentDto1> CommentDto1 { get; set; }
+
+		public object GetId()
+		{
+			return Id;
+		}
+	}
+
+	public class CommentDto1:IBaseEntity
+	{
+		public  int Id { get; set; }
+		public  string Content { get; set; }
+
+		public object GetId()
+		{
+			return Id;
+		}
+	}
 }

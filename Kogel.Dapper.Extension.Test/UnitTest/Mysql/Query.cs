@@ -95,12 +95,20 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				//  {
 				//  };
 				var comment = conn.QuerySet<News1>()
-				.Where(x => x.Comments.Any(y => y.Id != 1))
-				.Get(x => new News1
+				.Where(x => x.Comments.Any(y => y.Id != 10))
+				.ToList();
+
+				var comment11 = conn.QuerySet<News1>()
+				.Where(x => x.Comments.Any(y => y.Id != 10))
+				.Get(x => new NewsDto1
 				{
 					Id = x.Id,
-					Content = x.Content,
-					Comments = x.Comments
+					Title = x.Content,
+					CommentDto1 = x.Comments.Select(y => new CommentDto1()
+					{
+						Id = y.Id,
+						Content = y.Content
+					}).ToList()
 				});
 
 				var testaa = "123";
