@@ -4,7 +4,7 @@ using System;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 
-namespace Kogel.Dapper.Extension.MySql
+namespace Kogel.Dapper.Extension
 {
 	public class MySqlProvider : SqlProvider
 	{
@@ -22,7 +22,7 @@ namespace Kogel.Dapper.Extension.MySql
 
 		public override SqlProvider FormatGet<T>()
 		{
-			var selectSql = ResolveExpression.ResolveSelect(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression, null, Params);
+			var selectSql = ResolveExpression.ResolveSelect(null);
 
 			var fromTableSql = FormatTableName();
 
@@ -53,7 +53,7 @@ namespace Kogel.Dapper.Extension.MySql
 		{
 			var topNum = DataBaseContext<T>().QuerySet.TopNum;
 
-			var selectSql = ResolveExpression.ResolveSelect(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression, null, Params);
+			var selectSql = ResolveExpression.ResolveSelect(null);
 
 			var fromTableSql = FormatTableName();
 
@@ -79,7 +79,7 @@ namespace Kogel.Dapper.Extension.MySql
 			//if (string.IsNullOrEmpty(orderbySql))
 			//    throw new DapperExtensionException("order by takes precedence over pagelist");
 
-			var selectSql = ResolveExpression.ResolveSelect(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression, null, Params);
+			var selectSql = ResolveExpression.ResolveSelect(null);
 
 			var fromTableSql = FormatTableName();
 

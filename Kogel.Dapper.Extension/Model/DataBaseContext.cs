@@ -1,8 +1,8 @@
-﻿using Kogel.Dapper.Extension.Core.Interfaces;
-using Kogel.Dapper.Extension.Core.SetC;
+﻿using Kogel.Dapper.Extension.Core.SetC;
 using Kogel.Dapper.Extension.Core.SetQ;
+using Kogel.Dapper.Extension.Model;
 
-namespace Kogel.Dapper.Extension.Model
+namespace Kogel.Dapper.Extension
 {
     public class DataBaseContext<T> : AbstractDataBaseContext
     {
@@ -13,8 +13,8 @@ namespace Kogel.Dapper.Extension.Model
 
     public abstract class AbstractDataBaseContext
     {
-        public AbstractSet Set { get; internal set; }
+        public AbstractSet Set { get; set; }
 
-        internal EOperateType OperateType { get; set; }
+        public EOperateType OperateType { get; set; }
     }
 }

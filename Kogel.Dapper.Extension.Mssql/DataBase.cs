@@ -1,8 +1,7 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
+using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension.Core.SetC;
 using Kogel.Dapper.Extension.Core.SetQ;
-using Kogel.Dapper.Extension.Model;
 
 namespace Kogel.Dapper.Extension.MsSql
 {
@@ -14,11 +13,11 @@ namespace Kogel.Dapper.Extension.MsSql
 		/// <typeparam name="T"></typeparam>
 		/// <param name="sqlConnection"></param>
 		/// <returns></returns>
-		public static QuerySet<T> QuerySet<T>(this IDbConnection sqlConnection)
+		public static IQuerySet<T> QuerySet<T>(this IDbConnection sqlConnection)
 		{
 			return new QuerySet<T>(sqlConnection, new MsSqlProvider(), null);
 		}
-		public static QuerySet<T> QuerySet<T>(this IDbConnection sqlConnection, IDbTransaction dbTransaction = null)
+		public static IQuerySet<T> QuerySet<T>(this IDbConnection sqlConnection, IDbTransaction dbTransaction = null)
 		{
 			return new QuerySet<T>(sqlConnection, new MsSqlProvider(), dbTransaction);
 		}
@@ -28,11 +27,11 @@ namespace Kogel.Dapper.Extension.MsSql
 		/// <typeparam name="T"></typeparam>
 		/// <param name="sqlConnection"></param>
 		/// <returns></returns>
-		public static CommandSet<T> CommandSet<T>(this IDbConnection sqlConnection)
+		public static ICommandSet<T> CommandSet<T>(this IDbConnection sqlConnection)
 		{
 			return new CommandSet<T>(sqlConnection, new MsSqlProvider(), null);
 		}
-		public static CommandSet<T> CommandSet<T>(this IDbConnection sqlConnection, IDbTransaction dbTransaction = null)
+		public static ICommandSet<T> CommandSet<T>(this IDbConnection sqlConnection, IDbTransaction dbTransaction = null)
 		{
 			return new CommandSet<T>(sqlConnection, new MsSqlProvider(), dbTransaction);
 		}

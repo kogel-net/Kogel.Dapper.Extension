@@ -22,7 +22,7 @@ namespace Kogel.Dapper.Extension.Oracle
 
         public override SqlProvider FormatGet<T>()
         {
-            var selectSql = ResolveExpression.ResolveSelect(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression, null, Params);
+            var selectSql = ResolveExpression.ResolveSelect(null);
 
             var fromTableSql = FormatTableName();
 
@@ -51,9 +51,7 @@ namespace Kogel.Dapper.Extension.Oracle
 
         public override SqlProvider FormatToList<T>()
         {
-            var topNum = DataBaseContext<T>().QuerySet.TopNum;
-
-            var selectSql = ResolveExpression.ResolveSelect(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression, null, Params);
+            var selectSql = ResolveExpression.ResolveSelect(null);
 
             var fromTableSql = FormatTableName();
 
@@ -76,7 +74,7 @@ namespace Kogel.Dapper.Extension.Oracle
         {
             var orderbySql = ResolveExpression.ResolveOrderBy();
 
-            var selectSql = ResolveExpression.ResolveSelect(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression, null, Params);
+            var selectSql = ResolveExpression.ResolveSelect(null);
 
             var fromTableSql = FormatTableName();
 

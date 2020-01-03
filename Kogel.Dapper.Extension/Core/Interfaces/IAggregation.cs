@@ -7,7 +7,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
     public interface IAggregation<T>
     {
         /// <summary>
-        /// 条数
+        /// 行数
         /// </summary>
         /// <returns></returns>
         int Count();
