@@ -12,6 +12,7 @@ using Kogel.Dapper.Extension.MsSql;
 using Kogel.Dapper.Extension.Test.Model;
 using Lige.Model;
 using Lige.ViewModel.APP.Shopping;
+using Lige.ViewModel.Web.AppUser;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 {
@@ -75,6 +76,15 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 
 			using (var connection = new SqlConnection("server=localhost;database=Lige;user=sa;password=!RisingupTech/././.;max pool size=300"))
 			{
+				string account = "admin";
+				string password = "123456";
+
+				var adminUser = connection.QuerySet<AdminUser>()
+					.Where(x => x.Account == account && x.Password == password)
+					.Where(x => x.IsDelete == false && x.IsDelete != x.IsDelete)
+					.Get();
+
+
 				var outStockList = new List<string>()
 				{
 					"6FACCBB4-C378-4CE0-8BAB-37D16B612426",
