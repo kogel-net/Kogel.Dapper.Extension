@@ -80,7 +80,8 @@ namespace Kogel.Dapper.Extension.Model
 						LeftTabName = leftTab.Name,
 						LeftAssName = foreign.AssoField,
 						TableType = navigationTable,
-						PropertyType = item.PropertyType
+						//PropertyType = item.PropertyType
+						PropertyInfo = item
 					});
 					PropertyInfoList.Add(item);
 					continue;
