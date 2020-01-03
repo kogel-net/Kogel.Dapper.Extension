@@ -270,33 +270,28 @@ namespace Kogel.Dapper.Extension.Extension
 		/// 写入值对象
 		/// </summary>
 		/// <typeparam name="TEntity"></typeparam>
-		/// <param name="masterEntity"></param>
+		/// <param name="masterObj"></param>
+		/// <param name="joinAssTable"></param>
 		/// <param name="value"></param>
-		public static void SetProperValue<TEntity>(EntityObject masterEntity, object masterObj, TEntity value)
+		public static void SetProperValue<TEntity>(object masterObj, JoinAssTable joinAssTable, TEntity value)
 		{
 			var entityType = typeof(TEntity);
-			foreach (PropertyInfo property in masterEntity.Properties)
+			if (joinAssTable.PropertyType == entityType)//实体
 			{
-				//实体导航属性
-				if (property.PropertyType == entityType)
+				joinAssTable.PropertyInfo.SetValue(masterObj, value);
+			}
+			else//泛型
+			{
+				List<TEntity> entities = (List<TEntity>)joinAssTable.PropertyInfo.GetValue(masterObj);
+				if (entities == null)
 				{
-					property.SetValue(masterObj, value);
-					break;
+					entities = new List<TEntity>() { value };
 				}
-				else if (property.PropertyType.GenericTypeArguments.Any(y => y == entityType))//泛型导航属性
+				else
 				{
-					List<TEntity> entities = (List<TEntity>)property.GetValue(masterObj);
-					if (entities == null)
-					{
-						entities = new List<TEntity>() { value };
-					}
-					else
-					{
-						entities.Add(value);
-					}
-					property.SetValue(masterObj, entities);
-					break;
+					entities.Add(value);
 				}
+				joinAssTable.PropertyInfo.SetValue(masterObj, entities);
 			}
 		}
 

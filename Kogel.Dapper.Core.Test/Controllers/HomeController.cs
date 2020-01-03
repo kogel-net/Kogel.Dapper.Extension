@@ -21,7 +21,7 @@ namespace Kogel.Dapper.Core.Test.Controllers
 		public IActionResult Index()
 		{
 			var list = dbConnection.QuerySet<Product>()
-				//.Where(x=>x.)
+				.Where(x => 1 == 1)
 				.ToList();
 			return View();
 		}

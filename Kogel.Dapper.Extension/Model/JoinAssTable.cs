@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using Dapper;
 
@@ -20,7 +21,8 @@ namespace Kogel.Dapper.Extension.Model
 		public string LeftAssName { get; set; }
 		public Type TableType { get; set; }
 		public string JoinSql { get; set; }
-		public Type PropertyType { get; set; }
+		public Type PropertyType { get => PropertyInfo.PropertyType; }
+		public PropertyInfo PropertyInfo { get; set; }//接收导航属性的对象
 		/// <summary>
 		/// 自定义查询的字段
 		/// </summary>
@@ -65,7 +67,6 @@ namespace Kogel.Dapper.Extension.Model
 				LeftAssName = this.LeftAssName,
 				TableType = this.TableType,
 				JoinSql = this.JoinSql,
-				PropertyType = this.PropertyType,
 				SelectFieldPairs = new Dictionary<string, string>(),
 				MapperList = new Dictionary<string, string>(),
 				IsMapperField = false

@@ -19,7 +19,7 @@ namespace Kogel.Dapper.Extension.Oracle
         {
 
         }
-        public override string ResolveSelect(EntityObject entityObject, LambdaExpression selector, int? topNum, DynamicParameters Param)
+        public override string ResolveSelect(int? topNum)
         {
 			//添加需要连接的导航表
 			var masterEntity = EntityCache.QueryEntity(abstractSet.TableType);
@@ -31,16 +31,16 @@ namespace Kogel.Dapper.Extension.Oracle
 
 			var selectFormat = " SELECT {0} ";
             var selectSql = "";
-            if (selector == null)
+            if (provider.Context.Set.SelectExpression == null)
             {
-                var propertyBuilder = GetTableField(entityObject);
+                var propertyBuilder = GetTableField(masterEntity);
                 selectSql = string.Format(selectFormat, propertyBuilder);
             }
             else
             {
-                var selectExp = new SelectExpression(selector, "", provider);
+                var selectExp = new SelectExpression(provider.Context.Set.SelectExpression, "", provider);
                 selectSql = string.Format(selectFormat, selectExp.SqlCmd);
-                Param.AddDynamicParams(selectExp.Param);
+                provider.Params.AddDynamicParams(selectExp.Param);
             }
             return selectSql;
         }

@@ -9,6 +9,7 @@ using Kogel.Dapper.Extension.Helper;
 using System.Collections.Generic;
 using Kogel.Dapper.Extension.Exception;
 using System;
+using System.Reflection;
 
 namespace Kogel.Dapper.Extension.Expressions
 {
@@ -81,6 +82,8 @@ namespace Kogel.Dapper.Extension.Expressions
 					}
 					else if (memberInit.Expression.Type.FullName.Contains("System.Collections.Generic"))//Select Dto
 					{
+						//if (memberInit.Expression is MethodCallExpression)//Select Dto
+						//{
 						var selectMethCall = (memberInit.Expression as MethodCallExpression).Arguments[0] as MethodCallExpression;
 						var selectExpression = new SelectExpression(selectMethCall.Arguments[1] as LambdaExpression, prefix + "_Dto", provider);
 						Type selectEntity;
@@ -94,8 +97,18 @@ namespace Kogel.Dapper.Extension.Expressions
 								itemJoin.IsDto = true;
 								itemJoin.DtoType = memberInit.Expression.Type.GenericTypeArguments[0];
 								itemJoin.SelectFieldPairs = selectExpression.SelectFieldPairs;
+								if (itemJoin.PropertyInfo == null)
+									itemJoin.PropertyInfo = memberInit.Member as PropertyInfo;
 							}
 						}
+						//}
+						//else//List值
+						//{
+						//	var listValue = memberInit.Expression.ToConvertAndGetValue();
+						//	string paramName = $"{memberInit.Member.Name}_{base.Index}";
+						//	Param.Add(paramName, listValue);
+						//	_sqlCmd.Append($" {}")
+						//}
 					}
 					else
 					{

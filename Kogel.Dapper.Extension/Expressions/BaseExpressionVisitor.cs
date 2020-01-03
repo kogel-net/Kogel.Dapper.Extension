@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 
 namespace Kogel.Dapper.Extension.Expressions
@@ -519,6 +520,9 @@ namespace Kogel.Dapper.Extension.Expressions
 									var objectParam = new object[] { binaryVisitor.Param.Get<object>(paramName) };
 									this.Param.Add(paramName, objectParam);
 								}
+								//获取导航属性的成员信息
+								if (joinTable.PropertyInfo == null)
+									joinTable.PropertyInfo = (node.Arguments[0] as MemberExpression).Member as PropertyInfo;
 							}
 						}
 						else

@@ -5,50 +5,65 @@ using System.Linq.Expressions;
 using Kogel.Dapper.Extension.Model;
 using Dapper;
 
-namespace Kogel.Dapper.Extension.Core.Interfaces
+namespace Kogel.Dapper.Extension
 {
 	public abstract class AbstractSet
 	{
+		/// <summary>
+		/// 数据解析提供方
+		/// </summary>
 		public SqlProvider SqlProvider;
+
 		/// <summary>
 		/// 表类型
 		/// </summary>
-		public Type TableType { get; protected set; }
+		public Type TableType { get; set; }
+
 		/// <summary>
 		/// [已弃用]只用来生成对象
 		/// </summary>
-		public LambdaExpression WhereExpression { get; protected set; }
+		internal LambdaExpression WhereExpression { get; set; }
+
 		/// <summary>
 		/// 条件表达式对象
 		/// </summary>
-		public List<LambdaExpression> WhereExpressionList { get; set; }
-		//表达式排序集合
-		public Dictionary<LambdaExpression, EOrderBy> OrderbyExpressionList { get; protected set; }
+		internal List<LambdaExpression> WhereExpressionList { get; set; }
+
+		/// <summary>
+		/// 表达式排序集合
+		/// </summary>
+		internal Dictionary<LambdaExpression, EOrderBy> OrderbyExpressionList { get;  set; }
+
 		/// <summary>
 		/// 字符串排序
 		/// </summary>
-		public StringBuilder OrderbyBuilder { get; protected set; }
+		internal StringBuilder OrderbyBuilder { get; set; }
+
 		/// <summary>
 		/// 字段查询对象
 		/// </summary>
-		public LambdaExpression SelectExpression { get; internal set; }
+		public LambdaExpression SelectExpression { get;  set; }
+
 		/// <summary>
 		/// 是否锁表（with(nolock)）
 		/// </summary>
-		public bool NoLock { get; protected set; }
+		public bool NoLock { get;  set; }
 
 		/// <summary>
 		/// sql字符串对象
 		/// </summary>
 		internal StringBuilder WhereBuilder { get; set; }
+
 		/// <summary>
 		/// sql参数对象
 		/// </summary>
 		internal DynamicParameters Params { get => SqlProvider.Params; set => SqlProvider.Params.AddDynamicParams(value); }
+
 		/// <summary>
 		/// 分组表达式对象
 		/// </summary>
 		internal List<LambdaExpression> GroupExpressionList { get; set; }
+
 		/// <summary>
 		/// 分组聚合条件
 		/// </summary>

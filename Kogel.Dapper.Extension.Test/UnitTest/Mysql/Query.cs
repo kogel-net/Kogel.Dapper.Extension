@@ -111,6 +111,12 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 					}).ToList()
 				});
 
+
+				//x.Comments.Select(y => new CommentDto1()
+				//{
+				//	Id = y.Id,
+				//	Content = y.Content
+				//}).ToList()
 				var testaa = "123";
 
 

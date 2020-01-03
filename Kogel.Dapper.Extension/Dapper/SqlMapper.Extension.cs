@@ -95,6 +95,8 @@ namespace Dapper
 			string splitOn = GetSplitOn<TFirst>(provider);
 			if (!string.IsNullOrEmpty(splitOn))
 			{
+				//导航属性列表
+				var navigationList = provider.JoinList.Where(x => x.Action == JoinAction.Navigation && x.IsMapperField).ToArray();
 				var hashes = new HashSet<TFirst>();
 				cnn.Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TFirst>(provider.SqlString, (first, second, third, fourth, fifth, sixth) =>
 				{
@@ -106,15 +108,15 @@ namespace Dapper
 
 					//设置导航属性对应
 					if (second != null)
-						ExpressionExtension.SetProperValue(firstEntity, lookup, second);
+						ExpressionExtension.SetProperValue(lookup, navigationList[0], second);
 					if (third != null)
-						ExpressionExtension.SetProperValue(firstEntity, lookup, third);
+						ExpressionExtension.SetProperValue(lookup, navigationList[1], third);
 					if (fourth != null)
-						ExpressionExtension.SetProperValue(firstEntity, lookup, fourth);
+						ExpressionExtension.SetProperValue(lookup, navigationList[2], fourth);
 					if (fifth != null)
-						ExpressionExtension.SetProperValue(firstEntity, lookup, fifth);
+						ExpressionExtension.SetProperValue(lookup, navigationList[3], fifth);
 					if (sixth != null)
-						ExpressionExtension.SetProperValue(firstEntity, lookup, sixth);
+						ExpressionExtension.SetProperValue(lookup, navigationList[4], sixth);
 
 					//不存在的主表数据才添加进来，防止重复
 					if (!hashes.Any(x => x.GetId() == lookup.GetId()))
@@ -153,8 +155,10 @@ namespace Dapper
 			string splitOn = GetSplitOn<TFirst>(provider);
 			if (!string.IsNullOrEmpty(splitOn))
 			{
+				//导航属性列表
+				var navigationList = provider.JoinList.Where(x => x.Action == JoinAction.Navigation && x.IsMapperField).ToArray();
 				var hashes = new HashSet<TFirst>();
-				await cnn.QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TFirst>(provider.SqlString, (first, second, third, fourth, fifth, sixth) =>
+				cnn.Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TFirst>(provider.SqlString, (first, second, third, fourth, fifth, sixth) =>
 				{
 					object id = first.GetId();
 					//判断当前主数据是否出现过
@@ -164,18 +168,18 @@ namespace Dapper
 
 					//设置导航属性对应
 					if (second != null)
-						ExpressionExtension.SetProperValue(firstEntity, lookup, second);
+						ExpressionExtension.SetProperValue(firstEntity, navigationList[0], second);
 					if (third != null)
-						ExpressionExtension.SetProperValue(firstEntity, lookup, third);
+						ExpressionExtension.SetProperValue(firstEntity, navigationList[1], third);
 					if (fourth != null)
-						ExpressionExtension.SetProperValue(firstEntity, lookup, fourth);
+						ExpressionExtension.SetProperValue(firstEntity, navigationList[2], fourth);
 					if (fifth != null)
-						ExpressionExtension.SetProperValue(firstEntity, lookup, fifth);
+						ExpressionExtension.SetProperValue(firstEntity, navigationList[3], fifth);
 					if (sixth != null)
-						ExpressionExtension.SetProperValue(firstEntity, lookup, sixth);
+						ExpressionExtension.SetProperValue(firstEntity, navigationList[4], sixth);
 
 					//不存在的主表数据才添加进来，防止重复
-					if (!hashes.Any(x => x.GetId() == id))
+					if (!hashes.Any(x => x.GetId() == lookup.GetId()))
 						hashes.Add(lookup);
 
 					return default(TFirst);

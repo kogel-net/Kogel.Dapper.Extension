@@ -10,7 +10,7 @@ using Kogel.Dapper.Extension.Expressions;
 using Kogel.Dapper.Extension.Extension;
 using Kogel.Dapper.Extension.Model;
 
-namespace Kogel.Dapper.Extension.MsSql
+namespace Kogel.Dapper.Extension
 {
     internal class ResolveExpression : IResolveExpression
     {
@@ -18,15 +18,12 @@ namespace Kogel.Dapper.Extension.MsSql
         {
 
         }
-        /// <summary>
-        /// 解析查询字段
-        /// </summary>
-        /// <param name="entityObject"></param>
-        /// <param name="selector"></param>
-        /// <param name="topNum"></param>
-        /// <param name="Param"></param>
-        /// <returns></returns>
-        public override string ResolveSelect(EntityObject entityObject, LambdaExpression selector, int? topNum, DynamicParameters Param)
+		/// <summary>
+		/// 解析查询字段
+		/// </summary>
+		/// <param name="topNum"></param>
+		/// <returns></returns>
+		public override string ResolveSelect(int? topNum)
         {
 			//添加需要连接的导航表
 			var masterEntity = EntityCache.QueryEntity(abstractSet.TableType);
@@ -39,16 +36,16 @@ namespace Kogel.Dapper.Extension.MsSql
 			var selectFormat = topNum.HasValue ? " SELECT {1} {0} " : " SELECT {0} ";
             var selectSql = "";
             //不是自定义返回视图则显示所有字段
-            if (selector == null)
+            if (provider.Context.Set.SelectExpression == null)
             {
-                var propertyBuilder = GetTableField(entityObject);
+                var propertyBuilder = GetTableField(masterEntity);
                 selectSql = string.Format(selectFormat, propertyBuilder, $" TOP {topNum} ");
             }
             else//自定义查询字段
             {
-                var selectExp = new SelectExpression(selector, "", provider);
+                var selectExp = new SelectExpression(provider.Context.Set.SelectExpression, "", provider);
                 selectSql = string.Format(selectFormat, selectExp.SqlCmd, $" TOP {topNum} ");
-                Param.AddDynamicParams(selectExp.Param);
+                provider.Params.AddDynamicParams(selectExp.Param);
             }
             return selectSql;
         }

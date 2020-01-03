@@ -1,6 +1,6 @@
 ﻿namespace Kogel.Dapper.Extension.Model
 {
-    internal enum EOperateType
+    public enum EOperateType
     {
         Query,
         Command

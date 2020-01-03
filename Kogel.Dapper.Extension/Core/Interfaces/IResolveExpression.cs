@@ -40,18 +40,13 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// <summary>
 		/// 解析查询字段
 		/// </summary>
-		/// <param name="entityObject"></param>
-		/// <param name="selector"></param>
 		/// <param name="topNum"></param>
-		/// <param name="Param"></param>
 		/// <returns></returns>
-		public abstract string ResolveSelect(EntityObject entityObject, LambdaExpression selector, int? topNum, DynamicParameters Param);
+		public abstract string ResolveSelect(int? topNum);
 
 		/// <summary>
 		/// 解析查询条件
 		/// </summary>
-		/// <param name="abstractSet"></param>
-		/// <param name="whereSql"></param>
 		/// <param name="prefix"></param>
 		/// <returns></returns>
 		public virtual string ResolveWhereList(string prefix = null)
@@ -81,7 +76,6 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// <summary>
 		/// 解析分组
 		/// </summary>
-		/// <param name="abstractSet"></param>
 		/// <returns></returns>
 		public virtual string ResolveGroupBy()
 		{
@@ -104,7 +98,6 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// <summary>
 		/// 解析分组聚合条件
 		/// </summary>
-		/// <param name="abstractSet"></param>
 		/// <returns></returns>
 		public virtual string ResolveHaving()
 		{
@@ -130,7 +123,6 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// <summary>
 		/// 解析排序
 		/// </summary>
-		/// <param name="abstractSet"></param>
 		/// <returns></returns>
 		public virtual string ResolveOrderBy()
 		{
@@ -220,7 +212,6 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// <typeparam name="T"></typeparam>
 		/// <param name="t"></param>
 		/// <param name="Param"></param>
-		/// <param name=""></param>
 		/// <param name="excludeFields"></param>
 		/// <returns></returns>
 		public virtual string ResolveUpdates<T>(T t, DynamicParameters Param, string[] excludeFields)
@@ -268,7 +259,6 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// </summary>
 		/// <param name="joinAssTables"></param>
 		/// <param name="sql"></param>
-		/// <param name="selectExp"></param>
 		/// <returns></returns>
 		public virtual string ResolveJoinSql(List<JoinAssTable> joinAssTables, ref string sql)
 		{
@@ -311,6 +301,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 			}
 			return builder.ToString();
 		}
+
 		/// <summary>
 		/// 字段处理
 		/// </summary>

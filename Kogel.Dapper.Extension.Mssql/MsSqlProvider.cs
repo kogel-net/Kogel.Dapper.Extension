@@ -6,7 +6,7 @@ using Kogel.Dapper.Extension.MsSql.Extension;
 using System.Text.RegularExpressions;
 using Kogel.Dapper.Extension.Extension;
 
-namespace Kogel.Dapper.Extension.MsSql
+namespace Kogel.Dapper.Extension
 {
 	public class MsSqlProvider : SqlProvider
 	{
@@ -24,7 +24,7 @@ namespace Kogel.Dapper.Extension.MsSql
 
 		public override SqlProvider FormatGet<T>()
 		{
-			var selectSql = ResolveExpression.ResolveSelect(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression, 1, Params);
+			var selectSql = ResolveExpression.ResolveSelect(1);
 
 			var fromTableSql = FormatTableName();
 
@@ -49,7 +49,7 @@ namespace Kogel.Dapper.Extension.MsSql
 		{
 			var topNum = DataBaseContext<T>().QuerySet.TopNum;
 
-			var selectSql = ResolveExpression.ResolveSelect(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression, topNum, Params);
+			var selectSql = ResolveExpression.ResolveSelect(topNum);
 
 			var fromTableSql = FormatTableName();
 
@@ -76,7 +76,7 @@ namespace Kogel.Dapper.Extension.MsSql
 			if (string.IsNullOrEmpty(orderbySql))
 				throw new DapperExtensionException("order by takes precedence over pagelist");
 
-			var selectSql = ResolveExpression.ResolveSelect(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression, null, Params);
+			var selectSql = ResolveExpression.ResolveSelect(null);
 
 			var fromTableSql = FormatTableName();
 
