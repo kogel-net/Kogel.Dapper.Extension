@@ -7,7 +7,7 @@ using Kogel.Dapper.Extension.Model;
 
 namespace Kogel.Dapper.Extension.Core.Interfaces
 {
-	public interface IQuerySet<T> : IOrder<T>, IAggregation<T>
+	public interface IQuerySet<T> : IAggregation<T>, IOrder<T>, IQuery<T>
 	{
 		/// <summary>
 		/// 查询条件

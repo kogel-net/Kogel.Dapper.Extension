@@ -19,10 +19,12 @@ namespace Kogel.Dapper.Extension.MySql
 		{
 			return new QuerySet<T>(sqlConnection, new MySqlProvider(), null);
 		}
+
 		public static IQuerySet<T> QuerySet<T>(this IDbConnection sqlConnection, IDbTransaction dbTransaction = null)
 		{
 			return new QuerySet<T>(sqlConnection, new MySqlProvider(), dbTransaction);
 		}
+
 		/// <summary>
 		/// 用来解决表达式树不能使用默认参数
 		/// </summary>
@@ -33,6 +35,7 @@ namespace Kogel.Dapper.Extension.MySql
 		{
 			return new CommandSet<T>(sqlConnection, new MySqlProvider(), null);
 		}
+
 		public static ICommandSet<T> CommandSet<T>(this IDbConnection sqlConnection, IDbTransaction dbTransaction = null)
 		{
 			return new CommandSet<T>(sqlConnection, new MySqlProvider(), dbTransaction);

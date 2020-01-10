@@ -5,6 +5,7 @@ using Kogel.Dapper.Extension.Extension;
 using Kogel.Dapper.Extension.Helper;
 using Kogel.Dapper.Extension.Model;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -18,11 +19,17 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		protected SqlProvider provider;
 		protected IProviderOption providerOption;
 		protected AbstractSet abstractSet => provider.Context.Set;
+		
 		public IResolveExpression(SqlProvider provider)
 		{
 			this.provider = provider;
 			this.providerOption = provider.ProviderOption;
 		}
+
+		/// <summary>
+		/// 字段列列表
+		/// </summary>
+		private static Hashtable _tableFieldMap = new Hashtable();
 
 		/// <summary>
 		/// 根据反射对象获取表字段
@@ -31,10 +38,18 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// <returns></returns>
 		public virtual string GetTableField(EntityObject entityObject)
 		{
-			var propertyInfos = entityObject.Properties;
-			string asName = entityObject.Name == entityObject.AsName ? providerOption.CombineFieldName(entityObject.AsName) : entityObject.AsName;
-			string property = string.Join(",", entityObject.FieldPairs.Select(field => $"{asName}.{providerOption.CombineFieldName(field.Value) }"));
-			return property;
+			lock (_tableFieldMap)
+			{
+				string fieldBuild = (string)_tableFieldMap[entityObject];
+				if (fieldBuild == null)
+				{
+					var propertyInfos = entityObject.Properties;
+					string asName = entityObject.Name == entityObject.AsName ? providerOption.CombineFieldName(entityObject.AsName) : entityObject.AsName;
+					fieldBuild = string.Join(",", entityObject.FieldPairs.Select(field => $"{asName}.{providerOption.CombineFieldName(field.Value) }"));
+					_tableFieldMap.Add(entityObject, fieldBuild);
+				}
+				return fieldBuild;
+			}
 		}
 
 		/// <summary>
@@ -65,7 +80,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 				}
 			}
 			//添加自定义sql生成的条件和参数
-			if ((abstractSet.WhereBuilder != null && abstractSet.WhereBuilder.Length != 0) || (abstractSet.Params != null && abstractSet.Params.ParameterNames.Count() != 0))
+			if (abstractSet.WhereBuilder != null && abstractSet.WhereBuilder.Length != 0)
 			{
 				//添加自定义条件sql
 				builder.Append(abstractSet.WhereBuilder);

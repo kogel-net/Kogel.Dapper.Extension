@@ -63,7 +63,7 @@ namespace Dapper
 		/// <param name="splitOn"></param>
 		/// <returns></returns>
 		public static async Task<TFirst> QueryFirstOrDefaultAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth>(this IDbConnection cnn, SqlProvider provider, IDbTransaction transaction = null)
-		    where TFirst : IBaseEntity
+			where TFirst : IBaseEntity
 			where TSecond : IBaseEntity
 			where TThird : IBaseEntity
 			where TFourth : IBaseEntity
@@ -84,7 +84,7 @@ namespace Dapper
 		/// <param name="splitOn"></param>
 		/// <returns></returns>
 		public static IEnumerable<TFirst> Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth>(this IDbConnection cnn, SqlProvider provider, IDbTransaction transaction = null)
-		    where TFirst : IBaseEntity
+			where TFirst : IBaseEntity
 			where TSecond : IBaseEntity
 			where TThird : IBaseEntity
 			where TFourth : IBaseEntity
@@ -96,36 +96,42 @@ namespace Dapper
 			if (!string.IsNullOrEmpty(splitOn))
 			{
 				//导航属性列表
-				var navigationList = provider.JoinList.Where(x => x.Action == JoinAction.Navigation && x.IsMapperField).ToArray();
-				var hashes = new HashSet<TFirst>();
+				var navigationList = provider.JoinList.Where(x => x.Action == JoinAction.Navigation && x.IsMapperField).ToList();
+				//把所有实体的信息存下做导航关联索引
+				var firsts = new List<TFirst>();
 				cnn.Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TFirst>(provider.SqlString, (first, second, third, fourth, fifth, sixth) =>
 				{
-					object id = first.GetId();
-					//判断当前主数据是否出现过
-					var lookup = hashes.FirstOrDefault(x => x.GetId().Equals(id));
-					if (lookup == null)
-						lookup = first;
-
-					//设置导航属性对应
-					if (second != null)
-						ExpressionExtension.SetProperValue(lookup, navigationList[0], second);
-					if (third != null)
-						ExpressionExtension.SetProperValue(lookup, navigationList[1], third);
-					if (fourth != null)
-						ExpressionExtension.SetProperValue(lookup, navigationList[2], fourth);
-					if (fifth != null)
-						ExpressionExtension.SetProperValue(lookup, navigationList[3], fifth);
-					if (sixth != null)
-						ExpressionExtension.SetProperValue(lookup, navigationList[4], sixth);
-
+					var masterData = firsts.Find(x => x.GetId().Equals(first.GetId()));
 					//不存在的主表数据才添加进来，防止重复
-					if (!hashes.Any(x => x.GetId() == lookup.GetId()))
-						hashes.Add(lookup);
-
+					if (masterData == null)
+					{
+						firsts.Add(first);
+						masterData = first;
+					}
+					//开始索引导航属性和之前实体的关系
+					if (second != null)
+					{
+						ExpressionExtension.SetProperValue(masterData, second, navigationList, 0);
+					}
+					if (third != null)
+					{
+						ExpressionExtension.SetProperValue(masterData, third, navigationList, 1);
+					}
+					if (fourth != null)
+					{
+						ExpressionExtension.SetProperValue(masterData, fourth, navigationList, 2);
+					}
+					if (fifth != null)
+					{
+						ExpressionExtension.SetProperValue(masterData, fifth, navigationList, 3);
+					}
+					if (sixth != null)
+					{
+						ExpressionExtension.SetProperValue(masterData, sixth, navigationList, 4);
+					}
 					return default(TFirst);
 				}, provider.Params, transaction, true, splitOn);
-
-				return hashes;
+				return firsts;
 			}
 			else
 			{
@@ -166,17 +172,17 @@ namespace Dapper
 					if (lookup == null)
 						lookup = first;
 
-					//设置导航属性对应
-					if (second != null)
-						ExpressionExtension.SetProperValue(firstEntity, navigationList[0], second);
-					if (third != null)
-						ExpressionExtension.SetProperValue(firstEntity, navigationList[1], third);
-					if (fourth != null)
-						ExpressionExtension.SetProperValue(firstEntity, navigationList[2], fourth);
-					if (fifth != null)
-						ExpressionExtension.SetProperValue(firstEntity, navigationList[3], fifth);
-					if (sixth != null)
-						ExpressionExtension.SetProperValue(firstEntity, navigationList[4], sixth);
+					////设置导航属性对应
+					//if (second != null)
+					//	ExpressionExtension.SetProperValue(firstEntity, navigationList[0], second);
+					//if (third != null)
+					//	ExpressionExtension.SetProperValue(firstEntity, navigationList[1], third);
+					//if (fourth != null)
+					//	ExpressionExtension.SetProperValue(firstEntity, navigationList[2], fourth);
+					//if (fifth != null)
+					//	ExpressionExtension.SetProperValue(firstEntity, navigationList[3], fifth);
+					//if (sixth != null)
+					//	ExpressionExtension.SetProperValue(firstEntity, navigationList[4], sixth);
 
 					//不存在的主表数据才添加进来，防止重复
 					if (!hashes.Any(x => x.GetId() == lookup.GetId()))

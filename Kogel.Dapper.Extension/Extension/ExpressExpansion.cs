@@ -8,7 +8,11 @@ namespace Kogel.Dapper.Extension
         {
             return true;
         }
-        public static bool In(this string input, string[] array)
+		public static bool In(this long input, long[] array)
+		{
+			return true;
+		}
+		public static bool In(this string input, string[] array)
         {
             return true;
         }
@@ -16,7 +20,11 @@ namespace Kogel.Dapper.Extension
         {
             return true;
         }
-        public static bool NotIn(this string input, string[] array)
+		public static bool NotIn(this long input, long[] array)
+		{
+			return true;
+		}
+		public static bool NotIn(this string input, string[] array)
         {
             return true;
         }
@@ -32,7 +40,11 @@ namespace Kogel.Dapper.Extension
         {
             return true;
         }
-        public static bool Between(this DateTime input, DateTime from, DateTime to)
+		public static bool Between(this long input, long from, long to)
+		{
+			return true;
+		}
+		public static bool Between(this DateTime input, DateTime from, DateTime to)
         {
             return true;
         }

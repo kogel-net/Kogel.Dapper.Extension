@@ -60,13 +60,28 @@ namespace Kogel.Dapper.Extension.Expressions
 						if (!memberInit.Expression.ToString().Contains("QuerySet"))
 						{
 							//导航属性
-							var itemJoin = provider.JoinList.FirstOrDefault(x => x.TableType.IsTypeEquals(entityType));
-							if (itemJoin != null)
+							var navigationTable = provider.JoinList.FirstOrDefault(x => x.TableType.IsTypeEquals(entityType));
+							if (navigationTable != null)
 							{
-								itemJoin.IsMapperField = true;
+								navigationTable.IsMapperField = true;
 								//当前定义的查询返回对象
 								EntityObject entity = EntityCache.QueryEntity(entityType);
-								itemJoin.SelectFieldPairs = entity.FieldPairs;
+								navigationTable.SelectFieldPairs = entity.FieldPairs;
+							}
+							//不存在第一层中，可能在后几层嵌套使用导航属性
+							//获取调用者表达式
+							var parentExpression = (memberInit.Expression as MemberExpression).Expression;
+							var parentEntity = EntityCache.QueryEntity(parentExpression.Type);
+							navigationTable = parentEntity.Navigations.Find(x => x.TableType == entityType);
+							if (navigationTable != null)
+							{
+								navigationTable = (JoinAssTable)navigationTable.Clone();
+								navigationTable.IsMapperField = true;
+								//加入导航连表到提供方
+								Provider.JoinList.Add(navigationTable);
+								//当前定义的查询返回对象
+								EntityObject entity = EntityCache.QueryEntity(entityType);
+								navigationTable.SelectFieldPairs = entity.FieldPairs;
 							}
 						}
 						else
@@ -82,8 +97,6 @@ namespace Kogel.Dapper.Extension.Expressions
 					}
 					else if (memberInit.Expression.Type.FullName.Contains("System.Collections.Generic"))//Select Dto
 					{
-						//if (memberInit.Expression is MethodCallExpression)//Select Dto
-						//{
 						var selectMethCall = (memberInit.Expression as MethodCallExpression).Arguments[0] as MethodCallExpression;
 						var selectExpression = new SelectExpression(selectMethCall.Arguments[1] as LambdaExpression, prefix + "_Dto", provider);
 						Type selectEntity;
@@ -97,18 +110,8 @@ namespace Kogel.Dapper.Extension.Expressions
 								itemJoin.IsDto = true;
 								itemJoin.DtoType = memberInit.Expression.Type.GenericTypeArguments[0];
 								itemJoin.SelectFieldPairs = selectExpression.SelectFieldPairs;
-								if (itemJoin.PropertyInfo == null)
-									itemJoin.PropertyInfo = memberInit.Member as PropertyInfo;
 							}
 						}
-						//}
-						//else//List值
-						//{
-						//	var listValue = memberInit.Expression.ToConvertAndGetValue();
-						//	string paramName = $"{memberInit.Member.Name}_{base.Index}";
-						//	Param.Add(paramName, listValue);
-						//	_sqlCmd.Append($" {}")
-						//}
 					}
 					else
 					{

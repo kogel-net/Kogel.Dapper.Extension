@@ -8,9 +8,9 @@ namespace Kogel.Dapper.Extension
 {
 	public class MySqlProvider : SqlProvider
 	{
-		private const string OpenQuote = "`";
-		private const string CloseQuote = "`";
-		private const char ParameterPrefix = '@';
+		private readonly static string OpenQuote = "`";
+		private readonly static string CloseQuote = "`";
+		private readonly static char ParameterPrefix = '@';
 		private IResolveExpression ResolveExpression;
 		public MySqlProvider()
 		{
@@ -51,8 +51,6 @@ namespace Kogel.Dapper.Extension
 
 		public override SqlProvider FormatToList<T>()
 		{
-			var topNum = DataBaseContext<T>().QuerySet.TopNum;
-
 			var selectSql = ResolveExpression.ResolveSelect(null);
 
 			var fromTableSql = FormatTableName();
@@ -187,6 +185,7 @@ namespace Kogel.Dapper.Extension
 
 			return this;
 		}
+
 		public override SqlProvider FormatMin(LambdaExpression minExpression)
 		{
 			var selectSql = ResolveExpression.ResolveMin(minExpression);
@@ -202,6 +201,7 @@ namespace Kogel.Dapper.Extension
 
 			return this;
 		}
+
 		public override SqlProvider FormatMax(LambdaExpression maxExpression)
 		{
 			var selectSql = ResolveExpression.ResolveMax(maxExpression);

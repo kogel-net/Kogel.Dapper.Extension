@@ -32,7 +32,7 @@ namespace Kogel.Dapper.Extension
 			{
 				provider.JoinList.AddRange(ExpressionExtension.Clone(navigationList));
 			}
-
+		    //查询字段解析
 			var selectFormat = topNum.HasValue ? " SELECT {1} {0} " : " SELECT {0} ";
             var selectSql = "";
             //不是自定义返回视图则显示所有字段

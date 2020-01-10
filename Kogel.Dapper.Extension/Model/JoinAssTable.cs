@@ -23,9 +23,9 @@ namespace Kogel.Dapper.Extension.Model
 		public string JoinSql { get; set; }
 		public Type PropertyType { get => PropertyInfo.PropertyType; }
 		public PropertyInfo PropertyInfo { get; set; }//接收导航属性的对象
-		/// <summary>
-		/// 自定义查询的字段
-		/// </summary>
+													  /// <summary>
+													  /// 自定义查询的字段
+													  /// </summary>
 		public Dictionary<string, string> SelectFieldPairs { get; set; }
 		/// <summary>
 		/// 表首字段
@@ -69,7 +69,8 @@ namespace Kogel.Dapper.Extension.Model
 				JoinSql = this.JoinSql,
 				SelectFieldPairs = new Dictionary<string, string>(),
 				MapperList = new Dictionary<string, string>(),
-				IsMapperField = false
+				IsMapperField = false,
+				PropertyInfo = this.PropertyInfo
 			};
 		}
 	}

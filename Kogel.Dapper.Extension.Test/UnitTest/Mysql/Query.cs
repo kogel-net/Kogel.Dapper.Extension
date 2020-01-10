@@ -15,6 +15,8 @@ using Kogel.Dapper.Extension.Model;
 using System.Data;
 using static Dapper.SqlMapper;
 using Kogel.Dapper.Extension.Extension;
+using Newtonsoft.Json;
+
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 {
@@ -43,6 +45,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
 				 Console.WriteLine(sql);
 			 };
+
 
 			//Thread thread = new Thread(() =>
 			//{
@@ -95,21 +98,21 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				//  {
 				//  };
 				var comment = conn.QuerySet<News1>()
-				.Where(x => x.Comments.Any(y => y.Id != 10))
+				.Where(x => x.Comments.Any(y => y.Id.Between(1, 100) && y.ResourceMapping.Any(z => z.Id.Between(1, 100))))
 				.ToList();
 
-				var comment11 = conn.QuerySet<News1>()
-				.Where(x => x.Comments.Any(y => y.Id != 10))
-				.Get(x => new NewsDto1
-				{
-					Id = x.Id,
-					Title = x.Content,
-					CommentDto1 = x.Comments.Select(y => new CommentDto1()
-					{
-						Id = y.Id,
-						Content = y.Content
-					}).ToList()
-				});
+				//var comment11 = conn.QuerySet<News1>()
+				//.Where(x => x.Comments.Any(y => y.Id != 10))
+				//.Get(x => new NewsDto1
+				//{
+				//	Id = x.Id,
+				//	Title = x.Content,
+				//	CommentDto1 = x.Comments.Select(y => new CommentDto1()
+				//	{
+				//		Id = y.Id,
+				//		Content = y.Content
+				//	}).ToList()
+				//});
 
 
 				//x.Comments.Select(y => new CommentDto1()

@@ -62,7 +62,16 @@ namespace Kogel.Dapper.Extension.Test.Model
 	[Display(Rename = "Comment", AsName = "commm5")]
 	public class Comment2 : Comment
 	{
+		/// <summary>
+		/// 新闻类
+		/// </summary>
 		[ForeignKey("ArticleId", "Id")]
-		public List<News> News { get; set; }
+		public News News { get; set; }
+
+		/// <summary>
+		/// 资源类
+		/// </summary>
+		[ForeignKey("Id", "FKId")]
+		public List<ResourceMapping> ResourceMapping { get; set; }
 	}
 }

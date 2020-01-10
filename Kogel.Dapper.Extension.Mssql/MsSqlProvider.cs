@@ -10,9 +10,9 @@ namespace Kogel.Dapper.Extension
 {
 	public class MsSqlProvider : SqlProvider
 	{
-		private const string OpenQuote = "[";
-		private const string CloseQuote = "]";
-		private const char ParameterPrefix = '@';
+		private readonly static string OpenQuote = "[";
+		private readonly static string CloseQuote = "]";
+		private readonly static char ParameterPrefix = '@';
 		private IResolveExpression ResolveExpression;
 		public MsSqlProvider()
 		{

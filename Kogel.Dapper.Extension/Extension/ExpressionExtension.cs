@@ -8,6 +8,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Serialization;
 using Dapper;
+using Kogel.Dapper.Extension.Exception;
 using Kogel.Dapper.Extension.Expressions;
 using Kogel.Dapper.Extension.Model;
 
@@ -234,15 +235,7 @@ namespace Kogel.Dapper.Extension.Extension
 				return IsAnyBaseEntity(type.BaseType, out entityType);
 			}
 		}
-		///// <summary>
-		///// 是否存在
-		///// </summary>
-		///// <param name="type"></param>
-		///// <returns></returns>
-		//public static bool IsAnyQuerySet(Type type)
-		//{
 
-		//}
 		/// <summary>
 		/// 克隆list
 		/// </summary>
@@ -270,29 +263,99 @@ namespace Kogel.Dapper.Extension.Extension
 		/// 写入值对象
 		/// </summary>
 		/// <typeparam name="TEntity"></typeparam>
-		/// <param name="masterObj"></param>
-		/// <param name="joinAssTable"></param>
-		/// <param name="value"></param>
-		public static void SetProperValue<TEntity>(object masterObj, JoinAssTable joinAssTable, TEntity value)
+		/// <param name="masterData"></param>
+		/// <param name="joinTableList"></param>
+		/// <param name="index"></param>
+		public static void SetProperValue<TFirst, TEntity>(TFirst first, TEntity entityValue, List<JoinAssTable> joinTableList, int index)
+			where TFirst : IBaseEntity
+			where TEntity : IBaseEntity
 		{
-			var entityType = typeof(TEntity);
-			if (joinAssTable.PropertyType == entityType)//实体
+			var joinAssTable = joinTableList[index];
+			//然后查找导航属性父级实体信息位置
+			var parentIndex = joinTableList.FindIndex(x => x.TableType == joinAssTable.PropertyInfo.DeclaringType);
+			if (parentIndex < index || parentIndex == -1)//为-1是指主属性的导航属性
 			{
-				joinAssTable.PropertyInfo.SetValue(masterObj, value);
-			}
-			else//泛型
-			{
-				List<TEntity> entities = (List<TEntity>)joinAssTable.PropertyInfo.GetValue(masterObj);
-				if (entities == null)
+				var masterData = IndexEntityObj(first, joinAssTable, joinAssTable.TableType.GetProperty(joinAssTable.LeftAssName).GetValue(entityValue));
+				//实体
+				if (joinAssTable.PropertyType == typeof(TEntity))
 				{
-					entities = new List<TEntity>() { value };
+					joinAssTable.PropertyInfo.SetValue(masterData, entityValue);
 				}
 				else
 				{
-					entities.Add(value);
+					List<TEntity> entities = (List<TEntity>)joinAssTable.PropertyInfo.GetValue(masterData);
+					if (entities == null)
+					{
+						entities = new List<TEntity>() { entityValue };
+					}
+					else
+					{
+						entities.Add(entityValue);
+					}
+					joinAssTable.PropertyInfo.SetValue(masterData, entities);
 				}
-				joinAssTable.PropertyInfo.SetValue(masterObj, entities);
 			}
+			else
+			{
+				throw new DapperExtensionException("导航属性索引异常!");
+			}
+		}
+
+		/// <summary>
+		/// 根据属性索引数据
+		/// </summary>
+		/// <typeparam name="TValue"></typeparam>
+		/// <param name="master"></param>
+		/// <param name="joinAssTable"></param>
+		/// <param name="fieldValue">关联字段的值</param>
+		/// <returns></returns>
+		private static object IndexEntityObj<TValue>(TValue master, JoinAssTable joinAssTable, object fieldValue)
+			where TValue : IBaseEntity
+		{
+			PropertyInfo[] properties = master.GetType().GetProperties();
+			foreach (var item in properties)
+			{
+				//找到相同属性
+				if (item == joinAssTable.PropertyInfo)
+				{
+					return master;
+				}
+				else
+				{
+					var masterData = item.GetValue(master);
+					if (masterData != null)
+					{
+						var masterType = masterData.GetType();
+						//实体类型
+						Type entityType;
+						if (ExpressionExtension.IsAnyBaseEntity(masterType, out entityType))
+						{
+							//list
+							if (masterType.FullName.Contains("System.Collections.Generic"))
+							{
+								foreach (var obj in masterData as IEnumerable<IBaseEntity>)
+								{
+									//从list中查找对应的属性
+									var listData = IndexEntityObj(obj, joinAssTable, fieldValue);
+									if (listData != null)
+									{
+										//验证主外键数据是否关联
+										if (obj.GetType().GetProperty(joinAssTable.RightAssName).GetValue(obj).Equals(fieldValue))
+										{
+											return obj;
+										}
+									}
+								}
+							}
+							else
+							{
+								return IndexEntityObj((TValue)masterData, joinAssTable, fieldValue);
+							}
+						}
+					}
+				}
+			}
+			return null;
 		}
 
 		/// <summary>
@@ -307,7 +370,7 @@ namespace Kogel.Dapper.Extension.Extension
 			{
 				return true;
 			}
-			else if (type2.BaseType == null)
+			else if (type1.BaseType == null || type2.BaseType == null)
 			{
 				return false;
 			}

@@ -108,10 +108,12 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// 子查询导航的集合
 		/// </summary>
 		public List<NavigationMemberAssign> NavigationList { get; set; }
+
 		/// <summary>
 		/// 记录映射对象
 		/// </summary>
 		public Dictionary<string,string> MappingList { get; set; }
+
 		/// <summary>
 		/// 是否重命名   table  as newName
 		/// </summary>
@@ -131,6 +133,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 			fieldInkove.Invoke();
 			spliceField.Append(") ");
 		}
+
 		/// <summary>
 		/// 计总
 		/// </summary>
@@ -142,6 +145,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 			fieldInkove.Invoke();
 			spliceField.Append(") ");
 		}
+
 		/// <summary>
 		/// 最大值
 		/// </summary>
@@ -153,6 +157,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 			fieldInkove.Invoke();
 			spliceField.Append(") ");
 		}
+
 		/// <summary>
 		/// 最小值
 		/// </summary>
@@ -164,6 +169,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 			fieldInkove.Invoke();
 			spliceField.Append(") ");
 		}
+
 		/// <summary>
 		/// 平均值
 		/// </summary>
@@ -177,6 +183,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		}
 		#endregion
 	}
+
 	/// <summary>
 	/// 转换处理
 	/// </summary>
@@ -189,6 +196,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		ToBoolean,
 		ToDateTime
 	}
+
 	/// <summary>
 	/// 时间格式处理
 	/// </summary>
@@ -201,6 +209,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         AddMinutes,
         AddSeconds
     }
+
 	/// <summary>
 	/// 子查询导航
 	/// </summary>

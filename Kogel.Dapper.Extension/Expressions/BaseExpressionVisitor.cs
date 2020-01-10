@@ -2,6 +2,7 @@
 using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension.Exception;
 using Kogel.Dapper.Extension.Extension;
+using Kogel.Dapper.Extension.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -100,6 +101,7 @@ namespace Kogel.Dapper.Extension.Expressions
 			}
 			return node;
 		}
+
 		/// <summary>
 		/// 待执行的方法对象
 		/// </summary>
@@ -107,7 +109,7 @@ namespace Kogel.Dapper.Extension.Expressions
 		/// <returns></returns>
 		protected override Expression VisitMethodCall(MethodCallExpression node)
 		{
-            if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension.Function"))//系统函数
+			if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension.Function"))//系统函数
 			{
 				Operation(node);
 			}
@@ -123,6 +125,7 @@ namespace Kogel.Dapper.Extension.Expressions
 			}
 			return node;
 		}
+
 		/// <summary>
 		/// 解析函数
 		/// </summary>
@@ -268,6 +271,7 @@ namespace Kogel.Dapper.Extension.Expressions
 			}
 		}
 	}
+
 	/// <summary>
 	/// 用于解析条件表达式
 	/// </summary>
@@ -285,16 +289,17 @@ namespace Kogel.Dapper.Extension.Expressions
 
 		protected override Expression VisitMethodCall(MethodCallExpression node)
 		{
+			string callName = node.Method.DeclaringType.FullName;
 			//使用convert函数里待执行的sql数据
-			if (node.Method.DeclaringType.FullName.Equals("Kogel.Dapper.Extension.ExpressExpansion"))//自定义扩展方法
+			if (callName.Equals("Kogel.Dapper.Extension.ExpressExpansion"))//自定义扩展方法
 			{
 				Operation(node);
 			}
-			else if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension.Function"))//系统函数
+			else if (callName.Contains("Kogel.Dapper.Extension.Function"))//系统函数
 			{
 				Operation(node);
 			}
-			else if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension"))
+			else if (callName.Contains("Kogel.Dapper.Extension"))
 			{
 				base.VisitMethodCall(node);
 				this.SpliceField.Append(base.SpliceField);
@@ -332,22 +337,45 @@ namespace Kogel.Dapper.Extension.Expressions
 		/// <returns></returns>
 		protected override Expression VisitMember(MemberExpression node)
 		{
-			var expTypeName = node.Expression?.GetType().FullName ?? "";
+			var expType = node.Expression?.GetType();
+			var expTypeName = expType?.FullName ?? "";
 			if (expTypeName == "System.Linq.Expressions.TypedParameterExpression" || expTypeName == "System.Linq.Expressions.PropertyExpression")
 			{
 				var member = EntityCache.QueryEntity(node.Expression.Type);
 				string asName = string.Empty;
 				if (providerOption.IsAsName)
 				{
-					this.FieldName = member.AsName + "." + member.FieldPairs[node.Member.Name];
+					this.FieldName = $"{member.AsName}.{member.FieldPairs[node.Member.Name]}";
 					asName = member.GetAsName(providerOption);
 				}
 				else
-				{
 					this.FieldName = member.FieldPairs[node.Member.Name];
+				SpliceField.Append($"{asName}{providerOption.CombineFieldName(member.FieldPairs[node.Member.Name])}");
+				//导航属性允许显示字段
+				if (expTypeName == "System.Linq.Expressions.PropertyExpression")
+				{
+					//导航属性有条件时设置查询该导航属性
+					var joinTable = Provider.JoinList.Find(x => x.TableType.IsTypeEquals(member.Type));
+					if (joinTable != null && joinTable.IsMapperField == false)
+					{
+						joinTable.IsMapperField = true;
+					}
+					else
+					{
+						//不存在第一层中，可能在后几层嵌套使用导航属性
+						//获取调用者表达式
+						var parentExpression = (node.Expression as MemberExpression).Expression;
+						var parentEntity = EntityCache.QueryEntity(parentExpression.Type);
+						joinTable = parentEntity.Navigations.Find(x => x.TableType == member.Type);
+						if (joinTable != null)
+						{
+							joinTable = (JoinAssTable)joinTable.Clone();
+							joinTable.IsMapperField = true;
+							//加入导航连表到提供方
+							Provider.JoinList.Add(joinTable);
+						}
+					}
 				}
-				string fieldName = asName + providerOption.CombineFieldName(member.FieldPairs[node.Member.Name]);
-				SpliceField.Append(fieldName);
 			}
 			else
 			{
@@ -357,6 +385,7 @@ namespace Kogel.Dapper.Extension.Expressions
 			}
 			return node;
 		}
+
 		/// <summary>
 		/// 重写值对象，记录参数
 		/// </summary>
@@ -372,18 +401,18 @@ namespace Kogel.Dapper.Extension.Expressions
 			else
 			{
 				var nodeValue = node.ToConvertAndGetValue();
-				if (nodeValue.Equals(true))
+				switch (nodeValue)
 				{
-					SpliceField.Append("1=1");
-				}
-				else if (nodeValue.Equals(false))
-				{
-					SpliceField.Append("1!=1");
-				}
-				else
-				{
-					SpliceField.Append(ParamName);
-					Param.Add(ParamName, nodeValue);
+					case true:
+						SpliceField.Append("1=1");
+						break;
+					case false:
+						SpliceField.Append("1!=1");
+						break;
+					default:
+						SpliceField.Append(ParamName);
+						Param.Add(ParamName, nodeValue);
+						break;
 				}
 			}
 			return node;
@@ -506,24 +535,29 @@ namespace Kogel.Dapper.Extension.Expressions
 						if (ExpressionExtension.IsAnyBaseEntity(node.Arguments[0].Type, out entityType))
 						{
 							//导航属性有条件时设置查询该导航属性
-							var joinTable = Provider.JoinList.Find(x => x.TableType.IsTypeEquals(entityType));
-							joinTable.IsMapperField = true;
-							//解析导航属性条件
-							var binaryExp = (node.Arguments[1] as LambdaExpression)?.Body as BinaryExpression;
-							if (binaryExp != null)
+							var navigationTable = Provider.JoinList.Find(x => x.TableType.IsTypeEquals(entityType));
+							if (navigationTable != null)
+								navigationTable.IsMapperField = true;
+							else
 							{
-								var binaryVisitor = new BinaryExpressionVisitor(binaryExp, Provider);
-								this.SpliceField.Append(binaryVisitor.SpliceField.Replace("=", "In").Replace("!", "Not "));
-								//添加参数
-								foreach (string paramName in binaryVisitor.Param.ParameterNames)
+								//不存在第一层中，可能在后几层嵌套使用导航属性
+								//获取调用者表达式
+								var parentExpression = (node.Arguments[0] as MemberExpression).Expression;
+								var parentEntity = EntityCache.QueryEntity(parentExpression.Type);
+								navigationTable = parentEntity.Navigations.Find(x => x.TableType == entityType);
+								if (navigationTable != null)
 								{
-									var objectParam = new object[] { binaryVisitor.Param.Get<object>(paramName) };
-									this.Param.Add(paramName, objectParam);
+									navigationTable = (JoinAssTable)navigationTable.Clone();
+									navigationTable.IsMapperField = true;
+									//加入导航连表到提供方
+									Provider.JoinList.Add(navigationTable);
 								}
-								//获取导航属性的成员信息
-								if (joinTable.PropertyInfo == null)
-									joinTable.PropertyInfo = (node.Arguments[0] as MemberExpression).Member as PropertyInfo;
 							}
+							//解析导航属性条件
+							var navigationExpression = new WhereExpression(node.Arguments[1] as LambdaExpression, $"_Navi_{navigationTable.PropertyInfo.Name}", Provider);
+							//添加sql和参数
+							this.SpliceField.Append($" 1=1 {navigationExpression.SqlCmd}");
+							this.Param.AddDynamicParams(navigationExpression.Param);
 						}
 						else
 						{
@@ -684,8 +718,27 @@ namespace Kogel.Dapper.Extension.Expressions
 		{
 			SpliceField.Append("(");
 			Visit(node.Left);
-			SpliceField.Append(node.GetExpressionType());
-			Visit(node.Right);
+			var expressionType = node.GetExpressionType();
+			SpliceField.Append(expressionType);
+			if (expressionType == " AND " || expressionType == " OR ")
+			{
+				switch (node.Right.ToString())
+				{
+					case "True":
+						SpliceField.Append("1=1");
+						break;
+					case "False":
+						SpliceField.Append("1!=1");
+						break;
+					default:
+						Visit(node.Right);
+						break;
+				}
+			}
+			else
+			{
+				Visit(node.Right);
+			}
 			SpliceField.Append(")");
 			return node;
 		}
