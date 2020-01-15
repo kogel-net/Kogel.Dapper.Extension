@@ -3048,6 +3048,7 @@ namespace Dapper
 		public static ITypeMap GetTypeMap(Type type)
 		{
 			if (type == null) throw new ArgumentNullException(nameof(type));
+			if (_temporaryTypeMaps == null) _temporaryTypeMaps = new Hashtable();
 			//先从临时属性里获取
 			lock (_temporaryTypeMaps)
 			{

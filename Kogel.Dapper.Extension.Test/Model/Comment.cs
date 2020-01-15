@@ -45,8 +45,8 @@ namespace Kogel.Dapper.Extension.Test.Model
 		/// </summary>
 		public int RefCommentId { get; set; }
 
-		////[ForeignKey("ArticleId","Id")]
-		//public News News { get; set; }
+		[ForeignKey("ArticleId","Id")]
+		public virtual News News { get; set; }
 
 	}
 
@@ -66,7 +66,7 @@ namespace Kogel.Dapper.Extension.Test.Model
 		/// 新闻类
 		/// </summary>
 		[ForeignKey("ArticleId", "Id")]
-		public News News { get; set; }
+		public override News News { get; set; }
 
 		/// <summary>
 		/// 资源类

@@ -328,7 +328,7 @@ namespace Kogel.Dapper.Extension.Extension
 						var masterType = masterData.GetType();
 						//实体类型
 						Type entityType;
-						if (ExpressionExtension.IsAnyBaseEntity(masterType, out entityType))
+						if (IsAnyBaseEntity(masterType, out entityType))
 						{
 							//list
 							if (masterType.FullName.Contains("System.Collections.Generic"))

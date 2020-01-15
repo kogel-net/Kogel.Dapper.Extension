@@ -19,7 +19,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		protected SqlProvider provider;
 		protected IProviderOption providerOption;
 		protected AbstractSet abstractSet => provider.Context.Set;
-		
+
 		public IResolveExpression(SqlProvider provider)
 		{
 			this.provider = provider;
@@ -241,8 +241,14 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 				{
 					continue;
 				}
+				var customAttributes = propertiy.GetCustomAttributess(true);
+				//导航属性排除
+				if (customAttributes.Any(x => x.GetType().Equals(typeof(ForeignKey))))
+				{
+					continue;
+				}
 				//主键标识
-				var typeAttribute = propertiy.GetCustomAttributess(true).FirstOrDefault(x => x.GetType().Equals(typeof(Identity)));
+				var typeAttribute = customAttributes.FirstOrDefault(x => x.GetType().Equals(typeof(Identity)));
 				if (typeAttribute != null)
 				{
 					var identity = typeAttribute as Identity;

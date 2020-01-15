@@ -162,35 +162,42 @@ namespace Dapper
 			if (!string.IsNullOrEmpty(splitOn))
 			{
 				//导航属性列表
-				var navigationList = provider.JoinList.Where(x => x.Action == JoinAction.Navigation && x.IsMapperField).ToArray();
-				var hashes = new HashSet<TFirst>();
-				cnn.Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TFirst>(provider.SqlString, (first, second, third, fourth, fifth, sixth) =>
+				var navigationList = provider.JoinList.Where(x => x.Action == JoinAction.Navigation && x.IsMapperField).ToList();
+				//把所有实体的信息存下做导航关联索引
+				var firsts = new List<TFirst>();
+				await cnn.QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TFirst>(provider.SqlString, (first, second, third, fourth, fifth, sixth) =>
 				{
-					object id = first.GetId();
-					//判断当前主数据是否出现过
-					var lookup = hashes.FirstOrDefault(x => x.GetId().Equals(id));
-					if (lookup == null)
-						lookup = first;
-
-					////设置导航属性对应
-					//if (second != null)
-					//	ExpressionExtension.SetProperValue(firstEntity, navigationList[0], second);
-					//if (third != null)
-					//	ExpressionExtension.SetProperValue(firstEntity, navigationList[1], third);
-					//if (fourth != null)
-					//	ExpressionExtension.SetProperValue(firstEntity, navigationList[2], fourth);
-					//if (fifth != null)
-					//	ExpressionExtension.SetProperValue(firstEntity, navigationList[3], fifth);
-					//if (sixth != null)
-					//	ExpressionExtension.SetProperValue(firstEntity, navigationList[4], sixth);
-
+					var masterData = firsts.Find(x => x.GetId().Equals(first.GetId()));
 					//不存在的主表数据才添加进来，防止重复
-					if (!hashes.Any(x => x.GetId() == lookup.GetId()))
-						hashes.Add(lookup);
-
+					if (masterData == null)
+					{
+						firsts.Add(first);
+						masterData = first;
+					}
+					//开始索引导航属性和之前实体的关系
+					if (second != null)
+					{
+						ExpressionExtension.SetProperValue(masterData, second, navigationList, 0);
+					}
+					if (third != null)
+					{
+						ExpressionExtension.SetProperValue(masterData, third, navigationList, 1);
+					}
+					if (fourth != null)
+					{
+						ExpressionExtension.SetProperValue(masterData, fourth, navigationList, 2);
+					}
+					if (fifth != null)
+					{
+						ExpressionExtension.SetProperValue(masterData, fifth, navigationList, 3);
+					}
+					if (sixth != null)
+					{
+						ExpressionExtension.SetProperValue(masterData, sixth, navigationList, 4);
+					}
 					return default(TFirst);
 				}, provider.Params, transaction, true, splitOn);
-				return hashes;
+				return firsts;
 			}
 			else
 			{

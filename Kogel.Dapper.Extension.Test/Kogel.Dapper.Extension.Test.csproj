@@ -67,6 +67,8 @@
     <Compile Include="Model\TestDto.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UnitTest\Mssql\Command.cs" />
+    <Compile Include="UnitTest\Mssql\Query.cs" />
     <Compile Include="UnitTest\Mysql\Command.cs" />
     <Compile Include="UnitTest\Mysql\TestRepository.cs" />
     <Compile Include="UnitTest\Mysql\Query.cs" />

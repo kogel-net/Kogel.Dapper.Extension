@@ -74,7 +74,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 			//        }
 			SqlMapper.Aop.OnExecuting += Aop_OnExecuting;
 
-			using (var connection = new SqlConnection("server=localhost;database=Lige;user=sa;password=!RisingupTech/././.;max pool size=300"))
+			using (var connection = new SqlConnection("server=risingup.life98.cn,55940;database=Lige;user=sa;password=!RisingupTech/././.;max pool size=300"))
 			{
 				string account = "admin";
 				string password = "123456";
