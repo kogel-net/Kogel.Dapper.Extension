@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Kogel.Dapper.Extension;
+using Kogel.Dapper.Extension.Attributes;
 
 namespace Kogel.Dapper.Extension.Test.Model
 {
@@ -53,5 +55,16 @@ namespace Kogel.Dapper.Extension.Test.Model
 		/// 文件大小
 		/// </summary>
 		public int RSize { get; set; }
+
+		[ForeignKey("Id","Id")]
+		public List<man> MenList { get; set; }
+	}
+
+	public class man: IBaseEntity<man,int>
+	{
+		[Identity]
+		public override int Id { get; set; }
+
+		public int Sex { get; set; }
 	}
 }

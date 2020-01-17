@@ -98,7 +98,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				//  {
 				//  };
 				var comment = conn.QuerySet<News1>()
-				.Where(x => x.Comments.Any(y => y.Id.Between(1, 100) && y.ResourceMapping.Any(z => z.Id.Between(1, 100))))
+				.Where(x => x.Comments.Any(y => y.Id.Between(1, 100) && y.ResourceMapping.Any(z => z.Id.Between(1, 100) && z.MenList.Any(l => l.Id.Between(1, 100)))))
 				.ToList();
 
 				//var comment11 = conn.QuerySet<News1>()

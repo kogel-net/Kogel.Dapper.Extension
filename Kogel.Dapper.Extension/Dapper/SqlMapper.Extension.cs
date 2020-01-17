@@ -40,15 +40,16 @@ namespace Dapper
 		/// <param name="transaction"></param>
 		/// <param name="splitOn"></param>
 		/// <returns></returns>
-		public static TFirst QueryFirstOrDefault<TFirst, TSecond, TThird, TFourth, TFifth, TSixth>(this IDbConnection cnn, SqlProvider provider, IDbTransaction transaction = null)
+		public static TFirst QueryFirstOrDefault<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh>(this IDbConnection cnn, SqlProvider provider, IDbTransaction transaction = null)
 			where TFirst : IBaseEntity
 			where TSecond : IBaseEntity
 			where TThird : IBaseEntity
 			where TFourth : IBaseEntity
 			where TFifth : IBaseEntity
 			where TSixth : IBaseEntity
+			where TSeventh : IBaseEntity
 		{
-			return cnn.Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth>(provider, transaction).FirstOrDefault();
+			return cnn.Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh>(provider, transaction).FirstOrDefault();
 		}
 
 		/// <summary>
@@ -62,15 +63,16 @@ namespace Dapper
 		/// <param name="transaction"></param>
 		/// <param name="splitOn"></param>
 		/// <returns></returns>
-		public static async Task<TFirst> QueryFirstOrDefaultAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth>(this IDbConnection cnn, SqlProvider provider, IDbTransaction transaction = null)
+		public static async Task<TFirst> QueryFirstOrDefaultAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh>(this IDbConnection cnn, SqlProvider provider, IDbTransaction transaction = null)
 			where TFirst : IBaseEntity
 			where TSecond : IBaseEntity
 			where TThird : IBaseEntity
 			where TFourth : IBaseEntity
 			where TFifth : IBaseEntity
 			where TSixth : IBaseEntity
+			where TSeventh : IBaseEntity
 		{
-			return (await cnn.QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth>(provider, transaction)).FirstOrDefault();
+			return (await cnn.QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh>(provider, transaction)).FirstOrDefault();
 		}
 
 		/// <summary>
@@ -83,13 +85,14 @@ namespace Dapper
 		/// <param name="transaction"></param>
 		/// <param name="splitOn"></param>
 		/// <returns></returns>
-		public static IEnumerable<TFirst> Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth>(this IDbConnection cnn, SqlProvider provider, IDbTransaction transaction = null)
+		public static IEnumerable<TFirst> Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh>(this IDbConnection cnn, SqlProvider provider, IDbTransaction transaction = null)
 			where TFirst : IBaseEntity
 			where TSecond : IBaseEntity
 			where TThird : IBaseEntity
 			where TFourth : IBaseEntity
 			where TFifth : IBaseEntity
 			where TSixth : IBaseEntity
+			where TSeventh : IBaseEntity
 		{
 			EntityObject firstEntity = EntityCache.QueryEntity(typeof(TFirst));
 			string splitOn = GetSplitOn<TFirst>(provider);
@@ -98,45 +101,216 @@ namespace Dapper
 				//导航属性列表
 				var navigationList = provider.JoinList.Where(x => x.Action == JoinAction.Navigation && x.IsMapperField).ToList();
 				//把所有实体的信息存下做导航关联索引
-				var firsts = new List<TFirst>();
-				cnn.Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TFirst>(provider.SqlString, (first, second, third, fourth, fifth, sixth) =>
+				List<TFirst> firsts = new List<TFirst>();
+				List<TSecond> seconds = new List<TSecond>();
+				List<TThird> thirds = new List<TThird>();
+				List<TFourth> fourths = new List<TFourth>();
+				List<TFifth> fifths = new List<TFifth>();
+				List<TSixth> sixths = new List<TSixth>();
+				List<TSeventh> sevenths = new List<TSeventh>();
+				cnn.Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TFirst>(provider.SqlString, (first, second, third, fourth, fifth, sixth, seventh) =>
 				{
-					var masterData = firsts.Find(x => x.GetId().Equals(first.GetId()));
-					//不存在的主表数据才添加进来，防止重复
-					if (masterData == null)
-					{
-						firsts.Add(first);
-						masterData = first;
-					}
-					//开始索引导航属性和之前实体的关系
+					firsts.Add(first);
 					if (second != null)
 					{
-						ExpressionExtension.SetProperValue(masterData, second, navigationList, 0);
-					}
-					if (third != null)
-					{
-						ExpressionExtension.SetProperValue(masterData, third, navigationList, 1);
-					}
-					if (fourth != null)
-					{
-						ExpressionExtension.SetProperValue(masterData, fourth, navigationList, 2);
-					}
-					if (fifth != null)
-					{
-						ExpressionExtension.SetProperValue(masterData, fifth, navigationList, 3);
-					}
-					if (sixth != null)
-					{
-						ExpressionExtension.SetProperValue(masterData, sixth, navigationList, 4);
+						seconds.Add(second);
+						if (third != null)
+						{
+							thirds.Add(third);
+							if (fourth != null)
+							{
+								fourths.Add(fourth);
+								if (fifth != null)
+								{
+									fifths.Add(fifth);
+									if (sixth != null)
+									{
+										sixths.Add(sixth);
+										if (seventh != null)
+											sevenths.Add(seventh);
+									}
+								}
+							}
+						}
 					}
 					return default(TFirst);
 				}, provider.Params, transaction, true, splitOn);
+				//分割导航属性数据
+				firsts = ExcisionData(firsts, seconds, thirds, fourths, fifths, sixths, sevenths, navigationList);
 				return firsts;
 			}
 			else
 			{
 				return cnn.Query<TFirst>(provider.SqlString, provider.Params, transaction);
 			}
+		}
+
+
+		private static List<TFirst> ExcisionData<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh>(List<TFirst> firsts, List<TSecond> seconds, List<TThird> thirds,
+			List<TFourth> fourths, List<TFifth> fifths, List<TSixth> sixths, List<TSeventh> sevenths, List<JoinAssTable> joinAssTables)
+			where TFirst : IBaseEntity
+			where TSecond : IBaseEntity
+			where TThird : IBaseEntity
+			where TFourth : IBaseEntity
+			where TFifth : IBaseEntity
+			where TSixth : IBaseEntity
+			where TSeventh : IBaseEntity
+		{
+			List<TFirst> firstList = new List<TFirst>();
+			List<TSecond> secondList = new List<TSecond>();
+			List<TThird> thirdList = new List<TThird>();
+			List<TFourth> fourthList = new List<TFourth>();
+			List<TFifth> fifthList = new List<TFifth>();
+			List<TSixth> sixthList = new List<TSixth>();
+			List<TSeventh> seventhList = new List<TSeventh>();
+			for (int i = 0; i < firsts.Count; i++)
+			{
+				TFirst first = firstList.Find(x => x.GetId().Equals(firsts[i].GetId()));
+				if (first == null)
+				{
+					first = firsts[i];
+					firstList.Add(first);
+					//重置关联数据
+					secondList.Clear();
+					thirdList.Clear();
+					fourthList.Clear();
+					fifthList.Clear();
+					sixthList.Clear();
+					seventhList.Clear();
+				}
+				//设置第一个导航属性
+				if (seconds.Count > i)
+				{
+					TSecond second = secondList.Find(x => x.GetId().Equals(seconds[i].GetId()));
+					if (second == null)
+					{
+						second = seconds[i];
+						secondList.Add(second);
+						ExpressionExtension.SetProperValue(first, second, joinAssTables[0].PropertyInfo);
+						//重置关联数据
+						thirdList.Clear();
+						fourthList.Clear();
+						fifthList.Clear();
+						sixthList.Clear();
+						seventhList.Clear();
+					}
+					//设置第二个导航属性
+					if (thirds.Count > i)
+					{
+						TThird third = thirdList.Find(x => x.GetId().Equals(thirds[i].GetId()));
+						if (third == null)
+						{
+							third = thirds[i];
+							thirdList.Add(third);
+							//然后查找导航属性父级实体信息位置
+							int parentIndex = joinAssTables.FindIndex(x => x.TableType == joinAssTables[1].PropertyInfo.DeclaringType) + 1;
+							if (parentIndex == 0)
+								ExpressionExtension.SetProperValue(first, third, joinAssTables[1].PropertyInfo);
+							else if (parentIndex == 1)
+								ExpressionExtension.SetProperValue(second, third, joinAssTables[1].PropertyInfo);
+							//重置关联数据
+							fourthList.Clear();
+							fifthList.Clear();
+							sixthList.Clear();
+							seventhList.Clear();
+						}
+						//设置第三个导航属性
+						if (fourths.Count > i)
+						{
+							TFourth fourth = fourthList.Find(x => x.GetId().Equals(fourths[i].GetId()));
+							if (fourth == null)
+							{
+								fourth = fourths[i];
+								fourthList.Add(fourth);
+								//然后查找导航属性父级实体信息位置
+								int parentIndex = joinAssTables.FindIndex(x => x.TableType == joinAssTables[2].PropertyInfo.DeclaringType) + 1;
+								if (parentIndex == 0)
+									ExpressionExtension.SetProperValue(first, fourth, joinAssTables[2].PropertyInfo);
+								else if (parentIndex == 1)
+									ExpressionExtension.SetProperValue(second, fourth, joinAssTables[2].PropertyInfo);
+								else if (parentIndex == 2)
+									ExpressionExtension.SetProperValue(third, fourth, joinAssTables[2].PropertyInfo);
+								//重置关联数据
+								fifthList.Clear();
+								sixthList.Clear();
+								seventhList.Clear();
+							}
+							//设置第四个导航属性
+							if (fifths.Count > i)
+							{
+								TFifth fifth = fifthList.Find(x => x.GetId().Equals(fifths[i].GetId()));
+								if (fifth == null)
+								{
+									fifth = fifths[i];
+									fifthList.Add(fifth);
+									//然后查找导航属性父级实体信息位置
+									int parentIndex = joinAssTables.FindIndex(x => x.TableType == joinAssTables[2].PropertyInfo.DeclaringType) + 1;
+									if (parentIndex == 0)
+										ExpressionExtension.SetProperValue(first, fifth, joinAssTables[2].PropertyInfo);
+									else if (parentIndex == 1)
+										ExpressionExtension.SetProperValue(second, fifth, joinAssTables[2].PropertyInfo);
+									else if (parentIndex == 2)
+										ExpressionExtension.SetProperValue(third, fifth, joinAssTables[2].PropertyInfo);
+									else if (parentIndex == 3)
+										ExpressionExtension.SetProperValue(fourth, fifth, joinAssTables[2].PropertyInfo);
+									//重置关联数据
+									sixthList.Clear();
+									seventhList.Clear();
+								}
+								//设置第五个导航属性
+								if (sixths.Count > i)
+								{
+									TSixth sixth = sixthList.Find(x => x.GetId().Equals(sixths[i].GetId()));
+									if (sixth == null)
+									{
+										sixth = sixths[i];
+										sixthList.Add(sixth);
+										//然后查找导航属性父级实体信息位置
+										int parentIndex = joinAssTables.FindIndex(x => x.TableType == joinAssTables[2].PropertyInfo.DeclaringType) + 1;
+										if (parentIndex == 0)
+											ExpressionExtension.SetProperValue(first, sixth, joinAssTables[2].PropertyInfo);
+										else if (parentIndex == 1)
+											ExpressionExtension.SetProperValue(second, sixth, joinAssTables[2].PropertyInfo);
+										else if (parentIndex == 2)
+											ExpressionExtension.SetProperValue(third, sixth, joinAssTables[2].PropertyInfo);
+										else if (parentIndex == 3)
+											ExpressionExtension.SetProperValue(fourth, sixth, joinAssTables[2].PropertyInfo);
+										else if (parentIndex == 4)
+											ExpressionExtension.SetProperValue(fifth, sixth, joinAssTables[2].PropertyInfo);
+										//重置关联数据
+										seventhList.Clear();
+									}
+									//设置第五个导航属性
+									if (sevenths.Count > i)
+									{
+										TSeventh seventh = seventhList.Find(x => x.GetId().Equals(sevenths[i].GetId()));
+										if (seventh == null)
+										{
+											seventh = sevenths[i];
+											seventhList.Add(seventh);
+											//然后查找导航属性父级实体信息位置
+											int parentIndex = joinAssTables.FindIndex(x => x.TableType == joinAssTables[2].PropertyInfo.DeclaringType) + 1;
+											if (parentIndex == 0)
+												ExpressionExtension.SetProperValue(first, seventh, joinAssTables[2].PropertyInfo);
+											else if (parentIndex == 1)
+												ExpressionExtension.SetProperValue(second, seventh, joinAssTables[2].PropertyInfo);
+											else if (parentIndex == 2)
+												ExpressionExtension.SetProperValue(third, seventh, joinAssTables[2].PropertyInfo);
+											else if (parentIndex == 3)
+												ExpressionExtension.SetProperValue(fourth, seventh, joinAssTables[2].PropertyInfo);
+											else if (parentIndex == 4)
+												ExpressionExtension.SetProperValue(fifth, seventh, joinAssTables[2].PropertyInfo);
+											else if (parentIndex == 5)
+												ExpressionExtension.SetProperValue(sixth, seventh, joinAssTables[2].PropertyInfo);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			return firstList;
 		}
 
 		/// <summary>
@@ -149,13 +323,14 @@ namespace Dapper
 		/// <param name="transaction"></param>
 		/// <param name="splitOn"></param>
 		/// <returns></returns>
-		public static async Task<IEnumerable<TFirst>> QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth>(this IDbConnection cnn, SqlProvider provider, IDbTransaction transaction = null)
+		public static async Task<IEnumerable<TFirst>> QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh>(this IDbConnection cnn, SqlProvider provider, IDbTransaction transaction = null)
 			where TFirst : IBaseEntity
 			where TSecond : IBaseEntity
 			where TThird : IBaseEntity
 			where TFourth : IBaseEntity
 			where TFifth : IBaseEntity
 			where TSixth : IBaseEntity
+			where TSeventh : IBaseEntity
 		{
 			EntityObject firstEntity = EntityCache.QueryEntity(typeof(TFirst));
 			string splitOn = GetSplitOn<TFirst>(provider);
@@ -164,39 +339,42 @@ namespace Dapper
 				//导航属性列表
 				var navigationList = provider.JoinList.Where(x => x.Action == JoinAction.Navigation && x.IsMapperField).ToList();
 				//把所有实体的信息存下做导航关联索引
-				var firsts = new List<TFirst>();
-				await cnn.QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TFirst>(provider.SqlString, (first, second, third, fourth, fifth, sixth) =>
+				List<TFirst> firsts = new List<TFirst>();
+				List<TSecond> seconds = new List<TSecond>();
+				List<TThird> thirds = new List<TThird>();
+				List<TFourth> fourths = new List<TFourth>();
+				List<TFifth> fifths = new List<TFifth>();
+				List<TSixth> sixths = new List<TSixth>();
+				List<TSeventh> sevenths = new List<TSeventh>();
+				await cnn.QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TFirst>(provider.SqlString, (first, second, third, fourth, fifth, sixth, seventh) =>
 				{
-					var masterData = firsts.Find(x => x.GetId().Equals(first.GetId()));
-					//不存在的主表数据才添加进来，防止重复
-					if (masterData == null)
-					{
-						firsts.Add(first);
-						masterData = first;
-					}
-					//开始索引导航属性和之前实体的关系
+					firsts.Add(first);
 					if (second != null)
 					{
-						ExpressionExtension.SetProperValue(masterData, second, navigationList, 0);
-					}
-					if (third != null)
-					{
-						ExpressionExtension.SetProperValue(masterData, third, navigationList, 1);
-					}
-					if (fourth != null)
-					{
-						ExpressionExtension.SetProperValue(masterData, fourth, navigationList, 2);
-					}
-					if (fifth != null)
-					{
-						ExpressionExtension.SetProperValue(masterData, fifth, navigationList, 3);
-					}
-					if (sixth != null)
-					{
-						ExpressionExtension.SetProperValue(masterData, sixth, navigationList, 4);
+						seconds.Add(second);
+						if (third != null)
+						{
+							thirds.Add(third);
+							if (fourth != null)
+							{
+								fourths.Add(fourth);
+								if (fifth != null)
+								{
+									fifths.Add(fifth);
+									if (sixth != null)
+									{
+										sixths.Add(sixth);
+										if (seventh != null)
+											sevenths.Add(seventh);
+									}
+								}
+							}
+						}
 					}
 					return default(TFirst);
 				}, provider.Params, transaction, true, splitOn);
+				//分割导航属性数据
+				firsts = ExcisionData(firsts, seconds, thirds, fourths, fifths, sixths, sevenths, navigationList);
 				return firsts;
 			}
 			else

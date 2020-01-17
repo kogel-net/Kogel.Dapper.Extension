@@ -24,7 +24,7 @@ namespace Kogel.Dapper.Extension.Extension
 		private static Type[] GetNavigationTypes<T>(SqlProvider provider)
 		{
 			List<Type> typeList = new List<Type>() { typeof(T) };
-			for (var i = 0; i < 5; i++)
+			for (var i = 0; i < 6; i++)
 			{
 				if (provider.JoinList.Count > i)
 					typeList.Add(provider.JoinList[i].IsDto ? provider.JoinList[i].DtoType : provider.JoinList[i].TableType);
