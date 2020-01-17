@@ -145,7 +145,25 @@ namespace Dapper
 			}
 		}
 
-
+		/// <summary>
+		/// 分割导航属性数据
+		/// </summary>
+		/// <typeparam name="TFirst"></typeparam>
+		/// <typeparam name="TSecond"></typeparam>
+		/// <typeparam name="TThird"></typeparam>
+		/// <typeparam name="TFourth"></typeparam>
+		/// <typeparam name="TFifth"></typeparam>
+		/// <typeparam name="TSixth"></typeparam>
+		/// <typeparam name="TSeventh"></typeparam>
+		/// <param name="firsts"></param>
+		/// <param name="seconds"></param>
+		/// <param name="thirds"></param>
+		/// <param name="fourths"></param>
+		/// <param name="fifths"></param>
+		/// <param name="sixths"></param>
+		/// <param name="sevenths"></param>
+		/// <param name="joinAssTables"></param>
+		/// <returns></returns>
 		private static List<TFirst> ExcisionData<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh>(List<TFirst> firsts, List<TSecond> seconds, List<TThird> thirds,
 			List<TFourth> fourths, List<TFifth> fifths, List<TSixth> sixths, List<TSeventh> sevenths, List<JoinAssTable> joinAssTables)
 			where TFirst : IBaseEntity
@@ -244,15 +262,15 @@ namespace Dapper
 									fifth = fifths[i];
 									fifthList.Add(fifth);
 									//然后查找导航属性父级实体信息位置
-									int parentIndex = joinAssTables.FindIndex(x => x.TableType == joinAssTables[2].PropertyInfo.DeclaringType) + 1;
+									int parentIndex = joinAssTables.FindIndex(x => x.TableType == joinAssTables[3].PropertyInfo.DeclaringType) + 1;
 									if (parentIndex == 0)
-										ExpressionExtension.SetProperValue(first, fifth, joinAssTables[2].PropertyInfo);
+										ExpressionExtension.SetProperValue(first, fifth, joinAssTables[3].PropertyInfo);
 									else if (parentIndex == 1)
-										ExpressionExtension.SetProperValue(second, fifth, joinAssTables[2].PropertyInfo);
+										ExpressionExtension.SetProperValue(second, fifth, joinAssTables[3].PropertyInfo);
 									else if (parentIndex == 2)
-										ExpressionExtension.SetProperValue(third, fifth, joinAssTables[2].PropertyInfo);
+										ExpressionExtension.SetProperValue(third, fifth, joinAssTables[3].PropertyInfo);
 									else if (parentIndex == 3)
-										ExpressionExtension.SetProperValue(fourth, fifth, joinAssTables[2].PropertyInfo);
+										ExpressionExtension.SetProperValue(fourth, fifth, joinAssTables[3].PropertyInfo);
 									//重置关联数据
 									sixthList.Clear();
 									seventhList.Clear();
@@ -266,21 +284,21 @@ namespace Dapper
 										sixth = sixths[i];
 										sixthList.Add(sixth);
 										//然后查找导航属性父级实体信息位置
-										int parentIndex = joinAssTables.FindIndex(x => x.TableType == joinAssTables[2].PropertyInfo.DeclaringType) + 1;
+										int parentIndex = joinAssTables.FindIndex(x => x.TableType == joinAssTables[4].PropertyInfo.DeclaringType) + 1;
 										if (parentIndex == 0)
-											ExpressionExtension.SetProperValue(first, sixth, joinAssTables[2].PropertyInfo);
+											ExpressionExtension.SetProperValue(first, sixth, joinAssTables[4].PropertyInfo);
 										else if (parentIndex == 1)
-											ExpressionExtension.SetProperValue(second, sixth, joinAssTables[2].PropertyInfo);
+											ExpressionExtension.SetProperValue(second, sixth, joinAssTables[4].PropertyInfo);
 										else if (parentIndex == 2)
-											ExpressionExtension.SetProperValue(third, sixth, joinAssTables[2].PropertyInfo);
+											ExpressionExtension.SetProperValue(third, sixth, joinAssTables[4].PropertyInfo);
 										else if (parentIndex == 3)
-											ExpressionExtension.SetProperValue(fourth, sixth, joinAssTables[2].PropertyInfo);
+											ExpressionExtension.SetProperValue(fourth, sixth, joinAssTables[4].PropertyInfo);
 										else if (parentIndex == 4)
-											ExpressionExtension.SetProperValue(fifth, sixth, joinAssTables[2].PropertyInfo);
+											ExpressionExtension.SetProperValue(fifth, sixth, joinAssTables[4].PropertyInfo);
 										//重置关联数据
 										seventhList.Clear();
 									}
-									//设置第五个导航属性
+									//设置第六个导航属性
 									if (sevenths.Count > i)
 									{
 										TSeventh seventh = seventhList.Find(x => x.GetId().Equals(sevenths[i].GetId()));
@@ -289,19 +307,19 @@ namespace Dapper
 											seventh = sevenths[i];
 											seventhList.Add(seventh);
 											//然后查找导航属性父级实体信息位置
-											int parentIndex = joinAssTables.FindIndex(x => x.TableType == joinAssTables[2].PropertyInfo.DeclaringType) + 1;
+											int parentIndex = joinAssTables.FindIndex(x => x.TableType == joinAssTables[5].PropertyInfo.DeclaringType) + 1;
 											if (parentIndex == 0)
-												ExpressionExtension.SetProperValue(first, seventh, joinAssTables[2].PropertyInfo);
+												ExpressionExtension.SetProperValue(first, seventh, joinAssTables[5].PropertyInfo);
 											else if (parentIndex == 1)
-												ExpressionExtension.SetProperValue(second, seventh, joinAssTables[2].PropertyInfo);
+												ExpressionExtension.SetProperValue(second, seventh, joinAssTables[5].PropertyInfo);
 											else if (parentIndex == 2)
-												ExpressionExtension.SetProperValue(third, seventh, joinAssTables[2].PropertyInfo);
+												ExpressionExtension.SetProperValue(third, seventh, joinAssTables[5].PropertyInfo);
 											else if (parentIndex == 3)
-												ExpressionExtension.SetProperValue(fourth, seventh, joinAssTables[2].PropertyInfo);
+												ExpressionExtension.SetProperValue(fourth, seventh, joinAssTables[5].PropertyInfo);
 											else if (parentIndex == 4)
-												ExpressionExtension.SetProperValue(fifth, seventh, joinAssTables[2].PropertyInfo);
+												ExpressionExtension.SetProperValue(fifth, seventh, joinAssTables[5].PropertyInfo);
 											else if (parentIndex == 5)
-												ExpressionExtension.SetProperValue(sixth, seventh, joinAssTables[2].PropertyInfo);
+												ExpressionExtension.SetProperValue(sixth, seventh, joinAssTables[5].PropertyInfo);
 										}
 									}
 								}
