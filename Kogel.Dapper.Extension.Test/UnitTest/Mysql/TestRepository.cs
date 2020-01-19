@@ -31,7 +31,8 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 		{
 			builder
 				.BuildConnection(new SqlConnection("server=localhost;database=Lige;user=sa;password=!RisingupTech/././.;max pool size=300"))
-				.BuildProvider(new MsSqlProvider());
+				.BuildProvider(new MsSqlProvider())
+				.BuildAutoSyncStructure(true);
 		}
 	}
 

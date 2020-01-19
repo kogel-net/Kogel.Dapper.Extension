@@ -10,6 +10,8 @@ using Kogel.Dapper.Extension.Core.SetQ;
 using Kogel.Repository.Interfaces;
 using Kogel.Dapper.Extension;
 using Dapper;
+using Kogel.Dapper.Extension.Core.Interfaces;
+using Kogel.Dapper.Extension.Extension;
 
 namespace Kogel.Repository
 {
@@ -19,11 +21,17 @@ namespace Kogel.Repository
 		/// <summary>
 		/// 连接对象
 		/// </summary>
-		public IDbConnection Orm{ get => OptionsBuilder?.Connection ?? throw new DapperExtensionException("请在 OnConfiguring 中配置Connection"); }
+		public IDbConnection Orm { get => OptionsBuilder?.Connection ?? throw new DapperExtensionException("请在 OnConfiguring 中配置Connection"); }
 		/// <summary>
 		/// 工作单元
 		/// </summary>
 		public IUnitOfWork UnitOfWork { get; set; }
+
+		/// <summary>
+		/// 是否同步过实体
+		/// </summary>
+		private static bool IsFirstSyncStructure = false;
+		private static object AutoSyncLock = new object();
 
 		public BaseRepository()
 		{
@@ -31,6 +39,9 @@ namespace Kogel.Repository
 			OnConfiguring(builder);
 			this.OptionsBuilder = builder;
 			UnitOfWork = new UnitOfWork(this.OptionsBuilder.Connection);
+
+			//codefirst
+			SyncStructure();
 		}
 
 		~BaseRepository()
@@ -113,7 +124,7 @@ namespace Kogel.Repository
 			if (!string.IsNullOrEmpty(entityObject.Identitys))
 			{
 				var id = this.CommandSet(this.UnitOfWork.Transaction)
-			       .InsertIdentity(entity);
+				   .InsertIdentity(entity);
 				//写入主键数据
 				entityObject.Properties
 				   .FirstOrDefault(x => x.Name == entityObject.Identitys)
@@ -142,7 +153,7 @@ namespace Kogel.Repository
 			param.Add(entityObject.Identitys, id);
 			return this.CommandSet(this.UnitOfWork.Transaction)
 				.Where($"{entityObject.Identitys}={OptionsBuilder.Provider.ProviderOption.ParameterPrefix}{entityObject.Identitys}", param)
-			    .Delete();
+				.Delete();
 		}
 		/// <summary>
 		/// 修改
@@ -164,6 +175,52 @@ namespace Kogel.Repository
 			return this.CommandSet(this.UnitOfWork.Transaction)
 				.Where($"{entityObject.Identitys}={OptionsBuilder.Provider.ProviderOption.ParameterPrefix}{entityObject.Identitys}", param)
 				.Update(entity);
+		}
+
+		/// <summary>
+		/// 同步结构
+		/// </summary>
+		private void SyncStructure()
+		{
+			//用户配置是否需要同步
+			if (this.OptionsBuilder.IsAutoSyncStructure)
+			{
+				lock (AutoSyncLock)
+				{
+					if (!IsFirstSyncStructure)
+					{
+						//标记已经第一次同步
+						IsFirstSyncStructure = true;
+						//命名空间
+						string namespaces = string.Empty;
+						//类的完全限定名
+						string fullName = string.Empty;
+						switch (this.OptionsBuilder.Provider.GetType().Name)
+						{
+							case "MsSqlProvider":
+								{
+									namespaces = "Kogel.Dapper.Extension.MsSql";
+									fullName = "Kogel.Dapper.Extension.MsSql.Extension.CodeFirst";
+									break;
+								}
+							case "MySqlProvider":
+								{
+									namespaces = "Kogel.Dapper.Extension.MySql";
+									fullName = "Kogel.Dapper.Extension.MySql.Extension.CodeFirst";
+									break;
+								}
+						}
+						ICodeFirst codeFirst = (ICodeFirst)ReflectExtension.CreateInstance(namespaces, fullName, new object[] { Orm });
+						UnitOfWork.BeginTransaction(() =>
+						 {
+							 //开始同步实体
+							 codeFirst.SyncStructure();
+						 });
+						//提交（失败时会自动回滚）
+						UnitOfWork.Commit();
+					}
+				}
+			}
 		}
 	}
 }

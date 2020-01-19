@@ -16,7 +16,8 @@ using System.Data;
 using static Dapper.SqlMapper;
 using Kogel.Dapper.Extension.Extension;
 using Newtonsoft.Json;
-
+using Kogel.Dapper.Extension.MySql.Extension;
+using Lige.Model;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 {
@@ -46,7 +47,6 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				 Console.WriteLine(sql);
 			 };
 
-
 			//Thread thread = new Thread(() =>
 			//{
 			//	//执行前
@@ -69,6 +69,12 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
 			using (var conn = new MySqlConnection(mysqlConnection))
 			{
+				EntityCache.Register(typeof(AdminUser));
+
+				////测试codefirst
+				//CodeFirst codeFirst = new CodeFirst(conn);
+				//codeFirst.SyncStructure();
+
 				DateTime dateTime = DateTime.Now.AddDays(-10);
 
 				//var comments = conn.Query<Comment>("Select * from Comment").ToList();

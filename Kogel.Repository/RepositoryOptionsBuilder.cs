@@ -14,10 +14,17 @@ namespace Kogel.Repository
 		/// 数据库连接
 		/// </summary>
 		internal IDbConnection Connection { get; private set; }
+
 		/// <summary>
 		/// 数据提供者
 		/// </summary>
 		internal SqlProvider Provider { get; private set; }
+
+		/// <summary>
+		/// 是否自动同步
+		/// </summary>
+		internal bool IsAutoSyncStructure { get; private set; }
+
 		/// <summary>
 		/// 配置连接方式
 		/// </summary>
@@ -36,6 +43,17 @@ namespace Kogel.Repository
 		public RepositoryOptionsBuilder BuildProvider(SqlProvider provider)
 		{
 			this.Provider = provider;
+			return this;
+		}
+
+		/// <summary>
+		/// 配置是否自动同步实体结构到数据库
+		/// </summary>
+		/// <param name="IsAutoSyncStructure"></param>
+		/// <returns></returns>
+		public RepositoryOptionsBuilder BuildAutoSyncStructure(bool IsAutoSyncStructure = false)
+		{
+			this.IsAutoSyncStructure = IsAutoSyncStructure;
 			return this;
 		}
 	}

@@ -6,6 +6,7 @@ using Kogel.Dapper.Extension.Attributes;
 using Kogel.Dapper.Extension.Helper;
 using Kogel.Dapper.Extension.Core.Interfaces;
 using System.Linq.Expressions;
+using System.Data;
 
 namespace Kogel.Dapper.Extension.Model
 {
@@ -55,6 +56,8 @@ namespace Kogel.Dapper.Extension.Model
 			this.FieldPairs = new Dictionary<string, string>();
 			//导航列表
 			this.Navigations = new List<JoinAssTable>();
+			//字段列表
+			this.EntityFieldList = new List<EntityField>();
 			//反射实体类字段
 			foreach (var item in this.Properties)
 			{
@@ -101,12 +104,30 @@ namespace Kogel.Dapper.Extension.Model
 							this.FieldPairs[item.Name] = display.Rename;
 						}
 						PropertyInfoList.Add(item);
+						//设置详细属性
+						EntityFieldList.Add(new EntityField()
+						{
+							FieldName = display.Rename,
+							PropertyInfo = item,
+							SqlDbType = display.SqlDbType != SqlDbType.Structured ? display.SqlDbType : GetSqlDbType(item.PropertyType),
+							Length = display.Length,
+							Description = display.Description
+						});
 					}
 				}
 				else
 				{
 					this.FieldPairs.Add(item.Name, item.Name);
 					PropertyInfoList.Add(item);
+
+					//设置详细属性
+					EntityFieldList.Add(new EntityField()
+					{
+						FieldName = item.Name,
+						PropertyInfo = item,
+						SqlDbType = GetSqlDbType(item.PropertyType),
+						Length = 0
+					});
 				}
 				//获取主键
 				if (string.IsNullOrEmpty(Identitys))
@@ -116,6 +137,8 @@ namespace Kogel.Dapper.Extension.Model
 					if (identityAttribute != null)
 					{
 						this.Identitys = this.FieldPairs[item.Name];
+						EntityFieldList[EntityFieldList.Count - 1].IsIdentity = true;
+						EntityFieldList[EntityFieldList.Count - 1].IsIncrease = (identityAttribute as Identity).IsIncrease;
 					}
 				}
 			}
@@ -177,5 +200,86 @@ namespace Kogel.Dapper.Extension.Model
 			}
 			return asName;
 		}
+		/// <summary>
+		/// 字段列表
+		/// </summary>
+		public List<EntityField> EntityFieldList { get; set; }
+
+		/// <summary>
+		/// 获取默认数据类型
+		/// </summary>
+		/// <param name="type"></param>
+		/// <returns></returns>
+		private SqlDbType GetSqlDbType(Type type)
+		{
+			//设置数据库字段类型
+			SqlDbType sqlDbType = SqlDbType.VarChar;
+			if (type == typeof(int))
+			{
+				sqlDbType = SqlDbType.Int;
+			}
+			else if (type == typeof(long))
+			{
+				sqlDbType = SqlDbType.BigInt;
+			}
+			else if (type == typeof(Guid))
+			{
+				sqlDbType = SqlDbType.UniqueIdentifier;
+			}
+			else if (type == typeof(DateTime))
+			{
+				sqlDbType = SqlDbType.DateTime;
+			}
+			else if (type == typeof(decimal))
+			{
+				sqlDbType = SqlDbType.Decimal;
+			}
+			else if (type == typeof(bool))
+			{
+				sqlDbType = SqlDbType.Bit;
+			}
+			return sqlDbType;
+		}
+	}
+
+	/// <summary>
+	/// 实体字段
+	/// </summary>
+	public class EntityField
+	{
+		/// <summary>
+		/// 是否是主键
+		/// </summary>
+		public bool IsIdentity { get; set; }
+
+		/// <summary>
+		/// 是否自增
+		/// </summary>
+		public bool IsIncrease { get; set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public PropertyInfo PropertyInfo { get; set; }
+
+		/// <summary>
+		/// 字段名称
+		/// </summary>
+		public string FieldName { get; set; }
+
+		/// <summary>
+		/// 字段类型
+		/// </summary>
+		public SqlDbType SqlDbType { get; set; }
+
+		/// <summary>
+		/// 字段长度
+		/// </summary>
+		public int Length { get; set; }
+
+		/// <summary>
+		/// 字段描述
+		/// </summary>
+		public string Description { get; set; }
 	}
 }

@@ -38,8 +38,8 @@ namespace Kogel.Dapper.Extension.Test
 			var mysqlQuery = new UnitTest.Mysql.Query();
 			mysqlQuery.Test();
 
-			//var mysqlResQuery = new UnitTest.Mysql.TestRepositoryQuery();
-			//mysqlResQuery.Test();
+			var mysqlResQuery = new UnitTest.Mysql.TestRepositoryQuery();
+			mysqlResQuery.Test();
 			//mysqlQuery.TestMaxAndMin();
 
 			var mysqlCommand = new UnitTest.Mysql.Command();

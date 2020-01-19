@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Kogel.Dapper.Extension.Extension;
 using Kogel.Dapper.Extension.Helper;
 using Kogel.Dapper.Extension.Model;
 using System;
@@ -15,6 +16,7 @@ namespace Kogel.Dapper.Extension
     public class EntityCache
     {
         internal static List<EntityObject> EntitieList = new List<EntityObject>();
+
         /// <summary>
         /// 注册动态化查询可能会用到的实体类
         /// </summary>
@@ -32,6 +34,7 @@ namespace Kogel.Dapper.Extension
             }
             return entityObject;
         }
+
         /// <summary>
         /// 注册动态化查询可能会用到的实体类
         /// </summary>
@@ -43,6 +46,7 @@ namespace Kogel.Dapper.Extension
                 Register(item);
             }
         }
+
         /// <summary>
         /// 注册动态化查询可能会用到的实体类
         /// </summary>
@@ -56,6 +60,7 @@ namespace Kogel.Dapper.Extension
 #endif
             Register(assembly.GetTypes());
         }
+
         /// <summary>
         /// 查询实体类信息
         /// </summary>
@@ -73,6 +78,7 @@ namespace Kogel.Dapper.Extension
                 return Register(entity);
             }
         }
+
 		/// <summary>
 		/// 查询实体类信息（模糊查询）
 		/// </summary>
@@ -82,6 +88,16 @@ namespace Kogel.Dapper.Extension
 		{
 			var entityType = EntitieList.FirstOrDefault(x => x.Type.FullName.Contains(entityFullName));
 			return entityType;
+		}
+
+		/// <summary>
+		/// 获取所有实体
+		/// </summary>
+		/// <returns></returns>
+		public static List<EntityObject> GetEntities()
+		{
+			Type entityType;
+			return EntitieList.Where(x=> ExpressionExtension.IsAnyBaseEntity(x.Type, out entityType)).Distinct().ToList();
 		}
     }
 }

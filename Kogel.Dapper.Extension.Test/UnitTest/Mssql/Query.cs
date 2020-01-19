@@ -9,6 +9,7 @@ using Kogel.Dapper.Extension;
 using Kogel.Dapper.Extension.Core.SetQ;
 using Kogel.Dapper.Extension.Model;
 using Kogel.Dapper.Extension.MsSql;
+using Kogel.Dapper.Extension.MsSql.Extension;
 using Kogel.Dapper.Extension.Test.Model;
 using Lige.Model;
 using Lige.ViewModel.APP.Shopping;
@@ -74,8 +75,14 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 			//        }
 			SqlMapper.Aop.OnExecuting += Aop_OnExecuting;
 
-			using (var connection = new SqlConnection("server=risingup.life98.cn,55940;database=Lige;user=sa;password=!RisingupTech/././.;max pool size=300"))
+			using (var connection = new SqlConnection("server=localhost;database=Lige;user=sa;password=!RisingupTech/././.;max pool size=300"))
 			{
+				EntityCache.Register(typeof(Comment));
+
+				//测试codefirst
+				CodeFirst codeFirst = new CodeFirst(connection);
+				codeFirst.SyncStructure();
+
 				string account = "admin";
 				string password = "123456";
 
