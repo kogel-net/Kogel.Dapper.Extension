@@ -103,6 +103,9 @@ namespace Kogel.Dapper.Extension.MsSql.Extension
 					string fieldType = ConversionFieldType(field.SqlDbType, field.Length);
 					StringBuilder fieldScript = new StringBuilder($"ALTER TABLE [{typeEntity.Name}]");
 					fieldScript.Append($" ADD [{field.FieldName}] {fieldType} ");
+					//设置是否可以为空
+					if (field.IsNull)
+						fieldScript.Append(" NULL");
 					//设置备注
 					//if (!string.IsNullOrEmpty(field.Description))
 					//	fieldScript.Append($" COMMENT '{field.Description}'");

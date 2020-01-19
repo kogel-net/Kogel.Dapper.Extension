@@ -38,6 +38,7 @@ namespace Kogel.Dapper.Extension.Test.Model
 		public int ReplayCount111 { get; set; }
 		public int LikeCount { get; set; }
 		public bool IsRobot { get; set; }
+		[Display(IsNull = true)]
 		public string IdentityId { get; set; }
 		public bool CurrentUserLikes { get; set; }
 		/// <summary>
@@ -45,7 +46,7 @@ namespace Kogel.Dapper.Extension.Test.Model
 		/// </summary>
 		public int RefCommentId { get; set; }
 
-		[ForeignKey("ArticleId","Id")]
+		[ForeignKey("ArticleId", "Id")]
 		public virtual News News { get; set; }
 
 	}

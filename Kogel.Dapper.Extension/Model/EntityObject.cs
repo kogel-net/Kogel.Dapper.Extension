@@ -107,11 +107,12 @@ namespace Kogel.Dapper.Extension.Model
 						//设置详细属性
 						EntityFieldList.Add(new EntityField()
 						{
-							FieldName = display.Rename,
+							FieldName = this.FieldPairs[item.Name],
 							PropertyInfo = item,
 							SqlDbType = display.SqlDbType != SqlDbType.Structured ? display.SqlDbType : GetSqlDbType(item.PropertyType),
 							Length = display.Length,
-							Description = display.Description
+							Description = display.Description,
+							IsNull = display.IsNull
 						});
 					}
 				}
@@ -281,5 +282,10 @@ namespace Kogel.Dapper.Extension.Model
 		/// 字段描述
 		/// </summary>
 		public string Description { get; set; }
+
+		/// <summary>
+		/// 是否允许为空
+		/// </summary>
+		public bool IsNull { get; set; } = false;
 	}
 }

@@ -32,12 +32,16 @@ namespace Kogel.Dapper.Extension.Attributes
 		/// </summary>
 		public int Length { get; set; }
 		/// <summary>
+		/// 是否允许为空
+		/// </summary>
+		public bool IsNull { get; set; }
+		/// <summary>
 		/// 描述字段特性
 		/// </summary>
 		/// <param name="Name">名称</param>
 		/// <param name="Description">描述</param>
 		/// <param name="IsField">是否是表关联字段(实体类为True)</param>
-		public Display(string Name = null, string Description = null, string Rename = null, string Schema = null, string AsName = null, bool IsField = true, SqlDbType SqlDbType = SqlDbType.Structured, int Length = 0)
+		public Display(string Name = null, string Description = null, string Rename = null, string Schema = null, string AsName = null, bool IsField = true, SqlDbType SqlDbType = SqlDbType.Structured, int Length = 0, bool IsNull = false)
 		{
 			this.Name = Name;
 			this.Description = Description;
@@ -47,6 +51,7 @@ namespace Kogel.Dapper.Extension.Attributes
 			this.AsName = AsName;
 			this.SqlDbType = SqlDbType;
 			this.Length = Length;
+			this.IsNull = IsNull;
 		}
 	}
 }
