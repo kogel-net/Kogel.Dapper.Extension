@@ -19,10 +19,16 @@ namespace Kogel.Repository
 		/// 工作单元事务
 		/// </summary>
 		public IDbTransaction Transaction { get; set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="connection"></param>
 		public UnitOfWork(IDbConnection connection)
 		{
 			this.Connection = connection;
 		}
+
 		/// <summary>
 		/// 开始事务
 		/// </summary>
@@ -51,6 +57,7 @@ namespace Kogel.Repository
 			}
 			return this;
 		}
+
 		/// <summary>
 		/// 工作单元内所有访问数据库操作执行前
 		/// </summary>
@@ -64,6 +71,7 @@ namespace Kogel.Repository
 				command.Transaction = this.Transaction;
 			}
 		}
+
 		/// <summary>
 		/// 提交
 		/// </summary>
@@ -72,6 +80,7 @@ namespace Kogel.Repository
 			if (Transaction != null)
 				Transaction.Commit();
 		}
+
 		/// <summary>
 		/// 回滚
 		/// </summary>
@@ -80,6 +89,7 @@ namespace Kogel.Repository
 			if (Transaction != null)
 				Transaction.Rollback();
 		}
+
 		/// <summary>
 		/// 释放对象
 		/// </summary>
@@ -87,17 +97,10 @@ namespace Kogel.Repository
 		{
 			if (Transaction != null)
 				Transaction.Dispose();
+
 			if (Connection != null)
-			{
 				if (Connection.State == ConnectionState.Open)
 					Connection.Close();
-				Connection.Dispose();
-			}
-		}
-
-		~UnitOfWork()
-		{
-			Dispose();
 		}
 	}
 }

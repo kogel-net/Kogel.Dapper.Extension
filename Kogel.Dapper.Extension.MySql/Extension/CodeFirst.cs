@@ -109,6 +109,8 @@ namespace Kogel.Dapper.Extension.MySql.Extension
 				//设置是否可以为空
 				if (field.IsNull)
 					fieldScript.Append(" NULL");
+				else
+					fieldScript.Append(" NOT NULL");
 				//设置备注
 				if (!string.IsNullOrEmpty(field.Description))
 					fieldScript.Append($" COMMENT '{field.Description}'");
@@ -119,7 +121,6 @@ namespace Kogel.Dapper.Extension.MySql.Extension
 				if (field.IsIncrease)
 					fieldScript.Append(" AUTO_INCREMENT");
 				fieldScript.Append(";");
-
 				return fieldScript.ToString();
 			}
 		}

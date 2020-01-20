@@ -1,11 +1,8 @@
 ﻿using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension.Model;
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Dapper;
 
 namespace Kogel.Dapper.Extension.MsSql.Extension
@@ -88,43 +85,40 @@ namespace Kogel.Dapper.Extension.MsSql.Extension
 		/// <returns></returns>
 		public string SyncField(EntityObject typeEntity, EntityField field)
 		{
-			try
-			{
-				string fieldName = connection.QuerySingleOrDefault<string>($@"SELECT TOP 1 COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+			string fieldName = connection.QuerySingleOrDefault<string>($@"SELECT TOP 1 COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
                                                WHERE [TABLE_NAME] = '{typeEntity.Name}' AND [COLUMN_NAME] = '{field.FieldName}'");
-				//存在
-				if (!string.IsNullOrEmpty(fieldName))
-				{
-					//存在的字段不会做任何修改
-					return "";
-				}
-				else//不存在
-				{
-					string fieldType = ConversionFieldType(field.SqlDbType, field.Length);
-					StringBuilder fieldScript = new StringBuilder($"ALTER TABLE [{typeEntity.Name}]");
-					fieldScript.Append($" ADD [{field.FieldName}] {fieldType} ");
-					//设置是否可以为空
-					if (field.IsNull)
-						fieldScript.Append(" NULL");
-					//设置备注
-					//if (!string.IsNullOrEmpty(field.Description))
-					//	fieldScript.Append($" COMMENT '{field.Description}'");
-					//设置是否是主键
-					if (field.IsIdentity)
-						fieldScript.Append(" PRIMARY KEY");
-					//设置是否自增
-					if (field.IsIncrease)
-						fieldScript.Append(" IDENTITY(1,1)");
-					fieldScript.Append(";");
-
-					return fieldScript.ToString();
-				}
-			}
-			catch(Exception.DapperExtensionException ex)
+			//存在
+			if (!string.IsNullOrEmpty(fieldName))
 			{
-
+				//存在的字段不会做任何修改
+				return "";
 			}
-			return "";
+			else//不存在
+			{
+				string fieldType = ConversionFieldType(field.SqlDbType, field.Length);
+				StringBuilder fieldScript = new StringBuilder($"ALTER TABLE [{typeEntity.Name}]");
+				fieldScript.Append($" ADD [{field.FieldName}] {fieldType} ");
+				//设置是否可以为空
+				if (field.IsNull)
+					fieldScript.Append(" NULL");
+				else
+					fieldScript.Append(" NOT NULL");
+				//设置是否是主键
+				if (field.IsIdentity)
+					fieldScript.Append(" PRIMARY KEY");
+				//设置是否自增
+				if (field.IsIncrease)
+					fieldScript.Append(" IDENTITY(1,1)");
+				//设置默认值
+				if (field.DefaultValue != null)
+					fieldScript.Append($" DEFAULT '{field.DefaultValue}'");
+				fieldScript.Append(";");
+				//设置备注
+				if (!string.IsNullOrEmpty(field.Description))
+					fieldScript.Append($@"EXEC sp_addextendedproperty N'MS_Description', N'{field.Description}', N'SCHEMA',
+                                  N'dbo',N'TABLE', N'{typeEntity.Name}', N'COLUMN', N'{field.FieldName}';");
+				return fieldScript.ToString();
+			}
 		}
 
 		/// <summary>

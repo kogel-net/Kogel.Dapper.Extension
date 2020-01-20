@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Data;
+﻿using System.Data;
 using Kogel.Dapper.Extension.Model;
 
 namespace Kogel.Dapper.Extension.Core.Interfaces

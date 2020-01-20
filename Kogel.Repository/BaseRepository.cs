@@ -17,21 +17,20 @@ namespace Kogel.Repository
 {
 	public abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
 	{
+		/// <summary>
+		/// 
+		/// </summary>
 		internal RepositoryOptionsBuilder OptionsBuilder { get; }
+
 		/// <summary>
 		/// 连接对象
 		/// </summary>
 		public IDbConnection Orm { get => OptionsBuilder?.Connection ?? throw new DapperExtensionException("请在 OnConfiguring 中配置Connection"); }
+
 		/// <summary>
 		/// 工作单元
 		/// </summary>
 		public IUnitOfWork UnitOfWork { get; set; }
-
-		/// <summary>
-		/// 是否同步过实体
-		/// </summary>
-		private static bool IsFirstSyncStructure = false;
-		private static object AutoSyncLock = new object();
 
 		public BaseRepository()
 		{
@@ -48,6 +47,7 @@ namespace Kogel.Repository
 		{
 			Dispose();
 		}
+
 		/// <summary>
 		/// 配置连接信息
 		/// </summary>
@@ -58,9 +58,8 @@ namespace Kogel.Repository
 		{
 			if (UnitOfWork != null)
 				UnitOfWork.Dispose();
-			if (OptionsBuilder.Connection != null)
-				OptionsBuilder.Connection.Dispose();
 		}
+
 		/// <summary>
 		/// 获取查询对象
 		/// </summary>
@@ -69,6 +68,7 @@ namespace Kogel.Repository
 		{
 			return new QuerySet<T>(OptionsBuilder.Connection, OptionsBuilder.Provider.Copy(), null);
 		}
+
 		/// <summary>
 		/// 获取查询对象
 		/// </summary>
@@ -78,6 +78,7 @@ namespace Kogel.Repository
 		{
 			return new QuerySet<T>(OptionsBuilder.Connection, OptionsBuilder.Provider.Copy(), transaction);
 		}
+
 		/// <summary>
 		/// 获取编辑对象
 		/// </summary>
@@ -86,6 +87,7 @@ namespace Kogel.Repository
 		{
 			return new CommandSet<T>(OptionsBuilder.Connection, OptionsBuilder.Provider.Copy(), null);
 		}
+
 		/// <summary>
 		/// 获取编辑对象
 		/// </summary>
@@ -95,6 +97,7 @@ namespace Kogel.Repository
 		{
 			return new CommandSet<T>(OptionsBuilder.Connection, OptionsBuilder.Provider.Copy(), transaction);
 		}
+
 		/// <summary>
 		/// 根据主键获取当前实体数据
 		/// </summary>
@@ -112,6 +115,7 @@ namespace Kogel.Repository
 				.Where($"{entityObject.Identitys}={OptionsBuilder.Provider.ProviderOption.ParameterPrefix}{entityObject.Identitys}", param)
 				.Get();
 		}
+
 		/// <summary>
 		/// 增加(并且返回自增主键到写入到实体中)
 		/// </summary>
@@ -138,6 +142,7 @@ namespace Kogel.Repository
 					.Insert(entity);
 			}
 		}
+
 		/// <summary>
 		/// 删除(根据主键)
 		/// </summary>
@@ -155,6 +160,7 @@ namespace Kogel.Repository
 				.Where($"{entityObject.Identitys}={OptionsBuilder.Provider.ProviderOption.ParameterPrefix}{entityObject.Identitys}", param)
 				.Delete();
 		}
+
 		/// <summary>
 		/// 修改
 		/// </summary>
@@ -176,6 +182,16 @@ namespace Kogel.Repository
 				.Where($"{entityObject.Identitys}={OptionsBuilder.Provider.ProviderOption.ParameterPrefix}{entityObject.Identitys}", param)
 				.Update(entity);
 		}
+
+		/// <summary>
+		/// 是否同步过实体
+		/// </summary>
+		private static bool IsFirstSyncStructure = false;
+
+		/// <summary>
+		/// 
+		/// </summary>
+		private static object AutoSyncLock = new object();
 
 		/// <summary>
 		/// 同步结构
@@ -207,6 +223,10 @@ namespace Kogel.Repository
 								{
 									namespaces = "Kogel.Dapper.Extension.MySql";
 									fullName = "Kogel.Dapper.Extension.MySql.Extension.CodeFirst";
+									break;
+								}
+							case "OracleSqlProvider":
+								{
 									break;
 								}
 						}
