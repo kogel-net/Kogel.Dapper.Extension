@@ -1,7 +1,7 @@
 # Kogel.Dapper.Extension
 
 此框架是Dapper的扩展，效率优于EntityFramwork，并且支持.NetFramework和.NetCore框架
-支持.net framework4.5.1,.net core2.0及以上,更低版本适配如.netFramework4.0及以下请加群下载
+支持.net framework4.5.1,.net core2.0及以上,更低版本适配如.netFramework4.0及以下请加群下载710217654
 
 支持Mssql,Oracle,Mysql等数据库
 
