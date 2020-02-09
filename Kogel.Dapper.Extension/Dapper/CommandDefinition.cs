@@ -47,6 +47,11 @@ namespace Dapper
         /// </summary>
         public IDbTransaction Transaction { get; set; }
 
+		/// <summary>
+		/// 是否进入过工作单元
+		/// </summary>
+		public bool IsUnifOfWork { get; set; }
+
         /// <summary>
         /// The effective timeout for the command
         /// </summary>

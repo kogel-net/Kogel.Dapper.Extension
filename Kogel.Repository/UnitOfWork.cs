@@ -60,8 +60,13 @@ namespace Kogel.Repository
 			//相同数据库链接才会进入单元事务
 			if (command.Connection.ConnectionString == this.Connection.ConnectionString)
 			{
-				command.Connection = this.Connection;
-				command.Transaction = this.Transaction;
+				//是否进入过工作单元(防止循环嵌套UnitOfWork)
+				if (!command.IsUnifOfWork)
+				{
+					command.IsUnifOfWork = true;
+					command.Connection = this.Connection;
+					command.Transaction = this.Transaction;
+				}
 			}
 		}
 		/// <summary>
