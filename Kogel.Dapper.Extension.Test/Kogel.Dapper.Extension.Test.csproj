@@ -72,6 +72,8 @@
     <Compile Include="UnitTest\Mysql\Command.cs" />
     <Compile Include="UnitTest\Mysql\TestRepository.cs" />
     <Compile Include="UnitTest\Mysql\Query.cs" />
+    <Compile Include="UnitTest\Oracle\Command.cs" />
+    <Compile Include="UnitTest\Oracle\Query.cs" />
     <Compile Include="ViewModel\AdminUserDto.cs" />
     <Compile Include="ViewModel\CommentDto.cs" />
     <Compile Include="ViewModel\NewsDto.cs" />

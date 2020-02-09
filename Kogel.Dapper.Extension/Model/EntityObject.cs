@@ -112,7 +112,8 @@ namespace Kogel.Dapper.Extension.Model
 							SqlDbType = display.SqlDbType != SqlDbType.Structured ? display.SqlDbType : GetSqlDbType(item.PropertyType),
 							Length = display.Length,
 							Description = display.Description,
-							IsNull = display.IsNull
+							IsNull = display.IsNull,
+							DefaultValue = display.DefaultValue
 						});
 					}
 				}
@@ -145,42 +146,52 @@ namespace Kogel.Dapper.Extension.Model
 			}
 			this.Properties = PropertyInfoList.ToArray();
 		}
+
 		/// <summary>
 		/// 主键名称
 		/// </summary>
 		public string Identitys { get; set; }
+
 		/// <summary>
 		/// 类名(表名称)
 		/// </summary>
 		public string Name { get; set; }
+
 		/// <summary>
 		/// 名称空间
 		/// </summary>
 		public string Schema { get; set; }
+
 		/// <summary>
 		/// 指定as名称
 		/// </summary>
 		public string AsName { get; set; }
+
 		/// <summary>
 		/// 类型
 		/// </summary>
 		public Type Type { get; set; }
+
 		/// <summary>
 		/// 命名空间
 		/// </summary>
 		public string AssemblyString { get; set; }
+
 		/// <summary>
 		/// 类反射的属性实例
 		/// </summary>
 		public PropertyInfo[] Properties { get; set; }
+
 		/// <summary>
 		/// 字段目录(属性名称和实体名称)
 		/// </summary>
 		public Dictionary<string, string> FieldPairs { get; set; }
+
 		/// <summary>
 		/// 导航属性列表
 		/// </summary>
 		public List<JoinAssTable> Navigations { get; set; }
+
 		/// <summary>
 		/// 获取asname
 		/// </summary>
@@ -287,5 +298,10 @@ namespace Kogel.Dapper.Extension.Model
 		/// 是否允许为空
 		/// </summary>
 		public bool IsNull { get; set; } = false;
+
+		/// <summary>
+		/// 默认值
+		/// </summary>
+		public object DefaultValue { get; set; }
 	}
 }

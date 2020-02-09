@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Kogel.Dapper.Extension;
 using Kogel.Dapper.Extension.Attributes;
+using System.Data;
 
 namespace Kogel.Dapper.Extension.Test.Model
 {
@@ -21,11 +22,13 @@ namespace Kogel.Dapper.Extension.Test.Model
 		/// <summary>
 		/// Id
 		/// </summary>
-	    [Identity]
+		[Identity]
 		public override long Id { get; set; }
+
 		/// <summary>
 		/// 扩展名
 		/// </summary>
+		[Display(IsField = true, SqlDbType = SqlDbType.VarChar, IsNull = true, Description = "扩展名", DefaultValue = ".jpg")]
 		public string Extension { get; set; }
 		/// <summary>
 		/// 图片路径
@@ -56,11 +59,11 @@ namespace Kogel.Dapper.Extension.Test.Model
 		/// </summary>
 		public int RSize { get; set; }
 
-		[ForeignKey("Id","Id")]
+		[ForeignKey("Id", "Id")]
 		public List<man> MenList { get; set; }
 	}
 
-	public class man: IBaseEntity<man,int>
+	public class man : IBaseEntity<man, int>
 	{
 		[Identity]
 		public override int Id { get; set; }
