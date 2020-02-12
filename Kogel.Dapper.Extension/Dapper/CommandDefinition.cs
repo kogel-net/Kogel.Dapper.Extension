@@ -105,6 +105,7 @@ namespace Dapper
             CommandType = commandType;
             Flags = flags;
             CancellationToken = cancellationToken;
+			IsUnifOfWork = false;
         }
 
         private CommandDefinition(object parameters) : this()
