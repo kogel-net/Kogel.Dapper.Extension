@@ -305,7 +305,7 @@ namespace Kogel.Dapper.Extension.Expressions
 					}
 					break;
 				default:
-					throw new DapperExtensionException("the expression is no support this function");
+					throw new DapperExtensionException("Kogel.Dapper.Extension中子查询不支持的扩展函数");
 			}
 			//得到解析的sql和param对象
 			string sql = sqlProvider.SqlString;

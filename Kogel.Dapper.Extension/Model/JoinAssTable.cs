@@ -22,35 +22,51 @@ namespace Kogel.Dapper.Extension.Model
 		public Type TableType { get; set; }
 		public string JoinSql { get; set; }
 		public Type PropertyType { get => PropertyInfo.PropertyType; }
-		public PropertyInfo PropertyInfo { get; set; }//接收导航属性的对象
-													  /// <summary>
-													  /// 自定义查询的字段
-													  /// </summary>
+		/// <summary>
+		/// 接收导航属性的对象
+		/// </summary>
+		public PropertyInfo PropertyInfo { get; set; }
+
+		/// <summary>
+		/// 自定义查询的字段
+		/// </summary>
 		public Dictionary<string, string> SelectFieldPairs { get; set; }
+
 		/// <summary>
 		/// 表首字段
 		/// </summary>
-		public string FirstFieldName => MapperList.Values.AsList()[0];
+		public string FirstFieldName => MapperList.Values?.AsList()[0];
+
 		/// <summary>
 		/// 表尾字段
 		/// </summary>
 		public string LastFieldName => MapperList.Values.AsList()[MapperList.Count - 1];
+
 		/// <summary>
 		/// 隐射目录
 		/// </summary>
 		public Dictionary<string, string> MapperList { get; set; }
+
+		/// <summary>
+		/// 是否手动开关映射(优先级最高)
+		/// </summary>
+		public bool IsUseMapper { get; set; } = true;
+
 		/// <summary>
 		/// 是否需要隐射字段
 		/// </summary>
 		public bool IsMapperField { get; set; } = true;
+
 		/// <summary>
 		/// 是否是Dto
 		/// </summary>
 		public bool IsDto { get; set; } = false;
+
 		/// <summary>
 		/// Dto类
 		/// </summary>
 		public Type DtoType { get; set; }
+
 		/// <summary>
 		/// 克隆
 		/// </summary>
