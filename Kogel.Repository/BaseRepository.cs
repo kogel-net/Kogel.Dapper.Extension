@@ -111,7 +111,7 @@ namespace Kogel.Repository
 			//设置参数
 			DynamicParameters param = new DynamicParameters();
 			param.Add(entityObject.Identitys, id);
-			return this.QuerySet(this.UnitOfWork.Transaction)
+			return this.QuerySet()
 				.Where($"{entityObject.Identitys}={OptionsBuilder.Provider.ProviderOption.ParameterPrefix}{entityObject.Identitys}", param)
 				.Get();
 		}
@@ -127,18 +127,18 @@ namespace Kogel.Repository
 			//存在主键写入自增id
 			if (!string.IsNullOrEmpty(entityObject.Identitys))
 			{
-				var id = this.CommandSet(this.UnitOfWork.Transaction)
+				var id = this.CommandSet()
 				   .InsertIdentity(entity);
 				//写入主键数据
-				entityObject.Properties
-				   .FirstOrDefault(x => x.Name == entityObject.FieldPairs[entityObject.Identitys])
-				   .SetValue(entity, id);
+				entityObject.EntityFieldList
+					.First(x => x.IsIdentity).PropertyInfo
+					.SetValue(entity, id);
 				return 1;
 			}
 			else
 			{
 				//不存在就直接返回影响行数
-				return this.CommandSet(this.UnitOfWork.Transaction)
+				return this.CommandSet()
 					.Insert(entity);
 			}
 		}
@@ -156,7 +156,7 @@ namespace Kogel.Repository
 			//设置参数
 			DynamicParameters param = new DynamicParameters();
 			param.Add(entityObject.Identitys, id);
-			return this.CommandSet(this.UnitOfWork.Transaction)
+			return this.CommandSet()
 				.Where($"{entityObject.Identitys}={OptionsBuilder.Provider.ProviderOption.ParameterPrefix}{entityObject.Identitys}", param)
 				.Delete();
 		}
@@ -172,13 +172,13 @@ namespace Kogel.Repository
 			if (string.IsNullOrEmpty(entityObject.Identitys))
 				throw new DapperExtensionException("主键不存在!请前往实体类使用[Identity]特性设置主键。");
 			//获取主键数据
-			var id = entityObject.Properties
-				.FirstOrDefault(x => x.Name == entityObject.FieldPairs[entityObject.Identitys])
+			var id = entityObject.EntityFieldList
+				.First(x => x.IsIdentity).PropertyInfo
 				.GetValue(entity);
 			//设置参数
 			DynamicParameters param = new DynamicParameters();
 			param.Add(entityObject.Identitys, id);
-			return this.CommandSet(this.UnitOfWork.Transaction)
+			return this.CommandSet()
 				.Where($"{entityObject.Identitys}={OptionsBuilder.Provider.ProviderOption.ParameterPrefix}{entityObject.Identitys}", param)
 				.Update(entity);
 		}
@@ -208,29 +208,31 @@ namespace Kogel.Repository
 						//标记已经第一次同步
 						IsFirstSyncStructure = true;
 						//命名空间
-						string namespaces = string.Empty;
+						string nameSpaces = string.Empty;
 						//类的完全限定名
 						string fullName = string.Empty;
 						switch (this.OptionsBuilder.Provider.GetType().Name)
 						{
 							case "MsSqlProvider":
 								{
-									namespaces = "Kogel.Dapper.Extension.MsSql";
+									nameSpaces = "Kogel.Dapper.Extension.MsSql";
 									fullName = "Kogel.Dapper.Extension.MsSql.Extension.CodeFirst";
 									break;
 								}
 							case "MySqlProvider":
 								{
-									namespaces = "Kogel.Dapper.Extension.MySql";
+									nameSpaces = "Kogel.Dapper.Extension.MySql";
 									fullName = "Kogel.Dapper.Extension.MySql.Extension.CodeFirst";
 									break;
 								}
 							case "OracleSqlProvider":
 								{
+									nameSpaces = "Kogel.Dapper.Extension.Oracle";
+									fullName = "Kogel.Dapper.Extension.Oracle.Extension.CodeFirst";
 									break;
 								}
 						}
-						ICodeFirst codeFirst = (ICodeFirst)ReflectExtension.CreateInstance(namespaces, fullName, new object[] { Orm });
+						ICodeFirst codeFirst = (ICodeFirst)ReflectExtension.CreateInstance(nameSpaces, fullName, new object[] { Orm });
 						UnitOfWork.BeginTransaction(() =>
 						 {
 							 //开始同步实体

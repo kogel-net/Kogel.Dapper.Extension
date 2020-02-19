@@ -125,23 +125,23 @@ namespace Kogel.Dapper.Extension.Oracle.Extension
 				//设置是否自增
 				if (field.IsIncrease)
 				{
-					//string seqName = connection.QueryFirstOrDefault<string>($@"SELECT SEQUENCE_NAME FROM all_sequences 
-     //                     WHERE SEQUENCE_NAME like UPPER('%{typeEntity.Name}_{field.FieldName}_SEQ%')");
-					////首先查询序列是否存在
-					//if (!string.IsNullOrEmpty(seqName))
-					//{
-					//	//删除旧序列
-					//	connection.Execute($"DROP SEQUENCE {seqName}");
-					//}
-					////创建序列
-					//connection.Execute($"CREATE SEQUENCE {typeEntity.Name}_{field.FieldName}_SEQ Increment by 1 Start With 1 Nomaxvalue Nocycle Cache 10");
-					////创建触发器
-					//connection.Execute($@"CREATE OR REPLACE TRIGGER {typeEntity.Name}_SEQUENCE_TRIG
-     //                                  BEFORE INSERT ON ""{typeEntity.Name}""
-					//				   FOR EACH ROW
-					//				   BEGIN
-					//				       SELECT {typeEntity.Name.ToUpper()}_{field.FieldName.ToUpper()}_SEQ.NEXTVAL INTO :NEW.{field.FieldName} FROM DUAL
-					//				   END");
+					string seqName = connection.QueryFirstOrDefault<string>($@"SELECT SEQUENCE_NAME FROM all_sequences 
+                          WHERE SEQUENCE_NAME like UPPER('%{typeEntity.Name}_{field.FieldName}_SEQ%')");
+					//首先查询序列是否存在
+					if (!string.IsNullOrEmpty(seqName))
+					{
+						//删除旧序列
+						connection.Execute($"DROP SEQUENCE {seqName}");
+					}
+					//创建序列
+					connection.Execute($"CREATE SEQUENCE {typeEntity.Name}_{field.FieldName}_SEQ Increment by 1 Start With 1 Nomaxvalue Nocycle Cache 10");
+					//创建触发器
+					connection.Execute($@"CREATE OR REPLACE TRIGGER {typeEntity.Name}_SEQUENCE_TRIG
+                                       BEFORE INSERT ON ""{typeEntity.Name}""
+									   FOR EACH ROW
+									   BEGIN
+									       SELECT {typeEntity.Name.ToUpper()}_{field.FieldName.ToUpper()}_SEQ.NEXTVAL INTO :new.""{field.FieldName}"" FROM DUAL;
+									   END;");
 				}
 				return script;
 			}
@@ -181,7 +181,6 @@ namespace Kogel.Dapper.Extension.Oracle.Extension
 			}
 			foreach (var field in typeEntity.EntityFieldList)
 			{
-				//scriptBuilder.Append(SyncField(typeEntity, field));
 				SyncField(typeEntity, field);
 			}
 			//执行脚本

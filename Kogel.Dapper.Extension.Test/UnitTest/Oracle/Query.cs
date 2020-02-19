@@ -11,8 +11,8 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 {
    public class Query
     {
-        string oracleConnection = @"Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.105.0.224)(PORT=1521))
-                    (CONNECT_DATA=(SERVICE_NAME=ORCL)));User Id=system;Password=A123456a";
+        string oracleConnection = @"Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))
+                    (CONNECT_DATA=(SERVICE_NAME=ORCL)));User Id=system;Password=A5101264a";
 		public void Test()
 		{
 			using (var conn = new OracleConnection(oracleConnection))
@@ -24,6 +24,8 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 
 				CodeFirst codeFirst = new CodeFirst(conn);
 				codeFirst.SyncStructure();
+
+			
 
 
 				DateTime dateTime = DateTime.Now.AddDays(-10);

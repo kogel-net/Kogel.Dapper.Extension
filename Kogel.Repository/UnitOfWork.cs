@@ -15,6 +15,7 @@ namespace Kogel.Repository
 		/// 数据库连接
 		/// </summary>
 		public IDbConnection Connection { get; }
+
 		/// <summary>
 		/// 工作单元事务
 		/// </summary>
@@ -39,10 +40,10 @@ namespace Kogel.Repository
 		{
 			if (Connection.State == ConnectionState.Closed)
 				Connection.Open();
-			Transaction = Connection.BeginTransaction(IsolationLevel);
-			SqlMapper.Aop.OnExecuting += Aop_OnExecuting;
+			Transaction = Connection.BeginTransaction(IsolationLevel);	
 			try
 			{
+				SqlMapper.Aop.OnExecuting += Aop_OnExecuting;
 				transactionMethod.Invoke();
 			}
 			catch (Exception ex)
