@@ -131,7 +131,7 @@ namespace Kogel.Repository
 				   .InsertIdentity(entity);
 				//写入主键数据
 				entityObject.Properties
-				   .FirstOrDefault(x => x.Name == entityObject.Identitys)
+				   .FirstOrDefault(x => x.Name == entityObject.FieldPairs[entityObject.Identitys])
 				   .SetValue(entity, id);
 				return 1;
 			}
@@ -173,7 +173,7 @@ namespace Kogel.Repository
 				throw new DapperExtensionException("主键不存在!请前往实体类使用[Identity]特性设置主键。");
 			//获取主键数据
 			var id = entityObject.Properties
-				.FirstOrDefault(x => x.Name == entityObject.Identitys)
+				.FirstOrDefault(x => x.Name == entityObject.FieldPairs[entityObject.Identitys])
 				.GetValue(entity);
 			//设置参数
 			DynamicParameters param = new DynamicParameters();

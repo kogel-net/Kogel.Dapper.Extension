@@ -92,7 +92,7 @@ namespace Kogel.Dapper.Extension.Oracle.Extension
 		public string SyncField(EntityObject typeEntity, EntityField field)
 		{
 			string fieldName = connection.QuerySingleOrDefault<string>($@"SELECT COLUMN_NAME FROM ALL_TAB_COLUMNS 
-                                                   WHERE TABLE_NAME = '{typeEntity.Name}' AND COLUMN_NAME = '{field.FieldName}'");
+                                                   WHERE UPPER(TABLE_NAME) = UPPER('{typeEntity.Name}') AND UPPER(COLUMN_NAME) = UPPER('{field.FieldName}')");
 			//存在
 			if (!string.IsNullOrEmpty(fieldName))
 			{
@@ -165,7 +165,7 @@ namespace Kogel.Dapper.Extension.Oracle.Extension
 		public void SyncTable(EntityObject typeEntity)
 		{
 			//首先检查表是否存在
-			string tableName = connection.QuerySingleOrDefault<string>($"SELECT TABLE_NAME FROM ALL_TABLES WHERE TABLE_NAME ='{typeEntity.Name}'");
+			string tableName = connection.QuerySingleOrDefault<string>($"SELECT TABLE_NAME FROM ALL_TABLES WHERE UPPER(TABLE_NAME) =UPPER('{typeEntity.Name}')");
 			//脚本字符 oracle无法多条语句一起执行
 			StringBuilder scriptBuilder = new StringBuilder();
 			//创建表时会产生一个测试字段
