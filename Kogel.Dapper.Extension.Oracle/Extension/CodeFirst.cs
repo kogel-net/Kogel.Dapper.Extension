@@ -125,15 +125,17 @@ namespace Kogel.Dapper.Extension.Oracle.Extension
 				//设置是否自增
 				if (field.IsIncrease)
 				{
+					//序列名称
+					string sequenceName = ($"{typeEntity.Name}_{field.FieldName}_SEQ").ToUpper();
+					//检索是否存在此序列
 					string seqName = connection.QueryFirstOrDefault<string>($@"SELECT SEQUENCE_NAME FROM all_sequences 
-                          WHERE SEQUENCE_NAME like UPPER('%{typeEntity.Name}_{field.FieldName}_SEQ%')");
+                          WHERE SEQUENCE_NAME = {sequenceName}");
 					//首先查询序列是否存在
 					if (!string.IsNullOrEmpty(seqName))
 					{
 						//删除旧序列
 						connection.Execute($"DROP SEQUENCE {seqName}");
 					}
-					string sequenceName = ($"{typeEntity.Name}_{field.FieldName}_SEQ").ToUpper();
 					//创建序列
 					connection.Execute($"CREATE SEQUENCE {sequenceName} Increment by 1 Start With 1 Nomaxvalue Nocycle Cache 10");
 					//创建触发器
