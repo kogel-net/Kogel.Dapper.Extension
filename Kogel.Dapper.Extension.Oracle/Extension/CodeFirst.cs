@@ -133,14 +133,15 @@ namespace Kogel.Dapper.Extension.Oracle.Extension
 						//删除旧序列
 						connection.Execute($"DROP SEQUENCE {seqName}");
 					}
+					string sequenceName = ($"{typeEntity.Name}_{field.FieldName}_SEQ").ToUpper();
 					//创建序列
-					connection.Execute($"CREATE SEQUENCE {typeEntity.Name}_{field.FieldName}_SEQ Increment by 1 Start With 1 Nomaxvalue Nocycle Cache 10");
+					connection.Execute($"CREATE SEQUENCE {sequenceName} Increment by 1 Start With 1 Nomaxvalue Nocycle Cache 10");
 					//创建触发器
 					connection.Execute($@"CREATE OR REPLACE TRIGGER {typeEntity.Name}_SEQUENCE_TRIG
                                        BEFORE INSERT ON ""{typeEntity.Name}""
 									   FOR EACH ROW
 									   BEGIN
-									       SELECT {typeEntity.Name.ToUpper()}_{field.FieldName.ToUpper()}_SEQ.NEXTVAL INTO :new.""{field.FieldName}"" FROM DUAL;
+									       SELECT {sequenceName}.NEXTVAL INTO :new.""{field.FieldName}"" FROM DUAL;
 									   END;");
 				}
 				return script;
