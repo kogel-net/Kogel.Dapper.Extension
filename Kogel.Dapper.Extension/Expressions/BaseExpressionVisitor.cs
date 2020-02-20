@@ -92,7 +92,7 @@ namespace Kogel.Dapper.Extension.Expressions
 			else
 			{
 				//参数
-				string paramName = $"{providerOption.ParameterPrefix}Member_Param_{Param.ParameterNames.Count()}";
+				string paramName = $"{providerOption.ParameterPrefix}Member_Param_{Index}_{Param.ParameterNames.Count()}";
 				//值
 				object nodeValue = node.ToConvertAndGetValue();
 				//设置sql

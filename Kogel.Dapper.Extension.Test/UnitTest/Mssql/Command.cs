@@ -11,7 +11,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 {
     class Command
     {
-        string mssqlConnection = "Data Source=localhost;Initial Catalog=Qx_Sport_Common;User ID=qxdev;Password=qxdev123456;";
+        string mssqlConnection = @"Data Source=DESKTOP-UAHTT5I\SQLEXPRESS;Initial Catalog=Qx_Sport_Common;User ID=sa;Password=sa;";
         public void Test()
         {
             var commne = new Comment()
@@ -27,6 +27,8 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 
             using (var conn = new SqlConnection(mssqlConnection))
             {
+				conn.Open();
+
                 //根据成员修改
                 var result = conn.CommandSet<Comment>()
                 .Where(x => x.Id > commne.Id || x.Id < commne.Id)
