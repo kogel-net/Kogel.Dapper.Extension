@@ -16,7 +16,11 @@ namespace Kogel.Dapper.Extension
         {
             return true;
         }
-        public static bool NotIn(this int input, int[] array)
+		public static bool In(this Guid input, Guid[] array)
+		{
+			return true;
+		}
+		public static bool NotIn(this int input, int[] array)
         {
             return true;
         }
@@ -28,7 +32,11 @@ namespace Kogel.Dapper.Extension
         {
             return true;
         }
-        public static bool IsNull(this object input)
+		public static bool NotIn(this Guid input, Guid[] array)
+		{
+			return true;
+		}
+		public static bool IsNull(this object input)
         {
             return true;
         }
