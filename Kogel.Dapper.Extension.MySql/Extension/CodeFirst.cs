@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Dapper;
 using System.Data;
 using Kogel.Dapper.Extension.Model;
+using Kogel.Dapper.Extension.Extension;
 
 namespace Kogel.Dapper.Extension.MySql.Extension
 {
@@ -63,7 +64,7 @@ namespace Kogel.Dapper.Extension.MySql.Extension
 						fieldType = $"NVarChar({(length == 0 ? 50 : length)})";
 						break;
 					}
-			    case SqlDbType.Date:
+				case SqlDbType.Date:
 					{
 						fieldType = $"Date";
 						break;
@@ -132,7 +133,9 @@ namespace Kogel.Dapper.Extension.MySql.Extension
 		{
 			foreach (var entity in EntityCache.GetEntities())
 			{
-				SyncTable(entity);
+				Type type;
+				if (ExpressionExtension.IsAnyBaseEntity(entity.Type, out type))
+					SyncTable(entity);
 			}
 		}
 
