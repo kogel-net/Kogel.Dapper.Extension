@@ -111,5 +111,19 @@ namespace Kogel.Dapper.Extension.Core.SetC
             SqlProvider.FormatInsert(entities.FirstOrDefault(), excludeFields);
             return await DbCon.ExecuteAsync(SqlProvider.SqlString, entities, DbTransaction, timeout);
         }
+
+		public int Delete(T model)
+		{
+			SqlProvider.FormatDelete();
+			var entityObject = EntityCache.QueryEntity(model.GetType());
+			var identity = entityObject.EntityFieldList.FirstOrDefault(x => x.IsIdentity);
+			if (identity == null)
+				throw new System.Exception("主键不存在!");
+			//设置参数
+			DynamicParameters param = new DynamicParameters();
+			param.Add(entityObject.Identitys, identity.PropertyInfo.GetValue(model));
+			return DbCon.Execute($@"{SqlProvider.SqlString} AND {entityObject.Identitys}={SqlProvider.ProviderOption.ParameterPrefix}{entityObject.Identitys}
+			", param);
+		}
 	}
 }

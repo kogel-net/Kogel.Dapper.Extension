@@ -30,5 +30,8 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         int Insert(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120);
 
         Task<int> InsertAsync(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120);
-    }
+
+		int Delete(T model);
+
+	}
 }

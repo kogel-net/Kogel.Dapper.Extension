@@ -6,13 +6,14 @@ using Kogel.Dapper.Extension.Oracle;
 using Oracle.ManagedDataAccess.Client;
 using Kogel.Dapper.Extension.Test.ViewModel;
 using Kogel.Dapper.Extension.Oracle.Extension;
+using Dapper;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 {
-   public class Query
-    {
-        string oracleConnection = @"Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))
-                    (CONNECT_DATA=(SERVICE_NAME=ORCL)));User Id=system;Password=A5101264a";
+	public class Query
+	{
+		string oracleConnection = @"Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.105.0.224)(PORT=1521))
+                    (CONNECT_DATA=(SERVICE_NAME=ORCL)));User Id=system;Password=A123456a";
 		public void Test()
 		{
 			using (var conn = new OracleConnection(oracleConnection))
@@ -20,12 +21,41 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 
 				conn.Open();
 
-				EntityCache.Register(typeof(ResourceMapping));
+				EntityCache.Register(typeof(TB_SYS_USER));
+				EntityCache.Register(typeof(TB_SYS_DEPT));
+				EntityCache.Register(typeof(TB_TDG_UPH_EMP));
 
-				CodeFirst codeFirst = new CodeFirst(conn);
-				codeFirst.SyncStructure();
+				//CodeFirst codeFirst = new CodeFirst(conn);
+				//codeFirst.SyncStructure();
 
-			
+				SqlMapper.Aop.OnExecuting += (ref CommandDefinition command) =>
+				  {
+
+				  };
+
+				conn.QuerySet<TB_SYS_USER>()
+					.Where("USER_ID=1")
+					.ToList();
+
+				var query = conn.QuerySet<TB_SYS_USER>().Join<TB_SYS_USER, TB_SYS_DEPT>((x, y) => (x.DEPT == y.DEPT_ID))
+					.Join<TB_SYS_USER, TB_TDG_UPH_EMP>((x, y) => x.USER_ID == y.EMP_ID)
+					.Where(a => a.USER_ID == "" && a.PASSWORD == "")
+					.From<TB_SYS_USER, TB_SYS_DEPT, TB_TDG_UPH_EMP>();
+				var user = query.Get(
+					(a, b, c) => new TB_SYS_USER
+					{
+						DEPT = a.DEPT,
+						DEPT_NAME = b.DEPT_NAME,
+						DISABLE = a.DISABLE,
+						ISADMIN = a.ISADMIN,
+						REMARK = a.REMARK,
+						USER_ID = a.USER_ID,
+						USER_NAME = a.USER_NAME,
+						BU_ID = c.BU_ID,
+						BU_NAME = c.BU_NAME
+					});
+
+
 
 
 				DateTime dateTime = DateTime.Now.AddDays(-10);

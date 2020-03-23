@@ -30,7 +30,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 		public override void OnConfiguring(RepositoryOptionsBuilder builder)
 		{
 			builder
-				.BuildConnection(new SqlConnection("server=risingup.life98.cn,55940;database=Lige;user=sa;password=!RisingupTech/././.;max pool size=300"))
+				.BuildConnection(new SqlConnection("server=localhost;database=Lige;user=sa;password=!RisingupTech/././.;max pool size=300"))
 				.BuildProvider(new MsSqlProvider())
 				.BuildAutoSyncStructure(true);
 		}
