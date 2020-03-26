@@ -3112,6 +3112,7 @@ namespace Dapper
 				else
 				{
 					//临时属性
+					if (_temporaryTypeMaps == null) _temporaryTypeMaps = new Hashtable();
 					lock (_temporaryTypeMaps)
 					{
 						_temporaryTypeMaps[type] = map;
