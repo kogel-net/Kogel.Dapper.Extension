@@ -237,5 +237,10 @@ namespace Kogel.Dapper.Extension.Oracle
 
             return this;
         }
-    }
+
+		public override SqlProvider CreateNew()
+		{
+			return new OracleSqlProvider();
+		}
+	}
 }

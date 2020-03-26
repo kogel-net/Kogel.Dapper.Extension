@@ -239,5 +239,10 @@ namespace Kogel.Dapper.Extension
 
 			return this;
 		}
+
+		public override SqlProvider CreateNew()
+		{
+			return new MsSqlProvider();
+		}
 	}
 }

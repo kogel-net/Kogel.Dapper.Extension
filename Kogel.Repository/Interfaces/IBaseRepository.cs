@@ -51,7 +51,7 @@ namespace Kogel.Repository.Interfaces
 		/// 根据主键获取当前实体数据
 		/// </summary>
 		/// <returns></returns>
-		T FindById(int id);
+		T FindById(object id);
 
 		/// <summary>
 		/// 增加(并且返回自增主键到写入到实体中)
@@ -63,7 +63,7 @@ namespace Kogel.Repository.Interfaces
 		/// 删除(根据主键)
 		/// </summary>
 		/// <returns></returns>
-		int Delete(int id);
+		int Delete(object id);
 
 		/// <summary>
 		/// 修改(根据主键)
