@@ -1,14 +1,22 @@
 ﻿using System;
 using System.Data;
+using Dapper;
 using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension.Core.SetC;
 using Kogel.Dapper.Extension.Core.SetQ;
 using Kogel.Dapper.Extension.Model;
+using Kogel.Dapper.Extension.Oracle.Extension;
 
 namespace Kogel.Dapper.Extension.Oracle
 {
     public static class DataBase
     {
+		static DataBase()
+		{
+			//注册bool解析
+			SqlMapper.RemoveTypeMap(typeof(bool));
+			SqlMapper.AddTypeHandler(typeof(bool), new BoolTypeHanlder());
+		}
 		/// <summary>
 		/// 用来解决表达式树不能使用默认参数
 		/// </summary>

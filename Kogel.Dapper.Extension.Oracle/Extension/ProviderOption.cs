@@ -1,5 +1,7 @@
-﻿using Kogel.Dapper.Extension.Core.Interfaces;
+﻿using Dapper;
+using Kogel.Dapper.Extension.Core.Interfaces;
 using System;
+using System.Data;
 using System.Text;
 
 namespace Kogel.Dapper.Extension.Oracle.Extension
@@ -143,4 +145,21 @@ namespace Kogel.Dapper.Extension.Oracle.Extension
             //return result;
         }
     }
+
+	public class BoolTypeHanlder : SqlMapper.TypeHandler<bool>
+	{
+		public override void SetValue(IDbDataParameter parameter, bool value)
+		{
+			parameter.DbType = DbType.Int16;
+			if (value)
+				parameter.Value = 1;
+			else
+				parameter.Value = 0;
+		}
+
+		public override bool Parse(object value)
+		{
+			return Convert.ToBoolean(value);
+		}
+	}
 }

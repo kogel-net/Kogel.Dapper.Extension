@@ -75,6 +75,11 @@ namespace Kogel.Dapper.Extension.Oracle.Extension
 						fieldType = $"DATE";
 						break;
 					}
+				case SqlDbType.UniqueIdentifier:
+					{
+						fieldType = $"CHAR(36)";
+						break;
+					}
 				default:
 					{
 						throw new Exception.DapperExtensionException("不存在的数据类型，请参考文档设置SqlDbType");
@@ -129,7 +134,7 @@ namespace Kogel.Dapper.Extension.Oracle.Extension
 					string sequenceName = ($"{typeEntity.Name}_{field.FieldName}_SEQ").ToUpper();
 					//检索是否存在此序列
 					string seqName = connection.QueryFirstOrDefault<string>($@"SELECT SEQUENCE_NAME FROM all_sequences 
-                          WHERE SEQUENCE_NAME = {sequenceName}");
+                          WHERE SEQUENCE_NAME = '{sequenceName}'");
 					//首先查询序列是否存在
 					if (!string.IsNullOrEmpty(seqName))
 					{

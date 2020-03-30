@@ -54,7 +54,7 @@ namespace Kogel.Dapper.Extension.Expressions
 					{
 						//值对象
 						Visit(memberInit.Expression);
-						_sqlCmd.Append($" {memberInit.Member.Name} = {base.SpliceField} ");
+						_sqlCmd.Append($" {provider.ProviderOption.CombineFieldName(memberInit.Member.Name)} = {base.SpliceField} ");
 						Param.AddDynamicParams(base.Param);
 					}
 					base.Index++;

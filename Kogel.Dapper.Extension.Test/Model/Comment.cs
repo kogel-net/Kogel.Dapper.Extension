@@ -17,6 +17,8 @@ namespace Kogel.Dapper.Extension.Test.Model
 
 	public class Comment : BaseEntity<Comment>
 	{
+		[Identity(IsIncrease = true)]
+		public override int Id { get => base.Id; set => base.Id = value; }
 		/// <summary>
 		/// 评论父级id，不为0则是回复评论
 		/// </summary>
@@ -40,6 +42,8 @@ namespace Kogel.Dapper.Extension.Test.Model
 		public bool IsRobot { get; set; }
 		[Display(IsNull = true)]
 		public string IdentityId { get; set; }
+
+		[Display(IsField = false)]
 		public bool CurrentUserLikes { get; set; }
 		/// <summary>
 		/// 关联的评论id
@@ -48,6 +52,9 @@ namespace Kogel.Dapper.Extension.Test.Model
 
 		[ForeignKey("ArticleId", "Id")]
 		public virtual News News { get; set; }
+
+
+		public Guid Guid { get; set; }
 
 	}
 

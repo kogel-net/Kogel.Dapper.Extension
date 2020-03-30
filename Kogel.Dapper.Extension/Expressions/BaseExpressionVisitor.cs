@@ -650,89 +650,98 @@ namespace Kogel.Dapper.Extension.Expressions
                 case "Replace":
                     {
 
-                        SpliceField.Append("Replace(");
-                        Visit(node.Object);
-                        SpliceField.Append(",");
-                        Visit(node.Arguments[0]);
-                        SpliceField.Append(",");
-                        Visit(node.Arguments[1]);
-                        SpliceField.Append(")");
-                    }
-                    break;
-                case "Trim":
-                    {
-                        SpliceField.Append("Trim(");
-                        Visit(node.Object);
-                        SpliceField.Append(")");
-                    }
-                    break;
-                #endregion
-                #region 聚合函数
-                case "Count":
-                    {
-                        providerOption.Count(SpliceField, () =>
-                        {
-                            Visit(node.Arguments);
-                        });
-                    }
-                    break;
-                case "Sum":
-                    {
-                        providerOption.Sum(SpliceField, () =>
-                        {
-                            Visit(node.Arguments);
-                        });
-                    }
-                    break;
-                case "Max":
-                    {
-                        providerOption.Max(SpliceField, () =>
-                        {
-                            Visit(node.Arguments);
-                        });
-                    }
-                    break;
-                case "Min":
-                    {
-                        providerOption.Min(SpliceField, () =>
-                        {
-                            Visit(node.Arguments);
-                        });
-                    }
-                    break;
-                case "Avg":
-                    {
-                        providerOption.Avg(SpliceField, () =>
-                        {
-                            Visit(node.Arguments);
-                        });
-                    }
-                    break;
-                #endregion
-                default:
-                    {
-                        if (node.Object != null)
-                            Visit(node.Object);
-                        else
-                            Visit(node.Arguments);
-                    }
-                    break;
-            }
-        }
-    }
-    /// <summary>
-    /// 用于解析二元表达式
-    /// </summary>
-    public class BinaryExpressionVisitor : WhereExpressionVisitor
-    {
-        public BinaryExpressionVisitor(BinaryExpression expression, SqlProvider provider) : base(provider)
-        {
-            SpliceField = new StringBuilder();
-            Param = new DynamicParameters();
-            SpliceField.Append("(");
-            Visit(expression);
-            SpliceField.Append(")");
-        }
+						SpliceField.Append("Replace(");
+						Visit(node.Object);
+						SpliceField.Append(",");
+						Visit(node.Arguments[0]);
+						SpliceField.Append(",");
+						Visit(node.Arguments[1]);
+						SpliceField.Append(")");
+					}
+					break;
+				case "Trim":
+					{
+						SpliceField.Append("Trim(");
+						Visit(node.Object);
+						SpliceField.Append(")");
+					}
+					break;
+				#endregion
+				#region 聚合函数
+				case "Count":
+					{
+						providerOption.Count(SpliceField, () =>
+						{
+							Visit(node.Arguments);
+						});
+					}
+					break;
+				case "Sum":
+					{
+						providerOption.Sum(SpliceField, () =>
+						{
+							Visit(node.Arguments);
+						});
+					}
+					break;
+				case "Max":
+					{
+						providerOption.Max(SpliceField, () =>
+						{
+							Visit(node.Arguments);
+						});
+					}
+					break;
+				case "Min":
+					{
+						providerOption.Min(SpliceField, () =>
+						{
+							Visit(node.Arguments);
+						});
+					}
+					break;
+				case "Avg":
+					{
+						providerOption.Avg(SpliceField, () =>
+						{
+							Visit(node.Arguments);
+						});
+					}
+					break;
+				#endregion
+				#region lambda函数
+				case "FirstOrDefault":
+					{
+						string paramName = ParamName;
+						this.SpliceField.Append(paramName);
+						Param.Add(paramName, node.ToConvertAndGetValue());
+					}
+					break;
+				#endregion
+				default:
+					{
+						if (node.Object != null)
+							Visit(node.Object);
+						else
+							Visit(node.Arguments);
+					}
+					break;
+			}
+		}
+	}
+	/// <summary>
+	/// 用于解析二元表达式
+	/// </summary>
+	public class BinaryExpressionVisitor : WhereExpressionVisitor
+	{
+		public BinaryExpressionVisitor(BinaryExpression expression, SqlProvider provider) : base(provider)
+		{
+			SpliceField = new StringBuilder();
+			Param = new DynamicParameters();
+			SpliceField.Append("(");
+			Visit(expression);
+			SpliceField.Append(")");
+		}
 
         protected override Expression VisitBinary(BinaryExpression node)
         {
