@@ -17,6 +17,9 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
                     (CONNECT_DATA=(SERVICE_NAME=ORCL)));User Id=system;Password=A123456a";
 		public void Test()
 		{
+
+			var guid = Guid.NewGuid();
+
 			var commne = new Comment()
 			{
 				Id = 10,
@@ -25,20 +28,20 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 				Type = 1,
 				SubTime = DateTime.Now,
 				PId = 0,
-				RefCommentId = 0
+				RefCommentId = 0,
+				Guid = guid
 			};
 
 			using (var conn = new OracleConnection(oracleConnection))
 			{
 				conn.Open();
 
-				//EntityCache.Register(typeof(Comment));
+				EntityCache.Register(typeof(Comment));
 
 				//测试codefirst
-				//CodeFirst codeFirst = new CodeFirst(conn);
-				//codeFirst.SyncStructure();
+				CodeFirst codeFirst = new CodeFirst(conn);
+				codeFirst.SyncStructure();
 
-				var guid = Guid.NewGuid();
 				DynamicParameters parameters = new DynamicParameters();
 				parameters.Add("Guid", guid);
 
@@ -70,16 +73,16 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 						RefCommentId = 0
 					});
 				//新增返回自增id
-				var result3 = conn.CommandSet<Comment>()
-					.InsertIdentity(new Comment()
-					{
-						ArticleId = 11,
-						Type = 1,
-						SubTime = DateTime.Now,
-						Content = "test",
-						PId = 0,
-						RefCommentId = 0
-					});
+				//var result3 = conn.CommandSet<Comment>()
+				//	.InsertIdentity(new Comment()
+				//	{
+				//		ArticleId = 11,
+				//		Type = 1,
+				//		SubTime = DateTime.Now,
+				//		Content = "test",
+				//		PId = 0,
+				//		RefCommentId = 0
+				//	});
 				//批量新增
 				var result4 = conn.CommandSet<Comment>()
 					.Insert(new List<Comment>()
@@ -88,9 +91,11 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 						commne,
 						commne
 					});
+
+				var list = new List<Guid>() { guid };
 				//删除
 				var result5 = conn.CommandSet<Comment>()
-					.Where(x => x.Id == result3)
+					.Where(x => x.Guid == list.FirstOrDefault())
 					.Delete();
 			}
 		}

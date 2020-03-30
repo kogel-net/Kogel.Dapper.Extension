@@ -689,6 +689,15 @@ namespace Kogel.Dapper.Extension.Expressions
 					}
 					break;
 				#endregion
+				#region lambda函数
+				case "FirstOrDefault":
+					{
+						string paramName = ParamName;
+						this.SpliceField.Append(paramName);
+						Param.Add(paramName, node.ToConvertAndGetValue());
+					}
+					break;
+				#endregion
 				default:
 					{
 						if (node.Object != null)
