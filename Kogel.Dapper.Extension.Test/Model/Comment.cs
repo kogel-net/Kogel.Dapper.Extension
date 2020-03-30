@@ -40,6 +40,8 @@ namespace Kogel.Dapper.Extension.Test.Model
 		public bool IsRobot { get; set; }
 		[Display(IsNull = true)]
 		public string IdentityId { get; set; }
+
+		[Display(IsField =false)]
 		public bool CurrentUserLikes { get; set; }
 		/// <summary>
 		/// 关联的评论id
@@ -48,6 +50,9 @@ namespace Kogel.Dapper.Extension.Test.Model
 
 		[ForeignKey("ArticleId", "Id")]
 		public virtual News News { get; set; }
+
+
+		public Guid Guid { get; set; }
 
 	}
 

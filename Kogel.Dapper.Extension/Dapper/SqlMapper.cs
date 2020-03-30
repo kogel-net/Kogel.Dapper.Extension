@@ -229,6 +229,10 @@ namespace Dapper
 				[typeof(object)] = DbType.Object
 			};
 			ResetTypeHandlers(false);
+
+			//注册Guid解析
+			SqlMapper.RemoveTypeMap(typeof(Guid));
+			SqlMapper.AddTypeHandler(typeof(Guid), new GuidTypeHanlder());
 		}
 
 		/// <summary>
