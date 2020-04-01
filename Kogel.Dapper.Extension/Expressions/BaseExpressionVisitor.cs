@@ -278,7 +278,7 @@ namespace Kogel.Dapper.Extension.Expressions
     public class WhereExpressionVisitor : BaseExpressionVisitor
     {
         private string FieldName { get; set; }//字段
-        private string ParamName { get => ($"{providerOption.ParameterPrefix}{FieldName?.Replace(".", "_")}_{Param.ParameterNames.Count()}"); }//带参数标识的
+        private string ParamName { get => ($"{providerOption.ParameterPrefix}{FieldName?.Replace(".", "")}{Param.ParameterNames.Count()}"); }//带参数标识的
         internal new StringBuilder SpliceField { get; set; }
         internal new DynamicParameters Param { get; set; }
         public WhereExpressionVisitor(SqlProvider provider) : base(provider)

@@ -131,12 +131,28 @@ namespace Kogel.Dapper.Extension.Oracle
             return this;
         }
 
+		/// <summary>
+		/// oracle没有新增返回自增id
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="entity"></param>
+		/// <param name="excludeFields"></param>
+		/// <returns></returns>
         public override SqlProvider FormatInsertIdentity<T>(T entity, string[] excludeFields)
 		{
-            var fromTableSql = ProviderOption.CombineFieldName(FormatTableName(false, false).Trim());
-            var paramsAndValuesSql = FormatInsertParamsAndValues(entity);
-            SqlString = $"INSERT INTO {fromTableSql} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]}) SELECT @@IDENTITY";
-            return this;
+			//         var fromTableSql = ProviderOption.CombineFieldName(FormatTableName(false, false).Trim());
+			//         var paramsAndValuesSql = FormatInsertParamsAndValues(entity);
+			////获取主键
+			//var typeEntity = EntityCache.QueryEntity(typeof(T));
+			//var field = typeEntity.EntityFieldList.Find(x => x.IsIdentity);
+			////获取序列名称
+			//string sequenceName = ($"{typeEntity.Name}_{field.FieldName}_SEQ").ToUpper();
+
+			//SqlString = $"INSERT INTO {fromTableSql} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]});SELECT {sequenceName}.currval FROM DUAL";
+
+			FormatInsert(entity, excludeFields);
+
+			return this;
         }
 
         public override SqlProvider FormatUpdate<T>(Expression<Func<T, T>> updateExpression)

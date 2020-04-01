@@ -290,7 +290,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 		/// <returns></returns>
 		public QuerySet<T> Join<TOuter, TInner>(Expression<Func<TOuter, TInner, bool>> exp, JoinMode joinMode = JoinMode.LEFT, bool IsDisField = true)
 		{
-			var joinWhere = new WhereExpression(exp, $"Where_{Params.ParameterNames.Count()}_", SqlProvider);
+			var joinWhere = new WhereExpression(exp, $"{Params.ParameterNames.Count()}", SqlProvider);
 			Regex whereRex = new Regex("AND");
 			string tableName = SqlProvider.FormatTableName(false, true, typeof(TInner));
 			SqlProvider.JoinList.Add(new JoinAssTable()

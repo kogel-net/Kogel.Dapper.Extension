@@ -63,7 +63,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 
 				//新增
 				var result2 = conn.CommandSet<Comment>()
-					.Insert(new Comment()
+					.InsertIdentity(new Comment()
 					{
 						ArticleId = 11,
 						Type = 1,
