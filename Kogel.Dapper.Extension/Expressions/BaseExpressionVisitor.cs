@@ -301,7 +301,7 @@ namespace Kogel.Dapper.Extension.Expressions
 				//if (comma != -1)
 				//	builder.Append(FieldName.Substring(comma + 1));
 				//else
-				builder.Append(FieldName);
+				builder.Append(FieldName.Replace(".", "-"));
 			}
 			builder.Append(Param.ParameterNames.Count());
 			return builder.ToString();
