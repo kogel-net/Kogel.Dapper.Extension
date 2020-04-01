@@ -82,4 +82,16 @@ namespace Kogel.Dapper.Extension.Test.Model
 		[ForeignKey("Id", "FKId")]
 		public List<ResourceMapping> ResourceMapping { get; set; }
 	}
+
+
+
+	public class CommentA
+	{
+		NewsA newsA;
+	}
+
+	public class NewsA
+	{
+		List<CommentA> commentAs;
+	}
 }

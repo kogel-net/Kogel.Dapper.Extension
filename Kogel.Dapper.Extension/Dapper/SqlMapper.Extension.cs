@@ -431,6 +431,7 @@ namespace Dapper
 	{
 		public override void SetValue(IDbDataParameter parameter, Guid value)
 		{
+			parameter.Size = 10;
 			parameter.DbType = DbType.String;
 			parameter.Value = value.ToString();
 		}

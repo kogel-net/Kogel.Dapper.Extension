@@ -18,7 +18,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 		public void Test()
 		{
 
-			var guid = Guid.NewGuid();
+			var guid = new Guid("3fa85f64-5717-4562-b3fc-2c963f66afa6");
 
 			var commne = new Comment()
 			{
@@ -38,14 +38,14 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 
 				EntityCache.Register(typeof(Comment));
 
-				//测试codefirst
-				CodeFirst codeFirst = new CodeFirst(conn);
-				codeFirst.SyncStructure();
+				////测试codefirst
+				//CodeFirst codeFirst = new CodeFirst(conn);
+				//codeFirst.SyncStructure();
 
 				DynamicParameters parameters = new DynamicParameters();
-				parameters.Add("Guid", guid);
+				parameters.Add("Guid_1_1_1_sssssss_sssssssGuid_1_1_1_sssssss_sssssss", guid);
 
-				var sss = conn.Execute($@"UPDATE Comments SET Guid=:Guid ", parameters);
+				var sss = conn.Execute($@"UPDATE Comments SET Guid=:Guid_1_1_1_sssssss_sssssssGuid_1_1_1_sssssss_sssssss ", parameters);
 
 				//根据成员修改
 				var result = conn.CommandSet<Comment>()

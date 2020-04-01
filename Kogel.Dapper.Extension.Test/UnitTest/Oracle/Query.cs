@@ -7,6 +7,7 @@ using Oracle.ManagedDataAccess.Client;
 using Kogel.Dapper.Extension.Test.ViewModel;
 using Kogel.Dapper.Extension.Oracle.Extension;
 using Dapper;
+using Kogel.Dapper.Extension.Test.Model.Digiwin;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 {
@@ -21,9 +22,9 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 
 				conn.Open();
 
-				EntityCache.Register(typeof(TB_SYS_USER));
-				EntityCache.Register(typeof(TB_SYS_DEPT));
-				EntityCache.Register(typeof(TB_TDG_UPH_EMP));
+				//EntityCache.Register(typeof(SYS_ROLE));
+				//EntityCache.Register(typeof(SYS_USER));
+				//EntityCache.Register(typeof(SYS_USER_ROLE));
 
 				//CodeFirst codeFirst = new CodeFirst(conn);
 				//codeFirst.SyncStructure();
@@ -32,10 +33,16 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 				  {
 
 				  };
+				var guid = new Guid("3fa85f64-5717-4562-b3fc-2c963f66afa6");
+				var result = conn.QuerySet<SYS_ROLE>()
+				 .Join<SYS_ROLE, SYS_USER_ROLE>((a, b) => a.GUID == b.ROLE_GUID && b.USER_GUID == guid)
+				 .PageList(1, 10);
 
-				conn.QuerySet<TB_SYS_USER>()
-					.Where("USER_ID=1")
-					.ToList();
+
+
+				//conn.QuerySet<TB_SYS_USER>()
+				//	.Where("USER_ID=1")
+				//	.ToList();
 
 				var query = conn.QuerySet<TB_SYS_USER>().Join<TB_SYS_USER, TB_SYS_DEPT>((x, y) => (x.DEPT == y.DEPT_ID))
 					.Join<TB_SYS_USER, TB_TDG_UPH_EMP>((x, y) => x.USER_ID == y.EMP_ID)

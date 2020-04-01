@@ -56,6 +56,8 @@
     <Compile Include="Model\ActivitySendPoints.cs" />
     <Compile Include="Model\AdminUser.cs" />
     <Compile Include="Model\Comment.cs" />
+    <Compile Include="Model\Digiwin\RBACEntityBase.cs" />
+    <Compile Include="Model\Digiwin\SYS_ROLE.cs" />
     <Compile Include="Model\GiftDetail.cs" />
     <Compile Include="Model\News.cs" />
     <Compile Include="Model\Order.cs" />

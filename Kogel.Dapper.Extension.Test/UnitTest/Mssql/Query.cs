@@ -89,8 +89,10 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 				var adminUser = connection.QuerySet<AdminUser>()
 					.Where(x => x.Account == account && x.Password == password)
 					.Where(x => x.IsDelete == false && x.IsDelete != x.IsDelete)
-					.Get();
-
+					.Get(x => new AdminUser
+					{
+						Account = x.Password
+					});
 
 				var outStockList = new List<string>()
 				{
