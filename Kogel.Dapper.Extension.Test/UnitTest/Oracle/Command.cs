@@ -29,7 +29,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 				SubTime = DateTime.Now,
 				PId = 0,
 				RefCommentId = 0,
-				Guid = guid
+				//Guid = guid
 			};
 
 			using (var conn = new OracleConnection(oracleConnection))
@@ -54,7 +54,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 				{
 					Content = commne.Content,
 					SubTime = commne.SubTime,
-					Guid = guid
+					///Guid = guid
 				});
 				////全部修改
 				//var result1 = conn.CommandSet<Comment>()
@@ -93,10 +93,10 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 					});
 
 				var list = new List<Guid>() { guid };
-				//删除
-				var result5 = conn.CommandSet<Comment>()
-					.Where(x => x.Guid == list.FirstOrDefault())
-					.Delete();
+				////删除
+				//var result5 = conn.CommandSet<Comment>()
+				//	.Where(x => x.Guid == list.FirstOrDefault())
+				//	.Delete();
 			}
 		}
 	}

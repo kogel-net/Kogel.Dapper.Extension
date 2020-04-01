@@ -35,8 +35,8 @@ namespace Kogel.Dapper.Extension.Test
 			//#endregion
 
 			//#region mysql单元测试
-			//var mysqlQuery = new UnitTest.Mysql.Query();
-			//mysqlQuery.Test();
+			var mysqlQuery = new UnitTest.Mysql.Query();
+			mysqlQuery.Test();
 
 			////var mysqlResQuery = new UnitTest.Mysql.TestRepositoryQuery();
 			////mysqlResQuery.Test();
@@ -52,8 +52,8 @@ namespace Kogel.Dapper.Extension.Test
 			//var oracleQuery = new UnitTest.Oracle.Query();
 			//oracleQuery.Test();
 
-			var oracleCommand = new UnitTest.Oracle.Command();
-			oracleCommand.Test();
+			//var oracleCommand = new UnitTest.Oracle.Command();
+			//oracleCommand.Test();
 			//#endregion
 		}
 	}

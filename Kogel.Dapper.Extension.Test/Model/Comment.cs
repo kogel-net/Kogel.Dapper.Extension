@@ -52,10 +52,6 @@ namespace Kogel.Dapper.Extension.Test.Model
 
 		[ForeignKey("ArticleId", "Id")]
 		public virtual News News { get; set; }
-
-
-		public Guid Guid { get; set; }
-
 	}
 
 
@@ -83,15 +79,4 @@ namespace Kogel.Dapper.Extension.Test.Model
 		public List<ResourceMapping> ResourceMapping { get; set; }
 	}
 
-
-
-	public class CommentA
-	{
-		NewsA newsA;
-	}
-
-	public class NewsA
-	{
-		List<CommentA> commentAs;
-	}
 }
