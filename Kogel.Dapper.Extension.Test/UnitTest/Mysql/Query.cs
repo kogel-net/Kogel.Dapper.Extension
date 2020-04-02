@@ -71,6 +71,13 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 			{
 				EntityCache.Register(typeof(AdminUser));
 
+
+				IBaseEntity entitys = new Comment();
+				var test = conn.CommandSet<IBaseEntity>()
+					.Where(x => 1 == 1)
+					.Insert(entitys);
+
+
 				////测试codefirst
 				//CodeFirst codeFirst = new CodeFirst(conn);
 				//codeFirst.SyncStructure();
