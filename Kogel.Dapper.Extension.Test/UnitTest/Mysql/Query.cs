@@ -75,6 +75,10 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				//CodeFirst codeFirst = new CodeFirst(conn);
 				//codeFirst.SyncStructure();
 
+				var dataSet = conn.QuerySet<Comment>()
+					   .Where(x => 1 == 1)
+					   .ToDataSet(new MySqlDataAdapter());
+
 				DateTime dateTime = DateTime.Now.AddDays(-10);
 
 				//var comments = conn.Query<Comment>("Select * from Comment").ToList();
