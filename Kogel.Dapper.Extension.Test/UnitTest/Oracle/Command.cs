@@ -38,6 +38,14 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 
 				EntityCache.Register(typeof(Comment));
 
+
+
+				Guid[] guids = new Guid[] { Guid.NewGuid() };
+
+				var resultTest = conn.CommandSet<Comment>()
+					.Where(x => guids.Contains(x.Guid))
+					.Delete();
+
 				////测试codefirst
 				//CodeFirst codeFirst = new CodeFirst(conn);
 				//codeFirst.SyncStructure();

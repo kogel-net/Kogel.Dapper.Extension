@@ -29,8 +29,8 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
             {
 				conn.Open();
 
-                //根据成员修改
-                var result = conn.CommandSet<Comment>()
+				//根据成员修改
+				var result = conn.CommandSet<Comment>()
                 .Where(x => x.Id > commne.Id || x.Id < commne.Id)
                 .Update(x => new Comment()
                 {

@@ -233,6 +233,9 @@ namespace Dapper
 			//注册Guid解析
 			SqlMapper.RemoveTypeMap(typeof(Guid));
 			SqlMapper.AddTypeHandler(typeof(Guid), new GuidTypeHanlder());
+
+			SqlMapper.RemoveTypeMap(typeof(Guid[]));
+			SqlMapper.AddTypeHandler(typeof(Guid[]), new GuidArrTypeHanlder());
 		}
 
 		/// <summary>
