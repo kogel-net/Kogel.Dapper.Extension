@@ -13,6 +13,7 @@ using Kogel.Dapper.Extension.MsSql.Extension;
 using Kogel.Dapper.Extension.Test.Model;
 using Lige.Model;
 using Lige.ViewModel.APP.Shopping;
+using Lige.ViewModel.Web;
 using Lige.ViewModel.Web.AppUser;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
@@ -75,13 +76,45 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 			//        }
 			SqlMapper.Aop.OnExecuting += Aop_OnExecuting;
 
-			using (var connection = new SqlConnection("server=localhost;database=Lige;user=sa;password=!RisingupTech/././.;max pool size=300"))
+			using (var connection = new SqlConnection("server=localhost;database=Lige;user=sa;password=!RisingupTech/././.;"))
 			{
-				EntityCache.Register(typeof(Comment));
+				//EntityCache.Register(typeof(Comment));
 
-				//测试codefirst
-				CodeFirst codeFirst = new CodeFirst(connection);
-				codeFirst.SyncStructure();
+				////测试codefirst
+				//CodeFirst codeFirst = new CodeFirst(connection);
+				//codeFirst.SyncStructure();
+
+
+				var pageList2 = connection.QuerySet<Advert>()
+			//.Where(pageListReqDto.dynamicWhere)
+			 .Where(x => x.IsDelete == false)
+			 .Join<Advert, Store>((a, b) => a.AssoId == b.Id, JoinMode.LEFT)
+			 .From<Advert, Store>()
+			 .OrderByDescing<Advert>(x => x.Seq)
+			 .PageList(1, 10, (x, y) => new AdvertListDto()
+			 {
+				 Id = x.Id,
+				 Title_CN = x.Title_CN,
+				 Title_EN = x.Title_EN,
+				 ImgUrl_CN ="123"+ x.ImgUrl_CN,
+				 ImgUrl_EN = GlobalConfig.ResourcesUrl + x.ImgUrl_EN,
+				 Content_CN = x.Content_CN,
+				 Content_EN = x.Content_EN,
+				 Type = x.Type,
+				 AssoId = x.AssoId,
+				 AssoName = y.Name_CN,
+				 IsOnline = x.IsOnline,
+				 Sort = x.Sort,
+				 MarketId = x.MarketId,
+				 Seq = x.Seq,
+				 DetailImgUrl_CN = GlobalConfig.ResourcesUrl + x.DetailImgUrl_CN,
+				 DetailImgUrl_EN = GlobalConfig.ResourcesUrl + x.DetailImgUrl_EN,
+				 StartTime = x.StartTime,
+				 EndTime = x.EndTime
+			 });
+
+
+
 
 				string account = "admin";
 				string password = "123456";
@@ -244,5 +277,18 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 		{
 
 		}
+	}
+
+	public class GlobalConfig
+	{
+		/// <summary>
+		/// 连接字符串
+		/// </summary>
+		public static string ConnectionString { get; set; } = "";
+
+		/// <summary>
+		/// 资源地址
+		/// </summary>
+		public static string ResourcesUrl { get; set; } = "";
 	}
 }

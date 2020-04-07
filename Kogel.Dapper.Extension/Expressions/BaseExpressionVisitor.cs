@@ -52,7 +52,7 @@ namespace Kogel.Dapper.Extension.Expressions
 		/// <returns></returns>
 		protected override Expression VisitBinary(BinaryExpression node)
 		{
-			var binary = new BinaryExpressionVisitor(node, Provider);
+			var binary = new BinaryExpressionVisitor(node, Provider, Index);
 			SpliceField.Append(binary.SpliceField);
 			this.Param.AddDynamicParams(binary.Param);
 			return node;
@@ -277,7 +277,7 @@ namespace Kogel.Dapper.Extension.Expressions
 	/// </summary>
 	public class WhereExpressionVisitor : BaseExpressionVisitor
 	{
-		private string FieldName { get; set; }//字段
+		private string FieldName { get; set; } = "";//字段
 		private string ParamName { get => GetParamName(); }//带参数标识的
 		internal new StringBuilder SpliceField { get; set; }
 		internal new DynamicParameters Param { get; set; }
@@ -296,14 +296,8 @@ namespace Kogel.Dapper.Extension.Expressions
 			StringBuilder builder = new StringBuilder();
 			builder.Append(providerOption.ParameterPrefix);
 			if (!string.IsNullOrEmpty(FieldName))
-			{
-				//int comma = FieldName.IndexOf(".");
-				//if (comma != -1)
-				//	builder.Append(FieldName.Substring(comma + 1));
-				//else
 				builder.Append(FieldName.Replace(".", "_"));
-			}
-			builder.Append(Param.ParameterNames.Count());
+			builder.Append($"_{Param.ParameterNames.Count()}{Index}");
 			return builder.ToString();
 		}
 
@@ -754,10 +748,11 @@ namespace Kogel.Dapper.Extension.Expressions
 	/// </summary>
 	public class BinaryExpressionVisitor : WhereExpressionVisitor
 	{
-		public BinaryExpressionVisitor(BinaryExpression expression, SqlProvider provider) : base(provider)
+		public BinaryExpressionVisitor(BinaryExpression expression, SqlProvider provider, int index = 0) : base(provider)
 		{
 			SpliceField = new StringBuilder();
 			Param = new DynamicParameters();
+			base.Index = index;
 			SpliceField.Append("(");
 			Visit(expression);
 			SpliceField.Append(")");
