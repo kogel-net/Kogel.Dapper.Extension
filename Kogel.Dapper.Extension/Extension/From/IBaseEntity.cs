@@ -14,7 +14,7 @@ namespace Kogel.Dapper.Extension
 		/// 主键id
 		/// </summary>
 		[Identity]
-		public abstract TKey Id { get; set; }
+		public virtual TKey Id { get; set; }
 		/// <summary>
 		/// 获取主键值
 		/// </summary>
@@ -28,5 +28,13 @@ namespace Kogel.Dapper.Extension
 	public interface IBaseEntity
 	{
 		object GetId();
+	}
+
+	public class IBaseEntityDto : IBaseEntity
+	{
+		public object GetId()
+		{
+			return null;
+		}
 	}
 }
