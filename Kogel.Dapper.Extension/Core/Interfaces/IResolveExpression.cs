@@ -317,6 +317,11 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 							continue;
 						}
 					}
+					//自定义返回
+					if (provider.Context.Set.SelectExpression == null)
+					{
+						continue;
+					}
 					FieldDetailWith(ref sql, item, leftEntity);
 				}
 			}
