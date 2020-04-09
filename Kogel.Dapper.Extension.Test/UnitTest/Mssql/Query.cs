@@ -86,9 +86,10 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 
 
 				var pageList2 = connection.QuerySet<Advert>()
-			//.Where(pageListReqDto.dynamicWhere)
+			 //.Where(pageListReqDto.dynamicWhere)
 			 .Where(x => x.IsDelete == false)
 			 .Join<Advert, Store>((a, b) => a.AssoId == b.Id, JoinMode.LEFT)
+			 .Where<Advert, Store>((a, b) => a.Id != 1 && b.Id != 2)
 			 .From<Advert, Store>()
 			 .OrderByDescing<Advert>(x => x.Seq)
 			 .PageList(1, 10, (x, y) => new AdvertListDto()
@@ -96,7 +97,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 				 Id = x.Id,
 				 Title_CN = x.Title_CN,
 				 Title_EN = x.Title_EN,
-				 ImgUrl_CN ="123"+ x.ImgUrl_CN,
+				 ImgUrl_CN = "123" + x.ImgUrl_CN,
 				 ImgUrl_EN = GlobalConfig.ResourcesUrl + x.ImgUrl_EN,
 				 Content_CN = x.Content_CN,
 				 Content_EN = x.Content_EN,

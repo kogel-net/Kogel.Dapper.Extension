@@ -214,12 +214,13 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 		}
 		public QuerySet<T> Where<TWhere1, TWhere2>(Expression<Func<TWhere1, TWhere2, bool>> exp)
 		{
-			var sqlWhere = new WhereExpression(exp, $"Where_{Params.ParameterNames.Count()}_", SqlProvider);
-			WhereBuilder.Append(sqlWhere.SqlCmd);
-			if (sqlWhere.Param != null)
-			{
-				Params.AddDynamicParams(sqlWhere.Param);
-			}
+			//var sqlWhere = new WhereExpression(exp, $"Where_{Params.ParameterNames.Count()}_", SqlProvider);
+			//WhereBuilder.Append(sqlWhere.SqlCmd);
+			//if (sqlWhere.Param != null)
+			//{
+			//	Params.AddDynamicParams(sqlWhere.Param);
+			//}
+			WhereExpressionList.Add(exp);
 			return this;
 		}
 		/// <summary>
