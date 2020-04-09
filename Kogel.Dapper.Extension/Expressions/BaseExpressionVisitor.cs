@@ -296,7 +296,8 @@ namespace Kogel.Dapper.Extension.Expressions
 			StringBuilder builder = new StringBuilder();
 			builder.Append(providerOption.ParameterPrefix);
 			if (!string.IsNullOrEmpty(FieldName))
-				builder.Append(FieldName.Replace(".", "_"));
+				//builder.Append(FieldName.Replace(".", "_"));
+				builder.Append(FieldName.Substring(FieldName.IndexOf(".") + 1));
 			builder.Append($"_{Param.ParameterNames.Count()}{Index}");
 			return builder.ToString();
 		}
