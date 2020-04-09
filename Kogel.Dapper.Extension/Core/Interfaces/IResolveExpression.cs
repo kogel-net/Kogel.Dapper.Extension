@@ -318,7 +318,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 						}
 					}
 					//自定义返回
-					if (provider.Context.Set.SelectExpression == null)
+					if (provider.Context.Set.SelectExpression != null)
 					{
 						continue;
 					}
