@@ -3113,24 +3113,26 @@ namespace Dapper
 			}
 			else
 			{
-				if (isTemporary == false)
+				lock (type)
 				{
-					lock (_typeMaps)
+					if (isTemporary == false)
 					{
-						_typeMaps[type] = map;
+						lock (_typeMaps)
+						{
+							_typeMaps[type] = map;
+						}
 					}
-				}
-				else
-				{
-					//临时属性
-					if (_temporaryTypeMaps == null) _temporaryTypeMaps = new Hashtable();
-					lock (_temporaryTypeMaps)
+					else
 					{
-						_temporaryTypeMaps[type] = map;
+						//临时属性
+						if (_temporaryTypeMaps == null) _temporaryTypeMaps = new Hashtable();
+						lock (_temporaryTypeMaps)
+						{
+							_temporaryTypeMaps[type] = map;
+						}
 					}
 				}
 			}
-
 			PurgeQueryCacheByType(type);
 		}
 
