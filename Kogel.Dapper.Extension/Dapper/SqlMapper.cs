@@ -1136,6 +1136,10 @@ namespace Dapper
 					object val = func(reader);
 					if (val == null)
 					{
+						yield return default(T);
+					}
+					else if (val is T)
+					{
 						yield return (T)val;
 					}
 					else
@@ -1590,7 +1594,7 @@ namespace Dapper
 			switch (otherDeserializers.Length)
 			{
 				case 1:
-					return r => ((Func<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn>)map)((TFirst)deserializer(r), (TSecond)otherDeserializers[0](r), default(TThird), default(TFourth), default(TFifth), default(TSixth),default(TSeventh));
+					return r => ((Func<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn>)map)((TFirst)deserializer(r), (TSecond)otherDeserializers[0](r), default(TThird), default(TFourth), default(TFifth), default(TSixth), default(TSeventh));
 				case 2:
 					return r => ((Func<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn>)map)((TFirst)deserializer(r), (TSecond)otherDeserializers[0](r), (TThird)otherDeserializers[1](r), default(TFourth), default(TFifth), default(TSixth), default(TSeventh));
 				case 3:
