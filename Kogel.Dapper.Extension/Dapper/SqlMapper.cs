@@ -1134,7 +1134,7 @@ namespace Dapper
 				while (reader.Read())
 				{
 					object val = func(reader);
-					if (val == null || val is T)
+					if (val == null)
 					{
 						yield return (T)val;
 					}
