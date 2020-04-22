@@ -366,11 +366,11 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 				}
 			}
 			var joinEntityType = joinAssTable.IsDto == false ? joinEntity.Type : joinAssTable.DtoType;
-			//重新注册实体映射
-			SqlMapper.SetTypeMap(joinEntityType, new CustomPropertyTypeMap(joinEntityType,
-					(type, column) =>
-					type.GetPropertys(joinAssTable.MapperList.FirstOrDefault(x => x.Value.Equals(column)).Key)
-					), true);
+			////重新注册实体映射
+			//SqlMapper.SetTypeMap(joinEntityType, new CustomPropertyTypeMap(joinEntityType,
+			//		(type, column) =>
+			//		type.GetPropertys(joinAssTable.MapperList.FirstOrDefault(x => x.Value.Equals(column)).Key)
+			//		), true);
 			//设置sql字段
 			masterSql += sqlBuilder;
 			return masterSql;

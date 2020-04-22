@@ -8,12 +8,13 @@ using Kogel.Dapper.Extension.Test.ViewModel;
 using Kogel.Dapper.Extension.Oracle.Extension;
 using Dapper;
 using Kogel.Dapper.Extension.Test.Model.Digiwin;
+using Digiwin.MES.Server.Application.Domain.EQP.Entities;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 {
 	public class Query
 	{
-		string oracleConnection = @"Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.105.0.224)(PORT=1521))
+		string oracleConnection = @"Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))
                     (CONNECT_DATA=(SERVICE_NAME=ORCL)));User Id=system;Password=A123456a";
 		public void Test()
 		{
@@ -22,17 +23,30 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 
 				conn.Open();
 
-				//EntityCache.Register(typeof(SYS_ROLE));
-				//EntityCache.Register(typeof(SYS_USER));
-				//EntityCache.Register(typeof(SYS_USER_ROLE));
+				//EntityCache.Register(typeof(EQP_TYPE_BAS));
+				////EntityCache.Register(typeof(SYS_USER));
+				////EntityCache.Register(typeof(SYS_USER_ROLE));
 
 				//CodeFirst codeFirst = new CodeFirst(conn);
 				//codeFirst.SyncStructure();
 
-				SqlMapper.Aop.OnExecuting += (ref CommandDefinition command) =>
-				  {
+				//SqlMapper.Aop.OnExecuting += (ref CommandDefinition command) =>
+				//  {
 
-				  };
+				//  };
+
+				SqlMapper.RemoveTypeMap(typeof(EQP_TYPE_BAS));
+				var result233 = conn.QuerySet<EQP_TYPE_BAS>()
+				.Where(x => x.DELETE_FLAG == "N")
+				.OrderBy(x => x.CREATE_TIME)
+				.PageList(1, 10, x => new
+				{
+					Test = Function.Concact(Convert.ToString(x.Id), "ttt")
+				});
+
+				//Function
+
+
 				var guid = new Guid("3fa85f64-5717-4562-b3fc-2c963f66afa6");
 				var result = conn.QuerySet<SYS_ROLE>()
 				 .Join<SYS_ROLE, SYS_USER_ROLE>((a, b) => a.GUID == b.ROLE_GUID && b.USER_GUID == guid)

@@ -12,6 +12,7 @@ namespace Kogel.Dapper.Extension
 	/// </summary>
 	public static class Function
 	{
+		#region 聚合函数
 		public static int Count<T>(T countExpression)
 		{
 			return 0;
@@ -36,5 +37,20 @@ namespace Kogel.Dapper.Extension
 		{
 			return default(T);
 		}
+		#endregion
+
+		#region 基础函数
+		/// <summary>
+		/// 拼接（oracle使用，mssql可以直接使用+号）
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="left"></param>
+		/// <param name="right"></param>
+		/// <returns></returns>
+		public static T Concact<T>(T left,T right)
+		{
+			return default(T);
+		}
+		#endregion
 	}
 }

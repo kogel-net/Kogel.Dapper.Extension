@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
+using Digiwin.MES.Server.Application.Domain.EQP.Entities;
 using Kogel.Dapper.Extension;
 using Kogel.Dapper.Extension.Core.SetQ;
 using Kogel.Dapper.Extension.Model;
@@ -78,11 +79,19 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 
 			using (var connection = new SqlConnection("server=localhost;database=Lige;user=sa;password=!RisingupTech/././.;"))
 			{
-				//EntityCache.Register(typeof(Comment));
+				EntityCache.Register(typeof(EQP_TYPE_BAS));
 
 				////测试codefirst
 				//CodeFirst codeFirst = new CodeFirst(connection);
 				//codeFirst.SyncStructure();
+
+
+				SqlMapper.RemoveTypeMap(typeof(EQP_TYPE_BAS));
+				var result = connection.QuerySet<EQP_TYPE_BAS>()
+				.Where(x => x.DELETE_FLAG == "N")
+				.Where( x => x.EQP_TYPE_NO.Contains("") || x.EQP_TYPE_NAME.Contains(""))
+				.OrderBy(x => x.CREATE_TIME)
+				.PageList(1, 10);
 
 
 				var pageList2 = connection.QuerySet<Advert>()

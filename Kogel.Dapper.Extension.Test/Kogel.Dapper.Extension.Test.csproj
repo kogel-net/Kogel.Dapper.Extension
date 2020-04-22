@@ -61,6 +61,10 @@
     <Compile Include="Model\Digiwin\RBACEntityBase.cs" />
     <Compile Include="Model\Digiwin\SYS_ROLE.cs" />
     <Compile Include="Model\GiftDetail.cs" />
+    <Compile Include="Model\Huang\EntityBase.cs" />
+    <Compile Include="Model\Huang\EQP_NATURE_BAS.cs" />
+    <Compile Include="Model\Huang\EQP_STATE_BAS.cs" />
+    <Compile Include="Model\Huang\EquipmentType.cs" />
     <Compile Include="Model\News.cs" />
     <Compile Include="Model\Order.cs" />
     <Compile Include="Model\OrderDetail.cs" />
