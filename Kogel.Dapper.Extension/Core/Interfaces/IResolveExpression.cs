@@ -365,7 +365,8 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 					joinAssTable.MapperList.Add(fieldValue, fieldValue);
 				}
 			}
-			var joinEntityType = joinAssTable.IsDto == false ? joinEntity.Type : joinAssTable.DtoType;
+			//导航属性目前有点问题
+			//var joinEntityType = joinAssTable.IsDto == false ? joinEntity.Type : joinAssTable.DtoType;
 			////重新注册实体映射
 			//SqlMapper.SetTypeMap(joinEntityType, new CustomPropertyTypeMap(joinEntityType,
 			//		(type, column) =>
