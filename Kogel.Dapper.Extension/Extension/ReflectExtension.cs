@@ -10,7 +10,7 @@ namespace Kogel.Dapper.Extension.Extension
 	{
 		public static PropertyInfo GetKeyPropertity(this object obj)
 		{
-			var properties = EntityCache.QueryEntity(obj.GetType()).Properties.Where(a => a.GetCustomAttribute<Identity>() != null).ToArray();
+			var properties = EntityCache.QueryEntity(obj.GetType()).Properties.Where(a => a.GetCustomAttribute<Identity>() != null || a.GetCustomAttribute<System.ComponentModel.DataAnnotations.KeyAttribute>() != null).ToArray();
 
 			if (!properties.Any())
 				throw new DapperExtensionException($"the {nameof(obj)} entity with no KeyAttribute Propertity");
@@ -22,7 +22,7 @@ namespace Kogel.Dapper.Extension.Extension
 		}
 		public static PropertyInfo GetKeyPropertity(this Type typeInfo)
 		{
-			var properties = EntityCache.QueryEntity(typeInfo).Properties.Where(a => a.GetCustomAttribute<Identity>() != null).ToArray();
+			var properties = EntityCache.QueryEntity(typeInfo).Properties.Where(a => a.GetCustomAttribute<Identity>() != null || a.GetCustomAttribute<System.ComponentModel.DataAnnotations.KeyAttribute>() != null).ToArray();
 
 			if (!properties.Any())
 				throw new DapperExtensionException($"the type {nameof(typeInfo.FullName)} entity with no KeyAttribute Propertity");

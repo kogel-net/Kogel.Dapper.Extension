@@ -142,6 +142,14 @@ namespace Kogel.Dapper.Extension.Model
 						EntityFieldList[EntityFieldList.Count - 1].IsIdentity = true;
 						EntityFieldList[EntityFieldList.Count - 1].IsIncrease = (identityAttribute as Identity).IsIncrease;
 					}
+
+					var identityAttribute2 = item.GetCustomAttributes(true).FirstOrDefault(x => x.GetType().Equals(typeof(System.ComponentModel.DataAnnotations.KeyAttribute)));
+					if (identityAttribute2 != null)
+					{
+						this.Identitys = this.FieldPairs[item.Name];
+						EntityFieldList[EntityFieldList.Count - 1].IsIdentity = true;
+						EntityFieldList[EntityFieldList.Count - 1].IsIncrease = true;
+					}
 				}
 			}
 			this.Properties = PropertyInfoList.ToArray();
