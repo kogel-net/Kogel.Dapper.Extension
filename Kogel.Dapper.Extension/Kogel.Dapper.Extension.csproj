@@ -32,6 +32,7 @@ https://www.cnblogs.com/kogel/p/10805696.html</Description>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
     <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Emit" Version="4.6.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.6.0" />
