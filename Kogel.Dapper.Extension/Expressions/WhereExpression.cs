@@ -2,6 +2,7 @@
 using System.Text;
 using Dapper;
 using Kogel.Dapper.Extension.Core.Interfaces;
+using System.Linq;
 
 namespace Kogel.Dapper.Extension.Expressions
 {
@@ -44,9 +45,9 @@ namespace Kogel.Dapper.Extension.Expressions
 			else
 			{
 				//加上参数标记
-				foreach (var paramName in base.Param.ParameterNames)
+				foreach (var paramName in base.Param.ParameterNames.Reverse())
 				{
-					string newName = paramName + prefix;
+					string newName = (paramName + prefix).Replace("_", "__");
 					object value = base.Param.Get<object>(paramName);
 					this.SqlCmd = this.SqlCmd.Replace(paramName, newName);
 					this.Param.Add(newName, value);
