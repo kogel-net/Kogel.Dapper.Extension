@@ -16,7 +16,8 @@ namespace Kogel.Dapper.Extension.Core.SetC
     /// <typeparam name="T"></typeparam>
     public abstract class Command<T> : AbstractSet, ICommand<T>
     {
-   
+
+
         public readonly IDbConnection DbCon;
         public readonly IDbTransaction DbTransaction;
 
@@ -35,25 +36,53 @@ namespace Kogel.Dapper.Extension.Core.SetC
             DbTransaction = dbTransaction;
         }
 
-        public int Update(T entity, string[] excludeFields = null)
+        public int Insert(T entity, string[]excludeFields = null)
+        {
+            SqlProvider.FormatInsert(entity, excludeFields);
+            return DbCon.Execute(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
+        }
+
+        public async Task<int> InsertAsync(T entity, string[]excludeFields = null)
+        {
+            SqlProvider.FormatInsert(entity, excludeFields);
+            return await DbCon.ExecuteAsync(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
+        }
+
+        public int Insert(IEnumerable<T> entities, string[]excludeFields = null, int timeout = 120)
+        {
+            SqlProvider.FormatInsert(entities.FirstOrDefault(), excludeFields);
+            return DbCon.Execute(SqlProvider.SqlString, entities, DbTransaction, timeout);
+        }
+
+        public async Task<int> InsertAsync(IEnumerable<T> entities, string[]excludeFields = null, int timeout = 120)
+        {
+            SqlProvider.FormatInsert(entities.FirstOrDefault(), excludeFields);
+            return await DbCon.ExecuteAsync(SqlProvider.SqlString, entities, DbTransaction, timeout);
+        }
+
+        public int InsertIdentity(T entity, string[]excludeFields = null)
+        {
+            SqlProvider.FormatInsertIdentity(entity, excludeFields);
+            object result = DbCon.ExecuteScalar(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
+            return result != null ? Convert.ToInt32(result) : 0;
+        }
+
+        public async Task<int> InsertIdentityAsync(T entity, string[]excludeFields = null)
+        {
+            SqlProvider.FormatInsertIdentity(entity, excludeFields);
+            object result = await DbCon.ExecuteScalarAsync(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
+            return result != null ? Convert.ToInt32(result) : 0;
+        }
+
+        public int Update(T entity, string[]excludeFields = null)
         {
             SqlProvider.FormatUpdate(entity, excludeFields);
             return DbCon.Execute(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
         }
 
-		public int Update(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120)
-		{
-			SqlProvider.FormatUpdate(entities.FirstOrDefault(), excludeFields, true);
-			//批量修改不需要别名（暂时有点小bug，先勉强使用下）
-			SqlProvider.SqlString = SqlProvider.SqlString.Replace("Update_", "").Replace("_0","").Replace("_1", "");
-			var identity = EntityCache.QueryEntity(typeof(T)).Identitys;
-			SqlProvider.SqlString += $" AND {identity}={SqlProvider.ProviderOption.ParameterPrefix + identity}";
-			return DbCon.Execute(SqlProvider.SqlString, entities, DbTransaction, timeout);
-		}
-
-		public async Task<int> UpdateAsync(T entity)
+        public async Task<int> UpdateAsync(T entity, string[]excludeFields = null)
         {
-            SqlProvider.FormatUpdate(entity, null);
+            SqlProvider.FormatUpdate(entity, excludeFields);
             return await DbCon.ExecuteAsync(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
         }
 
@@ -69,6 +98,52 @@ namespace Kogel.Dapper.Extension.Core.SetC
             return await DbCon.ExecuteAsync(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
         }
 
+        private void PreUpdate(IEnumerable<T> entities, string[]excludeFields = null)
+        {
+            SqlProvider.FormatUpdate(entities.FirstOrDefault(), excludeFields, true);
+            //批量修改不需要别名（暂时有点小bug，先勉强使用下）
+            SqlProvider.SqlString = SqlProvider.SqlString.Replace("Update_", "").Replace("_0", "").Replace("_1", "");
+            var identity = EntityCache.QueryEntity(typeof(T)).Identitys;
+            SqlProvider.SqlString += $" AND {identity}={SqlProvider.ProviderOption.ParameterPrefix + identity}";
+        }
+
+        public int Update(IEnumerable<T> entities, string[]excludeFields = null, int timeout = 120)
+        {
+            PreUpdate(entities, excludeFields);
+            return DbCon.Execute(SqlProvider.SqlString, entities, DbTransaction, timeout);
+        }
+
+        public Task<int> UpdateAsync(IEnumerable<T> entities, string[]excludeFields = null, int timeout = 120)
+        {
+            throw new NotImplementedException();
+        }
+
+        private (string, DynamicParameters) PreDelete(T model)
+        {
+            SqlProvider.FormatDelete();
+            var entityObject = EntityCache.QueryEntity(model.GetType());
+            var identity = entityObject.EntityFieldList.FirstOrDefault(x => x.IsIdentity);
+            if (identity == null)
+                throw new System.Exception("主键不存在!");
+            //设置参数
+            DynamicParameters param = new DynamicParameters();
+            param.Add(entityObject.Identitys, identity.PropertyInfo.GetValue(model));
+            return ($@"{SqlProvider.SqlString} AND {entityObject.Identitys}={SqlProvider.ProviderOption.ParameterPrefix}{entityObject.Identitys}",
+                param);
+        }
+
+        public int Delete(T model)
+        {
+            (string sql, DynamicParameters param) = PreDelete(model);
+            return DbCon.Execute(sql, param);
+        }
+
+        public Task<int> DeleteAsync(T model)
+        {
+            (string sql, DynamicParameters param) = PreDelete(model);
+            return DbCon.ExecuteAsync(sql, param);
+        }
+
         public int Delete()
         {
             SqlProvider.FormatDelete();
@@ -80,50 +155,5 @@ namespace Kogel.Dapper.Extension.Core.SetC
             SqlProvider.FormatDelete();
             return await DbCon.ExecuteAsync(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
         }
-
-        public int Insert(T entity, string[] excludeFields = null)
-        {
-			SqlProvider.FormatInsert(entity, excludeFields);
-            return DbCon.Execute(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
-        }
-
-        public async Task<int> InsertAsync(T entity, string[] excludeFields = null)
-        {
-            SqlProvider.FormatInsert(entity, excludeFields);
-            return await DbCon.ExecuteAsync(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
-        }
-
-        public int InsertIdentity(T entity, string[] excludeFields = null)
-        {
-            SqlProvider.FormatInsertIdentity(entity, excludeFields);
-            object result= DbCon.ExecuteScalar(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
-            return result != null ? Convert.ToInt32(result) : 0;
-        }
-
-		public int Insert(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120)
-		{
-			SqlProvider.FormatInsert(entities.FirstOrDefault(), excludeFields);
-			return DbCon.Execute(SqlProvider.SqlString, entities, DbTransaction, timeout);
-		}
-
-        public async Task<int> InsertAsync(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120)
-        {
-            SqlProvider.FormatInsert(entities.FirstOrDefault(), excludeFields);
-            return await DbCon.ExecuteAsync(SqlProvider.SqlString, entities, DbTransaction, timeout);
-        }
-
-		public int Delete(T model)
-		{
-			SqlProvider.FormatDelete();
-			var entityObject = EntityCache.QueryEntity(model.GetType());
-			var identity = entityObject.EntityFieldList.FirstOrDefault(x => x.IsIdentity);
-			if (identity == null)
-				throw new System.Exception("主键不存在!");
-			//设置参数
-			DynamicParameters param = new DynamicParameters();
-			param.Add(entityObject.Identitys, identity.PropertyInfo.GetValue(model));
-			return DbCon.Execute($@"{SqlProvider.SqlString} AND {entityObject.Identitys}={SqlProvider.ProviderOption.ParameterPrefix}{entityObject.Identitys}
-			", param);
-		}
-	}
+    }
 }
