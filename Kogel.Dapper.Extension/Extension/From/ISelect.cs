@@ -27,12 +27,13 @@ namespace Kogel.Dapper.Extension.Extension.From
 		}
 		public QuerySet<T> Where(LambdaExpression exp)
 		{
-			var sqlWhere = new WhereExpression(exp, $"Where_{querySet.Params.ParameterNames.Count()}_", querySet.SqlProvider);
-			querySet.WhereBuilder.Append(sqlWhere.SqlCmd);
-			if (sqlWhere.Param != null)
-			{
-				querySet.Params.AddDynamicParams(sqlWhere.Param);
-			}
+			//var sqlWhere = new WhereExpression(exp, $"Where_{querySet.Params.ParameterNames.Count()}_", querySet.SqlProvider);
+			//querySet.WhereBuilder.Append(sqlWhere.SqlCmd);
+			//if (sqlWhere.Param != null)
+			//{
+			//	querySet.Params.AddDynamicParams(sqlWhere.Param);
+			//}
+			querySet.WhereExpressionList.Add(exp);
 			return querySet;
 		}
 		public TReturn Get<TReturn>(LambdaExpression exp)
