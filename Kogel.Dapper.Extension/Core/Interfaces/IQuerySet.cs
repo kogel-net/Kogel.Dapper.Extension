@@ -171,5 +171,11 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// <param name="falseHavingExp"></param>
 		/// <returns></returns>
 		QuerySet<T> HavingIf<THaving>(bool where, Expression<Func<THaving, object>> trueHavingExp, Expression<Func<THaving, object>> falseHavingExp);
+
+		/// <summary>
+		/// 是否去重
+		/// </summary>
+		/// <returns></returns>
+		QuerySet<T> Distinct();
 	}
 }

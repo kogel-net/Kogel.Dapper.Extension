@@ -68,5 +68,10 @@ namespace Kogel.Dapper.Extension
 		/// 分组聚合条件
 		/// </summary>
 		internal List<LambdaExpression> HavingExpressionList { get; set; }
+
+		/// <summary>
+		/// 是否去重
+		/// </summary>
+		public bool IsDistinct { get; set; } = false;
 	}
 }

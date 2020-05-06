@@ -77,6 +77,8 @@ namespace Kogel.Dapper.Extension
 				throw new DapperExtensionException("order by takes precedence over pagelist");
 
 			var selectSql = ResolveExpression.ResolveSelect(null);
+			//sqlserver需要处理下select,rownum时候
+			selectSql = new Regex("SELECT").Replace(selectSql, "", 1).Replace("DISTINCT", "");
 
 			var fromTableSql = FormatTableName();
 
@@ -91,8 +93,8 @@ namespace Kogel.Dapper.Extension
 			var havingSql = ResolveExpression.ResolveHaving();
 
 			SqlString = $@"SELECT T.* FROM    ( 
-                            SELECT ROW_NUMBER() OVER ( {orderbySql} ) AS ROWNUMBER,
-                            {(new Regex("SELECT").Replace(selectSql, "", 1))}
+                            SELECT {(Context.Set.IsDistinct ? "DISTINCT" : "")} ROW_NUMBER() OVER ( {orderbySql} ) AS ROWNUMBER,
+                            {selectSql}
                             {fromTableSql} {nolockSql}{joinSql}
                             {whereSql}
                             {groupSql}
@@ -195,26 +197,11 @@ namespace Kogel.Dapper.Extension
 			return this;
 		}
 
-        public override SqlProvider FormatMin(LambdaExpression minExpression)
-        {
-            var selectSql = ResolveExpression.ResolveMin(minExpression);
+		public override SqlProvider FormatMin(LambdaExpression minExpression)
+		{
+			var selectSql = ResolveExpression.ResolveMin(minExpression);
 
-            var fromTableSql = FormatTableName();
-
-			var whereSql = ResolveExpression.ResolveWhereList();
-
-			string noneSql = "";
-			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql);
-
-			SqlString = $"{selectSql} {fromTableSql}{joinSql} {whereSql} ";
-
-            return this;
-        }
-        public override SqlProvider FormatMax(LambdaExpression maxExpression)
-        {
-            var selectSql = ResolveExpression.ResolveMax(maxExpression);
-
-            var fromTableSql = FormatTableName();
+			var fromTableSql = FormatTableName();
 
 			var whereSql = ResolveExpression.ResolveWhereList();
 
@@ -223,12 +210,27 @@ namespace Kogel.Dapper.Extension
 
 			SqlString = $"{selectSql} {fromTableSql}{joinSql} {whereSql} ";
 
-            return this;
-        }
+			return this;
+		}
+		public override SqlProvider FormatMax(LambdaExpression maxExpression)
+		{
+			var selectSql = ResolveExpression.ResolveMax(maxExpression);
 
-        public override SqlProvider FormatUpdateSelect<T>(Expression<Func<T, T>> updator)
-        {
-            var update = ResolveExpression.ResolveUpdate(updator);
+			var fromTableSql = FormatTableName();
+
+			var whereSql = ResolveExpression.ResolveWhereList();
+
+			string noneSql = "";
+			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql);
+
+			SqlString = $"{selectSql} {fromTableSql}{joinSql} {whereSql} ";
+
+			return this;
+		}
+
+		public override SqlProvider FormatUpdateSelect<T>(Expression<Func<T, T>> updator)
+		{
+			var update = ResolveExpression.ResolveUpdate(updator);
 
 			var selectSql = ResolveExpression.ResolveSelectOfUpdate(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression);
 

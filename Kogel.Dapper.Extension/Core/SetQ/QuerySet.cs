@@ -407,6 +407,16 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 				HavingExpressionList.Add(falseHavingExp);
 			return this;
 		}
+
+		/// <summary>
+		/// 是否去重
+		/// </summary>
+		/// <returns></returns>
+		public QuerySet<T> Distinct()
+		{
+			IsDistinct = true;
+			return this;
+		}
 		#endregion
 	}
 }

@@ -86,17 +86,19 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 				//codeFirst.SyncStructure();
 
 
-				SqlMapper.RemoveTypeMap(typeof(EQP_TYPE_BAS));
-				var result = connection.QuerySet<EQP_TYPE_BAS>()
-				.Where(x => x.DELETE_FLAG == "N")
-				.Where( x => x.EQP_TYPE_NO.Contains("") || x.EQP_TYPE_NAME.Contains(""))
-				.OrderBy(x => x.CREATE_TIME)
-				.PageList(1, 10);
+				//SqlMapper.RemoveTypeMap(typeof(EQP_TYPE_BAS));
+				//var result = connection.QuerySet<EQP_TYPE_BAS>()
+				//.Where(x => x.DELETE_FLAG == "N")
+				//.Where( x => x.EQP_TYPE_NO.Contains("") || x.EQP_TYPE_NAME.Contains(""))
+				//.Distinct()
+				//.OrderBy(x => x.CREATE_TIME)
+				//.PageList(1, 10);
 
 
 				var pageList2 = connection.QuerySet<Advert>()
 			 //.Where(pageListReqDto.dynamicWhere)
 			 .Where(x => x.IsDelete == false)
+			 .Distinct()
 			 .Join<Advert, Store>((a, b) => a.AssoId == b.Id, JoinMode.LEFT)
 			 .Where<Advert, Store>((a, b) => a.Id != 1 && b.Id != 2)
 			 .From<Advert, Store>()

@@ -29,21 +29,27 @@ namespace Kogel.Dapper.Extension
 			{
 				provider.JoinList.AddRange(ExpressionExtension.Clone(navigationList));
 			}
-
-			var selectFormat = " SELECT {0} ";
-			var selectSql = "";
+			//查询字段解析
+			StringBuilder selectSql = new StringBuilder("SELECT");
+			//去重
+			if (abstractSet.IsDistinct)
+				selectSql.Append(" DISTINCT ");
+			////top
+			//if (topNum.HasValue)
+			//	selectSql.Append($" TOP {topNum} ");
+			//不是自定义返回视图则显示所有字段
 			if (provider.Context.Set.SelectExpression == null)
 			{
 				var propertyBuilder = GetTableField(masterEntity);
-				selectSql = string.Format(selectFormat, propertyBuilder);
+				selectSql.Append(propertyBuilder);
 			}
-			else
+			else//自定义查询字段
 			{
 				var selectExp = new SelectExpression(provider.Context.Set.SelectExpression, "", provider);
-				selectSql = string.Format(selectFormat, selectExp.SqlCmd);
+				selectSql.Append(selectExp.SqlCmd);
 				provider.Params.AddDynamicParams(selectExp.Param);
 			}
-			return selectSql;
+			return selectSql.ToString();
 		}
 
 		public override string ResolveSum(LambdaExpression selector)
