@@ -75,6 +75,8 @@ namespace Kogel.Dapper.Extension.Oracle
 			var orderbySql = ResolveExpression.ResolveOrderBy();
 
 			var selectSql = ResolveExpression.ResolveSelect(null);
+			//sqlserver需要处理下select,rownum时候
+			selectSql = new Regex("SELECT").Replace(selectSql, "", 1).Replace("DISTINCT", "");
 
 			var fromTableSql = FormatTableName();
 
@@ -87,9 +89,9 @@ namespace Kogel.Dapper.Extension.Oracle
 			var havingSql = ResolveExpression.ResolveHaving();
 
 			SqlString = $@" SELECT T2.* FROM(
-                            SELECT T.*,ROWNUM ROWNUMS FROM (
+                            SELECT {(Context.Set.IsDistinct ? "DISTINCT" : "")} T.*,ROWNUM ROWNUMS FROM (
                             SELECT 
-                            {(new Regex("SELECT").Replace(selectSql, "", 1))}
+                            {selectSql}
                             {fromTableSql} {joinSql} {whereSql} {groupSql} {havingSql} {orderbySql}
                             ) T 
                             )T2
