@@ -90,7 +90,6 @@ namespace Kogel.Dapper.Extension.Oracle
 
 			SqlString = $@" SELECT T2.* FROM(
                             SELECT {(Context.Set.IsDistinct ? "DISTINCT" : "")} T.*,ROWNUM ROWNUMS FROM (
-                            SELECT 
                             {selectSql}
                             {fromTableSql} {joinSql} {whereSql} {groupSql} {havingSql} {orderbySql}
                             ) T 
