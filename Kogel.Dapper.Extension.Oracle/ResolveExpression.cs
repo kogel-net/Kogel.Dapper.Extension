@@ -29,7 +29,7 @@ namespace Kogel.Dapper.Extension.Oracle
 				provider.JoinList.AddRange(ExpressionExtension.Clone(navigationList));
 			}
 			//查询字段解析
-			StringBuilder selectSql = new StringBuilder("Select");
+			StringBuilder selectSql = new StringBuilder("SELECT");
 			//去重
 			if (abstractSet.IsDistinct)
 				selectSql.Append(" DISTINCT ");
