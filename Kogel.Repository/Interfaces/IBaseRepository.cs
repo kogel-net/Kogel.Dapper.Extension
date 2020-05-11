@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data;
 using Kogel.Dapper.Extension.Core.SetC;
+using Kogel.Dapper.Extension.Core.Interfaces;
 
 namespace Kogel.Repository.Interfaces
 {
@@ -25,27 +26,51 @@ namespace Kogel.Repository.Interfaces
 		/// 获取查询对象
 		/// </summary>
 		/// <returns></returns>
-		QuerySet<T> QuerySet();
+		IQuerySet<T> QuerySet();
 
 		/// <summary>
 		/// 获取查询对象
 		/// </summary>
 		/// <param name="transaction"></param>
 		/// <returns></returns>
-		QuerySet<T> QuerySet(IDbTransaction transaction);
+		IQuerySet<T> QuerySet(IDbTransaction transaction);
+
+		/// <summary>
+		/// 获取查询对象
+		/// </summary>
+		/// <typeparam name="TEntity"></typeparam>
+		/// <returns></returns>
+		IQuerySet<TEntity> QuerySet<TEntity>();
+
+		/// <summary>
+		/// 获取查询对象
+		/// </summary>
+		/// <typeparam name="TEntity"></typeparam>
+		/// <param name="transaction"></param>
+		/// <returns></returns>
+		IQuerySet<TEntity> QuerySet<TEntity>(IDbTransaction transaction);
 
 		/// <summary>
 		/// 获取编辑对象
 		/// </summary>
 		/// <returns></returns>
-		CommandSet<T> CommandSet();
+		ICommandSet<T> CommandSet();
 
 		/// <summary>
 		/// 获取编辑对象
 		/// </summary>
 		/// <param name="transaction"></param>
 		/// <returns></returns>
-		CommandSet<T> CommandSet(IDbTransaction transaction);
+		ICommandSet<T> CommandSet(IDbTransaction transaction);
+
+		/// <summary>
+		/// 获取编辑对象
+		/// </summary>
+		/// <typeparam name="TEntity"></typeparam>
+		/// <param name="transaction"></param>
+		/// <returns></returns>
+		ICommandSet<TEntity> CommandSet<TEntity>(IDbTransaction transaction = null);
+
 
 		/// <summary>
 		/// 根据主键获取当前实体数据

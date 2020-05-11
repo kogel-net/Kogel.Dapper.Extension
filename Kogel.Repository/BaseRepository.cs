@@ -64,7 +64,7 @@ namespace Kogel.Repository
 		/// 获取查询对象
 		/// </summary>
 		/// <returns></returns>
-		public QuerySet<T> QuerySet()
+		public IQuerySet<T> QuerySet()
 		{
 			return new QuerySet<T>(OptionsBuilder.Connection, OptionsBuilder.Provider.CreateNew(), null);
 		}
@@ -74,16 +74,26 @@ namespace Kogel.Repository
 		/// </summary>
 		/// <param name="transaction"></param>
 		/// <returns></returns>
-		public QuerySet<T> QuerySet(IDbTransaction transaction)
+		public IQuerySet<T> QuerySet(IDbTransaction transaction)
 		{
 			return new QuerySet<T>(OptionsBuilder.Connection, OptionsBuilder.Provider.CreateNew(), transaction);
+		}
+
+		public IQuerySet<TEntity> QuerySet<TEntity>()
+		{
+			return new QuerySet<TEntity>(OptionsBuilder.Connection, OptionsBuilder.Provider.CreateNew());
+		}
+
+		public IQuerySet<TEntity> QuerySet<TEntity>(IDbTransaction transaction)
+		{
+			return new QuerySet<TEntity>(OptionsBuilder.Connection, OptionsBuilder.Provider.CreateNew(), transaction);
 		}
 
 		/// <summary>
 		/// 获取编辑对象
 		/// </summary>
 		/// <returns></returns>
-		public CommandSet<T> CommandSet()
+		public ICommandSet<T> CommandSet()
 		{
 			return new CommandSet<T>(OptionsBuilder.Connection, OptionsBuilder.Provider.CreateNew(), null);
 		}
@@ -93,9 +103,14 @@ namespace Kogel.Repository
 		/// </summary>
 		/// <param name="transaction"></param>
 		/// <returns></returns>
-		public CommandSet<T> CommandSet(IDbTransaction transaction)
+		public ICommandSet<T> CommandSet(IDbTransaction transaction)
 		{
 			return new CommandSet<T>(OptionsBuilder.Connection, OptionsBuilder.Provider.CreateNew(), transaction);
+		}
+
+		public ICommandSet<TEntity> CommandSet<TEntity>(IDbTransaction transaction = null)
+		{
+			return new CommandSet<TEntity>(OptionsBuilder.Connection, OptionsBuilder.Provider.CreateNew(), transaction);
 		}
 
 		/// <summary>
