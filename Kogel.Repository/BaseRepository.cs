@@ -58,6 +58,13 @@ namespace Kogel.Repository
 		{
 			if (UnitOfWork != null)
 				UnitOfWork.Dispose();
+			else
+			{
+				if (Orm != null)
+				{
+					Orm.Dispose();
+				}
+			}
 		}
 
 		/// <summary>

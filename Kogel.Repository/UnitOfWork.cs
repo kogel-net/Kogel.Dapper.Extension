@@ -105,8 +105,11 @@ namespace Kogel.Repository
 				Transaction.Dispose();
 
 			if (Connection != null)
+			{
 				if (Connection.State == ConnectionState.Open)
 					Connection.Close();
+				Connection.Dispose();
+			}
 		}
 	}
 }
