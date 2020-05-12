@@ -53,7 +53,7 @@ namespace Kogel.Dapper.Extension.Test.Model
 		[ForeignKey("ArticleId", "Id")]
 		public virtual News News { get; set; }
 
-
+		[Display(IsField = false)]
 		public Guid Guid { get; set; }
 	}
 

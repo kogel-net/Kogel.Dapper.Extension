@@ -40,7 +40,7 @@ namespace Kogel.Repository
 		{
 			if (Connection.State == ConnectionState.Closed)
 				Connection.Open();
-			Transaction = Connection.BeginTransaction(IsolationLevel);	
+			Transaction = Connection.BeginTransaction(IsolationLevel);
 			try
 			{
 				SqlMapper.Aop.OnExecuting += Aop_OnExecuting;
@@ -66,7 +66,7 @@ namespace Kogel.Repository
 		private void Aop_OnExecuting(ref CommandDefinition command)
 		{
 			//相同数据库链接才会进入单元事务
-			if (command.Connection.ConnectionString == this.Connection.ConnectionString)
+			if (command.Connection.ConnectionString.Contains(this.Connection.ConnectionString))
 			{
 				//是否进入过工作单元(防止循环嵌套UnitOfWork)
 				if (!command.IsUnifOfWork)
