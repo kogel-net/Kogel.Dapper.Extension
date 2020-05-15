@@ -73,8 +73,6 @@ namespace Kogel.Dapper.Extension
 		public override SqlProvider FormatToPageList<T>(int pageIndex, int pageSize)
 		{
 			var orderbySql = ResolveExpression.ResolveOrderBy();
-			if (string.IsNullOrEmpty(orderbySql))
-				throw new DapperExtensionException("order by takes precedence over pagelist");
 
 			var selectSql = ResolveExpression.ResolveSelect(null);
 
