@@ -93,7 +93,7 @@ namespace Kogel.Dapper.Extension
 			var havingSql = ResolveExpression.ResolveHaving();
 
 			SqlString = $@"SELECT T.* FROM    ( 
-                            SELECT {(Context.Set.IsDistinct ? "DISTINCT" : "")} ROW_NUMBER() OVER ( {orderbySql} ) AS ROWNUMBER,
+                            SELECT ROW_NUMBER() OVER ( {orderbySql} ) AS ROWNUMBER,
                             {selectSql}
                             {fromTableSql} {nolockSql}{joinSql}
                             {whereSql}
