@@ -77,8 +77,6 @@ namespace Kogel.Dapper.Extension
 				throw new DapperExtensionException("order by takes precedence over pagelist");
 
 			var selectSql = ResolveExpression.ResolveSelect(null);
-			//sqlserver需要处理下select,rownum时候
-			selectSql = new Regex("SELECT").Replace(selectSql, "", 1).Replace("DISTINCT", "");
 
 			var fromTableSql = FormatTableName();
 
@@ -92,16 +90,17 @@ namespace Kogel.Dapper.Extension
 
 			var havingSql = ResolveExpression.ResolveHaving();
 
-			SqlString = $@"SELECT T.* FROM    ( 
-                            SELECT ROW_NUMBER() OVER ( {orderbySql} ) AS ROWNUMBER,
+			SqlString = $@"SELECT T2.* FROM    ( 
+                            SELECT T.*,ROW_NUMBER() OVER (ORDER BY (SELECT 0)) AS ROWNUMBER FROM(
                             {selectSql}
                             {fromTableSql} {nolockSql}{joinSql}
                             {whereSql}
                             {groupSql}
                             {havingSql}
-                            ) T
-                            WHERE ROWNUMBER BETWEEN {((pageIndex - 1) * pageSize) + 1} AND {pageIndex * pageSize};";
-
+                            {orderbySql}
+                            )T
+                            ) T2
+                            WHERE T2.ROWNUMBER BETWEEN {((pageIndex - 1) * pageSize) + 1} AND {pageIndex * pageSize};";
 			return this;
 		}
 

@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension.Model;
 using Kogel.Dapper.Extension.Extension;
+using Dapper;
 
 namespace Kogel.Dapper.Extension.Core.SetQ
 {
@@ -167,6 +168,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			//查询总行数
 			SqlProvider.FormatCount();
 			var pageTotal = DbCon.QuerySingles<int>(SqlProvider, DbTransaction);
+			SqlProvider.Params = new DynamicParameters();
 			//查询数据
 			SqlProvider.Context.Set.SelectExpression = select;
 			SqlProvider.FormatToPageList<T>(pageIndex, pageSize);
