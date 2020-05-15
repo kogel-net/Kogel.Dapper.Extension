@@ -14,7 +14,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 {
 	public class Query
 	{
-		string oracleConnection = @"Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))
+		string oracleConnection = @"Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.105.0.224)(PORT=1521))
                     (CONNECT_DATA=(SERVICE_NAME=ORCL)));User Id=system;Password=A123456a";
 		public void Test()
 		{
@@ -34,6 +34,13 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 				//  {
 
 				//  };
+
+				var aaa = conn.QuerySet<Comment>()
+					   .Distinct()
+					   .PageList(1, 1, x => new
+					   {
+						   id = Function.Concact(Function.Concact(x.Content, "test"), x.ArticleId.ToString())
+					   });
 
 				SqlMapper.RemoveTypeMap(typeof(EQP_TYPE_BAS));
 				var result233 = conn.QuerySet<EQP_TYPE_BAS>()

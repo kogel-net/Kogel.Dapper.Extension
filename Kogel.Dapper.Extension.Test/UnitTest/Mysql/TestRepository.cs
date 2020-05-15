@@ -11,6 +11,7 @@ using Kogel.Dapper.Extension.MySql;
 using Kogel.Dapper.Extension.Test.Model;
 using System.Data.SqlClient;
 using Kogel.Dapper.Extension.MsSql;
+using Kogel.Dapper.Extension.Oracle;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 {
@@ -40,33 +41,43 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 	{
 		public void Test()
 		{
-			MysqlRepository mysqlRepository = new MysqlRepository();
-			mysqlRepository.UnitOfWork.BeginTransaction(() =>
+			using (MysqlRepository mysqlRepository = new MysqlRepository())
 			{
-				mysqlRepository.Insert(new Comment
-				{
-					Content = "test11111",
-					ArticleId = 11,
-					Type = 1,
-					SubTime = DateTime.Now,
-					PId = 0,
-					RefCommentId = 0
-				});
+				var aaa = mysqlRepository.QuerySet<Comment>()
+					   .Distinct()
+					   .PageList(1, 1, x => new
+					   {
+						   id = Function.Concact(Function.Concact(x.Content, "test"), x.ArticleId.ToString())
+					   });
 
-				MysqlRepository1 mysqlRepository1 = new MysqlRepository1();
 
-				mysqlRepository1.Insert(new News
-				{
-					   NewsLabel="test",
-					   Headlines="test",
-					   Content="test",
-					   NewsFrom="test",
+				//mysqlRepository.UnitOfWork.BeginTransaction(() =>
+				//{
+				//	mysqlRepository.Insert(new Comment
+				//	{
+				//		Content = "test11111",
+				//		ArticleId = 11,
+				//		Type = 1,
+				//		SubTime = DateTime.Now,
+				//		PId = 0,
+				//		RefCommentId = 0
+				//	});
 
-				});
-				throw new System.Exception("test");
-			});
+				//	MysqlRepository1 mysqlRepository1 = new MysqlRepository1();
 
-			mysqlRepository.UnitOfWork.Commit();
+				//	mysqlRepository1.Insert(new News
+				//	{
+				//		NewsLabel = "test",
+				//		Headlines = "test",
+				//		Content = "test",
+				//		NewsFrom = "test",
+
+				//	});
+				//	//throw new System.Exception("test");
+				//});
+
+				//mysqlRepository.UnitOfWork.Commit();
+			}
 		}
 	}
 }

@@ -75,8 +75,8 @@ namespace Kogel.Dapper.Extension.Oracle
 			var orderbySql = ResolveExpression.ResolveOrderBy();
 
 			var selectSql = ResolveExpression.ResolveSelect(null);
-			//sqlserver需要处理下select,rownum时候
-			selectSql = new Regex("SELECT").Replace(selectSql, "", 1).Replace("DISTINCT", "");
+			//oracle需要处理下select,rownum时候
+			selectSql = selectSql.Replace("DISTINCT", "");
 
 			var fromTableSql = FormatTableName();
 

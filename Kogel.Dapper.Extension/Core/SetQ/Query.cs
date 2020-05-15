@@ -171,7 +171,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			SqlProvider.Context.Set.SelectExpression = select;
 			SqlProvider.FormatToPageList<T>(pageIndex, pageSize);
 			var itemList = DbCon.Query_1<TReturn>(SqlProvider, DbTransaction);
-			return new PageList<TReturn>(pageIndex, pageSize, pageTotal, itemList);
+			return new PageList<TReturn>(pageIndex, pageSize, 0, itemList);
 		}
 
 		public PageList<TReturn> PageList<TReturn>(int pageIndex, int pageSize, bool where, Expression<Func<T, TReturn>> trueSelect, Expression<Func<T, TReturn>> falseSelect)
