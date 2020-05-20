@@ -34,15 +34,15 @@ namespace Kogel.Dapper.Extension
 			}
 			//查询字段解析
 			StringBuilder selectSql = new StringBuilder(" SELECT ");
-			//去重
-			if (abstractSet.IsDistinct)
-				selectSql.Append(" DISTINCT ");
+			////去重
+			//if (abstractSet.IsDistinct)
+			//	selectSql.Append(" DISTINCT ");
 			//top
 			if (topNum.HasValue)
 				selectSql.Append($" TOP {topNum} ");
-			else
-				//设置返回百分比(为了兼容更多语法)
-				selectSql.Append(" TOP (100) PERCENT ");
+			//else
+			//	//设置返回百分比(为了兼容更多语法)
+			//	selectSql.Append(" TOP (100) PERCENT ");
 			//不是自定义返回视图则显示所有字段
 			if (provider.Context.Set.SelectExpression == null)
 			{
