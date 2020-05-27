@@ -90,6 +90,8 @@ namespace Kogel.Dapper.Extension
 			//是否存在实体特性中的AsName标记
 			if (isAsName)
 				fromName = entity.AsName.Equals(fromName) ? ProviderOption.CombineFieldName(fromName) : $"{ProviderOption.CombineFieldName(fromName)} {entity.AsName}";
+			else
+				fromName = ProviderOption.CombineFieldName(fromName);
 			SqlString = $" {schema}{fromName} ";
 			if (isNeedFrom)
 				SqlString = " FROM " + SqlString;

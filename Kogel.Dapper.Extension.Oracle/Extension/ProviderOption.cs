@@ -144,7 +144,16 @@ namespace Kogel.Dapper.Extension.Oracle.Extension
             }
             //return result;
         }
-    }
+
+		/// <summary>
+		/// is null 函数
+		/// </summary>
+		/// <returns></returns>
+		public override string IfNull()
+		{
+			return "NVL";
+		}
+	}
 
 	public class BoolTypeHanlder : SqlMapper.TypeHandler<bool>
 	{

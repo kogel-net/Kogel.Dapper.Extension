@@ -180,5 +180,14 @@ namespace Kogel.Dapper.Extension.MsSql.Extension
             }
             return value;
         }
+
+        /// <summary>
+        /// is null 函数
+        /// </summary>
+        /// <returns></returns>
+        public override string IfNull()
+        {
+            return "IsNull";
+        }
     }
 }

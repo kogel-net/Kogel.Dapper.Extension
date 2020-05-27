@@ -224,6 +224,15 @@ namespace Kogel.Dapper.Extension.Expressions
 						SpliceField.Append(")");
 					}
 					break;
+				case "IfNull":
+					{
+						SpliceField.Append($"{providerOption.IfNull()}(");
+						Visit(node.Arguments[0]);
+						SpliceField.Append(",");
+						Visit(node.Arguments[1]);
+						SpliceField.Append(")");
+					}
+					break;
 				#endregion
 				#region 聚合函数
 				case "Count":
@@ -694,6 +703,15 @@ namespace Kogel.Dapper.Extension.Expressions
 				case "Concact":
 					{
 						SpliceField.Append("Concat(");
+						Visit(node.Arguments[0]);
+						SpliceField.Append(",");
+						Visit(node.Arguments[1]);
+						SpliceField.Append(")");
+					}
+					break;
+				case "IfNull":
+					{
+						SpliceField.Append($"{providerOption.IfNull()}(");
 						Visit(node.Arguments[0]);
 						SpliceField.Append(",");
 						Visit(node.Arguments[1]);

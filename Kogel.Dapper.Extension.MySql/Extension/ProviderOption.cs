@@ -142,5 +142,14 @@ namespace Kogel.Dapper.Extension.MySql.Extension
 			}
 			//return result;
 		}
+
+		/// <summary>
+		/// if null 函数
+		/// </summary>
+		/// <returns></returns>
+		public override string IfNull()
+		{
+			return "IfNull";
+		}
 	}
 }

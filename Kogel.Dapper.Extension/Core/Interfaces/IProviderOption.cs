@@ -115,6 +115,13 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
             spliceField.Append(") ");
         }
 
+        /// <summary>
+        /// if null函数
+        /// </summary>
+        /// <param name="beginInkove"></param>
+        /// <param name="endInkove"></param>
+        public abstract string IfNull();
+
         #region 临时属性
         /// <summary>
         /// 子查询导航的集合
