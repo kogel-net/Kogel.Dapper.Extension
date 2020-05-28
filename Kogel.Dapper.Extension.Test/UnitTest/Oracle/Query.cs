@@ -35,12 +35,14 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 
 				//  };
 
-				var aaa = conn.QuerySet<Comment>()
-					   .Distinct()
-					   .PageList(1, 1, x => new
-					   {
-						   id = Function.Concact(Function.Concact(x.Content, "test"), x.ArticleId.ToString())
-					   });
+				//var aaa = conn.QuerySet<Comment>()
+				//	   .Count();
+				var bbb = conn.QuerySet<Comment>()
+					.Distinct()
+					.PageList(1, 10, x => new
+					{
+						id = 1
+					});
 
 				SqlMapper.RemoveTypeMap(typeof(EQP_TYPE_BAS));
 				var result233 = conn.QuerySet<EQP_TYPE_BAS>()
