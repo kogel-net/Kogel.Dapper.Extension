@@ -264,8 +264,9 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 				{
 					builder.Append(",");
 				}
-				builder.Append($"{providerOption.CombineFieldName(name)}={providerOption.ParameterPrefix}Update_{name}");
-				Param.Add($"{providerOption.ParameterPrefix}Update_{name}", value);
+				string paramName = $"{providerOption.ParameterPrefix}Update_{Param.ParameterNames.Count()}";
+				builder.Append($"{providerOption.CombineFieldName(name)}={paramName}");
+				Param.Add($"{paramName}", value);
 			}
 			builder.Insert(0, " SET ");
 			return builder.ToString();
