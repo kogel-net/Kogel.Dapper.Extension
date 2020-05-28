@@ -125,7 +125,19 @@ namespace Kogel.Dapper.Extension
 			string noneSql = "";
 			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql);
 
-			SqlString = $"{selectSql} {fromTableSql} {nolockSql} {joinSql} {whereSql} ";
+			if (!Context.Set.IsDistinct)
+				SqlString = $"{selectSql} {fromTableSql} {nolockSql} {joinSql} {whereSql} ";
+			else
+			{
+				//字段解析字符
+				string countBySql = ResolveExpression.ResolveSelect(null);
+
+				SqlString = $@"SELECT COUNT(*) FROM(
+                                {countBySql} {fromTableSql} {nolockSql}
+                                {joinSql}
+                                {whereSql}
+                                 )T";
+			}
 
 			return this;
 		}

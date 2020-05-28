@@ -73,9 +73,6 @@ namespace Kogel.Dapper.Extension
 		public override SqlProvider FormatToPageList<T>(int pageIndex, int pageSize)
 		{
 			var orderbySql = ResolveExpression.ResolveOrderBy();
-			//Oracle可以不用必须排序翻页
-			//if (string.IsNullOrEmpty(orderbySql))
-			//    throw new DapperExtensionException("order by takes precedence over pagelist");
 
 			var selectSql = ResolveExpression.ResolveSelect(null);
 
@@ -89,8 +86,7 @@ namespace Kogel.Dapper.Extension
 
 			var havingSql = ResolveExpression.ResolveHaving();
 
-			SqlString = $@" SELECT 
-                           {(new Regex("SELECT").Replace(selectSql, "", 1))}
+			SqlString = $@" {selectSql}
                             {fromTableSql} {joinSql} {whereSql} {groupSql} {havingSql} {orderbySql}
                             LIMIT {((pageIndex - 1) * pageSize)},{pageSize};";
 
@@ -108,7 +104,19 @@ namespace Kogel.Dapper.Extension
 
 			var whereSql = ResolveExpression.ResolveWhereList();
 
-			SqlString = $"{selectSql} {fromTableSql} {joinSql} {whereSql} ";
+			if (!Context.Set.IsDistinct)
+				SqlString = $"{selectSql} {fromTableSql} {joinSql} {whereSql} ";
+			else
+			{
+				//字段解析字符
+				string countBySql = ResolveExpression.ResolveSelect(null);
+
+				SqlString = $@"SELECT COUNT(*) FROM(
+                                {countBySql} {fromTableSql}
+                                {joinSql}
+                                {whereSql}
+                                 )T";
+			}
 
 			return this;
 		}
