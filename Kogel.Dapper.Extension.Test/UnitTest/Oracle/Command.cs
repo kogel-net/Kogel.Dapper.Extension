@@ -34,26 +34,26 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 
 			using (var conn = new OracleConnection(oracleConnection))
 			{
-				conn.Open();
+				//conn.Open();
 
 				EntityCache.Register(typeof(Comment));
 
 
 
-				Guid[] guids = new Guid[] { Guid.NewGuid() };
+				//Guid[] guids = new Guid[] { Guid.NewGuid() };
 
-				var resultTest = conn.CommandSet<Comment>()
-					.Where(x => guids.Contains(x.Guid))
-					.Delete();
+				//var resultTest = conn.CommandSet<Comment>()
+				//	.Where(x => guids.Contains(x.Guid))
+				//	.Delete();
 
-				////测试codefirst
-				//CodeFirst codeFirst = new CodeFirst(conn);
-				//codeFirst.SyncStructure();
+				//////测试codefirst
+				////CodeFirst codeFirst = new CodeFirst(conn);
+				////codeFirst.SyncStructure();
 
-				DynamicParameters parameters = new DynamicParameters();
-				parameters.Add("Guid_1_1_1_sssssss_sssssssGuid_1_1_1_sssssss_sssssss", guid);
+				//DynamicParameters parameters = new DynamicParameters();
+				//parameters.Add("Guid_1_1_1_sssssss_sssssssGuid_1_1_1_sssssss_sssssss", guid);
 
-				var sss = conn.Execute($@"UPDATE Comments SET Guid=:Guid_1_1_1_sssssss_sssssssGuid_1_1_1_sssssss_sssssss ", parameters);
+				//var sss = conn.Execute($@"UPDATE Comments SET Guid=:Guid_1_1_1_sssssss_sssssssGuid_1_1_1_sssssss_sssssss ", parameters);
 
 				//根据成员修改
 				var result = conn.CommandSet<Comment>()

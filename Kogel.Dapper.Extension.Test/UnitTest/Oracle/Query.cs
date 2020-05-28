@@ -21,7 +21,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 			using (var conn = new OracleConnection(oracleConnection))
 			{
 
-				conn.Open();
+				//conn.Open();
 
 				//EntityCache.Register(typeof(EQP_TYPE_BAS));
 				////EntityCache.Register(typeof(SYS_USER));

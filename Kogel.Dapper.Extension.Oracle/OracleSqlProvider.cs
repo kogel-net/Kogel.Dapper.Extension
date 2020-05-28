@@ -113,7 +113,7 @@ namespace Kogel.Dapper.Extension.Oracle
 
 		public override SqlProvider FormatDelete()
 		{
-			var fromTableSql = ProviderOption.CombineFieldName(FormatTableName(false, false).Trim());
+			var fromTableSql = FormatTableName(false, false);
 
 			ProviderOption.IsAsName = false;
 
@@ -124,7 +124,7 @@ namespace Kogel.Dapper.Extension.Oracle
 
 		public override SqlProvider FormatInsert<T>(T entity, string[] excludeFields)
 		{
-			var fromTableSql = ProviderOption.CombineFieldName(FormatTableName(false, false).Trim());
+			var fromTableSql = FormatTableName(false, false);
 			var paramsAndValuesSql = FormatInsertParamsAndValues(entity);
 			SqlString = $"INSERT INTO {fromTableSql} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]})";
 			return this;
@@ -158,7 +158,7 @@ namespace Kogel.Dapper.Extension.Oracle
 		{
 			var update = ResolveExpression.ResolveUpdate(updateExpression);
 
-			var fromTableSql = ProviderOption.CombineFieldName(FormatTableName(false, false).Trim());
+			var fromTableSql = FormatTableName(false, false);
 
 			ProviderOption.IsAsName = false;
 
@@ -173,7 +173,7 @@ namespace Kogel.Dapper.Extension.Oracle
 		public override SqlProvider FormatUpdate<T>(T entity, string[] excludeFields, bool isBatch = false)
 		{
 			var update = ResolveExpression.ResolveUpdates<T>(entity, Params, excludeFields);
-			var fromTableSql = ProviderOption.CombineFieldName(FormatTableName(false, false).Trim());
+			var fromTableSql = FormatTableName(false, false);
 
 			ProviderOption.IsAsName = false;
 
@@ -240,7 +240,7 @@ namespace Kogel.Dapper.Extension.Oracle
 		{
 			var update = ResolveExpression.ResolveUpdate(updator);
 
-			var fromTableSql = ProviderOption.CombineFieldName(FormatTableName(false, false).Trim());
+			var fromTableSql = FormatTableName(false, false);
 			var selectSql = ResolveExpression.ResolveSelectOfUpdate(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression);
 
 			ProviderOption.IsAsName = false;
