@@ -68,12 +68,12 @@ namespace Kogel.Dapper.Extension.Extension.From
 		}
 		public PageList<TReturn> PageList<TReturn>(int pageIndex, int pageSize, LambdaExpression exp)
 		{
+			querySet.SqlProvider.Context.Set.SelectExpression = exp;
 			//查询总行数
 			querySet.SqlProvider.FormatCount();
 			var pageTotal = querySet.DbCon.QuerySingle<int>(querySet.SqlProvider.SqlString, querySet.SqlProvider.Params);
-			querySet.SqlProvider.Params = new DynamicParameters();
 			//查询数据
-			querySet.SqlProvider.Context.Set.SelectExpression = exp;
+			querySet.SqlProvider.Params = new DynamicParameters();
 			querySet.SqlProvider.FormatToPageList<T>(pageIndex, pageSize);
 			var itemList = querySet.DbCon.Query_1<TReturn>(querySet.SqlProvider, querySet.DbTransaction);
 			return new PageList<TReturn>(pageIndex, pageSize, pageTotal, itemList);

@@ -105,7 +105,9 @@ namespace Kogel.Dapper.Extension.Oracle
             var whereSql = ResolveExpression.ResolveWhereList();
 
             //字段解析字符
-            string noneSql = ResolveExpression.ResolveSelect(null);
+            string countBySql = ResolveExpression.ResolveSelect(null);
+
+            string noneSql = string.Empty;
 
             //连表字符
             var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql);
@@ -115,7 +117,7 @@ namespace Kogel.Dapper.Extension.Oracle
             else
             {
                 SqlString = $@"SELECT COUNT(*) FROM(
-                                {noneSql} {fromTableSql}
+                                {countBySql} {fromTableSql}
                                 {joinSql}
                                 {whereSql}
                                  )T";
