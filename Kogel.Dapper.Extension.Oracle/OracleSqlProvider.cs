@@ -114,7 +114,7 @@ namespace Kogel.Dapper.Extension.Oracle
                 SqlString = $"{selectSql} {fromTableSql} {joinSql} {whereSql} ";
             else
             {
-                SqlString = $@"{selectSql} FROM(
+                SqlString = $@"SELECT COUNT(*) FROM(
                                 {noneSql} {fromTableSql}
                                 {joinSql}
                                 {whereSql}
