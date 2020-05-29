@@ -11,7 +11,7 @@ namespace Kogel.Dapper.Extension.Test.Model.Digiwin
 	/// Entity父类
 	/// </summary>
 	/// <typeparam name="TPrimaryKey">主键</typeparam>
-	public abstract class RBACEntityBase<TPrimaryKey> : IBaseEntity<RBACEntityBase, Guid>
+	public abstract class RBACEntityBase<TPrimaryKey> : IBaseEntity<RBACEntityBase, string>
 	{
 		[Identity(IsIncrease = false)]
 		[Display(SqlDbType =System.Data.SqlDbType.UniqueIdentifier)]
@@ -21,12 +21,12 @@ namespace Kogel.Dapper.Extension.Test.Model.Digiwin
 		public virtual TPrimaryKey GUID { get; set; }
 
 		[Display(SqlDbType = System.Data.SqlDbType.UniqueIdentifier)]
-		public virtual Guid CREATOR { get; set; }
+		public virtual string CREATOR { get; set; }
 
 		public virtual DateTime CREATE_TIME { get; set; }
 
 		[Display(SqlDbType = System.Data.SqlDbType.UniqueIdentifier)]
-		public virtual Guid MODIFIER { get; set; }
+		public virtual string MODIFIER { get; set; }
 
 		public virtual DateTime MODIFY_TIME { get; set; }
 
@@ -50,7 +50,7 @@ namespace Kogel.Dapper.Extension.Test.Model.Digiwin
 	/// <summary>
 	/// Guid 类型主键实体基类
 	/// </summary>
-	public abstract class RBACEntityBase : RBACEntityBase<Guid>
+	public abstract class RBACEntityBase : RBACEntityBase<string>
 	{ }
 
 	#endregion

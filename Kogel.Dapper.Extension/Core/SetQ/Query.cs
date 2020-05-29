@@ -147,7 +147,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			SqlProvider.FormatCount();
 			var pageTotal = DbCon.QuerySingles<int>(SqlProvider, DbTransaction);
 			//查询数据
-			SqlProvider.Params = new DynamicParameters();
+			SqlProvider.Params.Clear();
 			SqlProvider.FormatToPageList<T>(pageIndex, pageSize);
 			var itemList = DbCon.Query_1<T>(SqlProvider, DbTransaction);
 			return new PageList<T>(pageIndex, pageSize, pageTotal, itemList);
@@ -160,7 +160,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			var pageTotal = DbCon.QuerySingles<int>(SqlProvider, DbTransaction);
 			SqlProvider.FormatToPageList<T>(pageIndex, pageSize);
 			//查询数据
-			SqlProvider.Params = new DynamicParameters();
+			SqlProvider.Params.Clear();
 			var itemList = DbCon.Query_1<TSource>(SqlProvider, DbTransaction);
 			return new PageList<TSource>(pageIndex, pageSize, pageTotal, itemList);
 		}
@@ -172,7 +172,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			SqlProvider.FormatCount();
 			var pageTotal = DbCon.QuerySingles<int>(SqlProvider, DbTransaction);
 			//查询数据
-			SqlProvider.Params = new DynamicParameters();
+			SqlProvider.Params.Clear();
 			SqlProvider.FormatToPageList<T>(pageIndex, pageSize);
 			var itemList = DbCon.Query_1<TReturn>(SqlProvider, DbTransaction);
 			return new PageList<TReturn>(pageIndex, pageSize, pageTotal, itemList);
@@ -188,7 +188,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			SqlProvider.FormatCount();
 			var pageTotal = DbCon.QuerySingles<int>(SqlProvider, DbTransaction);
 			//查询数据
-			SqlProvider.Params = new DynamicParameters();
+			SqlProvider.Params.Clear();
 			SqlProvider.FormatToPageList<T>(pageIndex, pageSize);
 			var itemList = DbCon.Query_1<TReturn>(SqlProvider, DbTransaction);
 			return new PageList<TReturn>(pageIndex, pageSize, pageTotal, itemList);

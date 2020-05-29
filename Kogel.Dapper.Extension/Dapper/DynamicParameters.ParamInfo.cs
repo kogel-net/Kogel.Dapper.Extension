@@ -19,6 +19,10 @@ namespace Dapper
 
             public byte? Precision { get; set; }
             public byte? Scale { get; set; }
+            /// <summary>
+            /// 是否永存
+            /// </summary>
+            public bool IsForever { get; set; } = false;
         }
     }
 }

@@ -27,12 +27,6 @@ namespace Kogel.Dapper.Extension.Extension.From
 		}
 		public QuerySet<T> Where(LambdaExpression exp)
 		{
-			//var sqlWhere = new WhereExpression(exp, $"Where_{querySet.Params.ParameterNames.Count()}_", querySet.SqlProvider);
-			//querySet.WhereBuilder.Append(sqlWhere.SqlCmd);
-			//if (sqlWhere.Param != null)
-			//{
-			//	querySet.Params.AddDynamicParams(sqlWhere.Param);
-			//}
 			querySet.WhereExpressionList.Add(exp);
 			return querySet;
 		}
@@ -73,7 +67,7 @@ namespace Kogel.Dapper.Extension.Extension.From
 			querySet.SqlProvider.FormatCount();
 			var pageTotal = querySet.DbCon.QuerySingle<int>(querySet.SqlProvider.SqlString, querySet.SqlProvider.Params);
 			//查询数据
-			querySet.SqlProvider.Params = new DynamicParameters();
+			querySet.SqlProvider.Params.Clear();
 			querySet.SqlProvider.FormatToPageList<T>(pageIndex, pageSize);
 			var itemList = querySet.DbCon.Query_1<TReturn>(querySet.SqlProvider, querySet.DbTransaction);
 			return new PageList<TReturn>(pageIndex, pageSize, pageTotal, itemList);

@@ -13,7 +13,7 @@ namespace Kogel.Dapper.Extension.Test.Model.Digiwin
 		public string ROLE_NAME { get; set; }
 
 		[Display(IsField = false)]
-		public override Guid Id { get; set; }
+		public override string Id { get; set; }
 	}
 
 	public class SYS_USER : RBACEntityBase
@@ -21,7 +21,7 @@ namespace Kogel.Dapper.Extension.Test.Model.Digiwin
 		#region 用户属性
 
 		[Display(IsField = false)]
-		public override Guid Id { get; set; }
+		public override string Id { get; set; }
 
 		/// <summary>
 		/// 用户代号
@@ -57,12 +57,12 @@ namespace Kogel.Dapper.Extension.Test.Model.Digiwin
 	public class SYS_USER_ROLE : RBACEntityBase
 	{
 		[Display(IsField =false)]
-		public override Guid Id { get; set; }
+		public override string Id { get; set; }
 
 		[Display(SqlDbType = System.Data.SqlDbType.UniqueIdentifier)]
-		public Guid USER_GUID { get; set; }
+		public string USER_GUID { get; set; }
 
 		[Display(SqlDbType = System.Data.SqlDbType.UniqueIdentifier)]
-		public Guid ROLE_GUID { get; set; }
+		public string ROLE_GUID { get; set; }
 	}
 }

@@ -48,7 +48,8 @@ namespace Dapper
         /// EG: AddDynamicParams(new {A = 1, B = 2}) // will add property A and B to the dynamic
         /// </summary>
         /// <param name="param"></param>
-        public void AddDynamicParams(object param)
+        /// <param name="isForever"></param>
+        public void AddDynamicParams(object param, bool isForever = false)
         {
             var obj = param;
             if (obj != null)
@@ -66,7 +67,7 @@ namespace Dapper
                     {
                         foreach (var kvp in dictionary)
                         {
-                            Add(kvp.Key, kvp.Value, null, null, null);
+                            Add(kvp.Key, kvp.Value, null, null, null, isForever);
                         }
                     }
                 }
@@ -76,6 +77,8 @@ namespace Dapper
                     {
                         foreach (var kvp in subDynamic.parameters)
                         {
+                            if (kvp.Value != null)
+                                kvp.Value.IsForever = isForever;
                             parameters.Add(kvp.Key, kvp.Value);
                         }
                     }
@@ -100,7 +103,8 @@ namespace Dapper
         /// <param name="dbType">The type of the parameter.</param>
         /// <param name="direction">The in or out direction of the parameter.</param>
         /// <param name="size">The size of the parameter.</param>
-        public void Add(string name, object value, DbType? dbType, ParameterDirection? direction, int? size)
+        /// <param name="isForever"></param>
+        public void Add(string name, object value, DbType? dbType, ParameterDirection? direction, int? size, bool isForever = false)
         {
             parameters[Clean(name)] = new ParamInfo
             {
@@ -108,7 +112,8 @@ namespace Dapper
                 Value = value,
                 ParameterDirection = direction ?? ParameterDirection.Input,
                 DbType = dbType,
-                Size = size
+                Size = size,
+                IsForever = isForever
             };
         }
 
@@ -122,7 +127,8 @@ namespace Dapper
         /// <param name="size">The size of the parameter.</param>
         /// <param name="precision">The precision of the parameter.</param>
         /// <param name="scale">The scale of the parameter.</param>
-        public void Add(string name, object value = null, DbType? dbType = null, ParameterDirection? direction = null, int? size = null, byte? precision = null, byte? scale = null)
+        /// <param name="isForever"></param>
+        public void Add(string name, object value = null, DbType? dbType = null, ParameterDirection? direction = null, int? size = null, byte? precision = null, byte? scale = null, bool isForever = false)
         {
             parameters[Clean(name)] = new ParamInfo
             {
@@ -132,7 +138,8 @@ namespace Dapper
                 DbType = dbType,
                 Size = size,
                 Precision = precision,
-                Scale = scale
+                Scale = scale,
+                IsForever = isForever
             };
         }
 
@@ -153,7 +160,7 @@ namespace Dapper
 
         void SqlMapper.IDynamicParameters.AddParameters(IDbCommand command, SqlMapper.Identity identity)
         {
-            AddParameters(command, identity);
+            AddParameters(command, identity, false);
         }
 
         /// <summary>
@@ -166,7 +173,8 @@ namespace Dapper
         /// </summary>
         /// <param name="command">The raw command prior to execution</param>
         /// <param name="identity">Information about the query</param>
-        protected void AddParameters(IDbCommand command, SqlMapper.Identity identity)
+        /// <param name="isForever"></param>
+        protected void AddParameters(IDbCommand command, SqlMapper.Identity identity, bool isForever)
         {
             var literals = SqlMapper.GetLiteralTokens(identity.sql);
 
@@ -206,7 +214,8 @@ namespace Dapper
                             Name = param.ParameterName,
                             ParameterDirection = param.Direction,
                             Size = param.Size,
-                            Value = param.Value
+                            Value = param.Value,
+                            IsForever = isForever
                         });
                     }
                 }
@@ -453,8 +462,8 @@ namespace Dapper
                 cache[lookup] = setter;
             }
 
-            // Queue the preparation to be fired off when adding parameters to the DbCommand
-            MAKECALLBACK:
+        // Queue the preparation to be fired off when adding parameters to the DbCommand
+        MAKECALLBACK:
             (outputCallbacks ?? (outputCallbacks = new List<Action>())).Add(() =>
             {
                 // Finally, prep the parameter and attach the callback to it
@@ -480,7 +489,7 @@ namespace Dapper
 
                     // CameFromTemplate property would not apply here because this new param
                     // Still needs to be added to the command
-                    Add(dynamicParamName, expression.Compile().Invoke(target), null, ParameterDirection.InputOutput, sizeToSet);
+                    Add(dynamicParamName, expression.Compile().Invoke(target), null, ParameterDirection.InputOutput, sizeToSet, false);
                 }
 
                 parameter = parameters[dynamicParamName];
@@ -498,6 +507,23 @@ namespace Dapper
             foreach (var param in from p in parameters select p.Value)
             {
                 param.OutputCallback?.Invoke(param.OutputTarget, this);
+            }
+        }
+
+        /// <summary>
+        /// 清除參數字典
+        /// </summary>
+        public void Clear()
+        {
+            lock (parameters)
+            {
+                foreach (var item in parameters.ToArray())
+                {
+                    if (!item.Value.IsForever)
+                    {
+                        parameters.Remove(item.Key);
+                    }
+                }
             }
         }
     }

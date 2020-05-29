@@ -44,21 +44,21 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
 						id = 1
 					});
 
-				SqlMapper.RemoveTypeMap(typeof(EQP_TYPE_BAS));
-				var result233 = conn.QuerySet<EQP_TYPE_BAS>()
-				.Where(x => x.DELETE_FLAG == "N")
-				.OrderBy(x => x.CREATE_TIME)
-				.PageList(1, 10, x => new
-				{
-					Test = Function.Concact(Convert.ToString(x.Id), "ttt")
-				});
+				//SqlMapper.RemoveTypeMap(typeof(EQP_TYPE_BAS));
+				//var result233 = conn.QuerySet<EQP_TYPE_BAS>()
+				//.Where(x => x.DELETE_FLAG == "N")
+				//.OrderBy(x => x.CREATE_TIME)
+				//.PageList(1, 10, x => new
+				//{
+				//	Test = Function.Concact(Convert.ToString(x.Id), "ttt")
+				//});
 
 				//Function
 
 
 				var guid = new Guid("3fa85f64-5717-4562-b3fc-2c963f66afa6");
 				var result = conn.QuerySet<SYS_ROLE>()
-				 .Join<SYS_ROLE, SYS_USER_ROLE>((a, b) => a.GUID == b.ROLE_GUID && b.USER_GUID == guid)
+				 .Join<SYS_ROLE, SYS_USER_ROLE>((a, b) => a.GUID == b.ROLE_GUID && b.USER_GUID == guid.ToString())
 				 .PageList(1, 10);
 
 
