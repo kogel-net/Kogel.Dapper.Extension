@@ -44,6 +44,15 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
                         id = 1
                     });
 
+
+                var AAA = conn.QuerySet<Comment>()
+                    .Where(x => x.Content.IsNull())
+                    .ToList(x => new
+                    {
+                        id = x.Id,
+                        content = x.Content
+                    });
+
                 //SqlMapper.RemoveTypeMap(typeof(EQP_TYPE_BAS));
                 //var result233 = conn.QuerySet<EQP_TYPE_BAS>()
                 //.Where(x => x.DELETE_FLAG == "N")
