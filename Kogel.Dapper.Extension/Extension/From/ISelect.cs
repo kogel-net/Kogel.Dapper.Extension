@@ -30,24 +30,6 @@ namespace Kogel.Dapper.Extension.Extension.From
             querySet.WhereExpressionList.Add(exp);
             return querySet;
         }
-        public QuerySet<T> Join<TJoin>(LambdaExpression exp, JoinMode joinMode)
-        {
-            var joinWhere = new WhereExpression(exp, $"{querySet.Params.ParameterNames.Count()}", querySet.SqlProvider);
-            Regex whereRex = new Regex("AND");
-            string tableName = querySet.SqlProvider.FormatTableName(false, true, typeof(TJoin));
-            querySet.SqlProvider.JoinList.Add(new JoinAssTable()
-            {
-                Action = JoinAction.Sql,
-                JoinSql = $"{joinMode.ToString()} JOIN {tableName} ON {  whereRex.Replace(joinWhere.SqlCmd, "", 1)}",
-                TableType = typeof(TJoin)
-            });
-            if (joinWhere.Param != null)
-            {
-                querySet.Params.AddDynamicParams(joinWhere.Param, true);
-            }
-            return querySet;
-        }
-
         public TReturn Get<TReturn>(LambdaExpression exp)
         {
             querySet.SqlProvider.Context.Set.SelectExpression = exp;
@@ -119,12 +101,6 @@ namespace Kogel.Dapper.Extension.Extension.From
                 base.Where(falseExp);
             return this;
         }
-        public ISelectFrom<T, T1, T2> Join(Expression<Func<T1, T2, bool>> exp, JoinMode joinMode = JoinMode.LEFT)
-        {
-            //T1为连表的对象
-            base.Join<T1>(exp, joinMode);
-            return this;
-        }
         public TReturn Get<TReturn>(Expression<Func<T1, T2, TReturn>> select)
         {
             return base.Get<TReturn>(select);
@@ -193,12 +169,6 @@ namespace Kogel.Dapper.Extension.Extension.From
                 base.Where(falseExp);
             return this;
         }
-        public ISelectFrom<T, T1, T2, T3> Join(Expression<Func<T1, T2, T3, bool>> exp, JoinMode joinMode = JoinMode.LEFT)
-        {
-            //T1为连表的对象
-            base.Join<T1>(exp, joinMode);
-            return this;
-        }
         public TReturn Get<TReturn>(Expression<Func<T1, T2, T3, TReturn>> select)
         {
             return base.Get<TReturn>(select);
@@ -265,12 +235,6 @@ namespace Kogel.Dapper.Extension.Extension.From
                 base.Where(trueExp);
             else
                 base.Where(falseExp);
-            return this;
-        }
-        public ISelectFrom<T, T1, T2, T3, T4> Join(Expression<Func<T1, T2, T3,T4, bool>> exp, JoinMode joinMode = JoinMode.LEFT)
-        {
-            //T1为连表的对象
-            base.Join<T1>(exp, joinMode);
             return this;
         }
         public TReturn Get<TReturn>(Expression<Func<T1, T2, T3, T4, TReturn>> select)

@@ -256,19 +256,19 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         /// <summary>
         /// 连表
         /// </summary>
-        /// <typeparam name="TOuter">主表</typeparam>
-        /// <typeparam name="TInner">外表</typeparam>
+        /// <typeparam name="TWhere">条件表</typeparam>
+        /// <typeparam name="TInner">连接表</typeparam>
         /// <param name="rightField">主表关联键</param>
         /// <param name="leftField">外表关联键</param>
         /// <param name="joinMode">连接方式</param>
         /// <returns></returns>
-        public QuerySet<T> Join<TOuter, TInner>(Expression<Func<TOuter, object>> rightField, Expression<Func<TInner, object>> leftField, JoinMode joinMode = JoinMode.LEFT)
+        public QuerySet<T> Join<TWhere, TInner>(Expression<Func<TWhere, object>> rightField, Expression<Func<TInner, object>> leftField, JoinMode joinMode = JoinMode.LEFT)
         {
             SqlProvider.JoinList.Add(new JoinAssTable()
             {
                 Action = JoinAction.Default,
                 JoinMode = joinMode,
-                RightTabName = EntityCache.QueryEntity(typeof(TOuter)).AsName,
+                RightTabName = EntityCache.QueryEntity(typeof(TWhere)).AsName,
                 RightAssName = rightField.GetCorrectPropertyName(),
                 LeftTabName = EntityCache.QueryEntity(typeof(TInner)).AsName,
                 LeftAssName = leftField.GetCorrectPropertyName(),
@@ -276,18 +276,18 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             });
             return this;
         }
+
         /// <summary>
         /// 连表
         /// </summary>
-        /// <typeparam name="TOuter">主表</typeparam>
         /// <typeparam name="TInner">副表</typeparam>
-        /// <param name="exp">条件</param>
+        /// <param name="expression">条件</param>
         /// <param name="joinMode">连接类型</param>
         /// <param name="isDisField">是否需要显示表字段</param>
         /// <returns></returns>
-        public QuerySet<T> Join<TOuter, TInner>(Expression<Func<TOuter, TInner, bool>> exp, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true)
+        public QuerySet<T> Join<TInner>(LambdaExpression expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true)
         {
-            var joinWhere = new WhereExpression(exp, $"{Params.ParameterNames.Count()}", SqlProvider);
+            var joinWhere = new WhereExpression(expression, $"{Params.ParameterNames.Count()}", SqlProvider);
             Regex whereRex = new Regex("AND");
             string tableName = SqlProvider.FormatTableName(false, true, typeof(TInner));
             SqlProvider.JoinList.Add(new JoinAssTable()
@@ -302,6 +302,55 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             }
             return this;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TWhere"></typeparam>
+        /// <typeparam name="TInner"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="joinMode"></param>
+        /// <param name="isDisField"></param>
+        /// <returns></returns>
+        public QuerySet<T>Join<TWhere,TInner>(Expression<Func<TWhere, TInner, bool>> expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true)
+        {
+            Join<TInner>(expression, joinMode, isDisField);
+            return this;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TWhere"></typeparam>
+        /// <typeparam name="TInner"></typeparam>
+        /// <typeparam name="TWhere2"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="joinMode"></param>
+        /// <param name="isDisField"></param>
+        /// <returns></returns>
+        public QuerySet<T> Join<TWhere, TInner,TWhere2>(Expression<Func<TWhere, TInner, TWhere2, bool>> expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true)
+        {
+            Join<TInner>(expression, joinMode, isDisField);
+            return this;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TWhere"></typeparam>
+        /// <typeparam name="TInner"></typeparam>
+        /// <typeparam name="TWhere2"></typeparam>
+        /// <typeparam name="TWhere3"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="joinMode"></param>
+        /// <param name="isDisField"></param>
+        /// <returns></returns>
+        public QuerySet<T> Join<TWhere, TInner, TWhere2, TWhere3>(Expression<Func<TWhere, TInner, TWhere2, TWhere3, bool>> expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true)
+        {
+            Join<TInner>(expression, joinMode, isDisField);
+            return this;
+        }
+
         public QuerySet<T> Join(string SqlJoin)
         {
             SqlProvider.JoinList.Add(new JoinAssTable()

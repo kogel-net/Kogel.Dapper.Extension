@@ -80,7 +80,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// <param name="rightField"></param>
 		/// <param name="leftField"></param>
 		/// <returns></returns>
-		QuerySet<T> Join<TOuter, TInner>(Expression<Func<TOuter, object>> rightField, Expression<Func<TInner, object>> leftField, JoinMode joinMode = JoinMode.LEFT);
+		QuerySet<T> Join<TWhere, TInner>(Expression<Func<TWhere, object>> rightField, Expression<Func<TInner, object>> leftField, JoinMode joinMode = JoinMode.LEFT);
 
 		/// <summary>
 		/// 连表查询(任意查)
@@ -91,7 +91,31 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// <param name="joinMode">连表方式</param>
 		/// <param name="IsDisField">是否显示字段</param>
 		/// <returns></returns>
-		QuerySet<T> Join<TOuter, TInner>(Expression<Func<TOuter, TInner, bool>> exp, JoinMode joinMode = JoinMode.LEFT, bool IsDisField = true);
+		QuerySet<T> Join<TWhere, TInner>(Expression<Func<TWhere, TInner, bool>> exp, JoinMode joinMode = JoinMode.LEFT, bool IsDisField = true);
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <typeparam name="TWhere"></typeparam>
+		/// <typeparam name="TInner"></typeparam>
+		/// <param name="expression"></param>
+		/// <param name="joinMode"></param>
+		/// <param name="isDisField"></param>
+		/// <returns></returns>
+		QuerySet<T> Join<TWhere, TInner, TWhere2>(Expression<Func<TWhere, TInner, TWhere2, bool>> expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true);
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <typeparam name="TWhere"></typeparam>
+		/// <typeparam name="TInner"></typeparam>
+		/// <typeparam name="TWhere2"></typeparam>
+		/// <typeparam name="TWhere3"></typeparam>
+		/// <param name="expression"></param>
+		/// <param name="joinMode"></param>
+		/// <param name="isDisField"></param>
+		/// <returns></returns>
+		QuerySet<T> Join<TWhere, TInner, TWhere2, TWhere3>(Expression<Func<TWhere, TInner, TWhere2, TWhere3, bool>> expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true);
 
 		/// <summary>
 		/// 连接(通过sql连接，不指定表实体默认为不增加该表显示字段)
