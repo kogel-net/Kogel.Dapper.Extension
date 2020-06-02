@@ -86,6 +86,7 @@ namespace Kogel.Dapper.Extension.Extension.From
             var pageTotal = querySet.DbCon.QuerySingle<int>(querySet.SqlProvider.SqlString, querySet.SqlProvider.Params);
             //查询数据
             querySet.SqlProvider.Params.Clear();
+            querySet.SqlProvider.ProviderOption.MappingList.Clear();
             querySet.SqlProvider.FormatToPageList<T>(pageIndex, pageSize);
             var itemList = querySet.DbCon.Query_1<TReturn>(querySet.SqlProvider, querySet.DbTransaction);
             return new PageList<TReturn>(pageIndex, pageSize, pageTotal, itemList);
