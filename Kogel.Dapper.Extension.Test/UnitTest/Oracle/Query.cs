@@ -155,7 +155,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Oracle
                 var comment1 = conn.QuerySet<Comment>()
                     .Join<Comment, News>((a, b) => a.ArticleId == b.Id)
                     .Where(x => x.Id.Between(80, 100)
-                    && x.SubTime.AddDays(-10) < DateTime.Now && x.Id > 10
+                    && x.SubTime.Value.AddDays(-10) < DateTime.Now && x.Id > 10
                     && x.Id > conn.QuerySet<News>().Where(y => y.Id < 3 && x.Id < y.Id).Sum(y => y.Id))
                     .From<Comment, News>()
                     .OrderBy<News>(x => x.Id)

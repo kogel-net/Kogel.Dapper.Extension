@@ -21,8 +21,8 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 				Content = "test",
 				ArticleId = 11,
 				Type = 1,
-				SubTime = DateTime.Now,
-				PId = 0,
+				//SubTime = DateTime.Now,
+				//PId = 0,
 				RefCommentId = 0
 			};
 			DateTime dateTime = DateTime.Now.AddDays(100);
@@ -49,24 +49,16 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
 				//新增
 				var result2 = conn.CommandSet<Comment>()
-					.Insert(new Comment()
-					{
-						ArticleId = 11,
-						Type = 1,
-						SubTime = DateTime.Now,
-						Content = "test",
-						PId = 0,
-						RefCommentId = 0
-					});
+					.Insert(commne);
 				//新增返回自增id
 				var result3 = conn.CommandSet<Comment>()
 					.InsertIdentity(new Comment()
 					{
 						ArticleId = 11,
 						Type = 1,
-						SubTime = DateTime.Now,
+						//SubTime = DateTime.Now,
 						Content = "test",
-						PId = 0,
+						//PId = 0,
 						RefCommentId = 0
 					});
 				//批量新增

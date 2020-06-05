@@ -74,7 +74,8 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
                 IBaseEntity entitys = new Comment();
                 var test = conn.QuerySet<Comment>()
-                    .Where(x => 1 == 1 && Function.IfNull(x.Id, 0) == 0)
+                    .Where(x => x.PId.HasValue)
+                    .WhereIf(false, x => 1 != 1, x => 1 == 1)
                     .Get();
 
 
@@ -201,7 +202,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                     .Join<Comment, News>((a, b) => a.ArticleId == b.Id)
                     .Where(x => x.Id.ToString().ToUpper().Equals("3".ToUpper()))
                     .Where(x => x.Id.Between(80, 100)
-                    && x.SubTime.AddDays(-10).AddYears(1) < DateTime.Now.AddYears(1) && x.Id > 10
+                    && x.SubTime.Value.AddDays(-10).AddYears(1) < DateTime.Now.AddYears(1) && x.Id > 10
                     && x.Id > new QuerySet<News>(conn, new MySqlProvider()).Where(y => y.Id < 3 && x.Id < y.Id).Sum(y => y.Id))
                     .From<Comment, News>()
                     .OrderBy<News>(x => x.Id)
