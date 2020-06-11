@@ -68,7 +68,7 @@ namespace Kogel.Dapper.Extension
         /// <returns></returns>
         public static EntityObject QueryEntity(Type entity)
         {
-            var entityType = EntitieList.FirstOrDefault(x => x.Type.FullName.Equals(entity.FullName));
+            var entityType = EntitieList.ToArray().FirstOrDefault(x => x.Type.FullName.Equals(entity.FullName));
             if (entityType != null)
             {
                 return entityType;
