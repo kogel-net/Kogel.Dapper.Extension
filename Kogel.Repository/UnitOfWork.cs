@@ -40,6 +40,8 @@ namespace Kogel.Repository
         {
             if (Connection.State == ConnectionState.Closed)
                 Connection.Open();
+            if (Transaction == null)
+                Transaction = Connection.BeginTransaction(IsolationLevel);
             Transaction = Connection.BeginTransaction(IsolationLevel);
             try
             {

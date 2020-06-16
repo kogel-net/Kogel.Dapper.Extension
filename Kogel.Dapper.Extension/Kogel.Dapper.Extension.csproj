@@ -31,6 +31,9 @@ https://www.cnblogs.com/kogel/p/10805696.html</Description>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Remove="Extension\From\IJoin.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
     <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Emit" Version="4.6.0" />

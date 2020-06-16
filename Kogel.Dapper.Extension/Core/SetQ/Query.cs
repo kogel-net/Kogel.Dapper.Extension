@@ -159,10 +159,10 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 			//查询总行数
 			SqlProvider.FormatCount();
 			var pageTotal = DbCon.QuerySingles<int>(SqlProvider, DbTransaction);
-			SqlProvider.FormatToPageList<T>(pageIndex, pageSize);
 			//查询数据
 			SqlProvider.Params.Clear();
 			SqlProvider.ProviderOption.MappingList.Clear();
+			SqlProvider.FormatToPageList<T>(pageIndex, pageSize);
 			var itemList = DbCon.Query_1<TSource>(SqlProvider, DbTransaction);
 			return new PageList<TSource>(pageIndex, pageSize, pageTotal, itemList);
 		}
