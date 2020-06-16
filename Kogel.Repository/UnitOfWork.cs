@@ -42,7 +42,6 @@ namespace Kogel.Repository
                 Connection.Open();
             if (Transaction == null)
                 Transaction = Connection.BeginTransaction(IsolationLevel);
-            Transaction = Connection.BeginTransaction(IsolationLevel);
             try
             {
                 SqlMapper.Aop.OnExecuting += Aop_OnExecuting;
