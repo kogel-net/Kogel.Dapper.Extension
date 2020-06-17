@@ -20,12 +20,17 @@ namespace Kogel.Repository.Interfaces
 		IDbTransaction Transaction { get; set; }
 
 		/// <summary>
+		/// 当前工作单元标识
+		/// </summary>
+		Guid ClientId { get; set; }
+
+		/// <summary>
 		/// 开启事务
 		/// </summary>
 		/// <param name="transactionMethod"></param>
 		/// <param name="IsolationLevel"></param>
 		IUnitOfWork BeginTransaction(Action transactionMethod, IsolationLevel IsolationLevel = IsolationLevel.Serializable);
-		
+
 		/// <summary>
 		/// 提交
 		/// </summary>
