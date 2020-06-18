@@ -33,20 +33,7 @@ namespace Dapper
 	public static partial class SqlMapper
 	{
 		#region Aop
-		[ThreadStatic]
-		private static ThreadLocal<AopProvider> _aop;
-
-		public static AopProvider Aop { get => GetAop(); }
-
-		private static AopProvider GetAop()
-		{
-			if (_aop == null)
-			{
-				_aop = new ThreadLocal<AopProvider>();
-				_aop.Value = new AopProvider();
-			}
-			return _aop.Value;
-		}
+		public static AopProvider Aop { get => AopProvider.Get(); }
 		#endregion
 		private class PropertyInfoByNameComparer : IComparer<PropertyInfo>
 		{

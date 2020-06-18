@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using System;
 using System.Data;
+using System.Threading;
 
 namespace Kogel.Dapper.Extension
 {
@@ -34,6 +35,24 @@ namespace Kogel.Dapper.Extension
 		internal void InvokeExecuted(ref CommandDefinition definition)
 		{
 			this.OnExecuted?.Invoke(ref definition);
+		}
+
+
+		[ThreadStatic]
+		private static ThreadLocal<AopProvider> _aop;
+
+		/// <summary>
+		/// 获取当前线程唯一Aop
+		/// </summary>
+		/// <returns></returns>
+		public static AopProvider Get()
+		{
+			if (_aop == null)
+			{
+				_aop = new ThreadLocal<AopProvider>();
+				_aop.Value = new AopProvider();
+			}
+			return _aop.Value;
 		}
 	}
 }
