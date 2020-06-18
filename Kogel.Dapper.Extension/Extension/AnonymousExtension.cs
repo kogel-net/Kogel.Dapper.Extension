@@ -134,7 +134,14 @@ namespace Kogel.Dapper.Extension.Extension
             //执行sql
             var navigationData = dbCon.Query<T1>(sql, param);
             PropertyInfo property = EntityCache.QueryEntity(typeof(T)).Properties.FirstOrDefault(x => x.Name.Equals(memberName));
-            property.SetValue(data, navigationData);
+            if (property.PropertyType.FullName.Contains("System.Collections.Generic"))
+                property.SetValue(data, navigationData);
+            else
+            {
+                var firstData = navigationData.FirstOrDefault();
+                if (firstData != null)
+                    property.SetValue(data, firstData);
+            }
         }
         /// <summary>
         /// 写入导航属性到实体(列表)

@@ -18,6 +18,8 @@ using Kogel.Dapper.Extension.Extension;
 using Newtonsoft.Json;
 using Kogel.Dapper.Extension.MySql.Extension;
 using Lige.Model;
+using zgh_service_api.DTO;
+using zgh_service_api.Models;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 {
@@ -70,6 +72,18 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
             using (var conn = new MySqlConnection(mysqlConnection))
             {
                 EntityCache.Register(typeof(AdminUser));
+
+
+                var user = conn.QuerySet<User>()
+                   .Where(x => x.UserName == "test")
+                   .Get(x => new UserDetailDTO()
+                   {
+                       Id = x.Id,
+                       FullName = x.FullName,
+                       UserName = x.UserName,
+                       RoleId = x.RoleId,
+                       Role = conn.QuerySet<Role>().Where(y => y.Id == x.RoleId).Get(),
+                   });
 
 
                 IBaseEntity entitys = new Comment();

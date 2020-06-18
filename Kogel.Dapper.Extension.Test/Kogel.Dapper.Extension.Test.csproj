@@ -72,6 +72,9 @@
     <Compile Include="Model\Product.cs" />
     <Compile Include="Model\PurchaseTransaction.cs" />
     <Compile Include="Model\ResourceMapping.cs" />
+    <Compile Include="Model\sss\Role.cs" />
+    <Compile Include="Model\sss\User.cs" />
+    <Compile Include="Model\sss\UserDetailDTO.cs" />
     <Compile Include="Model\Store.cs" />
     <Compile Include="Model\TB_SYS_USER.cs" />
     <Compile Include="Model\TestDto.cs" />
