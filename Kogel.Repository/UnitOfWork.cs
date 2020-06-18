@@ -23,27 +23,12 @@ namespace Kogel.Repository
         public IDbTransaction Transaction { get; set; }
 
         /// <summary>
-        /// 当前线程首次连接id
-        /// </summary>
-        [ThreadStatic]
-        private static Guid FirstClientId;
-
-        /// <summary>
-        /// 当前工作单元标识
-        /// </summary>
-        public Guid ClientId { get; set; }
-
-        /// <summary>
         /// 
         /// </summary>
         /// <param name="connection"></param>
         public UnitOfWork(IDbConnection connection)
         {
             this.Connection = connection;
-
-            ClientId = Guid.NewGuid();
-            if (FirstClientId == null || FirstClientId == Guid.Empty)
-                FirstClientId = ClientId;
         }
 
         /// <summary>
@@ -86,7 +71,7 @@ namespace Kogel.Repository
             if (command.Connection.ConnectionString.Contains(this.Connection.ConnectionString))
             {
                 //是否进入过工作单元(防止循环嵌套UnitOfWork)
-                if (!command.IsUnifOfWork && ClientId == FirstClientId)
+                if (!command.IsUnifOfWork)
                 {
                     command.IsUnifOfWork = true;
                     command.Connection = this.Connection;
@@ -100,9 +85,8 @@ namespace Kogel.Repository
         /// </summary>
         public void Commit()
         {
-            if (ClientId == FirstClientId)
-                if (Transaction != null)
-                    Transaction.Commit();
+            if (Transaction != null)
+                Transaction.Commit();
         }
 
         /// <summary>
@@ -110,9 +94,8 @@ namespace Kogel.Repository
         /// </summary>
         public void Rollback()
         {
-            if (ClientId == FirstClientId)
-                if (Transaction != null)
-                    Transaction.Rollback();
+            if (Transaction != null)
+                Transaction.Rollback();
         }
 
         /// <summary>
