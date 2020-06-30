@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Kogel.Dapper.Extension.Exception
+namespace Kogel.Dapper.Extension
 {
-    public class DapperExtensionException : System.Exception
+    public class DapperExtensionException : Exception
     {
         public DapperExtensionException(string msg) : base(msg)
         {

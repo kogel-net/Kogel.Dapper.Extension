@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using Kogel.Dapper.Extension.Exception;
+using Kogel.Dapper.Extension;
 using Kogel.Dapper.Extension.Extension;
 using System.Collections.Generic;
 using System.Linq;

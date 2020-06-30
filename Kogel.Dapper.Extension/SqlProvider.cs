@@ -9,7 +9,7 @@ using Kogel.Dapper.Extension.Model;
 using Kogel.Dapper.Extension.Attributes;
 using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension.Helper;
-using Kogel.Dapper.Extension.Exception;
+using Kogel.Dapper.Extension;
 
 namespace Kogel.Dapper.Extension
 {

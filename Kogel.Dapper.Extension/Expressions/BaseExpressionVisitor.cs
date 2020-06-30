@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using Kogel.Dapper.Extension.Core.Interfaces;
-using Kogel.Dapper.Extension.Exception;
+using Kogel.Dapper.Extension;
 using Kogel.Dapper.Extension.Extension;
 using Kogel.Dapper.Extension.Model;
 using System;

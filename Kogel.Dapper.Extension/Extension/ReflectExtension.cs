@@ -2,7 +2,7 @@
 using Kogel.Dapper.Extension.Attributes;
 using System.Linq;
 using System.Reflection;
-using Kogel.Dapper.Extension.Exception;
+using Kogel.Dapper.Extension;
 
 namespace Kogel.Dapper.Extension.Extension
 {

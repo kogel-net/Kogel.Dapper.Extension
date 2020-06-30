@@ -4,7 +4,7 @@ using System.Text;
 using Dapper;
 using Kogel.Dapper.Extension.Model;
 using Kogel.Dapper.Extension.Core.Interfaces;
-using Kogel.Dapper.Extension.Exception;
+using Kogel.Dapper.Extension;
 using Kogel.Dapper.Extension.Extension;
 using System;
 

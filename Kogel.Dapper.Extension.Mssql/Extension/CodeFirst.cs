@@ -71,7 +71,7 @@ namespace Kogel.Dapper.Extension.MsSql.Extension
 					}
 				default:
 					{
-						throw new Exception.DapperExtensionException("不存在的数据类型，请参考文档设置SqlDbType");
+						throw new DapperExtensionException("不存在的数据类型，请参考文档设置SqlDbType");
 					}
 			}
 			return fieldType;

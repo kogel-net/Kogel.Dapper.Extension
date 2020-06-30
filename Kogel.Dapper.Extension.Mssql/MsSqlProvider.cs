@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
-using Kogel.Dapper.Extension.Exception;
+using Kogel.Dapper.Extension;
 using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension.MsSql.Extension;
 using System.Text.RegularExpressions;

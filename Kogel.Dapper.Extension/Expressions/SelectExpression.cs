@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using Kogel.Dapper.Extension.Helper;
 using System.Collections.Generic;
-using Kogel.Dapper.Extension.Exception;
+using Kogel.Dapper.Extension;
 using System;
 using System.Reflection;
 
