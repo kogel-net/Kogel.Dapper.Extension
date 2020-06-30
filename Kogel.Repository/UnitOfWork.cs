@@ -141,12 +141,12 @@ namespace Kogel.Repository
             }
             return count > 0;
         }
-    }
 
-    /// <summary>
-    /// 仓储方法标记 （内部使用）
-    /// </summary>
-    public class UnitOfWorkAttrbute : Attribute
-    {
+        /// <summary>
+        /// 仓储方法标记 （内部使用）
+        /// </summary>
+        private sealed class UnitOfWorkAttrbute : Attribute
+        {
+        }
     }
 }
