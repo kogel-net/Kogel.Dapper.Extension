@@ -29,8 +29,12 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 			using (var conn = new MySqlConnection(mysqlConnection))
 			{
 
-				var result22= conn.CommandSet<Comment>()
-					.Delete(commne);
+				var commentList = conn.QuerySet<Comment>()
+						 .Where(x => 1 == 1)
+						 .ToList();
+				var results = conn.CommandSet<Comment>()
+					.Update(commentList);
+
 
 				//根据成员修改
 				var result = conn.CommandSet<Comment>()

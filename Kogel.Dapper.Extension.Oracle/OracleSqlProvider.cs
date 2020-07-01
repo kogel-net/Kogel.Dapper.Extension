@@ -187,7 +187,7 @@ namespace Kogel.Dapper.Extension.Oracle
 
         public override SqlProvider FormatUpdate<T>(T entity, string[] excludeFields, bool isBatch = false)
         {
-            var update = ResolveExpression.ResolveUpdates<T>(entity, Params, excludeFields);
+            var update = ResolveExpression.ResolveUpdates<T>(entity, Params, excludeFields, isBatch);
             var fromTableSql = FormatTableName(false, false);
 
             ProviderOption.IsAsName = false;

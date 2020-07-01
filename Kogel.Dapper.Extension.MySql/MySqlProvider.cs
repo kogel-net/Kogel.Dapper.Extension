@@ -164,7 +164,7 @@ namespace Kogel.Dapper.Extension
 
 		public override SqlProvider FormatUpdate<T>(T entity, string[] excludeFields, bool isBatch = false)
 		{
-			var update = ResolveExpression.ResolveUpdates<T>(entity, Params, excludeFields);
+			var update = ResolveExpression.ResolveUpdates<T>(entity, Params, excludeFields, isBatch);
 
 			ProviderOption.IsAsName = false;
 

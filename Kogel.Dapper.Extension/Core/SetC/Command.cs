@@ -47,7 +47,7 @@ namespace Kogel.Dapper.Extension.Core.SetC
 			//批量修改不需要别名（暂时有点小bug，先勉强使用下）
 			SqlProvider.SqlString = SqlProvider.SqlString.Replace("Update_", "").Replace("_0","").Replace("_1", "");
 			var identity = EntityCache.QueryEntity(typeof(T)).Identitys;
-			SqlProvider.SqlString += $" AND {identity}={SqlProvider.ProviderOption.ParameterPrefix + identity}";
+			SqlProvider.SqlString += $" AND {SqlProvider.ProviderOption.CombineFieldName(identity)}={SqlProvider.ProviderOption.ParameterPrefix + identity}";
 			return DbCon.Execute(SqlProvider.SqlString, entities, DbTransaction, timeout);
 		}
 
