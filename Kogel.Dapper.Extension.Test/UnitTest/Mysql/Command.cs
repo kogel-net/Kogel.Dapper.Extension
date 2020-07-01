@@ -33,7 +33,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 						 .Where(x => 1 == 1)
 						 .ToList();
 				var results = conn.CommandSet<Comment>()
-					.Update(commentList);
+					.Update(commentList,new string[] { "ReplayCount" });
 
 
 				//根据成员修改

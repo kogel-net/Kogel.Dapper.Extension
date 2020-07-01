@@ -132,8 +132,10 @@ namespace Kogel.Repository
 			//设置参数
 			DynamicParameters param = new DynamicParameters();
 			param.Add(entityObject.Identitys, id);
+			
 			return this.QuerySet()
-				.Where($"{entityObject.Identitys}={OptionsBuilder.Provider.ProviderOption.ParameterPrefix}{entityObject.Identitys}", param)
+				.Where($@"{this.OptionsBuilder.Provider.ProviderOption.CombineFieldName(entityObject.Identitys)}
+                 ={OptionsBuilder.Provider.ProviderOption.ParameterPrefix}{entityObject.Identitys}", param)
 				.Get();
 		}
 
@@ -179,7 +181,8 @@ namespace Kogel.Repository
 			DynamicParameters param = new DynamicParameters();
 			param.Add(entityObject.Identitys, id);
 			return this.CommandSet()
-				.Where($"{entityObject.Identitys}={OptionsBuilder.Provider.ProviderOption.ParameterPrefix}{entityObject.Identitys}", param)
+				.Where($@"{this.OptionsBuilder.Provider.ProviderOption.CombineFieldName(entityObject.Identitys)}
+                 ={OptionsBuilder.Provider.ProviderOption.ParameterPrefix}{entityObject.Identitys}", param)
 				.Delete();
 		}
 
@@ -201,7 +204,8 @@ namespace Kogel.Repository
 			DynamicParameters param = new DynamicParameters();
 			param.Add(entityObject.Identitys, id);
 			return this.CommandSet()
-				.Where($"{entityObject.Identitys}={OptionsBuilder.Provider.ProviderOption.ParameterPrefix}{entityObject.Identitys}", param)
+				.Where($@"{this.OptionsBuilder.Provider.ProviderOption.CombineFieldName(entityObject.Identitys)}
+                ={OptionsBuilder.Provider.ProviderOption.ParameterPrefix}{entityObject.Identitys}", param)
 				.Update(entity);
 		}
 
