@@ -1,4 +1,4 @@
-﻿using Dapper;
+using Dapper;
 using Kogel.Dapper.Extension.Attributes;
 using Kogel.Dapper.Extension.Expressions;
 using Kogel.Dapper.Extension.Extension;
@@ -71,7 +71,8 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
             StringBuilder builder = new StringBuilder("WHERE 1=1 ");
             for (int i = 0; i < lambdaExpressionList.Count; i++)
             {
-                var whereParam = new WhereExpression(lambdaExpressionList[i], $"{prefix}_{i}", provider);
+                prefix = $"{prefix}{i}";
+                var whereParam = new WhereExpression(lambdaExpressionList[i],prefix, provider);
                 builder.Append(whereParam.SqlCmd);
                 //参数
                 foreach (var paramKey in whereParam.Param.ParameterNames)
