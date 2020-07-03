@@ -1,4 +1,4 @@
-﻿using Dapper;
+using Dapper;
 using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension;
 using Kogel.Dapper.Extension.Extension;
@@ -310,7 +310,7 @@ namespace Kogel.Dapper.Extension.Expressions
         /// <summary>
         /// 参数标记
         /// </summary>
-        protected string Prefix { get; set; }
+        internal string Prefix { get; set; }
 
         /// <summary>
         /// 字段
@@ -851,11 +851,12 @@ namespace Kogel.Dapper.Extension.Expressions
     /// </summary>
     public class BinaryExpressionVisitor : WhereExpressionVisitor
     {
-        public BinaryExpressionVisitor(BinaryExpression expression, SqlProvider provider, int index = 0) : base(provider)
+        public BinaryExpressionVisitor(BinaryExpression expression, SqlProvider provider, int index = 0, string prefix = null) : base(provider)
         {
             SpliceField = new StringBuilder();
             Param = new DynamicParameters();
             base.Index = index;
+            base.Prefix = prefix;
             SpliceField.Append("(");
             Visit(expression);
             SpliceField.Append(")");
