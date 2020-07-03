@@ -33,26 +33,13 @@ namespace Kogel.Dapper.Extension.Expressions
 			this._sqlCmd = new StringBuilder(100);
 			this.Param = new DynamicParameters();
 			this.providerOption = provider.ProviderOption;
+			base.Prefix = prefix;
 			//开始解析对象
 			Visit(expression);
 			//开始拼接成条件
 			this._sqlCmd.Append(base.SpliceField);
 			this.SqlCmd = " AND " + this._sqlCmd.ToString();
-			if (string.IsNullOrEmpty(prefix))
-			{
-				this.Param.AddDynamicParams(base.Param);
-			}
-			else
-			{
-				//加上参数标记
-				foreach (var paramName in base.Param.ParameterNames.Reverse())
-				{
-					string newName = (paramName + prefix).Replace("_", "__");
-					object value = base.Param.Get<object>(paramName);
-					this.SqlCmd = this.SqlCmd.Replace(paramName, newName);
-					this.Param.Add(newName, value);
-				}
-			}
+			this.Param.AddDynamicParams(base.Param);
 		}
 
 		/// <summary>

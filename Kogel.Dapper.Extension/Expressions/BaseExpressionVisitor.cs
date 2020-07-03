@@ -307,10 +307,32 @@ namespace Kogel.Dapper.Extension.Expressions
     /// </summary>
     public class WhereExpressionVisitor : BaseExpressionVisitor
     {
-        private string FieldName { get; set; } = "";//字段
-        private string ParamName { get => GetParamName(); }//带参数标识的
+        /// <summary>
+        /// 参数标记
+        /// </summary>
+        protected string Prefix { get; set; }
+
+        /// <summary>
+        /// 字段
+        /// </summary>
+        private string FieldName { get; set; } = "";
+
+        /// <summary>
+        /// 带参数标识的参数名称
+        /// </summary>
+        private string ParamName { get => $"{GetParamName()}{Prefix}"; }
+
+        /// <summary>
+        /// 拼接sql
+        /// </summary>
         internal new StringBuilder SpliceField { get; set; }
+
+        /// <summary>
+        /// 参数目录
+        /// </summary>
         internal new DynamicParameters Param { get; set; }
+
+
         public WhereExpressionVisitor(SqlProvider provider) : base(provider)
         {
             this.SpliceField = new StringBuilder();
@@ -649,7 +671,12 @@ namespace Kogel.Dapper.Extension.Expressions
                             var navigationExpression = new WhereExpression(node.Arguments[1] as LambdaExpression, $"_Navi_{navigationTable.PropertyInfo.Name}", Provider);
                             //添加sql和参数
                             this.SpliceField.Append($" 1=1 {navigationExpression.SqlCmd}");
-                            this.Param.AddDynamicParams(navigationExpression.Param);
+                            foreach (var paramName in navigationExpression.Param.ParameterNames)
+                            {
+                                //相同的key会直接顶掉
+                                this.Param.Add(paramName, navigationExpression.Param.Get<object>(paramName));
+                            }
+                            //this.Param.AddDynamicParams(navigationExpression.Param);
                         }
                         else
                         {
