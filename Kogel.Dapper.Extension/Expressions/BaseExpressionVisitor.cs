@@ -84,6 +84,18 @@ namespace Kogel.Dapper.Extension.Expressions
             var expTypeName = node.Expression?.GetType().FullName ?? "";
             if (expTypeName == "System.Linq.Expressions.TypedParameterExpression" || expTypeName == "System.Linq.Expressions.PropertyExpression")
             {
+                //是否是成员值对象
+                if (expTypeName == "System.Linq.Expressions.PropertyExpression" && node.IsConstantExpression())
+                {
+                    //参数
+                    string paramName = $"{providerOption.ParameterPrefix}Member_Param_{Index}_{Param.ParameterNames.Count()}";
+                    //值
+                    object nodeValue = node.ToConvertAndGetValue();
+                    //设置sql
+                    SpliceField.Append(paramName);
+                    Param.Add(paramName, nodeValue);
+                    return node;
+                }
                 var member = EntityCache.QueryEntity(node.Expression.Type);
                 string fieldName = member.FieldPairs[node.Member.Name];
                 string field = (providerOption.IsAsName ? member.GetAsName(providerOption) : "") + providerOption.CombineFieldName(fieldName);
@@ -364,6 +376,7 @@ namespace Kogel.Dapper.Extension.Expressions
             }
             return node;
         }
+
         /// <summary>
         /// 重写成员对象，得到字段名称
         /// </summary>
@@ -375,6 +388,14 @@ namespace Kogel.Dapper.Extension.Expressions
             var expTypeName = expType?.FullName ?? "";
             if (expTypeName == "System.Linq.Expressions.TypedParameterExpression" || expTypeName == "System.Linq.Expressions.PropertyExpression")
             {
+                //是否是成员值对象
+                if (expTypeName == "System.Linq.Expressions.PropertyExpression" && node.IsConstantExpression())
+                {
+                    SpliceField.Append(ParamName);
+                    object nodeValue = node.ToConvertAndGetValue();
+                    Param.Add(ParamName, nodeValue);
+                    return node;
+                }
                 //验证是否是可空对象
                 if (!node.Expression.Type.FullName.Contains("System.Nullable")) //(node.Expression.Type != typeof(Nullable))
                 {

@@ -26,6 +26,8 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
     public class Query
     {
         string mysqlConnection = "Server=localhost;Database=Qx_Sport_Common;Uid=root;Pwd=A5101264a;";
+
+        protected User users{ get; set; }
         public void Test()
         {
             //Sql执行前
@@ -51,11 +53,11 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
             //Thread thread = new Thread(() =>
             //{
-            //	//执行前
-            //	SqlMapper.Aop.OnExecuting += (CommandDefinition Command) =>
-            //	{
+            	////执行前
+            	//SqlMapper.Aop.OnExecuting += (CommandDefinition Command) =>
+            	//{
 
-            //	};
+            	//};
             //	//执行后
             //	SqlMapper.Aop.OnExecuted += (CommandDefinition Command) =>
             //	{
@@ -74,8 +76,10 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                 EntityCache.Register(typeof(AdminUser));
 
 
+                users = new User() { UserName = "test" };
+
                 var user = conn.QuerySet<User>()
-                   .Where(x => x.UserName == "test")
+                   .Where(x => x.UserName == users.UserName)
                    .Get(x => new UserDetailDTO()
                    {
                        Id = x.Id,
