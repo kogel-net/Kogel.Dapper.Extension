@@ -36,7 +36,12 @@ namespace Kogel.Dapper.Extension.Expressions
             Visit(expression);
             //开始拼接成条件
             this._sqlCmd.Append(base.SpliceField);
-            this.SqlCmd = " AND " + this._sqlCmd.ToString();
+            string sql = this._sqlCmd.ToString();
+            if (!string.IsNullOrWhiteSpace(sql))
+            {
+                this.SqlCmd = " AND " + sql;
+            }
+
             if (string.IsNullOrEmpty(prefix))
             {
                 this.Param.AddDynamicParams(base.Param);
@@ -46,7 +51,7 @@ namespace Kogel.Dapper.Extension.Expressions
                 //加上参数标记
                 foreach (var paramName in base.Param.ParameterNames)
                 {
-                    string newName = (paramName + prefix).Replace("_", "__");
+                    string newName = (paramName + prefix).Replace("_", "xx");
                     object value = base.Param.Get<object>(paramName);
                     this.SqlCmd = this.SqlCmd.Replace(paramName, newName);
                     this.Param.Add(newName, value);

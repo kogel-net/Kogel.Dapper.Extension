@@ -81,12 +81,19 @@ namespace Kogel.Dapper.Extension.Core.SetQ
 		#region 条件
 		public QuerySet<T> Where(Expression<Func<T, bool>> predicate)
 		{
-			WhereExpressionList.Add(predicate);
+			if (predicate != null)
+			{
+				WhereExpressionList.Add(predicate);
+			}
+			
 			return this;
 		}
 		public QuerySet<T> Where<TWhere>(Expression<Func<TWhere, bool>> predicate)
 		{
-			WhereExpressionList.Add(predicate);
+			if(predicate != null)
+			{
+				WhereExpressionList.Add(predicate);
+			}
 			return this;
 		}
 
