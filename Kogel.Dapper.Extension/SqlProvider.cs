@@ -139,51 +139,51 @@ namespace Kogel.Dapper.Extension
                     continue;
 
                 }
-				//排除掉时间格式为最小值的字段
-				if (propertiy.PropertyType == typeof(DateTime))
-				{
-					if (Convert.ToDateTime(propertiy.GetValue(t)) == DateTime.MinValue)
-					{
-						continue;
-					}
-				}
-				if (isAppend)
-				{
-					paramSqlBuilder.Append(",");
-					valueSqlBuilder.Append(",");
-				}
-				var name = propertiy.GetColumnAttributeName();
-				paramSqlBuilder.AppendFormat("{0}{1}{2}", ProviderOption.OpenQuote, entity.FieldPairs[name], ProviderOption.CloseQuote);
-				valueSqlBuilder.Append(ProviderOption.ParameterPrefix + name);
-				Params.Add(ProviderOption.ParameterPrefix + name, propertiy.GetValue(t));
-				isAppend = true;
-			}
-			return new[] { paramSqlBuilder.ToString(), valueSqlBuilder.ToString() };
-		}
+                //排除掉时间格式为最小值的字段
+                if (propertiy.PropertyType == typeof(DateTime))
+                {
+                    if (Convert.ToDateTime(propertiy.GetValue(t)) == DateTime.MinValue)
+                    {
+                        continue;
+                    }
+                }
+                if (isAppend)
+                {
+                    paramSqlBuilder.Append(",");
+                    valueSqlBuilder.Append(",");
+                }
+                var name = propertiy.GetColumnAttributeName();
+                paramSqlBuilder.AppendFormat("{0}{1}{2}", ProviderOption.OpenQuote, entity.FieldPairs[name], ProviderOption.CloseQuote);
+                valueSqlBuilder.Append(ProviderOption.ParameterPrefix + name);
+                Params.Add(ProviderOption.ParameterPrefix + name, propertiy.GetValue(t));
+                isAppend = true;
+            }
+            return new[] { paramSqlBuilder.ToString(), valueSqlBuilder.ToString() };
+        }
 
-		protected DataBaseContext<T> DataBaseContext<T>()
-		{
-			return (DataBaseContext<T>)Context;
-		}
-	
-		/// <summary>
-		/// 根据主键获取条件
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="entity"></param>
-		/// <returns></returns>
-		protected string GetIdentityWhere<T>(T entity, DynamicParameters param)
-		{
-			var entityObject = EntityCache.QueryEntity(typeof(T));
-			if (string.IsNullOrEmpty(entityObject.Identitys))
-				throw new DapperExtensionException("主键不存在!请前往实体类使用[Identity]特性设置主键。");
-			//获取主键数据
-			var id = entityObject.Properties
-				.FirstOrDefault(x => x.Name == entityObject.Identitys)
-				.GetValue(entity);
-			//设置参数
-			param.Add(entityObject.Identitys, id);
-			return $" AND {entityObject.Identitys}={ProviderOption.ParameterPrefix}{entityObject.Identitys} ";
-		}
-	}
+        protected DataBaseContext<T> DataBaseContext<T>()
+        {
+            return (DataBaseContext<T>)Context;
+        }
+
+        /// <summary>
+        /// 根据主键获取条件
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        protected string GetIdentityWhere<T>(T entity, DynamicParameters param)
+        {
+            var entityObject = EntityCache.QueryEntity(typeof(T));
+            if (string.IsNullOrEmpty(entityObject.Identitys))
+                throw new DapperExtensionException("主键不存在!请前往实体类使用[Identity]特性设置主键。");
+            //获取主键数据
+            var id = entityObject.Properties
+                .FirstOrDefault(x => x.Name == entityObject.Identitys)
+                .GetValue(entity);
+            //设置参数
+            param.Add(entityObject.Identitys, id);
+            return $" AND {entityObject.Identitys}={ProviderOption.ParameterPrefix}{entityObject.Identitys} ";
+        }
+    }
 }

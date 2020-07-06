@@ -72,8 +72,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
             StringBuilder builder = new StringBuilder("WHERE 1=1 ");
             for (int i = 0; i < lambdaExpressionList.Count; i++)
             {
-                prefix = $"{prefix}{i}";
-                var whereParam = new WhereExpression(lambdaExpressionList[i],prefix, provider);
+                var whereParam = new WhereExpression(lambdaExpressionList[i], $"{prefix}_{i}", provider);
                 builder.Append(whereParam.SqlCmd);
                 //参数
                 foreach (var paramKey in whereParam.Param.ParameterNames)
@@ -230,9 +229,8 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// <param name="t"></param>
         /// <param name="Param"></param>
         /// <param name="excludeFields"></param>
-        /// <param name="isBatch">是否批量修改</param>
         /// <returns></returns>
-        public virtual string ResolveUpdates<T>(T t, DynamicParameters param, string[] excludeFields, bool isBatch = false)
+        public virtual string ResolveUpdates<T>(T t, DynamicParameters Param, string[] excludeFields)
         {
             var entity = EntityCache.QueryEntity(t.GetType());
             var properties = entity.Properties;
@@ -273,13 +271,8 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
                 {
                     builder.Append(",");
                 }
-                string paramName = string.Empty;
-                if (!isBatch)
-                    paramName = $"{providerOption.ParameterPrefix}Update_{param.ParameterNames.Count()}";
-                else
-                    paramName = $"{providerOption.ParameterPrefix}Update_{name}";
-                builder.Append($"{providerOption.CombineFieldName(name)}={paramName}");
-                param.Add($"{paramName}", value);
+                builder.Append($"{providerOption.CombineFieldName(name)}={providerOption.ParameterPrefix}Update_{name}");
+                Param.Add($"{providerOption.ParameterPrefix}Update_{name}", value);
             }
             builder.Insert(0, " SET ");
             return builder.ToString();

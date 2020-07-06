@@ -38,6 +38,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             HavingExpressionList = new List<LambdaExpression>();
         }
 
+<<<<<<< HEAD
         public QuerySet(IDbConnection conn, SqlProvider sqlProvider, IDbTransaction dbTransaction) : base(conn, sqlProvider, dbTransaction)
         {
             TableType = typeof(T);
@@ -89,6 +90,66 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             WhereExpressionList.Add(predicate);
             return this;
         }
+=======
+		public QuerySet(IDbConnection conn, SqlProvider sqlProvider, IDbTransaction dbTransaction) : base(conn, sqlProvider, dbTransaction)
+		{
+			TableType = typeof(T);
+			SetContext = new DataBaseContext<T>
+			{
+				Set = this,
+				OperateType = EOperateType.Query
+			};
+			sqlProvider.Context = SetContext;
+			WhereExpressionList = new List<LambdaExpression>();
+			WhereBuilder = new StringBuilder();
+			Params = new DynamicParameters();
+			GroupExpressionList = new List<LambdaExpression>();
+			HavingExpressionList = new List<LambdaExpression>();
+		}
+		#region 基础函数
+		public QuerySet<T> AsTableName(Type type, string tableName)
+		{
+			SqlProvider.AsTableNameDic.Add(type, tableName);
+			return this;
+		}
+		/// <summary>
+		/// 不锁表查询(此方法只支持Mssql)
+		/// </summary>
+		/// <returns></returns>
+		public QuerySet<T> WithNoLock()
+		{
+			NoLock = true;
+			return this;
+		}
+		/// <summary>
+		/// 字段匹配[已弃用]
+		/// </summary>
+		/// <typeparam name="TSource"></typeparam>
+		/// <returns></returns>
+		public QuerySet<T> FieldMatch<TSource>()
+		{
+			return this;
+		}
+		#endregion
+		#region 条件
+		public QuerySet<T> Where(Expression<Func<T, bool>> predicate)
+		{
+			if (predicate != null)
+			{
+				WhereExpressionList.Add(predicate);
+			}
+			
+			return this;
+		}
+		public QuerySet<T> Where<TWhere>(Expression<Func<TWhere, bool>> predicate)
+		{
+			if(predicate != null)
+			{
+				WhereExpressionList.Add(predicate);
+			}
+			return this;
+		}
+>>>>>>> 0f7f297adff43ead4861f5f52d9d2b740d15ad2e
 
 
         public QuerySet<T> Where(T model)
