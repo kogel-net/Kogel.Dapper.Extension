@@ -84,22 +84,39 @@ namespace Kogel.Dapper.Extension.Expressions
             var expTypeName = node.Expression?.GetType().FullName ?? "";
             if (expTypeName == "System.Linq.Expressions.TypedParameterExpression" || expTypeName == "System.Linq.Expressions.PropertyExpression")
             {
-                //是否是成员值对象
-                if (expTypeName == "System.Linq.Expressions.PropertyExpression" && node.IsConstantExpression())
+                //验证是否是可空对象
+                if (!node.Expression.Type.FullName.Contains("System.Nullable")) //(node.Expression.Type != typeof(Nullable))
                 {
-                    //参数
-                    string paramName = $"{providerOption.ParameterPrefix}Member_Param_{Index}_{Param.ParameterNames.Count()}";
-                    //值
-                    object nodeValue = node.ToConvertAndGetValue();
-                    //设置sql
-                    SpliceField.Append(paramName);
-                    Param.Add(paramName, nodeValue);
-                    return node;
+                    //是否是成员值对象
+                    if (expTypeName == "System.Linq.Expressions.PropertyExpression" && node.IsConstantExpression())
+                    {
+                        //参数
+                        string paramName = $"{providerOption.ParameterPrefix}Member_Param_{Index}_{Param.ParameterNames.Count()}";
+                        //值
+                        object nodeValue = node.ToConvertAndGetValue();
+                        //设置sql
+                        SpliceField.Append(paramName);
+                        Param.Add(paramName, nodeValue);
+                        return node;
+                    }
+                    var member = EntityCache.QueryEntity(node.Expression.Type);
+                    string fieldName = member.FieldPairs[node.Member.Name];
+                    string field = (providerOption.IsAsName ? member.GetAsName(providerOption) : "") + providerOption.CombineFieldName(fieldName);
+                    SpliceField.Append(field);
                 }
-                var member = EntityCache.QueryEntity(node.Expression.Type);
-                string fieldName = member.FieldPairs[node.Member.Name];
-                string field = (providerOption.IsAsName ? member.GetAsName(providerOption) : "") + providerOption.CombineFieldName(fieldName);
-                SpliceField.Append(field);
+                else
+                {
+                    //可空函数
+                    Visit(node.Expression);
+                    switch (node.Member.Name)
+                    {
+                        case "HasValue":
+                            {
+                                this.SpliceField.Append(" IS NOT NULL");
+                            }
+                            break;
+                    }
+                }
             }
             else
             {
@@ -410,17 +427,17 @@ namespace Kogel.Dapper.Extension.Expressions
             var expTypeName = expType?.FullName ?? "";
             if (expTypeName == "System.Linq.Expressions.TypedParameterExpression" || expTypeName == "System.Linq.Expressions.PropertyExpression")
             {
-                //是否是成员值对象
-                if (expTypeName == "System.Linq.Expressions.PropertyExpression" && node.IsConstantExpression())
-                {
-                    SpliceField.Append(ParamName);
-                    object nodeValue = node.ToConvertAndGetValue();
-                    Param.Add(ParamName, nodeValue);
-                    return node;
-                }
                 //验证是否是可空对象
                 if (!node.Expression.Type.FullName.Contains("System.Nullable")) //(node.Expression.Type != typeof(Nullable))
                 {
+                    //是否是成员值对象
+                    if (expTypeName == "System.Linq.Expressions.PropertyExpression" && node.IsConstantExpression())
+                    {
+                        SpliceField.Append(ParamName);
+                        object nodeValue = node.ToConvertAndGetValue();
+                        Param.Add(ParamName, nodeValue);
+                        return node;
+                    }
                     var member = EntityCache.QueryEntity(node.Expression.Type);
                     string asName = string.Empty;
                     if (providerOption.IsAsName)
