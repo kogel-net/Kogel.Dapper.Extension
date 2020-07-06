@@ -7,6 +7,7 @@ using Kogel.Dapper.Extension.Model;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Dapper;
+using System.Data;
 
 namespace Kogel.Dapper.Extension.Extension.From
 {
@@ -41,6 +42,12 @@ namespace Kogel.Dapper.Extension.Extension.From
             querySet.SqlProvider.Context.Set.SelectExpression = exp;
             querySet.SqlProvider.FormatToList<T>();
             return querySet.DbCon.Query_1<TReturn>(querySet.SqlProvider, querySet.DbTransaction);
+        }
+        public DataSet ToDataSet<TReturn>(LambdaExpression exp, IDbDataAdapter dataAdapter = null)
+        {
+            querySet.SqlProvider.Context.Set.SelectExpression = exp;
+            querySet.SqlProvider.FormatToList<T>();
+            return querySet.DbCon.QueryDataSets(querySet.SqlProvider, querySet.DbTransaction, dataAdapter);
         }
         public ISelect<T> OrderBy<TProperty>(Expression<Func<TProperty, object>> field)
         {
@@ -123,6 +130,17 @@ namespace Kogel.Dapper.Extension.Extension.From
             else
                 return base.ToList<TReturn>(falseSelect).ToList();
         }
+        public DataSet ToDataSet<TReturn>(Expression<Func<T1, T2, TReturn>> select, IDbDataAdapter dataAdapter = null)
+        {
+            return base.ToDataSet<TReturn>(select, dataAdapter);
+        }
+        public DataSet ToDataSet<TReturn>(bool where, Expression<Func<T1, T2, TReturn>> trueSelect, Expression<Func<T1, T2, TReturn>> falseSelect, IDbDataAdapter dataAdapter = null)
+        {
+            if (where)
+                return base.ToDataSet<TReturn>(trueSelect, dataAdapter);
+            else
+                return base.ToDataSet<TReturn>(falseSelect, dataAdapter);
+        }
         public new ISelectFrom<T, T1, T2> OrderBy<TProperty>(Expression<Func<TProperty, object>> field)
         {
             base.OrderBy(field);
@@ -191,6 +209,17 @@ namespace Kogel.Dapper.Extension.Extension.From
             else
                 return base.ToList<TReturn>(falseSelect).ToList();
         }
+        public DataSet ToDataSet<TReturn>(Expression<Func<T1, T2, T3, TReturn>> select, IDbDataAdapter dataAdapter = null)
+        {
+            return base.ToDataSet<TReturn>(select, dataAdapter);
+        }
+        public DataSet ToDataSet<TReturn>(bool where, Expression<Func<T1, T2, T3, TReturn>> trueSelect, Expression<Func<T1, T2, T3, TReturn>> falseSelect, IDbDataAdapter dataAdapter = null)
+        {
+            if (where)
+                return base.ToDataSet<TReturn>(trueSelect, dataAdapter);
+            else
+                return base.ToDataSet<TReturn>(falseSelect, dataAdapter);
+        }
         public new ISelectFrom<T, T1, T2, T3> OrderBy<TProperty>(Expression<Func<TProperty, object>> field)
         {
             base.OrderBy(field);
@@ -258,6 +287,17 @@ namespace Kogel.Dapper.Extension.Extension.From
                 return base.ToList<TReturn>(trueSelect).ToList();
             else
                 return base.ToList<TReturn>(falseSelect).ToList();
+        }
+        public DataSet ToDataSet<TReturn>(Expression<Func<T1, T2, T3, T4, TReturn>> select, IDbDataAdapter dataAdapter = null)
+        {
+            return base.ToDataSet<TReturn>(select, dataAdapter);
+        }
+        public DataSet ToDataSet<TReturn>(bool where, Expression<Func<T1, T2, T3, T4, TReturn>> trueSelect, Expression<Func<T1, T2, T3, T4, TReturn>> falseSelect, IDbDataAdapter dataAdapter = null)
+        {
+            if (where)
+                return base.ToDataSet<TReturn>(trueSelect, dataAdapter);
+            else
+                return base.ToDataSet<TReturn>(falseSelect, dataAdapter);
         }
         public new ISelectFrom<T, T1, T2, T3, T4> OrderBy<TProperty>(Expression<Func<TProperty, object>> field)
         {
