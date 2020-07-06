@@ -27,12 +27,12 @@ namespace Kogel.Dapper.Extension
 		/// <summary>
 		/// 条件表达式对象
 		/// </summary>
-		internal List<LambdaExpression> WhereExpressionList { get; set; }
+		public List<LambdaExpression> WhereExpressionList { get; set; }
 
 		/// <summary>
 		/// 表达式排序集合
 		/// </summary>
-		internal Dictionary<LambdaExpression, EOrderBy> OrderbyExpressionList { get;  set; }
+		public Dictionary<LambdaExpression, EOrderBy> OrderbyExpressionList { get;  set; }
 
 		/// <summary>
 		/// 字符串排序

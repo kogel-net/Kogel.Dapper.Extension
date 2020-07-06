@@ -7,6 +7,7 @@ using Kogel.Dapper.Extension.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -259,6 +260,12 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
                     {
                         continue;
                     }
+                }
+                var typeAttribute2 = customAttributes.FirstOrDefault(x => x.GetType().Equals(typeof(KeyAttribute)));
+                if (typeAttribute2 != null)
+                {
+                    continue;
+
                 }
                 object value = propertiy.GetValue(t);
                 string name = entity.FieldPairs[propertiy.Name];

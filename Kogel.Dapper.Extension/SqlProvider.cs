@@ -10,6 +10,7 @@ using Kogel.Dapper.Extension.Attributes;
 using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension.Helper;
 using Kogel.Dapper.Extension;
+using System.ComponentModel.DataAnnotations;
 
 namespace Kogel.Dapper.Extension
 {
@@ -132,6 +133,12 @@ namespace Kogel.Dapper.Extension
 						continue;
 					}
 				}
+				var typeAttribute2 = customAttributes.FirstOrDefault(x => x.GetType().Equals(typeof(KeyAttribute)));
+                if (typeAttribute2 != null)
+                {
+                    continue;
+
+                }
 				//排除掉时间格式为最小值的字段
 				if (propertiy.PropertyType == typeof(DateTime))
 				{

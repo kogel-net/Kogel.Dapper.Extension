@@ -7,6 +7,7 @@ using Kogel.Dapper.Extension.Helper;
 using Kogel.Dapper.Extension.Core.Interfaces;
 using System.Linq.Expressions;
 using System.Data;
+using System.ComponentModel.DataAnnotations;
 
 namespace Kogel.Dapper.Extension.Model
 {
@@ -141,6 +142,14 @@ namespace Kogel.Dapper.Extension.Model
 						this.Identitys = this.FieldPairs[item.Name];
 						EntityFieldList[EntityFieldList.Count - 1].IsIdentity = true;
 						EntityFieldList[EntityFieldList.Count - 1].IsIncrease = (identityAttribute as Identity).IsIncrease;
+					}
+
+					var identityAttribute2 = item.GetCustomAttributes(true).FirstOrDefault(x => x.GetType().Equals(typeof(KeyAttribute)));
+					if (identityAttribute2 != null)
+					{
+						this.Identitys = this.FieldPairs[item.Name];
+						EntityFieldList[EntityFieldList.Count - 1].IsIdentity = true;
+						EntityFieldList[EntityFieldList.Count - 1].IsIncrease = true;
 					}
 				}
 			}
