@@ -71,8 +71,8 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
             StringBuilder builder = new StringBuilder("WHERE 1=1 ");
             for (int i = 0; i < lambdaExpressionList.Count; i++)
             {
-                prefix = $"{prefix}{i}";
-                var whereParam = new WhereExpression(lambdaExpressionList[i],prefix, provider);
+                prefix = $"{prefix}{(i)}_";
+                var whereParam = new WhereExpression(lambdaExpressionList[i], prefix, provider);
                 builder.Append(whereParam.SqlCmd);
                 //参数
                 foreach (var paramKey in whereParam.Param.ParameterNames)
