@@ -244,7 +244,7 @@ namespace Kogel.Dapper.Extension.Expressions
                         SpliceField.Append(")");
                     }
                     break;
-                case "Concact":
+                case "Concat":
                     {
                         SpliceField.Append("Concat(");
                         Visit(node.Arguments[0]);
@@ -782,7 +782,7 @@ namespace Kogel.Dapper.Extension.Expressions
                         SpliceField.Append(")");
                     }
                     break;
-                case "Concact":
+                case "Concat":
                     {
                         SpliceField.Append("Concat(");
                         Visit(node.Arguments[0]);

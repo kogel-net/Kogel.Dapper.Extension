@@ -47,7 +47,7 @@ namespace Kogel.Dapper.Extension
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        public static T Concact<T>(T left, T right)
+        public static T Concat<T>(T left, T right)
         {
             return default(T);
         }
