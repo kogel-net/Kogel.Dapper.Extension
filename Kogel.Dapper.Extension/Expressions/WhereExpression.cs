@@ -64,9 +64,9 @@ namespace Kogel.Dapper.Extension.Expressions
         {
             if (node.NodeType == ExpressionType.Not)
             {
-                this._sqlCmd.Append(" Not (");
+                base.SpliceField.Append(" Not (");
                 Visit(node.Operand);
-                this._sqlCmd.Append(") ");
+                base.SpliceField.Append(") ");
             }
             else
             {
