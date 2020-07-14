@@ -2883,7 +2883,6 @@ namespace Dapper
 
 		private static T ExecuteScalarImpl<T>(IDbConnection cnn, ref CommandDefinition command)
 		{
-
 			Aop.InvokeExecuting(ref command);
 			Action<IDbCommand, object> paramReader = null;
 			object param = command.Parameters;
@@ -2916,14 +2915,13 @@ namespace Dapper
 		private static IDataReader ExecuteReaderImpl(IDbConnection cnn, ref CommandDefinition command, CommandBehavior commandBehavior, out IDbCommand cmd)
 		{
 			Aop.InvokeExecuting(ref command);
-
-			Action<IDbCommand, object> paramReader = GetParameterReader(cnn, ref command);
+			Action<IDbCommand, object> paramReader = GetParameterReader(command.Connection, ref command);
 			cmd = null;
-			bool wasClosed = cnn.State == ConnectionState.Closed, disposeCommand = true;
+			bool wasClosed = command.Connection.State == ConnectionState.Closed, disposeCommand = true;
 			try
 			{
-				cmd = command.SetupCommand(cnn, paramReader);
-				if (wasClosed) cnn.Open();
+				cmd = command.SetupCommand(command.Connection, paramReader);
+				if (wasClosed) command.Connection.Open();
 				var reader = ExecuteReaderWithFlagsFallback(cmd, wasClosed, commandBehavior);
 				wasClosed = false; // don't dispose before giving it to them!
 				disposeCommand = false;
@@ -2932,7 +2930,7 @@ namespace Dapper
 			}
 			finally
 			{
-				if (wasClosed) cnn.Close();
+				if (wasClosed) command.Connection.Close();
 				if (cmd != null && disposeCommand) cmd.Dispose();
 
 				Aop.InvokeExecuted(ref command);
