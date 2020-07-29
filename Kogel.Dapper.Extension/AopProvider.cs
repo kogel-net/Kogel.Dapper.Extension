@@ -37,9 +37,7 @@ namespace Kogel.Dapper.Extension
 			this.OnExecuted?.Invoke(ref definition);
 		}
 
-
-		[ThreadStatic]
-		private static ThreadLocal<AopProvider> _aop;
+		private static ThreadLocal<AopProvider> _aop = new ThreadLocal<AopProvider>();
 
 		/// <summary>
 		/// 获取当前线程唯一Aop
@@ -47,9 +45,9 @@ namespace Kogel.Dapper.Extension
 		/// <returns></returns>
 		public static AopProvider Get()
 		{
-			if (_aop == null)
+			if (_aop.Value == null)
 			{
-				_aop = new ThreadLocal<AopProvider>();
+				//_aop = new ThreadLocal<AopProvider>();
 				_aop.Value = new AopProvider();
 			}
 			return _aop.Value;
