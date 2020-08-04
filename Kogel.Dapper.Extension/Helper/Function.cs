@@ -63,6 +63,27 @@ namespace Kogel.Dapper.Extension
         {
             return default(T);
         }
+
+        /// <summary>
+        /// 拼接sql
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <returns></returns>
+        public static T ConcatSql<T>(string sql)
+        {
+            return default(T);
+        }
+
+        /// <summary>
+        /// 拼接sql
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public static T ConcatSql<T>(string sql, object param)
+        {
+            return default(T);
+        }
         #endregion
     }
 }

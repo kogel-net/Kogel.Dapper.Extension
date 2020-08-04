@@ -79,14 +79,14 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                 users = new User() { UserName = "test" };
 
                 var user = conn.QuerySet<User>()
-                  // .Where(x => x.UserName == users.UserName && x.Password == "test" && x.Password == "test" && x.Password == "test")
+                   // .Where(x => x.UserName == users.UserName && x.Password == "test" && x.Password == "test" && x.Password == "test")
                    .Where(x => x.Id.In(new int[] { 1, 2, 3 }) && x.UserName.In(names))
                    .Where(x => x.Id == 1)
                    .PageList(1, 10, x => new UserDetailDTO()
                    {
                        Id = x.Id,
                        FullName = x.FullName,
-                       UserName = x.UserName,
+                       UserName = Function.ConcatSql<string>(" Concat(UserName,@aaa) ", new { aaa = "ss" }),
                        RoleId = x.RoleId,
                        Role = conn.QuerySet<Role>().Where(y => y.Id == x.RoleId).Get(),
                    });

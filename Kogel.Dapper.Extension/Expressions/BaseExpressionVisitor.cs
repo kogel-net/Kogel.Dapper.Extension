@@ -262,6 +262,16 @@ namespace Kogel.Dapper.Extension.Expressions
                         SpliceField.Append(")");
                     }
                     break;
+                case "ConcatSql":
+                    {
+                        SpliceField.Append(node.Arguments[0].ToConvertAndGetValue());
+                        // Param
+                        if (node.Arguments.Count > 1)
+                        {
+                            Param.AddDynamicParams(node.Arguments[1].ToConvertAndGetValue());
+                        }
+                    }
+                    break;
                 #endregion
                 #region 聚合函数
                 case "Count":
@@ -528,6 +538,7 @@ namespace Kogel.Dapper.Extension.Expressions
             }
             return node;
         }
+
         /// <summary>
         /// 解析函数
         /// </summary>
@@ -798,6 +809,16 @@ namespace Kogel.Dapper.Extension.Expressions
                         SpliceField.Append(",");
                         Visit(node.Arguments[1]);
                         SpliceField.Append(")");
+                    }
+                    break;
+                case "ConcatSql":
+                    {
+                        SpliceField.Append(node.Arguments[0].ToConvertAndGetValue());
+                        // Param
+                        if (node.Arguments.Count > 1)
+                        {
+                            Param.AddDynamicParams(node.Arguments[1].ToConvertAndGetValue());
+                        }
                     }
                     break;
                 #endregion

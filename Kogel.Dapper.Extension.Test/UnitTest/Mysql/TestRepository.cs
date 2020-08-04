@@ -47,7 +47,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 					   .Distinct()
 					   .PageList(1, 1, x => new
 					   {
-						   id = Function.Concact(Function.Concact(x.Content, "test"), x.ArticleId.ToString())
+						   id = Function.Concat(Function.Concat(x.Content, "test"), x.ArticleId.ToString())
 					   });
 
 
