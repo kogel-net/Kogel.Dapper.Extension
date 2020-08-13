@@ -91,7 +91,7 @@ namespace Kogel.Repository
                 }
             }
         }
-
+        private static object transactionLock = new object();
         /// <summary>
         /// 提交
         /// </summary>
@@ -99,7 +99,7 @@ namespace Kogel.Repository
         {
             if (Transaction != null)
             {
-                lock (Transaction)
+                lock (transactionLock)
                     if (!IsAnyUnitOfWork() && !IsFirstCommit)
                     {
                         IsFirstCommit = true;
@@ -114,7 +114,7 @@ namespace Kogel.Repository
         public void Rollback()
         {
             if (Transaction != null)
-                lock (Transaction)
+                lock (transactionLock)
                     if (!IsAnyUnitOfWork() && !IsFirstCommit)
                     {
                         IsFirstCommit = true;
