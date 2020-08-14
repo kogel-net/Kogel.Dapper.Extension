@@ -60,6 +60,7 @@ namespace Kogel.Repository
             }
             catch (Exception ex)
             {
+                IsFirstCommit = true;
                 this.Rollback();
                 throw ex;
             }
