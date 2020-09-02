@@ -171,6 +171,14 @@ namespace Kogel.Dapper.Extension.Core.SetQ
                                 continue;
                             }
                         }
+                        else if (tree.ValueType == DbType.Boolean)
+                        {
+                            if (value.ToString() == "")
+                            {
+                                continue;
+                            }
+                            value = Convert.ToBoolean(value);
+                        }
                         Expression whereExpress = null;
                         switch (tree.Operators)
                         {
@@ -312,7 +320,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         /// <param name="joinMode"></param>
         /// <param name="isDisField"></param>
         /// <returns></returns>
-        public QuerySet<T>Join<TWhere,TInner>(Expression<Func<TWhere, TInner, bool>> expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true)
+        public QuerySet<T> Join<TWhere, TInner>(Expression<Func<TWhere, TInner, bool>> expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true)
         {
             Join<TInner>(expression, joinMode, isDisField);
             return this;
@@ -328,7 +336,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         /// <param name="joinMode"></param>
         /// <param name="isDisField"></param>
         /// <returns></returns>
-        public QuerySet<T> Join<TWhere, TInner,TWhere2>(Expression<Func<TWhere, TInner, TWhere2, bool>> expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true)
+        public QuerySet<T> Join<TWhere, TInner, TWhere2>(Expression<Func<TWhere, TInner, TWhere2, bool>> expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true)
         {
             Join<TInner>(expression, joinMode, isDisField);
             return this;

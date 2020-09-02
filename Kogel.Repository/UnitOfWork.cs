@@ -26,11 +26,6 @@ namespace Kogel.Repository
         public IDbTransaction Transaction { get; set; }
 
         /// <summary>
-        /// 是否第一次提交
-        /// </summary>
-        private bool IsFirstCommit { get; set; } = false;
-
-        /// <summary>
         /// 
         /// </summary>
         /// <param name="connection"></param>
@@ -60,7 +55,6 @@ namespace Kogel.Repository
             }
             catch (Exception ex)
             {
-                IsFirstCommit = true;
                 this.Rollback();
                 throw ex;
             }
@@ -80,33 +74,24 @@ namespace Kogel.Repository
             //相同数据库链接才会进入单元事务
             if (command.Connection.ConnectionString.Contains(this.Connection.ConnectionString))
             {
-                lock (command.Connection)
+                //是否进入过工作单元(防止循环嵌套UnitOfWork)
+                if (!command.IsUnifOfWork)
                 {
-                    //是否进入过工作单元(防止循环嵌套UnitOfWork)
-                    if (!command.IsUnifOfWork)
-                    {
-                        command.IsUnifOfWork = true;
-                        command.Connection = this.Connection;
-                        command.Transaction = this.Transaction;
-                    }
+                    command.IsUnifOfWork = true;
+                    command.Connection = this.Connection;
+                    command.Transaction = this.Transaction;
                 }
             }
         }
-        private static object transactionLock = new object();
+
         /// <summary>
         /// 提交
         /// </summary>
         public void Commit()
         {
             if (Transaction != null)
-            {
-                lock (transactionLock)
-                    if (!IsAnyUnitOfWork() && !IsFirstCommit)
-                    {
-                        IsFirstCommit = true;
-                        Transaction.Commit();
-                    }
-            }
+                if (!IsAnyUnitOfWork())
+                    Transaction.Commit();
         }
 
         /// <summary>
@@ -115,12 +100,8 @@ namespace Kogel.Repository
         public void Rollback()
         {
             if (Transaction != null)
-                lock (transactionLock)
-                    if (!IsAnyUnitOfWork() && !IsFirstCommit)
-                    {
-                        IsFirstCommit = true;
-                        Transaction.Rollback();
-                    }
+                if (!IsAnyUnitOfWork())
+                    Transaction.Rollback();
         }
 
         /// <summary>
