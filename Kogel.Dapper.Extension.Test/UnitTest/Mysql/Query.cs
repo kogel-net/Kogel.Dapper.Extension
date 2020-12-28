@@ -20,6 +20,7 @@ using Kogel.Dapper.Extension.MySql.Extension;
 using Lige.Model;
 using zgh_service_api.DTO;
 using zgh_service_api.Models;
+using Kogel.Dapper.Extension.Test.Model.Digiwin;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 {
@@ -73,7 +74,12 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
             using (var conn = new MySqlConnection(mysqlConnection))
             {
-                EntityCache.Register(typeof(AdminUser));
+
+                var queryList = conn.QuerySet<TAM_SERIAL_NO_CREATE_BAS>()
+                    .Where(x => x.CREATOR == "digiwin001" && x.DELETE_FLAG == "N")
+                    .ToDataSet(new MySqlDataAdapter());
+
+
 
                 string[] names = new string[] { "test", "test1" };
                 users = new User() { UserName = "test" };
@@ -98,10 +104,6 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                     .WhereIf(false, x => 1 != 1, x => 1 == 1)
                     .Get();
 
-
-                ////测试codefirst
-                //CodeFirst codeFirst = new CodeFirst(conn);
-                //codeFirst.SyncStructure();
 
                 var dataSet = conn.QuerySet<Comment>()
                        .Where(x => 1 == 1)

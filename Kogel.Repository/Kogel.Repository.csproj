@@ -6,7 +6,7 @@
     <Description>官方文档
 https://www.cnblogs.com/kogel/p/10805696.html</Description>
     <Authors>Kogel</Authors>
-    <TargetFrameworks>net45;net451;netstandard2.0;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>net45;net451;netstandard2.0;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
     <Company>Kogel.Repository</Company>
     <Product>Kogel.Repository</Product>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

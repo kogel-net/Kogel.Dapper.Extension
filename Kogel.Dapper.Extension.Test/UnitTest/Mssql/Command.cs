@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Kogel.Dapper.Extension.MsSql;
+using Dapper;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
 {
@@ -25,12 +26,14 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
                 RefCommentId = 0
             };
 
+            SqlMapper.Aop.OnExecuting += Aop_OnExecuting;
+
             using (var conn = new SqlConnection(mssqlConnection))
             {
-				conn.Open();
+                conn.Open();
 
-				//根据成员修改
-				var result = conn.CommandSet<Comment>()
+                //根据成员修改
+                var result = conn.CommandSet<Comment>()
                 .Where(x => x.Id > commne.Id || x.Id < commne.Id)
                 .Update(x => new Comment()
                 {
@@ -76,6 +79,15 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mssql
                 var result5 = conn.CommandSet<Comment>()
                     .Where(x => x.Id == result3)
                     .Delete();
+            }
+        }
+
+        private void Aop_OnExecuting(ref CommandDefinition command)
+        {
+            var paramter = (DynamicParameters)command.Parameters;
+            foreach (var item in paramter.ParameterNames)
+            {
+                var value = paramter.Get<object>(item);
             }
         }
     }

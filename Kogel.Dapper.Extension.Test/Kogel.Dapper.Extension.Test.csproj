@@ -60,6 +60,7 @@
     <Compile Include="Model\Comment.cs" />
     <Compile Include="Model\Digiwin\RBACEntityBase.cs" />
     <Compile Include="Model\Digiwin\SYS_ROLE.cs" />
+    <Compile Include="Model\Digiwin\TAM_SERIAL_NO_CREATE_BAS.cs" />
     <Compile Include="Model\GiftDetail.cs" />
     <Compile Include="Model\Huang\EntityBase.cs" />
     <Compile Include="Model\Huang\EQP_NATURE_BAS.cs" />
