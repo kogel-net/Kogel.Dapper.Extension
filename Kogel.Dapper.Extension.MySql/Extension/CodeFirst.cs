@@ -95,7 +95,7 @@ namespace Kogel.Dapper.Extension.MySql.Extension
 		public string SyncField(EntityObject typeEntity, EntityField field)
 		{
 			string fieldName = connection.QuerySingleOrDefault<string>($@"SELECT COLUMN_NAME  FROM information_schema.columns 
-                                                   WHERE TABLE_NAME = '{typeEntity.Name}' AND COLUMN_NAME = '{field.FieldName}'");
+                                                   WHERE TABLE_NAME = '{typeEntity.AsName}' AND COLUMN_NAME = '{field.FieldName}'");
 			//存在
 			if (!string.IsNullOrEmpty(fieldName))
 			{
@@ -105,7 +105,7 @@ namespace Kogel.Dapper.Extension.MySql.Extension
 			else//不存在
 			{
 				string fieldType = ConversionFieldType(field.SqlDbType, field.Length);
-				StringBuilder fieldScript = new StringBuilder($"ALTER TABLE `{typeEntity.Name}`");
+				StringBuilder fieldScript = new StringBuilder($"ALTER TABLE `{typeEntity.AsName}`");
 				fieldScript.Append($" ADD `{field.FieldName}` {fieldType} ");
 				//设置是否可以为空
 				if (field.IsNull)
@@ -146,7 +146,7 @@ namespace Kogel.Dapper.Extension.MySql.Extension
 		public void SyncTable(EntityObject typeEntity)
 		{
 			//首先检查表是否存在
-			string tableName = connection.QuerySingleOrDefault<string>($"SHOW TABLES LIKE '{typeEntity.Name}'");
+			string tableName = connection.QuerySingleOrDefault<string>($"SHOW TABLES LIKE '{typeEntity.AsName}'");
 			//脚本字符
 			StringBuilder scriptBuilder = new StringBuilder();
 			//创建表时会产生一个测试字段
@@ -155,7 +155,7 @@ namespace Kogel.Dapper.Extension.MySql.Extension
 			if (string.IsNullOrEmpty(tableName))
 			{
 				//创建整张表
-				scriptBuilder.Append($@"CREATE TABLE `{typeEntity.Name}`(
+				scriptBuilder.Append($@"CREATE TABLE `{typeEntity.AsName}`(
                                        `{testidName}` INT 
                                      );");
 			}
@@ -170,7 +170,7 @@ namespace Kogel.Dapper.Extension.MySql.Extension
 				//删除测试字段
 				if (script.Contains(testidName))
 				{
-					script += $@"ALTER TABLE `{typeEntity.Name}`
+					script += $@"ALTER TABLE `{typeEntity.AsName}`
                                             DROP `{testidName}`";
 				}
 				connection.Execute(script);

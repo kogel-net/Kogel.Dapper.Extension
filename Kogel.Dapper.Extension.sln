@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.757
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31112.23
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kogel.Dapper.Extension", "Kogel.Dapper.Extension\Kogel.Dapper.Extension.csproj", "{87E91D82-CE44-43B0-92B0-F4279A6708D7}"
 EndProject
@@ -14,12 +14,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kogel.Dapper.Extension.MySql", "Kogel.Dapper.Extension.MySql\Kogel.Dapper.Extension.MySql.csproj", "{1E431FF9-D7F5-4A31-8A1D-CD30AD7EBE6A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{E1D84770-977A-4B19-8631-6FB0BF7EA019}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{56AB7E02-01B7-4689-A44B-4711A3D9DF79}"
-	ProjectSection(SolutionItems) = preProject
-		..\mssql.sql = ..\mssql.sql
-		E:\Tools\mysql-5.7.27-winx64\mysql-5.7.27-winx64\bin\mysql.sql = E:\Tools\mysql-5.7.27-winx64\mysql-5.7.27-winx64\bin\mysql.sql
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FrameWork", "FrameWork", "{A91BBDFA-C068-46F6-945A-28AEA81F3395}"
 EndProject
