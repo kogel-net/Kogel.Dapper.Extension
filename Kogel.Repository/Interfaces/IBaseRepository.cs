@@ -10,12 +10,18 @@ using Kogel.Dapper.Extension.Core.Interfaces;
 
 namespace Kogel.Repository.Interfaces
 {
-	public interface IBaseRepository<T>
+	public interface IBaseRepository<T>: IDisposable
 	{
 		/// <summary>
 		/// 
 		/// </summary>
 		IDbConnection Orm { get; }
+
+		/// <summary>
+		/// 改变当前连接库（分库时可能会用到）
+		/// </summary>
+		/// <param name="dbConnection"></param>
+		void ChangeDataBase(string dbName = "master");
 
 		/// <summary>
 		/// 工作单元

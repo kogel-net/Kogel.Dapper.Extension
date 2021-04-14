@@ -112,8 +112,8 @@ namespace Kogel.Repository
             if (Transaction != null)
                 Transaction.Dispose();
 
-            if (Connection != null)
-                Connection.Dispose();
+            //if (Connection != null)
+            //    Connection.Dispose();
 
             GC.SuppressFinalize(this);
         }
