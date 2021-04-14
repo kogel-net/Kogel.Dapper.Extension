@@ -16,23 +16,26 @@ namespace Kogel.Dapper.Extension
     public class EntityCache
     {
         internal static List<EntityObject> EntitieList = new List<EntityObject>();
-
+        private static object EntitieLock = new object();
         /// <summary>
         /// 注册动态化查询可能会用到的实体类
         /// </summary>
         /// <param name="entity">实体类</param>
         public static EntityObject Register(Type entity)
         {
-            EntityObject entityObject = new EntityObject(entity);
-            if (!EntitieList.Exists(x => x.AssemblyString.Equals(entityObject.AssemblyString)))
+            lock (EntitieLock)
             {
-				SqlMapper.SetTypeMap(entityObject.Type, new CustomPropertyTypeMap(entityObject.Type,
-					(type, column) =>
-					type.GetPropertys(entityObject.FieldPairs.FirstOrDefault(x => x.Value.Equals(column)).Key)
-					));
-				EntitieList.Add(entityObject);
+                EntityObject entityObject = new EntityObject(entity);
+                if (!EntitieList.Exists(x => x.AssemblyString.Equals(entityObject.AssemblyString)))
+                {
+                    SqlMapper.SetTypeMap(entityObject.Type, new CustomPropertyTypeMap(entityObject.Type,
+                        (type, column) =>
+                        type.GetPropertys(entityObject.FieldPairs.FirstOrDefault(x => x.Value.Equals(column)).Key)
+                        ));
+                    EntitieList.Add(entityObject);
+                }
+                return entityObject;
             }
-            return entityObject;
         }
 
         /// <summary>
@@ -68,36 +71,39 @@ namespace Kogel.Dapper.Extension
         /// <returns></returns>
         public static EntityObject QueryEntity(Type entity)
         {
-            var entityType = EntitieList.ToArray().FirstOrDefault(x => x.Type.FullName.Equals(entity.FullName));
-            if (entityType != null)
+            lock (EntitieLock)
             {
-                return entityType;
-            }
-            else
-            {
-                return Register(entity);
+                var entityType = EntitieList.ToArray().FirstOrDefault(x => x.Type.FullName.Equals(entity.FullName));
+                if (entityType != null)
+                {
+                    return entityType;
+                }
+                else
+                {
+                    return Register(entity);
+                }
             }
         }
 
-		/// <summary>
-		/// 查询实体类信息（模糊查询）
-		/// </summary>
-		/// <param name="entityFullName"></param>
-		/// <returns></returns>
-		public static EntityObject QueryEntity(string entityFullName)
-		{
-			var entityType = EntitieList.FirstOrDefault(x => x.Type.FullName.Contains(entityFullName));
-			return entityType;
-		}
+        /// <summary>
+        /// 查询实体类信息（模糊查询）
+        /// </summary>
+        /// <param name="entityFullName"></param>
+        /// <returns></returns>
+        public static EntityObject QueryEntity(string entityFullName)
+        {
+            var entityType = EntitieList.FirstOrDefault(x => x.Type.FullName.Contains(entityFullName));
+            return entityType;
+        }
 
-		/// <summary>
-		/// 获取所有实体
-		/// </summary>
-		/// <returns></returns>
-		public static List<EntityObject> GetEntities()
-		{
-			Type entityType;
-			return EntitieList.Where(x=> ExpressionExtension.IsAnyBaseEntity(x.Type, out entityType)).Distinct().ToList();
-		}
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <returns></returns>
+        public static List<EntityObject> GetEntities()
+        {
+            Type entityType;
+            return EntitieList.Where(x => ExpressionExtension.IsAnyBaseEntity(x.Type, out entityType)).Distinct().ToList();
+        }
     }
 }

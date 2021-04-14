@@ -27,11 +27,13 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
             using (var repository = new FlowOrderRepository())
             {
 
-                var findFlowOrder = repository.QuerySet()
+                var flowOrder = repository.QuerySet()
                     .AsTableName(typeof(FlowOrder), "flow_order_1")
                     .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
                     .Get();
-                   
+
+
+                var findFlowOrder = repository.FindById(1);
             }
 
 
