@@ -97,7 +97,7 @@ namespace Kogel.Dapper.Extension.Oracle.Extension
 		public string SyncField(EntityObject typeEntity, EntityField field)
 		{
 			string fieldName = connection.QuerySingleOrDefault<string>($@"SELECT COLUMN_NAME FROM ALL_TAB_COLUMNS 
-                                                   WHERE UPPER(TABLE_NAME) = UPPER('{typeEntity.Name}') AND UPPER(COLUMN_NAME) = UPPER('{field.FieldName}')");
+                                                   WHERE UPPER(TABLE_NAME) = UPPER('{typeEntity.AsName}') AND UPPER(COLUMN_NAME) = UPPER('{field.FieldName}')");
 			//存在
 			if (!string.IsNullOrEmpty(fieldName))
 			{
@@ -107,7 +107,7 @@ namespace Kogel.Dapper.Extension.Oracle.Extension
 			else//不存在
 			{
 				string fieldType = ConversionFieldType(field.SqlDbType, field.Length);
-				StringBuilder fieldScript = new StringBuilder($@"ALTER TABLE ""{typeEntity.Name}""");
+				StringBuilder fieldScript = new StringBuilder($@"ALTER TABLE ""{typeEntity.AsName}""");
 				fieldScript.Append($@" ADD (""{ field.FieldName}"" {fieldType}");
 				//设置默认值
 				if (field.DefaultValue != null)
@@ -119,19 +119,19 @@ namespace Kogel.Dapper.Extension.Oracle.Extension
 					fieldScript.Append(" NOT NULL");
 				//设置是否是主键
 				if (field.IsIdentity)
-					fieldScript.Append($" CONSTRAINT PRIMARY_KEY_{typeEntity.Name}_{field.FieldName} PRIMARY KEY");
+					fieldScript.Append($" CONSTRAINT PRIMARY_KEY_{typeEntity.AsName}_{field.FieldName} PRIMARY KEY");
 				fieldScript.Append(")");
 
 				string script = fieldScript.ToString();
 				connection.Execute(script);
 				//设置备注
 				if (!string.IsNullOrEmpty(field.Description))
-					connection.Execute($@"COMMENT ON COLUMN ""{typeEntity.Name}"".""{field.FieldName}""   is   '{field.Description} '");
+					connection.Execute($@"COMMENT ON COLUMN ""{typeEntity.AsName}"".""{field.FieldName}""   is   '{field.Description} '");
 				//设置是否自增
 				if (field.IsIncrease)
 				{
 					//序列名称
-					string sequenceName = ($"{typeEntity.Name}_{field.FieldName}_SEQ").ToUpper();
+					string sequenceName = ($"{typeEntity.AsName}_{field.FieldName}_SEQ").ToUpper();
 					//检索是否存在此序列
 					string seqName = connection.QueryFirstOrDefault<string>($@"SELECT SEQUENCE_NAME FROM all_sequences 
                           WHERE SEQUENCE_NAME = '{sequenceName}'");
@@ -144,8 +144,8 @@ namespace Kogel.Dapper.Extension.Oracle.Extension
 					//创建序列
 					connection.Execute($"CREATE SEQUENCE {sequenceName} Increment by 1 Start With 1 Nomaxvalue Nocycle Cache 10");
 					//创建触发器
-					connection.Execute($@"CREATE OR REPLACE TRIGGER {typeEntity.Name}_SEQUENCE_TRIG
-                                       BEFORE INSERT ON ""{typeEntity.Name}""
+					connection.Execute($@"CREATE OR REPLACE TRIGGER {typeEntity.AsName}_SEQUENCE_TRIG
+                                       BEFORE INSERT ON ""{typeEntity.AsName}""
 									   FOR EACH ROW
 									   BEGIN
 									       SELECT {sequenceName}.NEXTVAL INTO :new.""{field.FieldName}"" FROM DUAL;
@@ -173,7 +173,7 @@ namespace Kogel.Dapper.Extension.Oracle.Extension
 		public void SyncTable(EntityObject typeEntity)
 		{
 			//首先检查表是否存在
-			string tableName = connection.QuerySingleOrDefault<string>($"SELECT TABLE_NAME FROM ALL_TABLES WHERE UPPER(TABLE_NAME) =UPPER('{typeEntity.Name}')");
+			string tableName = connection.QuerySingleOrDefault<string>($"SELECT TABLE_NAME FROM ALL_TABLES WHERE UPPER(TABLE_NAME) =UPPER('{typeEntity.AsName}')");
 			//脚本字符 oracle无法多条语句一起执行
 			StringBuilder scriptBuilder = new StringBuilder();
 			//创建表时会产生一个测试字段
@@ -182,7 +182,7 @@ namespace Kogel.Dapper.Extension.Oracle.Extension
 			if (string.IsNullOrEmpty(tableName))
 			{
 				//创建整张表
-				scriptBuilder.Append($@"CREATE TABLE ""{typeEntity.Name}"" (
+				scriptBuilder.Append($@"CREATE TABLE ""{typeEntity.AsName}"" (
                                           ""{testidName}"" NUMBER
                                           )");
 				connection.Execute(scriptBuilder.ToString());
@@ -198,7 +198,7 @@ namespace Kogel.Dapper.Extension.Oracle.Extension
 				//删除测试字段
 				if (script.Contains(testidName))
 				{
-					connection.Execute($@"ALTER TABLE ""{typeEntity.Name}"" DROP (""{testidName}"")");
+					connection.Execute($@"ALTER TABLE ""{typeEntity.AsName}"" DROP (""{testidName}"")");
 				}
 			}
 		}

@@ -1,7 +1,6 @@
 ﻿using Kogel.Dapper.Extension.Core.SetQ;
 using Kogel.Dapper.Extension.Extension.From;
 //using Kogel.Dapper.Extension.MySql;
-using Kogel.Dapper.Extension.Test.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,43 +17,39 @@ namespace Kogel.Dapper.Extension.Test
     {
         static void Main(string[] args)
         {
-			////预热实体类
-			//EntityCache.Register(new Type[] {
-			//	typeof(Comment),
-			//	typeof(Comment1),
-			//	typeof(News),
-			//	typeof(ResourceMapping),
-			//});
+            ////预热实体类
+            //EntityCache.Register(new Type[] {
+            //	typeof(Comment),
+            //	typeof(Comment1),
+            //	typeof(News),
+            //	typeof(ResourceMapping),
+            //});
 
-			#region mssql单元测试
-			//var mssqlQuery = new UnitTest.Mssql.Query();
-			//mssqlQuery.Test();
+            #region mssql单元测试
+            //var mssqlQuery = new UnitTest.Mssql.Query();
+            //mssqlQuery.Test();
 
-			//var mssqlCommand = new UnitTest.Mssql.Command();
-			//mssqlCommand.Test();
-			//#endregion
+            //var mssqlCommand = new UnitTest.Mssql.Command();
+            //mssqlCommand.Test();
+            #endregion
 
-			//#region mysql单元测试
-			var mysqlQuery = new UnitTest.Mysql.Query();
-			mysqlQuery.Test();
+            #region mysql单元测试
+            var mysqlQuery = new UnitTest.Mysql.Query();
+            mysqlQuery.Test();
 
-			//var mysqlResQuery = new UnitTest.Mysql.TestRepositoryQuery();
-			//mysqlResQuery.Test();
-			////mysqlQuery.TestMaxAndMin();
+            //var mysqlCommand = new UnitTest.Mysql.Command();
+            //mysqlCommand.Test();
+            #endregion
 
-			var mysqlCommand = new UnitTest.Mysql.Command();
-			mysqlCommand.Test();
-			#endregion
+            //stopwatch.Stop();
 
-			//stopwatch.Stop();
+            //#region oracle单元测试
+            //var oracleQuery = new UnitTest.Oracle.Query();
+            //oracleQuery.Test();
 
-			//#region oracle单元测试
-			//var oracleQuery = new UnitTest.Oracle.Query();
-			//oracleQuery.Test();
-
-			//var oracleCommand = new UnitTest.Oracle.Command();
-			//oracleCommand.Test();
-			//#endregion
-		}
-	}
+            //var oracleCommand = new UnitTest.Oracle.Command();
+            //oracleCommand.Test();
+            //#endregion
+        }
+    }
 }
