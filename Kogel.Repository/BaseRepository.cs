@@ -14,7 +14,7 @@ using Kogel.Dapper.Extension.Extension;
 
 namespace Kogel.Repository
 {
-    public abstract class BaseRepository<T> : IBaseRepository<T>, IDisposable
+    public abstract class BaseRepository<T> : IBaseRepository<T>
     {
         /// <summary>
         /// 
@@ -67,19 +67,13 @@ namespace Kogel.Repository
         {
             if (UnitOfWork != null)
                 UnitOfWork.Dispose();
-            else
-            {
-                //if (Orm != null)
-                //{
-                //    Orm.Dispose();
-                //}
-                //释放整个连接池
-                if (Options.Connections != null)
-                    foreach (var conn in Options.Connections)
-                    {
-                        conn.Item1.Dispose();
-                    }
-            }
+
+            //释放整个连接池
+            if (Options.Connections != null)
+                foreach (var conn in Options.Connections)
+                {
+                    conn.Item1.Dispose();
+                }
         }
 
         /// <summary>

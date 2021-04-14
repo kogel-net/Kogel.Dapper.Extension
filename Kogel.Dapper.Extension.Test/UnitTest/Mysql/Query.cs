@@ -46,11 +46,12 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
             }
 
             var conn = new MySqlConnection("server=localhost;port=3306;user id=root;password=A5101264a;database=gc_fps_receivable;");
-
-            //使用自定义仓储
-            var flowOrder1 = conn.QuerySet<FlowOrder>()
-                .GetRepository() //自定义仓储释放时 conn也会释放
-                .FindById(1);
+            //自定义仓储释放时 conn也会释放
+            using (var divReposirory = conn.QuerySet<FlowOrder>().GetRepository())
+            {
+                //使用自定义仓储
+                var flowOrder = divReposirory.FindById(1);
+            }
 
         }
     }

@@ -10,7 +10,7 @@ using Kogel.Dapper.Extension.Core.Interfaces;
 
 namespace Kogel.Repository.Interfaces
 {
-	public interface IBaseRepository<T>
+	public interface IBaseRepository<T>: IDisposable
 	{
 		/// <summary>
 		/// 
