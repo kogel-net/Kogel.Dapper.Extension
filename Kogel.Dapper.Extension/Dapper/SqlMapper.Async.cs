@@ -376,7 +376,7 @@ namespace Dapper
         /// <summary>
         /// Attempts to open a connection asynchronously, with a better error message for unsupported usages.
         /// </summary>
-        private static Task TryOpenAsync(this IDbConnection cnn, CancellationToken cancel)
+        public static Task TryOpenAsync(this IDbConnection cnn, CancellationToken cancel)
         {
             if (cnn is DbConnection dbConn)
             {

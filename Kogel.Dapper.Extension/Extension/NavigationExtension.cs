@@ -138,6 +138,19 @@ namespace Kogel.Dapper.Extension.Extension
 		}
 
 		/// <summary>
+		/// 
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="dbCon"></param>
+		/// <param name="provider"></param>
+		/// <param name="transaction"></param>
+		/// <returns></returns>
+		public static async Task<T> QuerySinglesAsync<T>(this IDbConnection dbCon, SqlProvider provider, IDbTransaction transaction)
+		{
+			return await dbCon.QuerySingleOrDefaultAsync<T>(provider.SqlString, provider.Params, transaction);
+		}
+
+		/// <summary>
 		/// 数据集返回
 		/// </summary>
 		/// <param name="dbCon"></param>
@@ -150,6 +163,21 @@ namespace Kogel.Dapper.Extension.Extension
 			if (dataAdapter == null)
 				dataAdapter = new SqlDataAdapter();
 			return dbCon.QueryDataSet(dataAdapter, provider.SqlString, provider.Params, transaction);
+		}
+
+		/// <summary>
+		/// 数据集返回
+		/// </summary>
+		/// <param name="dbCon"></param>
+		/// <param name="provider"></param>
+		/// <param name="transaction"></param>
+		/// <param name="dataAdapter"></param>
+		/// <returns></returns>
+		public static async Task<DataSet> QueryDataSetsAsync(this IDbConnection dbCon, SqlProvider provider, IDbTransaction transaction, IDbDataAdapter dataAdapter)
+		{
+			if (dataAdapter == null)
+				dataAdapter = new SqlDataAdapter();
+			return await dbCon.QueryDataSetAsync(dataAdapter, provider.SqlString, provider.Params, transaction);
 		}
 	}
 }

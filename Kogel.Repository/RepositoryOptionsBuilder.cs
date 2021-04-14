@@ -28,7 +28,8 @@ namespace Kogel.Repository
         /// <summary>
         /// 配置连接方式
         /// </summary>
-        /// <param name="connectionFactory"></param>
+        /// <param name="connection">数据库连接</param>
+        /// <param name="dbName">数据库名称</param>
         /// <returns></returns>
         public RepositoryOptionsBuilder BuildConnection(IDbConnection connection, string dbName = "marster")
         {
