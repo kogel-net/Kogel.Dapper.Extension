@@ -85,4 +85,16 @@ namespace Kogel.Dapper.Extension.Test.Model
         [Display(Rename = "delivered_receive_time")]
         public DateTime? DeliveredReceiveTime { get; set; }
     }
+
+    [Display(Rename = "flow_order")]
+    public class FlowOrder1 : FlowOrder
+    {
+
+    }
+
+    [Display(Rename = "flow_order")]
+    public class FlowOrder2 : FlowOrder
+    {
+
+    }
 }

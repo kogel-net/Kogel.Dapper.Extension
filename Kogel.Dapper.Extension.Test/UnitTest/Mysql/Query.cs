@@ -7,6 +7,7 @@ using System;
 using MySql.Data.MySqlClient;
 using Kogel.Repository;
 using Kogel.Dapper.Extension.MySql;
+using Kogel.Dapper.Extension.Test.Model.Dto;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 {
@@ -51,6 +52,16 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
             {
                 //使用自定义仓储
                 var flowOrder = divReposirory.FindById(1);
+
+
+                var tupleList = divReposirory.QuerySet()
+                         .ToList(x => new 
+                         {
+                             Id = x.Id,
+                             flowOrders1 = divReposirory.Orm.QuerySet<FlowOrder1>().Where(y => y.Id == x.Id).Get(y => true),
+                             flowOrders2 = divReposirory.Orm.QuerySet<FlowOrder2>().Where(y => y.Id == x.Id).Get(y => true)
+                         });
+
             }
 
         }

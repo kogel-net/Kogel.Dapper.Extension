@@ -145,7 +145,7 @@ namespace Kogel.Dapper.Extension.Expressions
             else if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension"))
             {
                 DynamicParameters parameters = new DynamicParameters();
-                SpliceField.Append("(" + node.MethodCallExpressionToSql(ref parameters) + ")");
+                SpliceField.Append("(" + node.MethodCallExpressionToSql(ref parameters, Index) + ")");
                 Param.AddDynamicParams(parameters);
             }
             else
