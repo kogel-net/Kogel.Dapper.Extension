@@ -55,7 +55,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
 
                 var tupleList = divReposirory.QuerySet()
-                         .ToList(x => new 
+                         .ToListAsync(x => new 
                          {
                              Id = x.Id,
                              flowOrders1 = divReposirory.Orm.QuerySet<FlowOrder1>().Where(y => y.Id == x.Id).Get(y => true),

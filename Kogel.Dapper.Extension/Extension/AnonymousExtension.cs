@@ -8,6 +8,7 @@ using Dapper;
 using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension.Expressions;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Kogel.Dapper.Extension.Extension
 {
@@ -27,10 +28,24 @@ namespace Kogel.Dapper.Extension.Extension
         {
             return QueryRowImpl<T>(conn, provider, transaction).FirstOrDefault().SetNavigation(conn, provider.ProviderOption);
         }
+
         public static List<T> Query_1<T>(this IDbConnection conn, SqlProvider provider, IDbTransaction transaction = null)
         {
             return QueryRowImpl<T>(conn, provider, transaction).SetNavigationList(conn, provider.ProviderOption);
         }
+
+        public static async Task<T> QueryFirst_1Async<T>(this IDbConnection conn, SqlProvider provider, IDbTransaction transaction = null)
+        {
+            List<T> queryRow = await QueryRowImplAsync<T>(conn, provider, transaction);
+            return queryRow.FirstOrDefault().SetNavigation(conn, provider.ProviderOption);
+        }
+
+        public static async Task<List<T>> Query_1Async<T>(this IDbConnection conn, SqlProvider provider, IDbTransaction transaction = null)
+        {
+            List<T> queryRow = await QueryRowImplAsync<T>(conn, provider, transaction);
+            return queryRow.SetNavigation(conn, provider.ProviderOption);
+        }
+
         /// <summary>
         /// 查询返回匿名类
         /// </summary>
@@ -75,6 +90,54 @@ namespace Kogel.Dapper.Extension.Extension
             else
             {
                 data = conn.Querys<T>(provider, transaction).ToList();
+            }
+            return data;
+        }
+
+        /// <summary>
+        /// 查询返回匿名类
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="conn"></param>
+        /// <param name="sql"></param>
+        /// <param name="param"></param>
+        /// <param name="transaction"></param>
+        /// <returns></returns>
+        private static async Task<List<T>> QueryRowImplAsync<T>(IDbConnection conn, SqlProvider provider, IDbTransaction transaction = null)
+        {
+            List<T> data = default(List<T>);
+            Type type = typeof(T);
+            if (type.FullName.Contains("AnonymousType"))//匿名类型
+            {
+                ConstructorInfo[] constructorInfoArray = type.GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                ConstructorInfo noParameterConstructorInfo = constructorInfoArray.FirstOrDefault(x => x.GetParameters().Length == 0);
+                data = new List<T>();
+                T t = default(T);
+                noParameterConstructorInfo = constructorInfoArray.FirstOrDefault();
+                using (var reader = await conn.ExecuteReaderAsync(provider.SqlString, provider.Params, transaction))
+                {
+                    var properties = EntityCache.QueryEntity(type).Properties;
+                    while (reader.Read())
+                    {
+                        object[] array = new object[properties.Length];
+                        for (var i = 0; i < properties.Length; i++)
+                        {
+                            var item = properties[i];
+                            var value = reader[item.Name];
+                            if (value != DBNull.Value)
+                                value = Convert.ChangeType(value, item.PropertyType);
+                            else
+                                value = default;
+                            array[i] = value;
+                        }
+                        t = (T)noParameterConstructorInfo.Invoke(array);
+                        data.Add(t);
+                    }
+                }
+            }
+            else
+            {
+                data = (await conn.QueryAsyncs<T>(provider, transaction)).ToList();
             }
             return data;
         }

@@ -425,6 +425,33 @@ namespace Dapper
 			if (wasClosed) cnn.Close();
 			return ds;
 		}
+
+		/// <summary>
+		/// 查询返回DataSet
+		/// </summary>
+		/// <param name="cnn"></param>
+		/// <param name="adapter"></param>
+		/// <param name="sql"></param>
+		/// <param name="param"></param>
+		/// <param name="transaction"></param>
+		/// <param name="buffered"></param>
+		/// <param name="commandTimeout"></param>
+		/// <param name="commandType"></param>
+		/// <returns></returns>
+		public static async Task<DataSet> QueryDataSetAsync(this IDbConnection cnn, IDbDataAdapter adapter, string sql, object param = null, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
+		{
+			var ds = new DataSet();
+			var command = new CommandDefinition(cnn, sql, (object)param, transaction, commandTimeout, commandType, buffered ? CommandFlags.Buffered : CommandFlags.None);
+			var identity = new Identity(command.CommandText, command.CommandType, cnn, null, param == null ? null : param.GetType(), null);
+			var info = SqlMapper.GetCacheInfo(identity, param, command.AddToCache);
+			bool wasClosed = cnn.State == ConnectionState.Closed;
+			var cancel = command.CancellationToken;
+			if (wasClosed) await cnn.TryOpenAsync(cancel).ConfigureAwait(false);
+			adapter.SelectCommand = command.SetupCommand(cnn, info.ParamReader);
+			adapter.Fill(ds);
+			if (wasClosed) cnn.Close();
+			return ds;
+		}
 	}
 
 	public class GuidTypeHanlder : SqlMapper.TypeHandler<Guid>
