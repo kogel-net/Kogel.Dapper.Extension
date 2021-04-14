@@ -5,6 +5,8 @@ using Kogel.Dapper.Extension.Test.UnitTest.Mysql.Repository;
 using Kogel.Repository.Interfaces;
 using System;
 using MySql.Data.MySqlClient;
+using Kogel.Repository;
+using Kogel.Dapper.Extension.MySql;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 {
@@ -24,7 +26,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                 Console.WriteLine(sql);
 #endif
             };
-
+            //正常模式下仓储使用
             using (var repository = new FlowOrderRepository())
             {
                 var flowOrder = repository.QuerySet()
@@ -40,13 +42,16 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                     .AsTableName(typeof(FlowOrder), "flow_order_1")
                     .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
                     .Get();
+
             }
 
+            var conn = new MySqlConnection("server=localhost;port=3306;user id=root;password=A5101264a;database=gc_fps_receivable;");
 
+            //使用自定义仓储
+            var flowOrder1 = conn.QuerySet<FlowOrder>()
+                .GetRepository() //自定义仓储释放时 conn也会释放
+                .FindById(1);
 
         }
-
-
-
     }
 }

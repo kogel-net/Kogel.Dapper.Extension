@@ -19,7 +19,7 @@ namespace Kogel.Repository
         /// <summary>
         /// 
         /// </summary>
-        internal RepositoryOptionsBuilder Options { get; }
+        public RepositoryOptionsBuilder Options { get; set; }
 
         /// <summary>
         /// 连接对象
@@ -36,6 +36,16 @@ namespace Kogel.Repository
             RepositoryOptionsBuilder builder = new RepositoryOptionsBuilder();
             OnConfiguring(builder);
             this.Options = builder;
+            UnitOfWork = new UnitOfWork(Orm);
+
+            //codefirst
+            SyncStructure();
+        }
+
+        public BaseRepository(RepositoryOptionsBuilder repositoryOptions)
+        {
+            OnConfiguring(repositoryOptions);
+            this.Options = repositoryOptions;
             UnitOfWork = new UnitOfWork(Orm);
 
             //codefirst
