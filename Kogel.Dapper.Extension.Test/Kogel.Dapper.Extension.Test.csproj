@@ -62,6 +62,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\Dto\FlowOrderDto.cs" />
     <Compile Include="Model\FlowOrder.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -80,7 +81,6 @@
     <None Include="Properties\app.manifest" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Model\Dto\" />
     <Folder Include="ViewModel\" />
   </ItemGroup>
   <ItemGroup>

@@ -46,7 +46,7 @@ namespace Kogel.Dapper.Extension
 			else//自定义查询字段
 			{
 				var selectExp = new SelectExpression(provider.Context.Set.SelectExpression, "", provider);
-				selectSql.Append(selectExp.SqlCmd);
+				selectSql.Append($" {selectExp.SqlCmd} ");
 				provider.Params.AddDynamicParams(selectExp.Param);
 			}
 			return selectSql.ToString();

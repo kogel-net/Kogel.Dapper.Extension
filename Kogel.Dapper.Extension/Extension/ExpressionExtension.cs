@@ -181,11 +181,12 @@ namespace Kogel.Dapper.Extension.Extension
         /// </summary>
         /// <param name="expression">表达式</param>
         /// <param name="Param">返回的参数</param>
+        /// <param name="paramIndex">参数索引防止冲突</param>
         /// <returns></returns>
-        public static string MethodCallExpressionToSql(this MethodCallExpression expression, ref DynamicParameters Param)
+        public static string MethodCallExpressionToSql(this MethodCallExpression expression, ref DynamicParameters Param, int paramIndex = 0)
         {
             //解析子查询
-            var subquery = new SubqueryExpression(expression);
+            var subquery = new SubqueryExpression(expression, paramIndex);
             Param = subquery.Param;
             return subquery.SqlCmd;
         }
