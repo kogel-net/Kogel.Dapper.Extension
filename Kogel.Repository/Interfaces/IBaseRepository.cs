@@ -18,6 +18,12 @@ namespace Kogel.Repository.Interfaces
 		IDbConnection Orm { get; }
 
 		/// <summary>
+		/// 改变当前连接库（分库时可能会用到）
+		/// </summary>
+		/// <param name="dbConnection"></param>
+		void ChangeDataBase(string dbName = "master");
+
+		/// <summary>
 		/// 工作单元
 		/// </summary>
 		IUnitOfWork UnitOfWork { get; set; }

@@ -4,6 +4,7 @@ using Kogel.Dapper.Extension.Test.Model;
 using Kogel.Dapper.Extension.Test.UnitTest.Mysql.Repository;
 using Kogel.Repository.Interfaces;
 using System;
+using MySql.Data.MySqlClient;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 {
@@ -26,14 +27,19 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
             using (var repository = new FlowOrderRepository())
             {
-
                 var flowOrder = repository.QuerySet()
                     .AsTableName(typeof(FlowOrder), "flow_order_1")
                     .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
                     .Get();
 
 
-                var findFlowOrder = repository.FindById(1);
+                repository.ChangeDataBase("fps_2021");
+
+
+                var gc_Fps_FlowOrder = repository.QuerySet()
+                    .AsTableName(typeof(FlowOrder), "flow_order_1")
+                    .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
+                    .Get();
             }
 
 
