@@ -66,7 +66,7 @@ namespace Kogel.Dapper.Extension
 
         public abstract SqlProvider FormatUpdateSelect<T>(Expression<Func<T, T>> updator);
 
-        public abstract SqlProvider CreateNew();
+        public abstract SqlProvider Create();
 
         /// <summary>
         /// 获取表名称

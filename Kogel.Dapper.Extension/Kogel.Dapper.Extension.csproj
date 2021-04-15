@@ -6,7 +6,7 @@
     <Description>官方文档
 https://www.cnblogs.com/kogel/p/10805696.html</Description>
     <Authors>Kogel</Authors>
-    <TargetFrameworks>net45;net451;netstandard2.0;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net45;net451;netstandard2.0;netcoreapp2.1;</TargetFrameworks>
     <Company>Kogel.Dapper.Extension</Company>
     <Product>Kogel.Dapper.Extension</Product>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -21,7 +21,7 @@ https://www.cnblogs.com/kogel/p/10805696.html</Description>
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1' Or '$(TargetFramework)' == 'netcoreapp3.1'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
     <PackageReference Include="System.Collections.NonGeneric">
       <Version>4.3.0</Version>
     </PackageReference>

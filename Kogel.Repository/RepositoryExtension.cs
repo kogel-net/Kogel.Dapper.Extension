@@ -36,7 +36,7 @@ namespace Kogel.Repository
         {
             //从基础querySet对象中取出连接对象和提供方
             var options = new RepositoryOptionsBuilder();
-            options.BuildConnection(querySet.DbCon);
+            options.BuildConnection(x => querySet.DbCon);
             options.BuildProvider(querySet.SqlProvider);
             //设置给通用仓储
             var baseRepository = new BaseRepositoryExtension<T>(options);

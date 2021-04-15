@@ -22,9 +22,9 @@ namespace Kogel.Repository
         public RepositoryOptionsBuilder Options { get; set; }
 
         /// <summary>
-        /// 连接对象
+        /// 当前主连接对象
         /// </summary>
-        public IDbConnection Orm { get => Options?.Connections.FirstOrDefault(x => x.Item2).Item1 ?? throw new DapperExtensionException("请在 OnConfiguring 中配置Connection"); }
+        public IDbConnection Orm { get => Options.GetConnection("Orm")?.Connection ?? throw new DapperExtensionException("请在 OnConfiguring 中配置Connection"); }
 
         /// <summary>
         /// 工作单元
@@ -69,10 +69,10 @@ namespace Kogel.Repository
                 UnitOfWork.Dispose();
 
             //释放整个连接池
-            if (Options.Connections != null)
-                foreach (var conn in Options.Connections)
+            if (Options.CurrentConnectionPool != null)
+                foreach (var item in Options.CurrentConnectionPool)
                 {
-                    conn.Item1.Dispose();
+                    item.Connection.Dispose();
                 }
         }
 
@@ -82,19 +82,26 @@ namespace Kogel.Repository
         /// <param name="dbName">为空时切换回主库</param>
         public void ChangeDataBase(string dbName = "master")
         {
-            lock (Options.Connections)
+            lock (Options.CurrentConnectionPool)
             {
-                Options.Connections = Change(Options.Connections).ToList();
-            }
-
-            IEnumerable<Tuple<IDbConnection, bool, string>> Change(IEnumerable<Tuple<IDbConnection, bool, string>> tuples)
-            {
-                foreach (var tuple in tuples)
+                if (Options.CurrentConnectionPool.Any(x=>x.DbName==dbName))
                 {
-                    if (tuple.Item3 == dbName)
-                        yield return Tuple.Create(tuple.Item1, true, tuple.Item3);
-                    else
-                        yield return Tuple.Create(tuple.Item1, false, tuple.Item3);
+                    foreach (var item in Options.CurrentConnectionPool)
+                    {
+                        if (item.DbName == dbName)
+                        {
+                            item.IsMaster = true;
+                        }
+                        else
+                        {
+                            item.IsMaster = false;
+                        }
+                    }
+                }
+                else
+                {
+                    Options.GetConnection(dbName);
+                    ChangeDataBase(dbName);
                 }
             }
         }
@@ -105,7 +112,7 @@ namespace Kogel.Repository
         /// <returns></returns>
         public IQuerySet<T> QuerySet()
         {
-            return new QuerySet<T>(Orm, Options.Provider.CreateNew(), null);
+            return new QuerySet<T>(Orm, Options.Provider.Create(), null);
         }
 
         /// <summary>
@@ -115,17 +122,17 @@ namespace Kogel.Repository
         /// <returns></returns>
         public IQuerySet<T> QuerySet(IDbTransaction transaction)
         {
-            return new QuerySet<T>(Orm, Options.Provider.CreateNew(), transaction);
+            return new QuerySet<T>(Orm, Options.Provider.Create(), transaction);
         }
 
         public IQuerySet<TEntity> QuerySet<TEntity>()
         {
-            return new QuerySet<TEntity>(Orm, Options.Provider.CreateNew());
+            return new QuerySet<TEntity>(Orm, Options.Provider.Create());
         }
 
         public IQuerySet<TEntity> QuerySet<TEntity>(IDbTransaction transaction)
         {
-            return new QuerySet<TEntity>(Orm, Options.Provider.CreateNew(), transaction);
+            return new QuerySet<TEntity>(Orm, Options.Provider.Create(), transaction);
         }
 
         /// <summary>
@@ -134,7 +141,7 @@ namespace Kogel.Repository
         /// <returns></returns>
         public ICommandSet<T> CommandSet()
         {
-            return new CommandSet<T>(Orm, Options.Provider.CreateNew(), null);
+            return new CommandSet<T>(Orm, Options.Provider.Create(), null);
         }
 
         /// <summary>
@@ -144,12 +151,12 @@ namespace Kogel.Repository
         /// <returns></returns>
         public ICommandSet<T> CommandSet(IDbTransaction transaction)
         {
-            return new CommandSet<T>(Orm, Options.Provider.CreateNew(), transaction);
+            return new CommandSet<T>(Orm, Options.Provider.Create(), transaction);
         }
 
         public ICommandSet<TEntity> CommandSet<TEntity>(IDbTransaction transaction = null)
         {
-            return new CommandSet<TEntity>(Orm, Options.Provider.CreateNew(), transaction);
+            return new CommandSet<TEntity>(Orm, Options.Provider.Create(), transaction);
         }
 
         /// <summary>
