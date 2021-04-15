@@ -13,12 +13,12 @@ namespace Kogel.Repository
         /// <summary>
         /// 总连接池 (所有连接都会注册到总连接池中，总连接池中不区分主从)
         /// </summary>
-        private static List<ConnectionPool> _connectionPool = new List<ConnectionPool>();
+        private static readonly List<ConnectionPool> _connectionPool = new List<ConnectionPool>();
 
         /// <summary>
         /// 当前仓储 数据库连接池   1.连接对象 2.是否是主连接对象 3.库名称(切换库时使用)
         /// </summary>
-        public List<ConnectionOptions> CurrentConnectionPool { get; internal set; } = new List<ConnectionOptions>();
+        internal List<ConnectionOptions> CurrentConnectionPool { get; set; } = new List<ConnectionOptions>();
 
         /// <summary>
         /// 数据提供者
@@ -31,12 +31,23 @@ namespace Kogel.Repository
         internal bool IsAutoSyncStructure { get; private set; }
 
         /// <summary>
-        /// 配置连接方式
+        /// (仓储使用)注册连接方式
         /// </summary>
         /// <param name="connection">数据库连接</param>
         /// <param name="dbName">数据库名称</param>
         /// <returns></returns>
         public RepositoryOptionsBuilder BuildConnection(Func<IDbConnection, IDbConnection> connection, string dbName = "marster")
+        {
+            RegisterDataBase(connection, dbName);
+            return this;
+        }
+
+        /// <summary>
+        /// (全局使用)注册连接方式
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="dbName"></param>
+        public static void RegisterDataBase(Func<IDbConnection, IDbConnection> connection, string dbName)
         {
             //验证总连接池是否注册过
             lock (_connectionPool)
@@ -47,7 +58,6 @@ namespace Kogel.Repository
                     _connectionPool.Add(new ConnectionPool { FuncConnection = connection, DbName = dbName });
                 }
             }
-            return this;
         }
 
         /// <summary>
@@ -97,7 +107,6 @@ namespace Kogel.Repository
                                     DbName = connection.DbName
                                 };
                             }
-
                             CurrentConnectionPool.Add(connectionOptions);
                         }
                     }
@@ -134,7 +143,6 @@ namespace Kogel.Repository
     /// </summary>
     public class ConnectionOptions
     {
-
         /// <summary>
         /// 
         /// </summary>

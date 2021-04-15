@@ -84,7 +84,7 @@ namespace Kogel.Repository
         {
             lock (Options.CurrentConnectionPool)
             {
-                if (Options.CurrentConnectionPool.Any(x=>x.DbName==dbName))
+                if (Options.CurrentConnectionPool.Any(x => x.DbName == dbName))
                 {
                     foreach (var item in Options.CurrentConnectionPool)
                     {
@@ -125,11 +125,22 @@ namespace Kogel.Repository
             return new QuerySet<T>(Orm, Options.Provider.Create(), transaction);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <returns></returns>
         public IQuerySet<TEntity> QuerySet<TEntity>()
         {
             return new QuerySet<TEntity>(Orm, Options.Provider.Create());
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="transaction"></param>
+        /// <returns></returns>
         public IQuerySet<TEntity> QuerySet<TEntity>(IDbTransaction transaction)
         {
             return new QuerySet<TEntity>(Orm, Options.Provider.Create(), transaction);
