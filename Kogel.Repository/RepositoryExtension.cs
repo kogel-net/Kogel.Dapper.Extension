@@ -61,6 +61,18 @@ namespace Kogel.Repository
         /// <typeparam name="T"></typeparam>
         /// <param name="querySet"></param>
         /// <returns></returns>
+        public static IQuerySet<T> NotUnitOfWork<T>(this IQuerySet<T> querySet)
+        {
+            NotUnitOfWork(querySet as QuerySet<T>);
+            return querySet;
+        }
+
+        /// <summary>
+        /// 排除在工作单元外
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="querySet"></param>
+        /// <returns></returns>
         public static QuerySet<T> NotUnitOfWork<T>(this QuerySet<T> querySet)
         {
             querySet.SqlProvider.IsExcludeUnitOfWork = true;
