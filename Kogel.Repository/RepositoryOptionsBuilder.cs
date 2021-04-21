@@ -13,7 +13,7 @@ namespace Kogel.Repository
         /// <summary>
         /// 总连接池 (所有连接都会注册到总连接池中，总连接池中不区分主从)
         /// </summary>
-        private static readonly List<ConnectionPool> _connectionPool = new List<ConnectionPool>();
+        internal static readonly List<ConnectionPool> _connectionPool = new List<ConnectionPool>();
 
         /// <summary>
         /// 当前仓储 数据库连接池   1.连接对象 2.是否是主连接对象 3.库名称(切换库时使用)
@@ -55,7 +55,11 @@ namespace Kogel.Repository
                 //不存在时注入到总连接池中
                 if (!_connectionPool.Any(x => x.DbName == dbName))
                 {
-                    _connectionPool.Add(new ConnectionPool { FuncConnection = connection, DbName = dbName });
+                    //首次测试注册得到连接字符串(防止传空)
+                    using (var dbConn = connection.Invoke(null))
+                    {
+                        _connectionPool.Add(new ConnectionPool { FuncConnection = connection, DbName = dbName, ConnectionString = dbConn.ConnectionString });
+                    }
                 }
             }
         }
@@ -88,9 +92,11 @@ namespace Kogel.Repository
                                 connection = _connectionPool.FirstOrDefault();
                                 if (connection == null)
                                     throw new DapperExtensionException($"请在 OnConfiguring 中配置Connection，DbName：{dbName}");
+
+                                var dbConn = connection.FuncConnection.Invoke(null);
                                 connectionOptions = new ConnectionOptions
                                 {
-                                    Connection = connection.FuncConnection.Invoke(null),
+                                    Connection = dbConn,
                                     DbName = connection.DbName,
                                     IsMaster = true
                                 };
@@ -101,9 +107,10 @@ namespace Kogel.Repository
                             }
                             else
                             {
+                                var dbConn = connection.FuncConnection.Invoke(null);
                                 connectionOptions = new ConnectionOptions
                                 {
-                                    Connection = connection.FuncConnection.Invoke(null),
+                                    Connection = dbConn,
                                     DbName = connection.DbName
                                 };
                             }
@@ -165,6 +172,11 @@ namespace Kogel.Repository
         /// 
         /// </summary>
         public Func<IDbConnection, IDbConnection> FuncConnection { get; set; }
+
+        /// <summary>
+        /// 连接字符串(内部判断使用)
+        /// </summary>
+        internal string ConnectionString { get; set; }
 
         /// <summary>
         /// 数据库名称

@@ -27,10 +27,10 @@ namespace Dapper
         {
             (Parameters as SqlMapper.IParameterCallbacks)?.OnCompleted();
         }
-		/// <summary>
-		/// db command connection
-		/// </summary>
-		public IDbConnection Connection { get; set; }
+        /// <summary>
+        /// db command connection
+        /// </summary>
+        public IDbConnection Connection { get; set; }
 
         /// <summary>
         /// The command (sql or a stored-procedure name) to execute
@@ -47,10 +47,15 @@ namespace Dapper
         /// </summary>
         public IDbTransaction Transaction { get; set; }
 
-		/// <summary>
-		/// 是否进入过工作单元
-		/// </summary>
-		public bool IsUnifOfWork { get; set; }
+        /// <summary>
+        /// 是否进入过工作单元
+        /// </summary>
+        public bool IsUnitOfWork { get; set; }
+
+        /// <summary>
+        /// 是否排除在工作单元外
+        /// </summary>
+        public bool IsExcludeUnitOfWork { get; set; }
 
         /// <summary>
         /// The effective timeout for the command
@@ -92,20 +97,22 @@ namespace Dapper
         /// <param name="commandType">The <see cref="CommandType"/> for this command.</param>
         /// <param name="flags">The behavior flags for this command.</param>
         /// <param name="cancellationToken">The cancellation token for this command.</param>
-        public CommandDefinition(IDbConnection connection,string commandText, object parameters = null, IDbTransaction transaction = null, int? commandTimeout = null,
+        public CommandDefinition(IDbConnection connection, string commandText, object parameters = null, IDbTransaction transaction = null, int? commandTimeout = null,
                                  CommandType? commandType = null, CommandFlags flags = CommandFlags.Buffered
-                                 , CancellationToken cancellationToken = default(CancellationToken)
+                                 , CancellationToken cancellationToken = default(CancellationToken),
+                                 bool isExcludeUnitOfWork = false
             )
         {
-			Connection = connection;
-            CommandText = commandText;
-            Parameters = parameters;
-            Transaction = transaction;
-            CommandTimeout = commandTimeout;
-            CommandType = commandType;
-            Flags = flags;
-            CancellationToken = cancellationToken;
-			IsUnifOfWork = false;
+            this.Connection = connection;
+            this.CommandText = commandText;
+            this.Parameters = parameters;
+            this.Transaction = transaction;
+            this.CommandTimeout = commandTimeout;
+            this.CommandType = commandType;
+            this.Flags = flags;
+            this.CancellationToken = cancellationToken;
+            this.IsUnitOfWork = false;
+            this.IsExcludeUnitOfWork = isExcludeUnitOfWork;
         }
 
         private CommandDefinition(object parameters) : this()

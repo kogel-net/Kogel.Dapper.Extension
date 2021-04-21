@@ -72,6 +72,11 @@ namespace Kogel.Dapper.Extension
 		/// <summary>
 		/// 是否去重
 		/// </summary>
-		public bool IsDistinct { get; set; } = false;
+		public bool IsDistinct { get; set; }
+
+		/// <summary>
+		/// 是否排除在工作单元外
+		/// </summary>
+		public bool IsExcludeUnitOfWork { get; set; }
 	}
 }

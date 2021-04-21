@@ -26,12 +26,24 @@ namespace Kogel.Repository
             }
         }
 
+        /// <summary>
+        /// 获取自定义仓储
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="iQuerySet"></param>
+        /// <returns></returns>
         public static IBaseRepository<T> GetRepository<T>(this IQuerySet<T> iQuerySet)
         {
             QuerySet<T> querySet = iQuerySet as QuerySet<T>;
             return querySet.GetRepository();
         }
 
+        /// <summary>
+        /// 获取自定义仓储
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="querySet"></param>
+        /// <returns></returns>
         public static IBaseRepository<T> GetRepository<T>(this QuerySet<T> querySet)
         {
             //从基础querySet对象中取出连接对象和提供方
@@ -41,6 +53,18 @@ namespace Kogel.Repository
             //设置给通用仓储
             var baseRepository = new BaseRepositoryExtension<T>(options);
             return baseRepository;
+        }
+
+        /// <summary>
+        /// 排除在工作单元外
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="querySet"></param>
+        /// <returns></returns>
+        public static QuerySet<T> NotUnitOfWork<T>(this QuerySet<T> querySet)
+        {
+            querySet.SqlProvider.IsExcludeUnitOfWork = true;
+            return querySet;
         }
     }
 }

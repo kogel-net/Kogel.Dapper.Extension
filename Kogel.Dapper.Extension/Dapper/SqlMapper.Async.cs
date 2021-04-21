@@ -23,7 +23,7 @@ namespace Dapper
         /// <param name="commandType">The type of command to execute.</param>
         /// <remarks>Note: each row can be accessed via "dynamic", or by casting to an IDictionary&lt;string,object&gt;</remarks>
         public static Task<IEnumerable<dynamic>> QueryAsync(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null) =>
-            QueryAsync<dynamic>(cnn, typeof(DapperRow), new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered, default(CancellationToken)));
+            QueryAsync<dynamic>(cnn, typeof(DapperRow), new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered, default(CancellationToken)));
 
         /// <summary>
         /// Execute a query asynchronously using .NET 4.5 Task.
@@ -84,8 +84,10 @@ namespace Dapper
         /// A sequence of data of <typeparamref name="T"/>; if a basic type (int, string, etc) is queried then the data from the first column in assumed, otherwise an instance is
         /// created per row, and a direct column-name===member-name mapping is assumed (case insensitive).
         /// </returns>
-        public static Task<IEnumerable<T>> QueryAsync<T>(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null) =>
-            QueryAsync<T>(cnn, typeof(T), new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered, default(CancellationToken)));
+        public static Task<IEnumerable<T>> QueryAsync<T>(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null,
+            int? commandTimeout = null, CommandType? commandType = null, bool IsExcludeUnitOfWork = false) =>
+            QueryAsync<T>(cnn, typeof(T), new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered,
+                default(CancellationToken), IsExcludeUnitOfWork));
 
         /// <summary>
         /// Execute a single-row query asynchronously using .NET 4.5 Task.
@@ -98,7 +100,7 @@ namespace Dapper
         /// <param name="commandTimeout">The command timeout (in seconds).</param>
         /// <param name="commandType">The type of command to execute.</param>
         public static Task<T> QueryFirstAsync<T>(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null) =>
-            QueryRowAsync<T>(cnn, Row.First, typeof(T), new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.None, default(CancellationToken)));
+            QueryRowAsync<T>(cnn, Row.First, typeof(T), new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, CommandFlags.None, default(CancellationToken)));
 
         /// <summary>
         /// Execute a single-row query asynchronously using .NET 4.5 Task.
@@ -110,8 +112,11 @@ namespace Dapper
         /// <param name="transaction">The transaction to use, if any.</param>
         /// <param name="commandTimeout">The command timeout (in seconds).</param>
         /// <param name="commandType">The type of command to execute.</param>
-        public static Task<T> QueryFirstOrDefaultAsync<T>(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null) =>
-            QueryRowAsync<T>(cnn, Row.FirstOrDefault, typeof(T), new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.None, default(CancellationToken)));
+        public static Task<T> QueryFirstOrDefaultAsync<T>(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null,
+            int? commandTimeout = null, CommandType? commandType = null, bool isExcludeUnitOfWork = false) =>
+            QueryRowAsync<T>(cnn, Row.FirstOrDefault, typeof(T),
+                new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType,
+                CommandFlags.None, default(CancellationToken), isExcludeUnitOfWork));
 
         /// <summary>
         /// Execute a single-row query asynchronously using .NET 4.5 Task.
@@ -124,7 +129,7 @@ namespace Dapper
         /// <param name="commandTimeout">The command timeout (in seconds).</param>
         /// <param name="commandType">The type of command to execute.</param>
         public static Task<T> QuerySingleAsync<T>(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null) =>
-            QueryRowAsync<T>(cnn, Row.Single, typeof(T), new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.None, default(CancellationToken)));
+            QueryRowAsync<T>(cnn, Row.Single, typeof(T), new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, CommandFlags.None, default(CancellationToken)));
 
         /// <summary>
         /// Execute a single-row query asynchronously using .NET 4.5 Task.
@@ -136,8 +141,10 @@ namespace Dapper
         /// <param name="transaction">The transaction to use, if any.</param>
         /// <param name="commandTimeout">The command timeout (in seconds).</param>
         /// <param name="commandType">The type of command to execute.</param>
-        public static Task<T> QuerySingleOrDefaultAsync<T>(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null) =>
-            QueryRowAsync<T>(cnn, Row.SingleOrDefault, typeof(T), new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.None, default(CancellationToken)));
+        public static Task<T> QuerySingleOrDefaultAsync<T>(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null,
+            int? commandTimeout = null, CommandType? commandType = null, bool isExcludeUnitOfWork = false) =>
+            QueryRowAsync<T>(cnn, Row.SingleOrDefault, typeof(T), new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType,
+                CommandFlags.None, default(CancellationToken), isExcludeUnitOfWork: isExcludeUnitOfWork));
 
         /// <summary>
         /// Execute a single-row query asynchronously using .NET 4.5 Task.
@@ -149,7 +156,7 @@ namespace Dapper
         /// <param name="commandTimeout">The command timeout (in seconds).</param>
         /// <param name="commandType">The type of command to execute.</param>
         public static Task<dynamic> QueryFirstAsync(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null) =>
-            QueryRowAsync<dynamic>(cnn, Row.First, typeof(DapperRow), new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.None, default(CancellationToken)));
+            QueryRowAsync<dynamic>(cnn, Row.First, typeof(DapperRow), new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, CommandFlags.None, default(CancellationToken)));
 
         /// <summary>
         /// Execute a single-row query asynchronously using .NET 4.5 Task.
@@ -161,7 +168,7 @@ namespace Dapper
         /// <param name="commandTimeout">The command timeout (in seconds).</param>
         /// <param name="commandType">The type of command to execute.</param>
         public static Task<dynamic> QueryFirstOrDefaultAsync(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null) =>
-            QueryRowAsync<dynamic>(cnn, Row.FirstOrDefault, typeof(DapperRow), new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.None, default(CancellationToken)));
+            QueryRowAsync<dynamic>(cnn, Row.FirstOrDefault, typeof(DapperRow), new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, CommandFlags.None, default(CancellationToken)));
 
         /// <summary>
         /// Execute a single-row query asynchronously using .NET 4.5 Task.
@@ -173,7 +180,7 @@ namespace Dapper
         /// <param name="commandTimeout">The command timeout (in seconds).</param>
         /// <param name="commandType">The type of command to execute.</param>
         public static Task<dynamic> QuerySingleAsync(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null) =>
-            QueryRowAsync<dynamic>(cnn, Row.Single, typeof(DapperRow), new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.None, default(CancellationToken)));
+            QueryRowAsync<dynamic>(cnn, Row.Single, typeof(DapperRow), new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, CommandFlags.None, default(CancellationToken)));
 
         /// <summary>
         /// Execute a single-row query asynchronously using .NET 4.5 Task.
@@ -185,7 +192,7 @@ namespace Dapper
         /// <param name="commandTimeout">The command timeout (in seconds).</param>
         /// <param name="commandType">The type of command to execute.</param>
         public static Task<dynamic> QuerySingleOrDefaultAsync(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null) =>
-            QueryRowAsync<dynamic>(cnn, Row.SingleOrDefault, typeof(DapperRow), new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.None, default(CancellationToken)));
+            QueryRowAsync<dynamic>(cnn, Row.SingleOrDefault, typeof(DapperRow), new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, CommandFlags.None, default(CancellationToken)));
 
         /// <summary>
         /// Execute a query asynchronously using .NET 4.5 Task.
@@ -201,7 +208,7 @@ namespace Dapper
         public static Task<IEnumerable<object>> QueryAsync(this IDbConnection cnn, Type type, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
-            return QueryAsync<object>(cnn, type, new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered, default(CancellationToken)));
+            return QueryAsync<object>(cnn, type, new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered, default(CancellationToken)));
         }
 
         /// <summary>
@@ -218,7 +225,7 @@ namespace Dapper
         public static Task<object> QueryFirstAsync(this IDbConnection cnn, Type type, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
-            return QueryRowAsync<object>(cnn, Row.First, type, new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.None, default(CancellationToken)));
+            return QueryRowAsync<object>(cnn, Row.First, type, new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, CommandFlags.None, default(CancellationToken)));
         }
         /// <summary>
         /// Execute a single-row query asynchronously using .NET 4.5 Task.
@@ -234,7 +241,7 @@ namespace Dapper
         public static Task<object> QueryFirstOrDefaultAsync(this IDbConnection cnn, Type type, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
-            return QueryRowAsync<object>(cnn, Row.FirstOrDefault, type, new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.None, default(CancellationToken)));
+            return QueryRowAsync<object>(cnn, Row.FirstOrDefault, type, new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, CommandFlags.None, default(CancellationToken)));
         }
         /// <summary>
         /// Execute a single-row query asynchronously using .NET 4.5 Task.
@@ -250,7 +257,7 @@ namespace Dapper
         public static Task<object> QuerySingleAsync(this IDbConnection cnn, Type type, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
-            return QueryRowAsync<object>(cnn, Row.Single, type, new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.None, default(CancellationToken)));
+            return QueryRowAsync<object>(cnn, Row.Single, type, new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, CommandFlags.None, default(CancellationToken)));
         }
         /// <summary>
         /// Execute a single-row query asynchronously using .NET 4.5 Task.
@@ -266,7 +273,7 @@ namespace Dapper
         public static Task<object> QuerySingleOrDefaultAsync(this IDbConnection cnn, Type type, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
-            return QueryRowAsync<object>(cnn, Row.SingleOrDefault, type, new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.None, default(CancellationToken)));
+            return QueryRowAsync<object>(cnn, Row.SingleOrDefault, type, new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, CommandFlags.None, default(CancellationToken)));
         }
 
         /// <summary>
@@ -535,8 +542,10 @@ namespace Dapper
         /// <param name="commandTimeout">Number of seconds before command execution timeout.</param>
         /// <param name="commandType">Is it a stored proc or a batch?</param>
         /// <returns>The number of rows affected.</returns>
-        public static Task<int> ExecuteAsync(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null) =>
-            ExecuteAsync(cnn, new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered, default(CancellationToken)));
+        public static Task<int> ExecuteAsync(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null,
+            int? commandTimeout = null, CommandType? commandType = null, bool isExcludeUnitOfWork = false) =>
+            ExecuteAsync(cnn, new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered,
+                default(CancellationToken), isExcludeUnitOfWork));
 
         /// <summary>
         /// Execute a command asynchronously using .NET 4.5 Task.
@@ -705,7 +714,7 @@ namespace Dapper
         /// <returns>An enumerable of <typeparamref name="TReturn"/>.</returns>
         public static Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TReturn>(this IDbConnection cnn, string sql, Func<TFirst, TSecond, TReturn> map, object param = null, IDbTransaction transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null) =>
             MultiMapAsync<TFirst, TSecond, DontMap, DontMap, DontMap, DontMap, DontMap, TReturn>(cnn,
-                new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, buffered ? CommandFlags.Buffered : CommandFlags.None, default(CancellationToken)), map, splitOn);
+                new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, buffered ? CommandFlags.Buffered : CommandFlags.None, default(CancellationToken)), map, splitOn);
 
         /// <summary>
         /// Perform a asynchronous multi-mapping query with 2 input types. 
@@ -742,7 +751,7 @@ namespace Dapper
         /// <returns>An enumerable of <typeparamref name="TReturn"/>.</returns>
         public static Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TReturn>(this IDbConnection cnn, string sql, Func<TFirst, TSecond, TThird, TReturn> map, object param = null, IDbTransaction transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null) =>
             MultiMapAsync<TFirst, TSecond, TThird, DontMap, DontMap, DontMap, DontMap, TReturn>(cnn,
-                new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, buffered ? CommandFlags.Buffered : CommandFlags.None, default(CancellationToken)), map, splitOn);
+                new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, buffered ? CommandFlags.Buffered : CommandFlags.None, default(CancellationToken)), map, splitOn);
 
         /// <summary>
         /// Perform a asynchronous multi-mapping query with 3 input types. 
@@ -781,7 +790,7 @@ namespace Dapper
         /// <returns>An enumerable of <typeparamref name="TReturn"/>.</returns>
         public static Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TReturn>(this IDbConnection cnn, string sql, Func<TFirst, TSecond, TThird, TFourth, TReturn> map, object param = null, IDbTransaction transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null) =>
             MultiMapAsync<TFirst, TSecond, TThird, TFourth, DontMap, DontMap, DontMap, TReturn>(cnn,
-                new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, buffered ? CommandFlags.Buffered : CommandFlags.None, default(CancellationToken)), map, splitOn);
+                new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, buffered ? CommandFlags.Buffered : CommandFlags.None, default(CancellationToken)), map, splitOn);
 
         /// <summary>
         /// Perform a asynchronous multi-mapping query with 4 input types. 
@@ -822,7 +831,7 @@ namespace Dapper
         /// <returns>An enumerable of <typeparamref name="TReturn"/>.</returns>
         public static Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TReturn>(this IDbConnection cnn, string sql, Func<TFirst, TSecond, TThird, TFourth, TFifth, TReturn> map, object param = null, IDbTransaction transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null) =>
             MultiMapAsync<TFirst, TSecond, TThird, TFourth, TFifth, DontMap, DontMap, TReturn>(cnn,
-                new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, buffered ? CommandFlags.Buffered : CommandFlags.None, default(CancellationToken)), map, splitOn);
+                new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, buffered ? CommandFlags.Buffered : CommandFlags.None, default(CancellationToken)), map, splitOn);
 
         /// <summary>
         /// Perform a asynchronous multi-mapping query with 5 input types. 
@@ -865,7 +874,7 @@ namespace Dapper
         /// <returns>An enumerable of <typeparamref name="TReturn"/>.</returns>
         public static Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TReturn>(this IDbConnection cnn, string sql, Func<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TReturn> map, object param = null, IDbTransaction transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null) =>
             MultiMapAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, DontMap, TReturn>(cnn,
-                new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, buffered ? CommandFlags.Buffered : CommandFlags.None, default(CancellationToken)), map, splitOn);
+                new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, buffered ? CommandFlags.Buffered : CommandFlags.None, default(CancellationToken)), map, splitOn);
 
         /// <summary>
         /// Perform a asynchronous multi-mapping query with 6 input types. 
@@ -910,7 +919,7 @@ namespace Dapper
         /// <returns>An enumerable of <typeparamref name="TReturn"/>.</returns>
         public static Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn>(this IDbConnection cnn, string sql, Func<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn> map, object param = null, IDbTransaction transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null) =>
             MultiMapAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn>(cnn,
-                new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, buffered ? CommandFlags.Buffered : CommandFlags.None, default(CancellationToken)), map, splitOn);
+                new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, buffered ? CommandFlags.Buffered : CommandFlags.None, default(CancellationToken)), map, splitOn);
 
         /// <summary>
         /// Perform an asynchronous multi-mapping query with 7 input types. 
@@ -973,7 +982,7 @@ namespace Dapper
         /// <returns>An enumerable of <typeparamref name="TReturn"/>.</returns>
         public static Task<IEnumerable<TReturn>> QueryAsync<TReturn>(this IDbConnection cnn, string sql, Type[] types, Func<object[], TReturn> map, object param = null, IDbTransaction transaction = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
         {
-            var command = new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, buffered ? CommandFlags.Buffered : CommandFlags.None, default(CancellationToken));
+            var command = new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, buffered ? CommandFlags.Buffered : CommandFlags.None, default(CancellationToken));
             return MultiMapAsync(cnn, command, types, map, splitOn);
         }
 
@@ -1027,7 +1036,7 @@ namespace Dapper
         /// <param name="commandTimeout">Number of seconds before command execution timeout.</param>
         /// <param name="commandType">Is it a stored proc or a batch?</param>
         public static Task<GridReader> QueryMultipleAsync(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null) =>
-            QueryMultipleAsync(cnn, new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered));
+            QueryMultipleAsync(cnn, new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered));
 
         /// <summary>
         /// Execute a command that returns multiple result sets, and access each in turn.
@@ -1101,7 +1110,7 @@ namespace Dapper
         /// </code>
         /// </example>
         public static Task<IDataReader> ExecuteReaderAsync(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null) =>
-            ExecuteReaderImplAsync(cnn, new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered), CommandBehavior.Default);
+            ExecuteReaderImplAsync(cnn, new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered), CommandBehavior.Default);
 
         /// <summary>
         /// Execute parameterized SQL and return an <see cref="IDataReader"/>.
@@ -1162,7 +1171,7 @@ namespace Dapper
         /// <param name="commandType">Is it a stored proc or a batch?</param>
         /// <returns>The first cell returned, as <see cref="object"/>.</returns>
         public static Task<object> ExecuteScalarAsync(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null) =>
-            ExecuteScalarImplAsync<object>(cnn, new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered));
+            ExecuteScalarImplAsync<object>(cnn, new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered));
 
         /// <summary>
         /// Execute parameterized SQL that selects a single value.
@@ -1176,7 +1185,7 @@ namespace Dapper
         /// <param name="commandType">Is it a stored proc or a batch?</param>
         /// <returns>The first cell returned, as <typeparamref name="T"/>.</returns>
         public static Task<T> ExecuteScalarAsync<T>(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null) =>
-            ExecuteScalarImplAsync<T>(cnn, new CommandDefinition(cnn,sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered));
+            ExecuteScalarImplAsync<T>(cnn, new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered));
 
         /// <summary>
         /// Execute parameterized SQL that selects a single value.

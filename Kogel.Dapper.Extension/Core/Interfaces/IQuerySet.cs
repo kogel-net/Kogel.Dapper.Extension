@@ -144,7 +144,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// <param name="type"></param>
 		/// <param name="tableName"></param>
 		/// <returns></returns>
-		QuerySet<T> AsTableName(Type type, string tableName);
+		QuerySet<T> ResetTableName(Type type, string tableName);
 
 		/// <summary>
 		/// 分组

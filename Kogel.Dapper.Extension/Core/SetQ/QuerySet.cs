@@ -54,7 +54,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             HavingExpressionList = new List<LambdaExpression>();
         }
         #region 基础函数
-        public QuerySet<T> AsTableName(Type type, string tableName)
+        public QuerySet<T> ResetTableName(Type type, string tableName)
         {
             SqlProvider.AsTableNameDic.Add(type, tableName);
             return this;

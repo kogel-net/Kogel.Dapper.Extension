@@ -27,18 +27,26 @@ namespace Kogel.Dapper.Extension
         public abstract IProviderOption ProviderOption { get; set; }
 
         public string SqlString { get; set; }
+
         /// <summary>
         /// 连接对象集合
         /// </summary>
         public List<JoinAssTable> JoinList { get; set; }
+
         /// <summary>
         /// 参数对象
         /// </summary>
         public DynamicParameters Params { get; set; }
+
         /// <summary>
         /// 重命名目录
         /// </summary>
         public Dictionary<Type, string> AsTableNameDic { get; set; }
+
+        /// <summary>
+        /// 是否排除在工作单元外
+        /// </summary>
+        public bool IsExcludeUnitOfWork { get; set; }
 
         public abstract SqlProvider FormatGet<T>();
 

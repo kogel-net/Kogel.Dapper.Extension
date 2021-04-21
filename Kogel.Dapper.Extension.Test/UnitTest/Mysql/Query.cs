@@ -31,7 +31,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
             using (var repository = new FlowOrderRepository())
             {
                 var flowOrder = repository.QuerySet()
-                    .AsTableName(typeof(FlowOrder), "flow_order_1")
+                    .ResetTableName(typeof(FlowOrder), "flow_order_1")
                     .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
                     .Get();
 
@@ -40,7 +40,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
 
                 var gc_Fps_FlowOrder = repository.QuerySet()
-                    .AsTableName(typeof(FlowOrder), "flow_order_1")
+                    .ResetTableName(typeof(FlowOrder), "flow_order_1")
                     .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
                     .Get();
 

@@ -75,11 +75,23 @@ namespace Kogel.Repository
             if (command.Connection.ConnectionString.Contains(this.Connection.ConnectionString))
             {
                 //是否进入过工作单元(防止循环嵌套UnitOfWork)
-                if (!command.IsUnifOfWork)
+                if (!command.IsUnitOfWork)
                 {
-                    command.IsUnifOfWork = true;
-                    command.Connection = this.Connection;
-                    command.Transaction = this.Transaction;
+                    command.IsUnitOfWork = true;
+                    //是否排除在工作单元外
+                    if (command.IsExcludeUnitOfWork)
+                    {
+                        var connectionFunc = RepositoryOptionsBuilder._connectionPool.FirstOrDefault(x => x.ConnectionString.Contains(this.Connection.ConnectionString));
+                        if (connectionFunc == null)
+                            throw new DapperExtensionException($"连接未注入{this.Connection.ConnectionString}");
+                        command.Connection = connectionFunc.FuncConnection.Invoke(null);
+                        command.Transaction = null;
+                    }
+                    else
+                    {
+                        command.Connection = this.Connection;
+                        command.Transaction = this.Transaction;
+                    }
                 }
             }
         }
@@ -111,9 +123,6 @@ namespace Kogel.Repository
         {
             if (Transaction != null)
                 Transaction.Dispose();
-
-            //if (Connection != null)
-            //    Connection.Dispose();
 
             GC.SuppressFinalize(this);
         }
