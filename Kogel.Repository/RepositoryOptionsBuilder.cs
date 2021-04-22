@@ -36,7 +36,7 @@ namespace Kogel.Repository
         /// <param name="connection">数据库连接</param>
         /// <param name="dbName">数据库名称</param>
         /// <returns></returns>
-        public RepositoryOptionsBuilder BuildConnection(Func<IDbConnection, IDbConnection> connection, string dbName = "marster")
+        public RepositoryOptionsBuilder BuildConnection(Func<IDbConnection, IDbConnection> connection, string dbName = "master")
         {
             RegisterDataBase(connection, dbName);
             return this;
@@ -69,7 +69,7 @@ namespace Kogel.Repository
         /// </summary>
         /// <param name="dbName"></param>
         /// <returns></returns>
-        internal ConnectionOptions GetConnection(string dbName = "marster")
+        internal ConnectionOptions GetConnection(string dbName = "master")
         {
             lock (CurrentConnectionPool)
             {

@@ -6,37 +6,37 @@ using System.Text.RegularExpressions;
 
 namespace Kogel.Dapper.Extension
 {
-	public class MySqlProvider : SqlProvider
-	{
-		private readonly static string OpenQuote = "`";
-		private readonly static string CloseQuote = "`";
-		private readonly static char ParameterPrefix = '@';
-		private IResolveExpression ResolveExpression;
-		public MySqlProvider()
-		{
-			ProviderOption = new ProviderOption(OpenQuote, CloseQuote, ParameterPrefix);
-			ResolveExpression = new ResolveExpression(this);
-		}
+    public class MySqlProvider : SqlProvider
+    {
+        private readonly static string OpenQuote = "`";
+        private readonly static string CloseQuote = "`";
+        private readonly static char ParameterPrefix = '@';
+        private IResolveExpression ResolveExpression;
+        public MySqlProvider()
+        {
+            ProviderOption = new ProviderOption(OpenQuote, CloseQuote, ParameterPrefix);
+            ResolveExpression = new ResolveExpression(this);
+        }
 
-		public sealed override IProviderOption ProviderOption { get; set; }
+        public sealed override IProviderOption ProviderOption { get; set; }
 
-		public override SqlProvider FormatGet<T>()
-		{
-			var selectSql = ResolveExpression.ResolveSelect(null);
+        public override SqlProvider FormatGet<T>()
+        {
+            var selectSql = ResolveExpression.ResolveSelect(null);
 
-			var fromTableSql = FormatTableName();
+            var fromTableSql = FormatTableName();
 
-			var whereSql = ResolveExpression.ResolveWhereList();
+            var whereSql = ResolveExpression.ResolveWhereList();
 
-			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref selectSql);
+            var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref selectSql);
 
-			var groupSql = ResolveExpression.ResolveGroupBy();
+            var groupSql = ResolveExpression.ResolveGroupBy();
 
-			var havingSql = ResolveExpression.ResolveHaving();
+            var havingSql = ResolveExpression.ResolveHaving();
 
-			var orderbySql = ResolveExpression.ResolveOrderBy();
+            var orderbySql = ResolveExpression.ResolveOrderBy();
 
-			SqlString = $@"SELECT T.* FROM( 
+            SqlString = $@"SELECT T.* FROM( 
                             {selectSql}
                             {fromTableSql} {joinSql}
                             {whereSql}
@@ -46,203 +46,209 @@ namespace Kogel.Dapper.Extension
                             ) T
                             LIMIT 0,1";
 
-			return this;
-		}
+            return this;
+        }
 
-		public override SqlProvider FormatToList<T>()
-		{
-			var selectSql = ResolveExpression.ResolveSelect(null);
+        public override SqlProvider FormatToList<T>()
+        {
+            var topNum = DataBaseContext<T>().QuerySet.TopNum;
 
-			var fromTableSql = FormatTableName();
+            var selectSql = ResolveExpression.ResolveSelect(null);
 
-			var whereSql = ResolveExpression.ResolveWhereList();
+            var fromTableSql = FormatTableName();
 
-			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref selectSql);
+            var whereSql = ResolveExpression.ResolveWhereList();
 
-			var groupSql = ResolveExpression.ResolveGroupBy();
+            var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref selectSql);
 
-			var havingSql = ResolveExpression.ResolveHaving();
+            var groupSql = ResolveExpression.ResolveGroupBy();
 
-			var orderbySql = ResolveExpression.ResolveOrderBy();
+            var havingSql = ResolveExpression.ResolveHaving();
 
-			SqlString = $"{selectSql} {fromTableSql} {joinSql} {whereSql} {groupSql} {havingSql} {orderbySql}";
+            var orderbySql = ResolveExpression.ResolveOrderBy();
 
-			return this;
-		}
+            SqlString = $@" {selectSql} 
+                            {fromTableSql} {joinSql} {whereSql} {groupSql} {havingSql} {orderbySql}";
 
-		public override SqlProvider FormatToPageList<T>(int pageIndex, int pageSize)
-		{
-			var orderbySql = ResolveExpression.ResolveOrderBy();
+            if (topNum.HasValue)
+                SqlString = $"{SqlString} LIMIT {topNum} ";
 
-			var selectSql = ResolveExpression.ResolveSelect(null);
+            return this;
+        }
 
-			var fromTableSql = FormatTableName();
+        public override SqlProvider FormatToPageList<T>(int pageIndex, int pageSize)
+        {
+            var orderbySql = ResolveExpression.ResolveOrderBy();
 
-			var whereSql = ResolveExpression.ResolveWhereList();
+            var selectSql = ResolveExpression.ResolveSelect(null);
 
-			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref selectSql);
+            var fromTableSql = FormatTableName();
 
-			var groupSql = ResolveExpression.ResolveGroupBy();
+            var whereSql = ResolveExpression.ResolveWhereList();
 
-			var havingSql = ResolveExpression.ResolveHaving();
+            var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref selectSql);
 
-			SqlString = $@" {selectSql}
+            var groupSql = ResolveExpression.ResolveGroupBy();
+
+            var havingSql = ResolveExpression.ResolveHaving();
+
+            SqlString = $@" {selectSql}
                             {fromTableSql} {joinSql} {whereSql} {groupSql} {havingSql} {orderbySql}
                             LIMIT {((pageIndex - 1) * pageSize)},{pageSize};";
 
-			return this;
-		}
+            return this;
+        }
 
-		public override SqlProvider FormatCount()
-		{
-			var selectSql = "SELECT COUNT(1)";
+        public override SqlProvider FormatCount()
+        {
+            var selectSql = "SELECT COUNT(1)";
 
-			var fromTableSql = FormatTableName();
+            var fromTableSql = FormatTableName();
 
-			string noneSql = "";
-			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql);
+            string noneSql = "";
+            var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql);
 
-			var whereSql = ResolveExpression.ResolveWhereList();
+            var whereSql = ResolveExpression.ResolveWhereList();
 
-			if (!Context.Set.IsDistinct)
-				SqlString = $"{selectSql} {fromTableSql} {joinSql} {whereSql} ";
-			else
-			{
-				//字段解析字符
-				string countBySql = ResolveExpression.ResolveSelect(null);
+            if (!Context.Set.IsDistinct)
+                SqlString = $"{selectSql} {fromTableSql} {joinSql} {whereSql} ";
+            else
+            {
+                //字段解析字符
+                string countBySql = ResolveExpression.ResolveSelect(null);
 
-				SqlString = $@"SELECT COUNT(*) FROM(
+                SqlString = $@"SELECT COUNT(*) FROM(
                                 {countBySql} {fromTableSql}
                                 {joinSql}
                                 {whereSql}
                                  )T";
-			}
+            }
 
-			return this;
-		}
+            return this;
+        }
 
-		public override SqlProvider FormatDelete()
-		{
-			var fromTableSql = FormatTableName(false, false);
+        public override SqlProvider FormatDelete()
+        {
+            var fromTableSql = FormatTableName(false, false);
 
-			ProviderOption.IsAsName = false;
+            ProviderOption.IsAsName = false;
 
-			var whereSql = ResolveExpression.ResolveWhereList();
+            var whereSql = ResolveExpression.ResolveWhereList();
 
-			SqlString = $"DELETE FROM {fromTableSql} {whereSql}";
+            SqlString = $"DELETE FROM {fromTableSql} {whereSql}";
 
-			return this;
-		}
+            return this;
+        }
 
-		public override SqlProvider FormatInsert<T>(T entity, string[] excludeFields)
-		{
-			var paramsAndValuesSql = FormatInsertParamsAndValues(entity, excludeFields);
-			SqlString = $"INSERT INTO {FormatTableName(false, false)} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]})";
-			return this;
-		}
+        public override SqlProvider FormatInsert<T>(T entity, string[] excludeFields)
+        {
+            var paramsAndValuesSql = FormatInsertParamsAndValues(entity, excludeFields);
+            SqlString = $"INSERT INTO {FormatTableName(false, false)} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]})";
+            return this;
+        }
 
-		public override SqlProvider FormatInsertIdentity<T>(T entity, string[] excludeFields)
-		{
-			var paramsAndValuesSql = FormatInsertParamsAndValues(entity, excludeFields);
-			SqlString = $"INSERT INTO {FormatTableName(false, false)} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]}); SELECT @@IDENTITY";
-			return this;
-		}
+        public override SqlProvider FormatInsertIdentity<T>(T entity, string[] excludeFields)
+        {
+            var paramsAndValuesSql = FormatInsertParamsAndValues(entity, excludeFields);
+            SqlString = $"INSERT INTO {FormatTableName(false, false)} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]}); SELECT @@IDENTITY";
+            return this;
+        }
 
-		public override SqlProvider FormatUpdate<T>(Expression<Func<T, T>> updateExpression)
-		{
-			var update = ResolveExpression.ResolveUpdate(updateExpression);
+        public override SqlProvider FormatUpdate<T>(Expression<Func<T, T>> updateExpression)
+        {
+            var update = ResolveExpression.ResolveUpdate(updateExpression);
 
-			ProviderOption.IsAsName = false;
+            ProviderOption.IsAsName = false;
 
-			var whereSql = ResolveExpression.ResolveWhereList();
-			Params.AddDynamicParams(update.Param);
+            var whereSql = ResolveExpression.ResolveWhereList();
+            Params.AddDynamicParams(update.Param);
 
-			SqlString = $"UPDATE {FormatTableName(false, false)} {update.SqlCmd} {whereSql}";
+            SqlString = $"UPDATE {FormatTableName(false, false)} {update.SqlCmd} {whereSql}";
 
-			return this;
-		}
+            return this;
+        }
 
-		public override SqlProvider FormatUpdate<T>(T entity, string[] excludeFields, bool isBatch = false)
-		{
-			var update = ResolveExpression.ResolveUpdates<T>(entity, Params, excludeFields, isBatch);
+        public override SqlProvider FormatUpdate<T>(T entity, string[] excludeFields, bool isBatch = false)
+        {
+            var update = ResolveExpression.ResolveUpdates<T>(entity, Params, excludeFields, isBatch);
 
-			ProviderOption.IsAsName = false;
+            ProviderOption.IsAsName = false;
 
-			var whereSql = ResolveExpression.ResolveWhereList();
-			//如果不存在条件，就用主键作为条件
-			if (!isBatch)
-				if (whereSql.Trim().Equals("WHERE 1=1"))
-					whereSql += GetIdentityWhere(entity, Params);
+            var whereSql = ResolveExpression.ResolveWhereList();
+            //如果不存在条件，就用主键作为条件
+            if (!isBatch)
+                if (whereSql.Trim().Equals("WHERE 1=1"))
+                    whereSql += GetIdentityWhere(entity, Params);
 
-			SqlString = $"UPDATE {FormatTableName(false, false)} {update} {whereSql}";
-			return this;
-		}
+            SqlString = $"UPDATE {FormatTableName(false, false)} {update} {whereSql}";
+            return this;
+        }
 
-		public override SqlProvider FormatSum(LambdaExpression sumExpression)
-		{
-			var selectSql = ResolveExpression.ResolveSum(sumExpression);
+        public override SqlProvider FormatSum(LambdaExpression sumExpression)
+        {
+            var selectSql = ResolveExpression.ResolveSum(sumExpression);
 
-			var fromTableSql = FormatTableName();
+            var fromTableSql = FormatTableName();
 
-			var whereSql = ResolveExpression.ResolveWhereList();
+            var whereSql = ResolveExpression.ResolveWhereList();
 
-			string noneSql = "";
-			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql);
+            string noneSql = "";
+            var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql);
 
-			SqlString = $"{selectSql} {fromTableSql}{joinSql} {whereSql} ";
+            SqlString = $"{selectSql} {fromTableSql}{joinSql} {whereSql} ";
 
-			return this;
-		}
+            return this;
+        }
 
-		public override SqlProvider FormatMin(LambdaExpression minExpression)
-		{
-			var selectSql = ResolveExpression.ResolveMin(minExpression);
+        public override SqlProvider FormatMin(LambdaExpression minExpression)
+        {
+            var selectSql = ResolveExpression.ResolveMin(minExpression);
 
-			var fromTableSql = FormatTableName();
+            var fromTableSql = FormatTableName();
 
-			var whereSql = ResolveExpression.ResolveWhereList();
+            var whereSql = ResolveExpression.ResolveWhereList();
 
-			string noneSql = "";
-			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql);
+            string noneSql = "";
+            var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql);
 
-			SqlString = $"{selectSql} {fromTableSql}{joinSql} {whereSql} ";
+            SqlString = $"{selectSql} {fromTableSql}{joinSql} {whereSql} ";
 
-			return this;
-		}
+            return this;
+        }
 
-		public override SqlProvider FormatMax(LambdaExpression maxExpression)
-		{
-			var selectSql = ResolveExpression.ResolveMax(maxExpression);
+        public override SqlProvider FormatMax(LambdaExpression maxExpression)
+        {
+            var selectSql = ResolveExpression.ResolveMax(maxExpression);
 
-			var fromTableSql = FormatTableName();
+            var fromTableSql = FormatTableName();
 
-			var whereSql = ResolveExpression.ResolveWhereList();
+            var whereSql = ResolveExpression.ResolveWhereList();
 
-			string noneSql = "";
-			var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql);
+            string noneSql = "";
+            var joinSql = ResolveExpression.ResolveJoinSql(JoinList, ref noneSql);
 
-			SqlString = $"{selectSql} {fromTableSql}{joinSql} {whereSql} ";
+            SqlString = $"{selectSql} {fromTableSql}{joinSql} {whereSql} ";
 
-			return this;
-		}
+            return this;
+        }
 
-		public override SqlProvider FormatUpdateSelect<T>(Expression<Func<T, T>> updator)
-		{
-			var update = ResolveExpression.ResolveUpdate(updator);
+        public override SqlProvider FormatUpdateSelect<T>(Expression<Func<T, T>> updator)
+        {
+            var update = ResolveExpression.ResolveUpdate(updator);
 
-			var selectSql = ResolveExpression.ResolveSelectOfUpdate(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression);
+            var selectSql = ResolveExpression.ResolveSelectOfUpdate(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression);
 
-			var whereSql = ResolveExpression.ResolveWhereList();
-			Params.AddDynamicParams(update.Param);
+            var whereSql = ResolveExpression.ResolveWhereList();
+            Params.AddDynamicParams(update.Param);
 
-			SqlString = $"UPDATE {FormatTableName(false, false)} {update.SqlCmd} {selectSql} {whereSql}";
+            SqlString = $"UPDATE {FormatTableName(false, false)} {update.SqlCmd} {selectSql} {whereSql}";
 
-			return this;
-		}
+            return this;
+        }
 
-		public override SqlProvider Create()
-		{
-			return new MySqlProvider();
-		}
-	}
+        public override SqlProvider Create()
+        {
+            return new MySqlProvider();
+        }
+    }
 }

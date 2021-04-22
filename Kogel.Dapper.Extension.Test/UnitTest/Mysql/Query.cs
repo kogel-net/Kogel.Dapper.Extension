@@ -35,14 +35,22 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                     .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
                     .Get();
 
-
+                //切换数据库
                 repository.ChangeDataBase("fps_2021");
-
 
                 var gc_Fps_FlowOrder = repository.QuerySet()
                     .ResetTableName(typeof(FlowOrder), "flow_order_1")
                     .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
-                    .Get();
+                    .Top(10)
+                    .ToList();
+
+                repository.ChangeDataBase("master");
+
+                gc_Fps_FlowOrder = repository.QuerySet()
+                  .ResetTableName(typeof(FlowOrder), "flow_order_1")
+                  .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
+                  .Top(10)
+                  .ToList();
 
             }
 
@@ -55,7 +63,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
 
                 var tupleList = divReposirory.QuerySet()
-                         .ToListAsync(x => new 
+                         .ToListAsync(x => new
                          {
                              Id = x.Id,
                              flowOrders1 = divReposirory.Orm.QuerySet<FlowOrder1>().Where(y => y.Id == x.Id).Get(y => true),
