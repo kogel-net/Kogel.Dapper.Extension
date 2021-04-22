@@ -8,12 +8,12 @@ using MySql.Data.MySqlClient;
 using Kogel.Repository;
 using Kogel.Dapper.Extension.MySql;
 using Kogel.Dapper.Extension.Test.Model.Dto;
+using System.Collections.Generic;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 {
     public class Query
     {
-
         public void Test()
         {
 
@@ -27,6 +27,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                 Console.WriteLine(sql);
 #endif
             };
+
             //正常模式下仓储使用
             using (var repository = new FlowOrderRepository())
             {
@@ -67,8 +68,9 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                          .ToListAsync(x => new
                          {
                              Id = x.Id,
-                             flowOrders1 = divReposirory.Orm.QuerySet<FlowOrder1>().Where(y => y.Id == x.Id).Get(y => true),
-                             flowOrders2 = divReposirory.Orm.QuerySet<FlowOrder2>().Where(y => y.Id == x.Id).Get(y => true)
+                             //flowOrders1 = divReposirory.Orm.QuerySet<FlowOrder1>().Where(y => y.Id == x.Id).Get(y => true),
+                             //flowOrders2 = divReposirory.Orm.QuerySet<FlowOrder2>().Where(y => y.Id == x.Id).Get(y => true),
+                             dateTime = x.DeliveredReceiveTime
                          }).Result;
 
             }
