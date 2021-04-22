@@ -38,16 +38,16 @@ namespace Kogel.Repository
         /// 开始事务
         /// </summary>
         /// <param name="transactionMethod"></param>
-        /// <param name="IsolationLevel"></param>
+        /// <param name="isolationLevel"></param>
         /// <returns></returns>
         [UnitOfWorkAttrbute]
-        public IUnitOfWork BeginTransaction(Action transactionMethod, IsolationLevel IsolationLevel = IsolationLevel.Serializable)
+        public IUnitOfWork BeginTransaction(Action transactionMethod, IsolationLevel isolationLevel = IsolationLevel.ReadCommitted)
         {
             if (Connection.State == ConnectionState.Closed)
                 Connection.Open();
 
             if (Transaction == null)
-                Transaction = Connection.BeginTransaction(IsolationLevel);
+                Transaction = Connection.BeginTransaction(isolationLevel);
             try
             {
                 SqlMapper.Aop.OnExecuting += Aop_OnExecuting;

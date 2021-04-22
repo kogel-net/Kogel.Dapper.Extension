@@ -1,4 +1,5 @@
 ﻿using Kogel.Dapper.Extension.Core.Interfaces;
+using Kogel.Dapper.Extension.Core.SetC;
 using Kogel.Dapper.Extension.Core.SetQ;
 using Kogel.Repository.Interfaces;
 using System;
@@ -30,12 +31,11 @@ namespace Kogel.Repository
         /// 获取自定义仓储
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="iQuerySet"></param>
+        /// <param name="querySet"></param>
         /// <returns></returns>
-        public static IBaseRepository<T> GetRepository<T>(this IQuerySet<T> iQuerySet)
+        public static IBaseRepository<T> GetRepository<T>(this IQuerySet<T> querySet)
         {
-            QuerySet<T> querySet = iQuerySet as QuerySet<T>;
-            return querySet.GetRepository();
+            return (querySet as QuerySet<T>).GetRepository();
         }
 
         /// <summary>
@@ -50,6 +50,34 @@ namespace Kogel.Repository
             var options = new RepositoryOptionsBuilder();
             options.BuildConnection(x => querySet.DbCon);
             options.BuildProvider(querySet.SqlProvider);
+            //设置给通用仓储
+            var baseRepository = new BaseRepositoryExtension<T>(options);
+            return baseRepository;
+        }
+
+        /// <summary>
+        /// 获取自定义仓储
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandSet"></param>
+        /// <returns></returns>
+        public static IBaseRepository<T> GetRepository<T>(this ICommandSet<T> commandSet)
+        {
+            return (commandSet as CommandSet<T>).GetRepository();
+        }
+
+        /// <summary>
+        /// 获取自定义仓储
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandSet"></param>
+        /// <returns></returns>
+        public static IBaseRepository<T> GetRepository<T>(this CommandSet<T> commandSet)
+        {
+            //从基础querySet对象中取出连接对象和提供方
+            var options = new RepositoryOptionsBuilder();
+            options.BuildConnection(x => commandSet.DbCon);
+            options.BuildProvider(commandSet.SqlProvider);
             //设置给通用仓储
             var baseRepository = new BaseRepositoryExtension<T>(options);
             return baseRepository;
@@ -77,6 +105,30 @@ namespace Kogel.Repository
         {
             querySet.SqlProvider.IsExcludeUnitOfWork = true;
             return querySet;
+        }
+
+        /// <summary>
+        /// 排除在工作单元外
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandSet"></param>
+        /// <returns></returns>
+        public static ICommandSet<T> NotUnitOfWork<T>(this ICommandSet<T> commandSet)
+        {
+            NotUnitOfWork(commandSet as CommandSet<T>);
+            return commandSet;
+        }
+
+        /// <summary>
+        /// 排除在工作单元外
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandSet"></param>
+        /// <returns></returns>
+        public static CommandSet<T> NotUnitOfWork<T>(this CommandSet<T> commandSet)
+        {
+            commandSet.SqlProvider.IsExcludeUnitOfWork = true;
+            return commandSet;
         }
     }
 }

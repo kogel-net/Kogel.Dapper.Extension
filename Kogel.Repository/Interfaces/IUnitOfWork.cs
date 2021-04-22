@@ -23,8 +23,8 @@ namespace Kogel.Repository.Interfaces
 		/// 开启事务
 		/// </summary>
 		/// <param name="transactionMethod"></param>
-		/// <param name="IsolationLevel"></param>
-		IUnitOfWork BeginTransaction(Action transactionMethod, IsolationLevel IsolationLevel = IsolationLevel.Serializable);
+		/// <param name="isolationLevel"></param>
+		IUnitOfWork BeginTransaction(Action transactionMethod, IsolationLevel isolationLevel = IsolationLevel.ReadCommitted);
 
 		/// <summary>
 		/// 提交

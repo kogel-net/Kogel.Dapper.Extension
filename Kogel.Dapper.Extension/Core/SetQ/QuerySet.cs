@@ -53,6 +53,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             GroupExpressionList = new List<LambdaExpression>();
             HavingExpressionList = new List<LambdaExpression>();
         }
+
         #region 基础函数
         public QuerySet<T> ResetTableName(Type type, string tableName)
         {
@@ -78,6 +79,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             return this;
         }
         #endregion
+
         #region 条件
         public QuerySet<T> Where(Expression<Func<T, bool>> predicate)
         {
@@ -89,7 +91,6 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             WhereExpressionList.Add(predicate);
             return this;
         }
-
 
         public QuerySet<T> Where(T model)
         {
@@ -205,6 +206,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             }
             return this;
         }
+
         /// <summary>
         /// 使用sql查询条件
         /// </summary>

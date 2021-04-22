@@ -12,12 +12,14 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// <param name="field"></param>
         /// <returns></returns>
         Order<T> OrderBy(Expression<Func<T, object>> field);
+
         /// <summary>
         /// 倒序
         /// </summary>
         /// <param name="field"></param>
         /// <returns></returns>
         Order<T> OrderByDescing(Expression<Func<T, object>> field);
+
         /// <summary>
         /// 顺序
         /// </summary>
@@ -33,5 +35,12 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// <param name="field"></param>
         /// <returns></returns>
         Order<T> OrderByDescing<TProperty>(Expression<Func<TProperty, object>> field);
+
+        /// <summary>
+        /// 字符串拼接排序
+        /// </summary>
+        /// <param name="orderBy"></param>
+        /// <returns></returns>
+        Order<T> OrderBy(string orderBy);
     }
 }

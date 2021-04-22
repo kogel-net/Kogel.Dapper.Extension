@@ -31,7 +31,6 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         {
             if (field != null)
                 OrderbyExpressionList.Add(field, EOrderBy.Asc);
-
             return this;
         }
 
@@ -39,7 +38,6 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         {
             if (field != null)
                 OrderbyExpressionList.Add(field, EOrderBy.Asc);
-
             return this;
         }
 
@@ -48,7 +46,6 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         {
             if (field != null)
                 OrderbyExpressionList.Add(field, EOrderBy.Desc);
-
             return this;
         }
 
@@ -56,14 +53,13 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         {
             if (field != null)
                 OrderbyExpressionList.Add(field, EOrderBy.Desc);
-
             return this;
         }
+
         public Order<T> OrderBy(string orderBy)
         {
             if (!string.IsNullOrEmpty(orderBy))
                 OrderbyBuilder.Append(orderBy);
-
             return this;
         }
     }
