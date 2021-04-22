@@ -143,7 +143,7 @@ namespace Kogel.Dapper.Extension.Extension
         }
         #endregion
         #region 导航拓展
-
+        private static readonly MethodInfo _SetValueMethod = typeof(AnonymousExtension).GetMethod("SetValue");
         /// <summary>
         /// 写入导航属性到实体(单条)
         /// </summary>
@@ -155,8 +155,6 @@ namespace Kogel.Dapper.Extension.Extension
         {
             if (providerOption.NavigationList.Any() && data != null)
             {
-                //写入值方法
-                var setValueMethod = typeof(AnonymousExtension).GetMethod("SetValue");
                 foreach (var navigation in providerOption.NavigationList)
                 {
                     var navigationExpression = new NavigationExpression(navigation.MemberAssign.Expression);
@@ -175,7 +173,7 @@ namespace Kogel.Dapper.Extension.Extension
                                 navigationExpression.Param.Add(param, paramValue);
                             }
                         }
-                        setValueMethod
+                        _SetValueMethod
                             .MakeGenericMethod(new Type[] { typeof(T), navigationExpression.ReturnType })
                             .Invoke(null, new object[] { data, dbCon, navigationExpression.SqlCmd, navigationExpression.Param, navigation.MemberAssignName });
                     }
@@ -206,6 +204,9 @@ namespace Kogel.Dapper.Extension.Extension
                     property.SetValue(data, firstData);
             }
         }
+
+
+        private static readonly MethodInfo _SetListValueMethod = typeof(AnonymousExtension).GetMethod("SetListValue");
         /// <summary>
         /// 写入导航属性到实体(列表)
         /// </summary>
@@ -217,7 +218,6 @@ namespace Kogel.Dapper.Extension.Extension
         {
             if (providerOption.NavigationList.Any() && data != null && data.Any())
             {
-                var setListMethod = typeof(AnonymousExtension).GetMethod("SetListValue");
                 foreach (var navigation in providerOption.NavigationList)
                 {
                     StringBuilder sqlBuilder = new StringBuilder();
@@ -243,7 +243,7 @@ namespace Kogel.Dapper.Extension.Extension
                                 }
                             }
                         }
-                        setListMethod
+                        _SetListValueMethod
                            .MakeGenericMethod(new Type[] { typeof(T), navigationExpression.ReturnType })
                            .Invoke(null, new object[] { data, dbCon, sqlBuilder.ToString(), navigationExpression.Param,
                             navigation.MemberAssignName });
