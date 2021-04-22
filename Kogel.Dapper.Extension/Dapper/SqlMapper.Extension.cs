@@ -466,12 +466,26 @@ namespace Dapper
         {
             parameter.Size = 10;
             parameter.DbType = DbType.String;
-            parameter.Value = value.ToString();
+            //parameter.Value = value.ToString();
+            parameter.Value = value;
         }
 
         public override Guid Parse(object value)
         {
-            return Guid.Parse((string)value);
+            //return Guid.Parse((string)value);
+            return Convert(value);
+        }
+
+        internal static Guid Convert(object value)
+        {
+            if (value.GetType().Name.Contains("Guid"))
+            {
+                return (Guid)value;
+            }
+            else
+            {
+                return Guid.Parse(value.ToString());
+            }
         }
     }
 
@@ -481,7 +495,7 @@ namespace Dapper
         {
             parameter.Size = 10;
             parameter.DbType = DbType.String;
-            parameter.Value = value.ToString();
+            parameter.Value = value;
         }
 
         public override Guid[] Parse(object value)
@@ -489,7 +503,7 @@ namespace Dapper
             List<Guid> guids = new List<Guid>();
             foreach (var item in value as string[])
             {
-                guids.Add(Guid.Parse((string)item));
+                guids.Add(GuidTypeHanlder.Convert(value));
             }
             return guids.ToArray();
         }
