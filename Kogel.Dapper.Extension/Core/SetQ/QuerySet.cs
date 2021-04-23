@@ -20,7 +20,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
     /// 查询集
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class QuerySet<T> : Aggregation<T>, IQuerySet<T>
+    public partial class QuerySet<T> : Aggregation<T>, IQuerySet<T>
     {
         public QuerySet(IDbConnection conn, SqlProvider sqlProvider) : base(conn, sqlProvider)
         {
@@ -78,8 +78,235 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         {
             return this;
         }
+
+        /// <summary>
+        /// 返回对应行数数据（此方法只对mssql和mysql有效）
+        /// </summary>
+        /// <param name="num"></param>
+        /// <returns></returns>
+        public QuerySet<T> Top(int num)
+        {
+            TopNum = num;
+            return this;
+        }
         #endregion
 
+        #region 连表
+        /// <summary>
+        /// 连表
+        /// </summary>
+        /// <typeparam name="TWhere">条件表</typeparam>
+        /// <typeparam name="TInner">连接表</typeparam>
+        /// <param name="rightField">主表关联键</param>
+        /// <param name="leftField">外表关联键</param>
+        /// <param name="joinMode">连接方式</param>
+        /// <returns></returns>
+        public QuerySet<T> Join<TWhere, TInner>(Expression<Func<TWhere, object>> rightField, Expression<Func<TInner, object>> leftField, JoinMode joinMode = JoinMode.LEFT)
+        {
+            SqlProvider.JoinList.Add(new JoinAssTable()
+            {
+                Action = JoinAction.Default,
+                JoinMode = joinMode,
+                RightTabName = EntityCache.QueryEntity(typeof(TWhere)).AsName,
+                RightAssName = rightField.GetCorrectPropertyName(),
+                LeftTabName = EntityCache.QueryEntity(typeof(TInner)).AsName,
+                LeftAssName = leftField.GetCorrectPropertyName(),
+                TableType = typeof(TInner)
+            });
+            return this;
+        }
+
+        /// <summary>
+        /// 连表
+        /// </summary>
+        /// <typeparam name="TInner">副表</typeparam>
+        /// <param name="expression">条件</param>
+        /// <param name="joinMode">连接类型</param>
+        /// <param name="isDisField">是否需要显示表字段</param>
+        /// <returns></returns>
+        public QuerySet<T> Join<TInner>(LambdaExpression expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true)
+        {
+            var joinWhere = new WhereExpression(expression, $"{Params.ParameterNames.Count()}", SqlProvider);
+            Regex whereRex = new Regex("AND");
+            string tableName = SqlProvider.FormatTableName(false, true, typeof(TInner));
+            SqlProvider.JoinList.Add(new JoinAssTable()
+            {
+                Action = JoinAction.Sql,
+                JoinSql = $"{joinMode.ToString()} JOIN {tableName} ON {  whereRex.Replace(joinWhere.SqlCmd, "", 1)}",
+                TableType = (isDisField ? typeof(TInner) : null)
+            });
+            if (joinWhere.Param != null)
+            {
+                Params.AddDynamicParams(joinWhere.Param, true);
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TWhere"></typeparam>
+        /// <typeparam name="TInner"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="joinMode"></param>
+        /// <param name="isDisField"></param>
+        /// <returns></returns>
+        public QuerySet<T> Join<TWhere, TInner>(Expression<Func<TWhere, TInner, bool>> expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true)
+        {
+            Join<TInner>(expression, joinMode, isDisField);
+            return this;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TWhere"></typeparam>
+        /// <typeparam name="TInner"></typeparam>
+        /// <typeparam name="TWhere2"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="joinMode"></param>
+        /// <param name="isDisField"></param>
+        /// <returns></returns>
+        public QuerySet<T> Join<TWhere, TInner, TWhere2>(Expression<Func<TWhere, TInner, TWhere2, bool>> expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true)
+        {
+            Join<TInner>(expression, joinMode, isDisField);
+            return this;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TWhere"></typeparam>
+        /// <typeparam name="TInner"></typeparam>
+        /// <typeparam name="TWhere2"></typeparam>
+        /// <typeparam name="TWhere3"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="joinMode"></param>
+        /// <param name="isDisField"></param>
+        /// <returns></returns>
+        public QuerySet<T> Join<TWhere, TInner, TWhere2, TWhere3>(Expression<Func<TWhere, TInner, TWhere2, TWhere3, bool>> expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true)
+        {
+            Join<TInner>(expression, joinMode, isDisField);
+            return this;
+        }
+
+        public QuerySet<T> Join(string SqlJoin)
+        {
+            SqlProvider.JoinList.Add(new JoinAssTable()
+            {
+                Action = JoinAction.Sql,
+                JoinSql = SqlJoin,
+                IsMapperField = false
+            });
+            return this;
+        }
+        /// <summary>
+        /// 连接(通过sql连接，不指定表实体默认为不增加该表显示字段)
+        /// </summary>
+        /// <typeparam name="TInner"></typeparam>
+        /// <param name="SqlJoin"></param>
+        /// <returns></returns>
+        public QuerySet<T> Join<TInner>(string SqlJoin)
+        {
+            SqlProvider.JoinList.Add(new JoinAssTable()
+            {
+                Action = JoinAction.Sql,
+                JoinSql = SqlJoin,
+                TableType = typeof(TInner),
+            });
+            return this;
+        }
+        #endregion
+
+        #region 多表索引扩展
+        public ISelectFrom<T, T1, T2> From<T1, T2>()
+        {
+            return new ISelectFrom<T, T1, T2>(this);
+        }
+        public ISelectFrom<T, T1, T2, T3> From<T1, T2, T3>()
+        {
+            return new ISelectFrom<T, T1, T2, T3>(this);
+        }
+        public ISelectFrom<T, T1, T2, T3, T4> From<T1, T2, T3, T4>()
+        {
+            return new ISelectFrom<T, T1, T2, T3, T4>(this);
+        }
+        #endregion
+
+        #region 分组
+        public QuerySet<T> GroupBy(Expression<Func<T, object>> groupByExp)
+        {
+            GroupExpressionList.Add(groupByExp);
+            return this;
+        }
+
+        public QuerySet<T> GroupBy<TGroup>(Expression<Func<TGroup, object>> groupByExp)
+        {
+            GroupExpressionList.Add(groupByExp);
+            return this;
+        }
+        public QuerySet<T> GroupByIf<TGroup>(bool where, Expression<Func<TGroup, object>> trueGroupByExp, Expression<Func<TGroup, object>> falseGroupByExp)
+        {
+            if (where)
+                GroupExpressionList.Add(trueGroupByExp);
+            else
+                GroupExpressionList.Add(falseGroupByExp);
+            return this;
+        }
+
+        /// <summary>
+        /// 分组聚合条件
+        /// </summary>
+        /// <param name="havingExp"></param>
+        /// <returns></returns>
+        public QuerySet<T> Having(Expression<Func<T, object>> havingExp)
+        {
+            HavingExpressionList.Add(havingExp);
+            return this;
+        }
+
+        /// <summary>
+        /// 分组聚合条件(根据指定表)
+        /// </summary>
+        /// <typeparam name="THaving"></typeparam>
+        /// <param name="havingExp"></param>
+        /// <returns></returns>
+        public QuerySet<T> Having<THaving>(Expression<Func<THaving, object>> havingExp)
+        {
+            HavingExpressionList.Add(havingExp);
+            return this;
+        }
+        /// <summary>
+        /// 分组聚合条件(带判断)
+        /// </summary>
+        /// <typeparam name="THaving"></typeparam>
+        /// <param name="where"></param>
+        /// <param name="trueHavingExp"></param>
+        /// <param name="falseHavingExp"></param>
+        /// <returns></returns>
+        public QuerySet<T> HavingIf<THaving>(bool where, Expression<Func<THaving, object>> trueHavingExp, Expression<Func<THaving, object>> falseHavingExp)
+        {
+            if (where)
+                HavingExpressionList.Add(trueHavingExp);
+            else
+                HavingExpressionList.Add(falseHavingExp);
+            return this;
+        }
+
+        /// <summary>
+        /// 是否去重
+        /// </summary>
+        /// <returns></returns>
+        public QuerySet<T> Distinct()
+        {
+            IsDistinct = true;
+            return this;
+        }
+        #endregion
+    }
+
+    public partial class QuerySet<T> : Aggregation<T>, IQuerySet<T>
+    {
         #region 条件
         public QuerySet<T> Where(Expression<Func<T, bool>> predicate)
         {
@@ -259,217 +486,6 @@ namespace Kogel.Dapper.Extension.Core.SetQ
                 WhereExpressionList.Add(truePredicate);
             else
                 WhereExpressionList.Add(falsePredicate);
-            return this;
-        }
-        #endregion
-        #region 连表
-        /// <summary>
-        /// 连表
-        /// </summary>
-        /// <typeparam name="TWhere">条件表</typeparam>
-        /// <typeparam name="TInner">连接表</typeparam>
-        /// <param name="rightField">主表关联键</param>
-        /// <param name="leftField">外表关联键</param>
-        /// <param name="joinMode">连接方式</param>
-        /// <returns></returns>
-        public QuerySet<T> Join<TWhere, TInner>(Expression<Func<TWhere, object>> rightField, Expression<Func<TInner, object>> leftField, JoinMode joinMode = JoinMode.LEFT)
-        {
-            SqlProvider.JoinList.Add(new JoinAssTable()
-            {
-                Action = JoinAction.Default,
-                JoinMode = joinMode,
-                RightTabName = EntityCache.QueryEntity(typeof(TWhere)).AsName,
-                RightAssName = rightField.GetCorrectPropertyName(),
-                LeftTabName = EntityCache.QueryEntity(typeof(TInner)).AsName,
-                LeftAssName = leftField.GetCorrectPropertyName(),
-                TableType = typeof(TInner)
-            });
-            return this;
-        }
-
-        /// <summary>
-        /// 连表
-        /// </summary>
-        /// <typeparam name="TInner">副表</typeparam>
-        /// <param name="expression">条件</param>
-        /// <param name="joinMode">连接类型</param>
-        /// <param name="isDisField">是否需要显示表字段</param>
-        /// <returns></returns>
-        public QuerySet<T> Join<TInner>(LambdaExpression expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true)
-        {
-            var joinWhere = new WhereExpression(expression, $"{Params.ParameterNames.Count()}", SqlProvider);
-            Regex whereRex = new Regex("AND");
-            string tableName = SqlProvider.FormatTableName(false, true, typeof(TInner));
-            SqlProvider.JoinList.Add(new JoinAssTable()
-            {
-                Action = JoinAction.Sql,
-                JoinSql = $"{joinMode.ToString()} JOIN {tableName} ON {  whereRex.Replace(joinWhere.SqlCmd, "", 1)}",
-                TableType = (isDisField ? typeof(TInner) : null)
-            });
-            if (joinWhere.Param != null)
-            {
-                Params.AddDynamicParams(joinWhere.Param, true);
-            }
-            return this;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="TWhere"></typeparam>
-        /// <typeparam name="TInner"></typeparam>
-        /// <param name="expression"></param>
-        /// <param name="joinMode"></param>
-        /// <param name="isDisField"></param>
-        /// <returns></returns>
-        public QuerySet<T> Join<TWhere, TInner>(Expression<Func<TWhere, TInner, bool>> expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true)
-        {
-            Join<TInner>(expression, joinMode, isDisField);
-            return this;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="TWhere"></typeparam>
-        /// <typeparam name="TInner"></typeparam>
-        /// <typeparam name="TWhere2"></typeparam>
-        /// <param name="expression"></param>
-        /// <param name="joinMode"></param>
-        /// <param name="isDisField"></param>
-        /// <returns></returns>
-        public QuerySet<T> Join<TWhere, TInner, TWhere2>(Expression<Func<TWhere, TInner, TWhere2, bool>> expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true)
-        {
-            Join<TInner>(expression, joinMode, isDisField);
-            return this;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="TWhere"></typeparam>
-        /// <typeparam name="TInner"></typeparam>
-        /// <typeparam name="TWhere2"></typeparam>
-        /// <typeparam name="TWhere3"></typeparam>
-        /// <param name="expression"></param>
-        /// <param name="joinMode"></param>
-        /// <param name="isDisField"></param>
-        /// <returns></returns>
-        public QuerySet<T> Join<TWhere, TInner, TWhere2, TWhere3>(Expression<Func<TWhere, TInner, TWhere2, TWhere3, bool>> expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true)
-        {
-            Join<TInner>(expression, joinMode, isDisField);
-            return this;
-        }
-
-        public QuerySet<T> Join(string SqlJoin)
-        {
-            SqlProvider.JoinList.Add(new JoinAssTable()
-            {
-                Action = JoinAction.Sql,
-                JoinSql = SqlJoin,
-                IsMapperField = false
-            });
-            return this;
-        }
-        /// <summary>
-        /// 连接(通过sql连接，不指定表实体默认为不增加该表显示字段)
-        /// </summary>
-        /// <typeparam name="TInner"></typeparam>
-        /// <param name="SqlJoin"></param>
-        /// <returns></returns>
-        public QuerySet<T> Join<TInner>(string SqlJoin)
-        {
-            SqlProvider.JoinList.Add(new JoinAssTable()
-            {
-                Action = JoinAction.Sql,
-                JoinSql = SqlJoin,
-                TableType = typeof(TInner),
-            });
-            return this;
-        }
-        #endregion
-        #region 多表索引扩展
-        public ISelectFrom<T, T1, T2> From<T1, T2>()
-        {
-            return new ISelectFrom<T, T1, T2>(this);
-        }
-        public ISelectFrom<T, T1, T2, T3> From<T1, T2, T3>()
-        {
-            return new ISelectFrom<T, T1, T2, T3>(this);
-        }
-        public ISelectFrom<T, T1, T2, T3, T4> From<T1, T2, T3, T4>()
-        {
-            return new ISelectFrom<T, T1, T2, T3, T4>(this);
-        }
-        #endregion
-
-        #region 分组
-        public QuerySet<T> GroupBy(Expression<Func<T, object>> groupByExp)
-        {
-            GroupExpressionList.Add(groupByExp);
-            return this;
-        }
-
-        public QuerySet<T> GroupBy<TGroup>(Expression<Func<TGroup, object>> groupByExp)
-        {
-            GroupExpressionList.Add(groupByExp);
-            return this;
-        }
-        public QuerySet<T> GroupByIf<TGroup>(bool where, Expression<Func<TGroup, object>> trueGroupByExp, Expression<Func<TGroup, object>> falseGroupByExp)
-        {
-            if (where)
-                GroupExpressionList.Add(trueGroupByExp);
-            else
-                GroupExpressionList.Add(falseGroupByExp);
-            return this;
-        }
-
-        /// <summary>
-        /// 分组聚合条件
-        /// </summary>
-        /// <param name="havingExp"></param>
-        /// <returns></returns>
-        public QuerySet<T> Having(Expression<Func<T, object>> havingExp)
-        {
-            HavingExpressionList.Add(havingExp);
-            return this;
-        }
-
-        /// <summary>
-        /// 分组聚合条件(根据指定表)
-        /// </summary>
-        /// <typeparam name="THaving"></typeparam>
-        /// <param name="havingExp"></param>
-        /// <returns></returns>
-        public QuerySet<T> Having<THaving>(Expression<Func<THaving, object>> havingExp)
-        {
-            HavingExpressionList.Add(havingExp);
-            return this;
-        }
-        /// <summary>
-        /// 分组聚合条件(带判断)
-        /// </summary>
-        /// <typeparam name="THaving"></typeparam>
-        /// <param name="where"></param>
-        /// <param name="trueHavingExp"></param>
-        /// <param name="falseHavingExp"></param>
-        /// <returns></returns>
-        public QuerySet<T> HavingIf<THaving>(bool where, Expression<Func<THaving, object>> trueHavingExp, Expression<Func<THaving, object>> falseHavingExp)
-        {
-            if (where)
-                HavingExpressionList.Add(trueHavingExp);
-            else
-                HavingExpressionList.Add(falseHavingExp);
-            return this;
-        }
-
-        /// <summary>
-        /// 是否去重
-        /// </summary>
-        /// <returns></returns>
-        public QuerySet<T> Distinct()
-        {
-            IsDistinct = true;
             return this;
         }
         #endregion

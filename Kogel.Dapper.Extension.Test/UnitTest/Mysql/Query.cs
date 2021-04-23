@@ -42,8 +42,8 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                 var gc_Fps_FlowOrder = repository.QuerySet()
                     .ResetTableName(typeof(FlowOrder), "flow_order_1")
                     .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
-                    .OrderBy("")
                     .Top(10)
+                    .OrderBy("")      
                     .ToList();
 
                 repository.ChangeDataBase("master");

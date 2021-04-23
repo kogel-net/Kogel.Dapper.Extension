@@ -78,5 +78,10 @@ namespace Kogel.Dapper.Extension
 		/// 是否排除在工作单元外
 		/// </summary>
 		public bool IsExcludeUnitOfWork { get; set; }
+
+		/// <summary>
+		/// 返回行数
+		/// </summary>
+		public int? TopNum { get; set; }
 	}
 }

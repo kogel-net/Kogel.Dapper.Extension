@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kogel.Dapper.Extension.Test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kogel.Dapper.Extension.MySql", "Kogel.Dapper.Extension.MySql\Kogel.Dapper.Extension.MySql.csproj", "{1E431FF9-D7F5-4A31-8A1D-CD30AD7EBE6A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{E1D84770-977A-4B19-8631-6FB0BF7EA019}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{E1D84770-977A-4B19-8631-6FB0BF7EA019}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FrameWork", "FrameWork", "{A91BBDFA-C068-46F6-945A-28AEA81F3395}"
 EndProject

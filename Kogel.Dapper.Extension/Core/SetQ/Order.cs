@@ -12,7 +12,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
     /// 排序
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract class Order<T> : Option<T>, IOrder<T>
+    public partial class Order<T> : Query<T>, IOrder<T>
     {
         protected Order(IDbConnection conn, SqlProvider sqlProvider) : base(conn, sqlProvider)
         {
