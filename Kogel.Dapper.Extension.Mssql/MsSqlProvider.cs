@@ -5,6 +5,7 @@ using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension.MsSql.Extension;
 using System.Text.RegularExpressions;
 using Kogel.Dapper.Extension.Extension;
+using System.Collections.Generic;
 
 namespace Kogel.Dapper.Extension
 {
@@ -88,17 +89,6 @@ namespace Kogel.Dapper.Extension
 
             var havingSql = ResolveExpression.ResolveHaving();
 
-            //SqlString = $@"SELECT T2.* FROM    ( 
-            //                         SELECT T.*,ROW_NUMBER() OVER (ORDER BY (SELECT 0)) AS ROWNUMBER FROM(
-            //                         {selectSql}
-            //                         {fromTableSql} {nolockSql}{joinSql}
-            //                         {whereSql}
-            //                         {groupSql}
-            //                         {havingSql}
-            //                         {orderbySql}
-            //                         )T
-            //                         ) T2
-            //                         WHERE T2.ROWNUMBER BETWEEN {((pageIndex - 1) * pageSize) + 1} AND {pageIndex * pageSize};";
             SqlString = $@"SELECT T.* FROM    ( 
                             SELECT ROW_NUMBER() OVER ( {orderbySql} ) AS ROWNUMBER,
                             {(new Regex("SELECT").Replace(selectSql, "", 1))}
@@ -173,6 +163,13 @@ namespace Kogel.Dapper.Extension
             SqlString = $"INSERT INTO {FormatTableName(false, false)} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]})";
             return this;
         }
+
+        public override SqlProvider FormatInsert<T>(IEnumerable<T> entitys, string[] excludeFields)
+        {
+            SqlString = ResolveExpression.ResolveBulkInsert<T>(entitys, excludeFields);
+            return this;
+        }
+
         public override SqlProvider FormatInsertIdentity<T>(T entity, string[] excludeFields)
         {
             var paramsAndValuesSql = FormatInsertParamsAndValues(entity, excludeFields);

@@ -60,6 +60,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             SqlProvider.AsTableNameDic.Add(type, tableName);
             return this;
         }
+
         /// <summary>
         /// 不锁表查询(此方法只支持Mssql)
         /// </summary>
@@ -69,6 +70,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             NoLock = true;
             return this;
         }
+
         /// <summary>
         /// 字段匹配[已弃用]
         /// </summary>
@@ -103,14 +105,16 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         /// <returns></returns>
         public QuerySet<T> Join<TWhere, TInner>(Expression<Func<TWhere, object>> rightField, Expression<Func<TInner, object>> leftField, JoinMode joinMode = JoinMode.LEFT)
         {
+            var tWhere = EntityCache.QueryEntity(typeof(TWhere));
+            var tInner = EntityCache.QueryEntity(typeof(TInner));
             SqlProvider.JoinList.Add(new JoinAssTable()
             {
                 Action = JoinAction.Default,
                 JoinMode = joinMode,
-                RightTabName = EntityCache.QueryEntity(typeof(TWhere)).AsName,
-                RightAssName = rightField.GetCorrectPropertyName(),
-                LeftTabName = EntityCache.QueryEntity(typeof(TInner)).AsName,
-                LeftAssName = leftField.GetCorrectPropertyName(),
+                RightTabName = tWhere.AsName,
+                RightAssName = tWhere.FieldPairs[rightField.GetCorrectPropertyName()],
+                LeftTabName = tInner.AsName,
+                LeftAssName = tInner.FieldPairs[leftField.GetCorrectPropertyName()],
                 TableType = typeof(TInner)
             });
             return this;
@@ -132,7 +136,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             SqlProvider.JoinList.Add(new JoinAssTable()
             {
                 Action = JoinAction.Sql,
-                JoinSql = $"{joinMode.ToString()} JOIN {tableName} ON {  whereRex.Replace(joinWhere.SqlCmd, "", 1)}",
+                JoinSql = $"{joinMode} JOIN {tableName} ON {  whereRex.Replace(joinWhere.SqlCmd, "", 1)}",
                 TableType = (isDisField ? typeof(TInner) : null)
             });
             if (joinWhere.Param != null)
@@ -319,118 +323,14 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             return this;
         }
 
-        public QuerySet<T> Where(T model)
-        {
-            ParameterExpression parameter = Expression.Parameter(typeof(T), "parameter");
-            var entityType = EntityCache.QueryEntity(typeof(T));
-            foreach (var item in entityType.Properties)
-            {
-                string name = item.Name;
-                object value = item.GetValue(model, null);
-                if (value != null)
-                {
-                    if (item.PropertyType == typeof(int) || item.PropertyType == typeof(double) || item.PropertyType == typeof(decimal) || item.PropertyType == typeof(long))
-                    {
-                        if (Convert.ToDecimal(value) == 0)
-                        {
-                            continue;
-                        }
-                    }
-                    else if (item.PropertyType == typeof(DateTime))
-                    {
-                        var time = Convert.ToDateTime(value);
-                        if (time == DateTime.MinValue)
-                        {
-                            continue;
-                        }
-                    }
-                    var whereExpress = Expression.Equal(Expression.Property(parameter, name), Expression.Constant(value));
-                    WhereExpressionList.Add(Expression.Lambda<Func<T, bool>>(TrimExpression.Trim(whereExpress), parameter));
-                }
-            }
-            return this;
-        }
-
         /// <summary>
         /// 动态化查讯(转换成表达式树集合)  注意，int参数不会判断为0的值
         /// </summary>
-        /// <typeparam name="T">对应表</typeparam>
         /// <param name="dynamicTree"></param>
         /// <returns></returns>
         public QuerySet<T> Where(Dictionary<string, DynamicTree> dynamicTree)
         {
-            if (dynamicTree != null)
-            {
-                foreach (var key in dynamicTree.Keys)
-                {
-                    DynamicTree tree = dynamicTree[key];
-                    if (tree != null && !string.IsNullOrEmpty(tree.Value))
-                    {
-                        Type tableType = typeof(T);
-                        if (!string.IsNullOrEmpty(tree.Table))
-                        {
-                            tableType = EntityCache.QueryEntity(tree.Table).Type;
-                        }
-                        //如果不存在对应表就使用默认表
-                        ParameterExpression param = Expression.Parameter(tableType, "param");
-                        object value = tree.Value;
-                        if (value == null)
-                        {
-                            continue;
-                        }
-                        else if (tree.ValueType == DbType.DateTime)
-                        {
-                            value = Convert.ToDateTime(value);
-                        }
-                        else if (tree.ValueType == DbType.String)
-                        {
-                            value = Convert.ToString(value);
-                            if ("" == value.ToString())
-                            {
-                                continue;
-                            }
-                        }
-                        else if (tree.ValueType == DbType.Int32)
-                        {
-                            int number = Convert.ToInt32(value);
-                            value = number;
-                            if (0 == number)
-                            {
-                                continue;
-                            }
-                        }
-                        else if (tree.ValueType == DbType.Boolean)
-                        {
-                            if (value.ToString() == "")
-                            {
-                                continue;
-                            }
-                            value = Convert.ToBoolean(value);
-                        }
-                        Expression whereExpress = null;
-                        switch (tree.Operators)
-                        {
-                            case ExpressionType.Equal://等于
-                                whereExpress = Expression.Equal(Expression.Property(param, tree.Field), Expression.Constant(value));
-                                break;
-                            case ExpressionType.GreaterThanOrEqual://大于等于
-                                whereExpress = Expression.GreaterThanOrEqual(Expression.Property(param, tree.Field), Expression.Constant(value));
-                                break;
-                            case ExpressionType.LessThanOrEqual://小于等于
-                                whereExpress = Expression.LessThanOrEqual(Expression.Property(param, tree.Field), Expression.Constant(value));
-                                break;
-                            case ExpressionType.Call://模糊查询
-                                var method = typeof(string).GetMethodss().FirstOrDefault(x => x.Name.Equals("Contains"));
-                                whereExpress = Expression.Call(Expression.Property(param, tree.Field), method, new Expression[] { Expression.Constant(value) });
-                                break;
-                            default:
-                                whereExpress = Expression.Equal(Expression.Property(param, tree.Field), Expression.Constant(value));
-                                break;
-                        }
-                        WhereExpressionList.Add(Expression.Lambda(TrimExpression.Trim(whereExpress), param));
-                    }
-                }
-            }
+            WhereExpressionList.AddRange(SqlProvider.FormatDynamicTreeWhereExpression<T>(dynamicTree));
             return this;
         }
 

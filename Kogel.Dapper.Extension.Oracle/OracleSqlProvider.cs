@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using Kogel.Dapper.Extension.Core.Interfaces;
@@ -141,7 +142,13 @@ namespace Kogel.Dapper.Extension.Oracle
         {
             var fromTableSql = FormatTableName(false, false);
             var paramsAndValuesSql = FormatInsertParamsAndValues(entity);
-            SqlString = $"INSERT INTO {fromTableSql} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]})";
+            SqlString = $"INSERT INTO {fromTableSql} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]});";
+            return this;
+        }
+
+        public override SqlProvider FormatInsert<T>(IEnumerable<T> entitys, string[] excludeFields)
+        {
+            SqlString = ResolveExpression.ResolveBulkInsert<T>(entitys, excludeFields);
             return this;
         }
 

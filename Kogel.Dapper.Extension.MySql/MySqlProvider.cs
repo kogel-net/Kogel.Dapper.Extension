@@ -1,6 +1,7 @@
 ﻿using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension.MySql.Extension;
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 
@@ -144,6 +145,12 @@ namespace Kogel.Dapper.Extension
         {
             var paramsAndValuesSql = FormatInsertParamsAndValues(entity, excludeFields);
             SqlString = $"INSERT INTO {FormatTableName(false, false)} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]})";
+            return this;
+        }
+
+        public override SqlProvider FormatInsert<T>(IEnumerable<T> entitys, string[] excludeFields)
+        {
+            SqlString = ResolveExpression.ResolveBulkInsert<T>(entitys, excludeFields);
             return this;
         }
 

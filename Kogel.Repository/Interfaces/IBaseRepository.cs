@@ -85,10 +85,17 @@ namespace Kogel.Repository.Interfaces
 		T FindById(object id);
 
 		/// <summary>
-		/// 增加(并且返回自增主键到写入到实体中)
+		/// 新增
 		/// </summary>
 		/// <returns></returns>
 		int Insert(T entity);
+
+		/// <summary>
+		/// 批量新增
+		/// </summary>
+		/// <param name="entitys"></param>
+		/// <returns></returns>
+		int Insert(IEnumerable<T> entitys);
 
 		/// <summary>
 		/// 删除(根据主键)

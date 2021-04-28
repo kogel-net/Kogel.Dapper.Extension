@@ -191,31 +191,23 @@ namespace Kogel.Repository
         }
 
         /// <summary>
-        /// 增加(并且返回自增主键到写入到实体中)
+        /// 新增
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
         public int Insert(T entity)
         {
-            var entityObject = EntityCache.QueryEntity(typeof(T));
-            //存在主键写入自增id
-            if (!string.IsNullOrEmpty(entityObject.Identitys))
-            {
-                //var id = this.CommandSet()
-                //   .InsertIdentity(entity);
-                ////写入主键数据
-                //entityObject.EntityFieldList
-                //	.First(x => x.IsIdentity).PropertyInfo
-                //	.SetValue(entity, id);
-                return this.CommandSet()
-                   .Insert(entity);
-            }
-            else
-            {
-                //不存在就直接返回影响行数
-                return this.CommandSet()
-                    .Insert(entity);
-            }
+            return this.CommandSet().Insert(entity);
+        }
+
+        /// <summary>
+		/// 批量新增
+		/// </summary>
+		/// <param name="entitys"></param>
+		/// <returns></returns>
+		public int Insert(IEnumerable<T> entitys)
+        {
+            return this.CommandSet().Insert(entitys);
         }
 
         /// <summary>

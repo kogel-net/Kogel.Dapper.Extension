@@ -191,7 +191,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
                 {
                     if (propertyBuilder.Length > 0)
                         propertyBuilder.Append(",");
-                    propertyBuilder.AppendFormat($"INSERTED.{ providerOption.CombineFieldName(propertyInfo.GetColumnAttributeName())} { providerOption.CombineFieldName(propertyInfo.Name)}");
+                    propertyBuilder.AppendFormat($"INSERTED.{ providerOption.CombineFieldName(entityObject.FieldPairs[propertyInfo.Name])} { providerOption.CombineFieldName(propertyInfo.Name)}");
                 }
                 selectSql = propertyBuilder.ToString();
             }
@@ -200,17 +200,18 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
                 var nodeType = selector.Body.NodeType;
                 if (nodeType == ExpressionType.MemberAccess)
                 {
-                    var columnName = ((MemberExpression)selector.Body).Member.GetColumnAttributeName();
+                    var columnName = entityObject.FieldPairs[((MemberExpression)selector.Body).Member.Name];
                     selectSql = "INSERTED." + providerOption.CombineFieldName(columnName);
                 }
                 else if (nodeType == ExpressionType.MemberInit)
                 {
                     var memberInitExpression = (MemberInitExpression)selector.Body;
-                    selectSql = string.Join(",", memberInitExpression.Bindings.Select(a => "INSERTED." + providerOption.CombineFieldName(a.Member.GetColumnAttributeName())));
+                    selectSql = string.Join(",", memberInitExpression.Bindings.Select(a => "INSERTED." + providerOption.CombineFieldName(entityObject.FieldPairs[a.Member.Name])));
                 }
             }
             return "OUTPUT " + selectSql;
         }
+
         /// <summary>
         /// 解析更新
         /// </summary>
@@ -277,6 +278,12 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
             builder.Insert(0, " SET ");
             return builder.ToString();
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="nolock"></param>
+        /// <returns></returns>
         public virtual string ResolveWithNoLock(bool nolock)
         {
             return nolock ? "(NOLOCK)" : "";
@@ -382,6 +389,95 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
             //设置sql字段
             masterSql += sqlBuilder;
             return masterSql;
+        }
+
+        /// <summary>
+        /// 解析批量新增
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entitys"></param>
+        /// <param name="excludeFields"></param>
+        /// <returns></returns>
+        public virtual string ResolveBulkInsert<T>(IEnumerable<T> entitys, string[] excludeFields)
+        {
+            var sqlBuilder = new StringBuilder();
+            DynamicParameters parameters = new DynamicParameters();
+            //当前数据索引
+            int index = 0;
+            foreach (var item in entitys)
+            {
+#if NET45 || NET451
+                var resolveInsertParamsAndValues = ResolveInsertParamsAndValues(item, excludeFields, index++);
+                var tableName = resolveInsertParamsAndValues.Item1;
+                var fieldStr = resolveInsertParamsAndValues.Item2;
+                var paramStr = resolveInsertParamsAndValues.Item3;
+                var parameter = resolveInsertParamsAndValues.Item4;
+#else
+                var (tableName, fieldStr, paramStr, parameter) = ResolveInsertParamsAndValues(item, excludeFields, index++);
+#endif
+
+                //增加字段(只加一次)
+                if (sqlBuilder.Length == 0)
+                {
+                    sqlBuilder.Append($"INSERT INTO {tableName}");
+                    sqlBuilder.Append($"({fieldStr})");
+                }
+                //增加参数
+                if (index == 1)
+                    sqlBuilder.Append($"Values({paramStr})");
+                else
+                    sqlBuilder.Append($",({paramStr})");
+                parameters.AddDynamicParams(parameter);
+            }
+            provider.Params.AddDynamicParams(parameters);
+            return sqlBuilder.ToString();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="tValue></param>
+        /// <param name="excludeFields">排除字段</param>
+        /// <param name="index">当前数据索引</param>
+        /// <returns></returns>
+        private Tuple<string, StringBuilder, StringBuilder, DynamicParameters> ResolveInsertParamsAndValues<T>(T tValue, string[] excludeFields = null, int index = 0)
+        {
+            var fieldBuilder = new StringBuilder(64);
+            var paramBuilder = new StringBuilder(64);
+            DynamicParameters parameters = new DynamicParameters();
+
+            var entityProperties = EntityCache.QueryEntity(typeof(T));
+            var tableName = entityProperties.Name;
+            var isAppend = false;
+
+            foreach (var entityField in entityProperties.EntityFieldList)
+            {
+                string fieldName = entityField.FieldName;
+                //是否是排除字段
+                if (excludeFields != null && (excludeFields.Contains(fieldName) || excludeFields.Contains(entityField.PropertyInfo.Name)))
+                {
+                    continue;
+                }
+                //是否自增
+                if (entityField.IsIncrease)
+                {
+                    continue;
+                }
+                if (isAppend)
+                {
+                    fieldBuilder.Append(",");
+                    paramBuilder.Append(",");
+                }
+                //字段添加
+                fieldBuilder.Append($"{fieldName}");
+                //参数添加
+                paramBuilder.Append($"{provider.ProviderOption.ParameterPrefix}{fieldName}{index}");
+                parameters.Add($"{provider.ProviderOption.ParameterPrefix}{fieldName}{index}", entityField.PropertyInfo.GetValue(tValue));
+
+                isAppend = true;
+            }
+            return new Tuple<string, StringBuilder, StringBuilder, DynamicParameters>(tableName, fieldBuilder, paramBuilder, parameters);
         }
     }
 }

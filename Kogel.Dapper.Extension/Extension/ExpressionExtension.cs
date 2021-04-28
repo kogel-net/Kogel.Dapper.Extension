@@ -142,10 +142,6 @@ namespace Kogel.Dapper.Extension.Extension
             return compileExpression.Compile();
         }
 
-        public static string GetColumnAttributeName(this MemberInfo memberInfo)
-        {
-            return memberInfo.Name;
-        }
         /// <summary>
         /// 获取表达式的字段名
         /// </summary>
@@ -206,6 +202,7 @@ namespace Kogel.Dapper.Extension.Extension
             var memberExpression = expression as MemberExpression;
             return Expression.Lambda(memberExpression, memberExpression.Expression as ParameterExpression);
         }
+
         /// <summary>
         /// 是否继承了IBaseEntity
         /// </summary>

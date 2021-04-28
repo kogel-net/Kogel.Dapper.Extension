@@ -120,8 +120,8 @@ namespace Kogel.Dapper.Extension.Core.SetC
 
         public int Insert(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120)
         {
-            SqlProvider.FormatInsert(entities.FirstOrDefault(), excludeFields);
-            return DbCon.Execute(SqlProvider.SqlString, entities, DbTransaction, timeout, isExcludeUnitOfWork: SqlProvider.IsExcludeUnitOfWork);
+            SqlProvider.FormatInsert(entities, excludeFields);
+            return DbCon.Execute(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, timeout, isExcludeUnitOfWork: SqlProvider.IsExcludeUnitOfWork);
         }
 
         public async Task<int> InsertAsync(T entity, string[] excludeFields = null)

@@ -47,7 +47,8 @@ namespace Kogel.Repository
         /// </summary>
         /// <param name="connection"></param>
         /// <param name="dbName"></param>
-        public static void RegisterDataBase(Func<IDbConnection, IDbConnection> connection, string dbName)
+        /// <param name="isReplace">是否替换掉之前db连接</param>
+        public static void RegisterDataBase(Func<IDbConnection, IDbConnection> connection, string dbName, bool isReplace = false)
         {
             //验证总连接池是否注册过
             lock (_connectionPool)
@@ -59,6 +60,19 @@ namespace Kogel.Repository
                     using (var dbConn = connection.Invoke(null))
                     {
                         _connectionPool.Add(new ConnectionPool { FuncConnection = connection, DbName = dbName, ConnectionString = dbConn.ConnectionString });
+                    }
+                }
+                else
+                {
+                    if (isReplace)
+                    {
+                        var connectionPool = _connectionPool.FirstOrDefault(x => x.DbName == dbName);
+                        //首次测试注册得到连接字符串(防止传空)
+                        using (var dbConn = connection.Invoke(null))
+                        {
+                            connectionPool.FuncConnection = connection;
+                            connectionPool.ConnectionString = dbConn.ConnectionString;
+                        }
                     }
                 }
             }

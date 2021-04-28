@@ -37,8 +37,8 @@ namespace Kogel.Dapper.Extension.Test
             var mysqlQuery = new UnitTest.Mysql.Query();
             mysqlQuery.Test();
 
-            //var mysqlCommand = new UnitTest.Mysql.Command();
-            //mysqlCommand.Test();
+            var mysqlCommand = new UnitTest.Mysql.Command();
+            mysqlCommand.Test();
             #endregion
 
             //stopwatch.Stop();

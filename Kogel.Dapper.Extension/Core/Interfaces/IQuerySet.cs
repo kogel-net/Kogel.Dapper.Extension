@@ -27,13 +27,6 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 		/// <summary>
 		/// 查询条件
 		/// </summary>
-		/// <param name="model"></param>
-		/// <returns></returns>
-		QuerySet<T> Where(T model);
-
-		/// <summary>
-		/// 查询条件
-		/// </summary>
 		/// <param name="dynamicTree"></param>
 		/// <returns></returns>
 		QuerySet<T> Where(Dictionary<string, DynamicTree> dynamicTree);

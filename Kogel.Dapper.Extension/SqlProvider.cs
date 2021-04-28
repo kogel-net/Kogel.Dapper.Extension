@@ -10,6 +10,8 @@ using Kogel.Dapper.Extension.Attributes;
 using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension.Helper;
 using Kogel.Dapper.Extension;
+using System.Data;
+using Kogel.Dapper.Extension.Expressions;
 
 namespace Kogel.Dapper.Extension
 {
@@ -59,6 +61,8 @@ namespace Kogel.Dapper.Extension
         public abstract SqlProvider FormatDelete();
 
         public abstract SqlProvider FormatInsert<T>(T entity, string[] excludeFields);
+
+        public abstract SqlProvider FormatInsert<T>(IEnumerable<T> entitys, string[] excludeFields);
 
         public abstract SqlProvider FormatInsertIdentity<T>(T entity, string[] excludeFields);
 
@@ -119,9 +123,9 @@ namespace Kogel.Dapper.Extension
             foreach (var propertiy in properties)
             {
                 var fieldName = propertiy.Name;
-                var fieldAsName = entity.FieldPairs[propertiy.Name];
+                var fieldResetName = entity.FieldPairs[propertiy.Name];
                 //是否是排除字段
-                if (excludeFields != null && (excludeFields.Contains(propertiy.Name) || excludeFields.Contains(fieldAsName)))
+                if (excludeFields != null && (excludeFields.Contains(propertiy.Name) || excludeFields.Contains(fieldResetName)))
                 {
                     continue;
                 }
@@ -155,10 +159,9 @@ namespace Kogel.Dapper.Extension
                     paramSqlBuilder.Append(",");
                     valueSqlBuilder.Append(",");
                 }
-                var name = propertiy.GetColumnAttributeName();
-                paramSqlBuilder.AppendFormat("{0}{1}{2}", ProviderOption.OpenQuote, fieldAsName, ProviderOption.CloseQuote);
-                valueSqlBuilder.Append(ProviderOption.ParameterPrefix + name);
-                Params.Add(ProviderOption.ParameterPrefix + name, propertiy.GetValue(t));
+                paramSqlBuilder.AppendFormat("{0}{1}{2}", ProviderOption.OpenQuote, fieldResetName, ProviderOption.CloseQuote);
+                valueSqlBuilder.Append(ProviderOption.ParameterPrefix + fieldResetName);
+                Params.Add(ProviderOption.ParameterPrefix + fieldResetName, propertiy.GetValue(t));
                 isAppend = true;
             }
             return new[] { paramSqlBuilder.ToString(), valueSqlBuilder.ToString() };
@@ -187,6 +190,87 @@ namespace Kogel.Dapper.Extension
             //设置参数
             param.Add(entityObject.Identitys, id);
             return $" AND {entityObject.Identitys}={ProviderOption.ParameterPrefix}{entityObject.Identitys} ";
+        }
+
+        /// <summary>
+        /// 自定义条件生成表达式
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dynamicTree"></param>
+        /// <returns></returns>
+        public virtual IEnumerable<LambdaExpression> FormatDynamicTreeWhereExpression<T>(Dictionary<string, DynamicTree> dynamicTree)
+        {
+            foreach (var key in dynamicTree.Keys)
+            {
+                DynamicTree tree = dynamicTree[key];
+                if (tree != null && !string.IsNullOrEmpty(tree.Value))
+                {
+                    Type tableType = typeof(T);
+                    if (!string.IsNullOrEmpty(tree.Table))
+                    {
+                        tableType = EntityCache.QueryEntity(tree.Table).Type;
+                    }
+                    //如果不存在对应表就使用默认表
+                    ParameterExpression param = Expression.Parameter(tableType, "param");
+                    object value = tree.Value;
+                    if (value == null)
+                    {
+                        continue;
+                    }
+                    else if (tree.ValueType == DbType.DateTime)
+                    {
+                        value = Convert.ToDateTime(value);
+                    }
+                    else if (tree.ValueType == DbType.String)
+                    {
+                        value = Convert.ToString(value);
+                        if ("" == value.ToString())
+                        {
+                            continue;
+                        }
+                    }
+                    else if (tree.ValueType == DbType.Int32)
+                    {
+                        int number = Convert.ToInt32(value);
+                        value = number;
+                        if (0 == number)
+                        {
+                            continue;
+                        }
+                    }
+                    else if (tree.ValueType == DbType.Boolean)
+                    {
+                        if (value.ToString() == "")
+                        {
+                            continue;
+                        }
+                        value = Convert.ToBoolean(value);
+                    }
+                    Expression whereExpress = null;
+                    switch (tree.Operators)
+                    {
+                        case ExpressionType.Equal://等于
+                            whereExpress = Expression.Equal(Expression.Property(param, tree.Field), Expression.Constant(value));
+                            break;
+                        case ExpressionType.GreaterThanOrEqual://大于等于
+                            whereExpress = Expression.GreaterThanOrEqual(Expression.Property(param, tree.Field), Expression.Constant(value));
+                            break;
+                        case ExpressionType.LessThanOrEqual://小于等于
+                            whereExpress = Expression.LessThanOrEqual(Expression.Property(param, tree.Field), Expression.Constant(value));
+                            break;
+                        case ExpressionType.Call://模糊查询
+                            var method = typeof(string).GetMethodss().FirstOrDefault(x => x.Name.Equals("Contains"));
+                            whereExpress = Expression.Call(Expression.Property(param, tree.Field), method, new Expression[] { Expression.Constant(value) });
+                            break;
+                        default:
+                            whereExpress = Expression.Equal(Expression.Property(param, tree.Field), Expression.Constant(value));
+                            break;
+                    }
+                    var lambdaExp = Expression.Lambda(TrimExpression.Trim(whereExpress), param);
+                    //WhereExpressionList.Add();
+                    yield return lambdaExp;
+                }
+            }
         }
     }
 }
