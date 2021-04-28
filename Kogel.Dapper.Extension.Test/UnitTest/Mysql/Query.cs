@@ -68,8 +68,8 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                          .ToListAsync(x => new
                          {
                              Id = x.Id,
-                             //flowOrders1 = divReposirory.Orm.QuerySet<FlowOrder1>().Where(y => y.Id == x.Id).Get(y => true),
-                             //flowOrders2 = divReposirory.Orm.QuerySet<FlowOrder2>().Where(y => y.Id == x.Id).Get(y => true),
+                             flowOrders1 = divReposirory.Orm.QuerySet<FlowOrder1>().Where(y => y.Id == x.Id).Get(y => true),
+                             flowOrders2 = divReposirory.Orm.QuerySet<FlowOrder2>().Where(y => y.Id == x.Id).Get(y => true),
                              dateTime = x.DeliveredReceiveTime
                          }).Result;
 

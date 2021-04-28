@@ -56,7 +56,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         }
 
         #region 基础函数
-        public QuerySet<T> ResetTableName(Type type, string tableName)
+        public IQuerySet<T> ResetTableName(Type type, string tableName)
         {
             SqlProvider.AsTableNameDic.Add(type, tableName);
             return this;
@@ -66,7 +66,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         /// 不锁表查询(此方法只支持Mssql)
         /// </summary>
         /// <returns></returns>
-        public QuerySet<T> WithNoLock()
+        public IQuerySet<T> WithNoLock()
         {
             NoLock = true;
             return this;
@@ -77,7 +77,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <returns></returns>
-        public QuerySet<T> FieldMatch<TSource>()
+        public IQuerySet<T> FieldMatch<TSource>()
         {
             return this;
         }
@@ -87,7 +87,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         /// </summary>
         /// <param name="num"></param>
         /// <returns></returns>
-        public QuerySet<T> Top(int num)
+        public IQuerySet<T> Top(int num)
         {
             TopNum = num;
             return this;
@@ -104,7 +104,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         /// <param name="leftField">外表关联键</param>
         /// <param name="joinMode">连接方式</param>
         /// <returns></returns>
-        public QuerySet<T> Join<TWhere, TInner>(Expression<Func<TWhere, object>> rightField, Expression<Func<TInner, object>> leftField, JoinMode joinMode = JoinMode.LEFT)
+        public IQuerySet<T> Join<TWhere, TInner>(Expression<Func<TWhere, object>> rightField, Expression<Func<TInner, object>> leftField, JoinMode joinMode = JoinMode.LEFT)
         {
             var tWhere = EntityCache.QueryEntity(typeof(TWhere));
             var tInner = EntityCache.QueryEntity(typeof(TInner));
@@ -129,7 +129,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         /// <param name="joinMode">连接类型</param>
         /// <param name="isDisField">是否需要显示表字段</param>
         /// <returns></returns>
-        public QuerySet<T> Join<TInner>(LambdaExpression expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true)
+        public IQuerySet<T> Join<TInner>(LambdaExpression expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true)
         {
             var joinWhere = new WhereExpression(expression, $"{Params.ParameterNames.Count()}", SqlProvider);
             Regex whereRex = new Regex("AND");
@@ -156,7 +156,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         /// <param name="joinMode"></param>
         /// <param name="isDisField"></param>
         /// <returns></returns>
-        public QuerySet<T> Join<TWhere, TInner>(Expression<Func<TWhere, TInner, bool>> expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true)
+        public IQuerySet<T> Join<TWhere, TInner>(Expression<Func<TWhere, TInner, bool>> expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true)
         {
             Join<TInner>(expression, joinMode, isDisField);
             return this;
@@ -172,7 +172,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         /// <param name="joinMode"></param>
         /// <param name="isDisField"></param>
         /// <returns></returns>
-        public QuerySet<T> Join<TWhere, TInner, TWhere2>(Expression<Func<TWhere, TInner, TWhere2, bool>> expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true)
+        public IQuerySet<T> Join<TWhere, TInner, TWhere2>(Expression<Func<TWhere, TInner, TWhere2, bool>> expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true)
         {
             Join<TInner>(expression, joinMode, isDisField);
             return this;
@@ -189,13 +189,13 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         /// <param name="joinMode"></param>
         /// <param name="isDisField"></param>
         /// <returns></returns>
-        public QuerySet<T> Join<TWhere, TInner, TWhere2, TWhere3>(Expression<Func<TWhere, TInner, TWhere2, TWhere3, bool>> expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true)
+        public IQuerySet<T> Join<TWhere, TInner, TWhere2, TWhere3>(Expression<Func<TWhere, TInner, TWhere2, TWhere3, bool>> expression, JoinMode joinMode = JoinMode.LEFT, bool isDisField = true)
         {
             Join<TInner>(expression, joinMode, isDisField);
             return this;
         }
 
-        public QuerySet<T> Join(string SqlJoin)
+        public IQuerySet<T> Join(string SqlJoin)
         {
             SqlProvider.JoinList.Add(new JoinAssTable()
             {
@@ -205,13 +205,14 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             });
             return this;
         }
+
         /// <summary>
         /// 连接(通过sql连接，不指定表实体默认为不增加该表显示字段)
         /// </summary>
         /// <typeparam name="TInner"></typeparam>
         /// <param name="SqlJoin"></param>
         /// <returns></returns>
-        public QuerySet<T> Join<TInner>(string SqlJoin)
+        public IQuerySet<T> Join<TInner>(string SqlJoin)
         {
             SqlProvider.JoinList.Add(new JoinAssTable()
             {
@@ -224,18 +225,18 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         #endregion
 
         #region 分组
-        public QuerySet<T> GroupBy(Expression<Func<T, object>> groupByExp)
+        public IQuerySet<T> GroupBy(Expression<Func<T, object>> groupByExp)
         {
             GroupExpressionList.Add(groupByExp);
             return this;
         }
 
-        public QuerySet<T> GroupBy<TGroup>(Expression<Func<TGroup, object>> groupByExp)
+        public IQuerySet<T> GroupBy<TGroup>(Expression<Func<TGroup, object>> groupByExp)
         {
             GroupExpressionList.Add(groupByExp);
             return this;
         }
-        public QuerySet<T> GroupByIf<TGroup>(bool where, Expression<Func<TGroup, object>> trueGroupByExp, Expression<Func<TGroup, object>> falseGroupByExp)
+        public IQuerySet<T> GroupByIf<TGroup>(bool where, Expression<Func<TGroup, object>> trueGroupByExp, Expression<Func<TGroup, object>> falseGroupByExp)
         {
             if (where)
                 GroupExpressionList.Add(trueGroupByExp);
@@ -249,7 +250,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         /// </summary>
         /// <param name="havingExp"></param>
         /// <returns></returns>
-        public QuerySet<T> Having(Expression<Func<T, object>> havingExp)
+        public IQuerySet<T> Having(Expression<Func<T, object>> havingExp)
         {
             HavingExpressionList.Add(havingExp);
             return this;
@@ -261,11 +262,12 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         /// <typeparam name="THaving"></typeparam>
         /// <param name="havingExp"></param>
         /// <returns></returns>
-        public QuerySet<T> Having<THaving>(Expression<Func<THaving, object>> havingExp)
+        public IQuerySet<T> Having<THaving>(Expression<Func<THaving, object>> havingExp)
         {
             HavingExpressionList.Add(havingExp);
             return this;
         }
+
         /// <summary>
         /// 分组聚合条件(带判断)
         /// </summary>
@@ -274,7 +276,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         /// <param name="trueHavingExp"></param>
         /// <param name="falseHavingExp"></param>
         /// <returns></returns>
-        public QuerySet<T> HavingIf<THaving>(bool where, Expression<Func<THaving, object>> trueHavingExp, Expression<Func<THaving, object>> falseHavingExp)
+        public IQuerySet<T> HavingIf<THaving>(bool where, Expression<Func<THaving, object>> trueHavingExp, Expression<Func<THaving, object>> falseHavingExp)
         {
             if (where)
                 HavingExpressionList.Add(trueHavingExp);
@@ -287,7 +289,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         /// 是否去重
         /// </summary>
         /// <returns></returns>
-        public QuerySet<T> Distinct()
+        public IQuerySet<T> Distinct()
         {
             IsDistinct = true;
             return this;
@@ -313,12 +315,13 @@ namespace Kogel.Dapper.Extension.Core.SetQ
     public partial class QuerySet<T> : Aggregation<T>, IQuerySet<T>
     {
         #region 条件
-        public QuerySet<T> Where(Expression<Func<T, bool>> predicate)
+        public IQuerySet<T> Where(Expression<Func<T, bool>> predicate)
         {
             WhereExpressionList.Add(predicate);
             return this;
         }
-        public QuerySet<T> Where<TWhere>(Expression<Func<TWhere, bool>> predicate)
+
+        public IQuerySet<T> Where<TWhere>(Expression<Func<TWhere, bool>> predicate)
         {
             WhereExpressionList.Add(predicate);
             return this;
@@ -329,7 +332,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         /// </summary>
         /// <param name="dynamicTree"></param>
         /// <returns></returns>
-        public QuerySet<T> Where(Dictionary<string, DynamicTree> dynamicTree)
+        public IQuerySet<T> Where(Dictionary<string, DynamicTree> dynamicTree)
         {
             WhereExpressionList.AddRange(SqlProvider.FormatDynamicTreeWhereExpression<T>(dynamicTree));
             return this;
@@ -341,7 +344,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         /// <param name="sqlWhere"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public QuerySet<T> Where(string sqlWhere, object param = null)
+        public IQuerySet<T> Where(string sqlWhere, object param = null)
         {
             WhereBuilder.Append(" AND " + sqlWhere);
             if (param != null)
@@ -351,9 +354,25 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             return this;
         }
 
-        public QuerySet<T> Where<TWhere1, TWhere2>(Expression<Func<TWhere1, TWhere2, bool>> exp)
+        public IQuerySet<T> Where<TWhere1, TWhere2>(Expression<Func<TWhere1, TWhere2, bool>> exp)
         {
             WhereExpressionList.Add(exp);
+            return this;
+        }
+
+        /// <summary>
+        /// 带前置条件的Where判断
+        /// </summary>
+        /// <param name="where"></param>
+        /// <param name="truePredicate"></param>
+        /// <param name="falsePredicate"></param>
+        /// <returns></returns>
+        public IQuerySet<T> WhereIf(bool where, Expression<Func<T, bool>> truePredicate, Expression<Func<T, bool>> falsePredicate)
+        {
+            if (where)
+                WhereExpressionList.Add(truePredicate);
+            else
+                WhereExpressionList.Add(falsePredicate);
             return this;
         }
 
@@ -365,23 +384,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         /// <param name="truePredicate"></param>
         /// <param name="falsePredicate"></param>
         /// <returns></returns>
-        public QuerySet<T> WhereIf(bool where, Expression<Func<T, bool>> truePredicate, Expression<Func<T, bool>> falsePredicate)
-        {
-            if (where)
-                WhereExpressionList.Add(truePredicate);
-            else
-                WhereExpressionList.Add(falsePredicate);
-            return this;
-        }
-        /// <summary>
-        /// 带前置条件的Where判断
-        /// </summary>
-        /// <typeparam name="TWhere"></typeparam>
-        /// <param name="where"></param>
-        /// <param name="truePredicate"></param>
-        /// <param name="falsePredicate"></param>
-        /// <returns></returns>
-        public QuerySet<T> WhereIf<TWhere>(bool where, Expression<Func<TWhere, bool>> truePredicate, Expression<Func<TWhere, bool>> falsePredicate)
+        public IQuerySet<T> WhereIf<TWhere>(bool where, Expression<Func<TWhere, bool>> truePredicate, Expression<Func<TWhere, bool>> falsePredicate)
         {
             if (where)
                 WhereExpressionList.Add(truePredicate);

@@ -84,6 +84,7 @@ namespace Kogel.Dapper.Extension
         {
             Params.Clear();
             ProviderOption.MappingList.Clear();
+            ProviderOption.NavigationList.Clear();
             return this;
         }
 
