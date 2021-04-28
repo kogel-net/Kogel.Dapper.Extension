@@ -145,9 +145,7 @@ namespace Kogel.Dapper.Extension.Oracle
 
         public override SqlProvider FormatInsert<T>(T entity, string[] excludeFields)
         {
-            var fromTableSql = FormatTableName(false, false);
-            var paramsAndValuesSql = FormatInsertParamsAndValues(entity);
-            SqlString = $"INSERT INTO {fromTableSql} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]});";
+            SqlString = ResolveExpression.ResolveBulkInsert<T>(new List<T> { entity }, excludeFields);
             return this;
         }
 

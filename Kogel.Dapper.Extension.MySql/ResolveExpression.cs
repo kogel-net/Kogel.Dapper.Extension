@@ -63,7 +63,8 @@ namespace Kogel.Dapper.Extension
                     {
                         EntityObject entityObject = EntityCache.QueryEntity(selector.Parameters[0].Type);
                         var memberName = selector.Body.GetCorrectPropertyName();
-                        selectSql = $" SELECT IFNULL(SUM({entityObject.AsName}.{providerOption.CombineFieldName(entityObject.FieldPairs[memberName])}),0)  ";
+                        string fieldName = $"{entityObject.AsName}.{providerOption.CombineFieldName(entityObject.FieldPairs[memberName])}";
+                        selectSql = $" SELECT IFNULL(SUM({fieldName}),0)  ";
                     }
                     break;
                 case ExpressionType.MemberInit:
@@ -86,7 +87,8 @@ namespace Kogel.Dapper.Extension
                     {
                         EntityObject entityObject = EntityCache.QueryEntity(selector.Parameters[0].Type);
                         var memberName = selector.Body.GetCorrectPropertyName();
-                        selectSql = $" SELECT Max({entityObject.AsName}.{providerOption.CombineFieldName(entityObject.FieldPairs[memberName])})  ";
+                        string fieldName = $"{entityObject.AsName}.{providerOption.CombineFieldName(entityObject.FieldPairs[memberName])}";
+                        selectSql = $" SELECT Max({fieldName})  ";
                     }
                     break;
                 case ExpressionType.MemberInit:
@@ -109,7 +111,8 @@ namespace Kogel.Dapper.Extension
                     {
                         EntityObject entityObject = EntityCache.QueryEntity(selector.Parameters[0].Type);
                         var memberName = selector.Body.GetCorrectPropertyName();
-                        selectSql = $" SELECT Min({entityObject.AsName}.{providerOption.CombineFieldName(entityObject.FieldPairs[memberName])})  ";
+                        string fieldName = $"{entityObject.AsName}.{providerOption.CombineFieldName(entityObject.FieldPairs[memberName])}";
+                        selectSql = $" SELECT Min({fieldName})  ";
                     }
                     break;
                 case ExpressionType.MemberInit:

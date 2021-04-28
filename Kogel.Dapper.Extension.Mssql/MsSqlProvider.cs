@@ -159,8 +159,7 @@ namespace Kogel.Dapper.Extension
 
         public override SqlProvider FormatInsert<T>(T entity, string[] excludeFields)
         {
-            var paramsAndValuesSql = FormatInsertParamsAndValues(entity, excludeFields);
-            SqlString = $"INSERT INTO {FormatTableName(false, false)} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]})";
+            SqlString = ResolveExpression.ResolveBulkInsert<T>(new List<T> { entity }, excludeFields);
             return this;
         }
 
@@ -172,8 +171,7 @@ namespace Kogel.Dapper.Extension
 
         public override SqlProvider FormatInsertIdentity<T>(T entity, string[] excludeFields)
         {
-            var paramsAndValuesSql = FormatInsertParamsAndValues(entity, excludeFields);
-            SqlString = $"INSERT INTO {FormatTableName(false, false)} ({paramsAndValuesSql[0]}) VALUES({paramsAndValuesSql[1]}) SELECT @@IDENTITY";
+            SqlString = $"{ResolveExpression.ResolveBulkInsert<T>(new List<T> { entity }, excludeFields)} SELECT @@IDENTITY";
             return this;
         }
 

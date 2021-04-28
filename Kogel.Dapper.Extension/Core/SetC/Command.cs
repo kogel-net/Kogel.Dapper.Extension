@@ -111,11 +111,11 @@ namespace Kogel.Dapper.Extension.Core.SetC
             return DbCon.Execute(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, isExcludeUnitOfWork: SqlProvider.IsExcludeUnitOfWork);
         }
 
-        public int InsertIdentity(T entity, string[] excludeFields = null)
+        public long InsertIdentity(T entity, string[] excludeFields = null)
         {
             SqlProvider.FormatInsertIdentity(entity, excludeFields);
             object result = DbCon.ExecuteScalar(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, isExcludeUnitOfWork: SqlProvider.IsExcludeUnitOfWork);
-            return result != null ? Convert.ToInt32(result) : 0;
+            return result != null ? Convert.ToInt64(result) : 0;
         }
 
         public int Insert(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120)

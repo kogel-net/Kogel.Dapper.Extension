@@ -36,6 +36,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             Params = new DynamicParameters();
             GroupExpressionList = new List<LambdaExpression>();
             HavingExpressionList = new List<LambdaExpression>();
+            
         }
 
         public QuerySet(IDbConnection conn, SqlProvider sqlProvider, IDbTransaction dbTransaction) : base(conn, sqlProvider, dbTransaction)
@@ -222,21 +223,6 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         }
         #endregion
 
-        #region 多表索引扩展
-        public ISelectFrom<T, T1, T2> From<T1, T2>()
-        {
-            return new ISelectFrom<T, T1, T2>(this);
-        }
-        public ISelectFrom<T, T1, T2, T3> From<T1, T2, T3>()
-        {
-            return new ISelectFrom<T, T1, T2, T3>(this);
-        }
-        public ISelectFrom<T, T1, T2, T3, T4> From<T1, T2, T3, T4>()
-        {
-            return new ISelectFrom<T, T1, T2, T3, T4>(this);
-        }
-        #endregion
-
         #region 分组
         public QuerySet<T> GroupBy(Expression<Func<T, object>> groupByExp)
         {
@@ -305,6 +291,21 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         {
             IsDistinct = true;
             return this;
+        }
+        #endregion
+
+        #region 多表索引扩展
+        public ISelectFrom<T, T1, T2> From<T1, T2>()
+        {
+            return new ISelectFrom<T, T1, T2>(this);
+        }
+        public ISelectFrom<T, T1, T2, T3> From<T1, T2, T3>()
+        {
+            return new ISelectFrom<T, T1, T2, T3>(this);
+        }
+        public ISelectFrom<T, T1, T2, T3, T4> From<T1, T2, T3, T4>()
+        {
+            return new ISelectFrom<T, T1, T2, T3, T4>(this);
         }
         #endregion
     }

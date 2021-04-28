@@ -448,7 +448,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
             DynamicParameters parameters = new DynamicParameters();
 
             var entityProperties = EntityCache.QueryEntity(typeof(T));
-            var tableName = entityProperties.Name;
+            var tableName = provider.FormatTableName(false, false); // entityProperties.Name;
             var isAppend = false;
 
             foreach (var entityField in entityProperties.EntityFieldList)

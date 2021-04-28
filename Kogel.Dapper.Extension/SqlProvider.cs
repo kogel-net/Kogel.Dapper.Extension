@@ -97,6 +97,7 @@ namespace Kogel.Dapper.Extension
 
         public string FormatTableName(bool isNeedFrom = true, bool isAsName = true, Type tableType = null)
         {
+            //实体解析类型
             var entity = EntityCache.QueryEntity(tableType == null ? Context.Set.TableType : tableType);
             string schema = string.IsNullOrEmpty(entity.Schema) ? "" : ProviderOption.CombineFieldName(entity.Schema) + ".";
             string fromName = entity.Name;
@@ -108,76 +109,34 @@ namespace Kogel.Dapper.Extension
             }
             //是否存在实体特性中的AsName标记
             if (isAsName)
-                fromName = entity.AsName.Equals(fromName) ? ProviderOption.CombineFieldName(fromName) : $"{ProviderOption.CombineFieldName(fromName)} {entity.AsName}";
-            else
-                fromName = ProviderOption.CombineFieldName(fromName);
-            SqlString = $" {schema}{fromName} ";
-            if (isNeedFrom)
-                SqlString = " FROM " + SqlString;
-
-            return SqlString;
-        }
-
-        protected string[] FormatInsertParamsAndValues<T>(T t, string[] excludeFields = null)
-        {
-            var paramSqlBuilder = new StringBuilder(64);
-            var valueSqlBuilder = new StringBuilder(64);
-
-            var entity = EntityCache.QueryEntity(t.GetType());
-            var properties = entity.Properties;
-
-            var isAppend = false;
-            foreach (var propertiy in properties)
             {
-                var fieldName = propertiy.Name;
-                var fieldResetName = entity.FieldPairs[propertiy.Name];
-                //是否是排除字段
-                if (excludeFields != null && (excludeFields.Contains(propertiy.Name) || excludeFields.Contains(fieldResetName)))
+                if (entity.AsName.Equals(fromName))
                 {
-                    continue;
+                    fromName = ProviderOption.CombineFieldName(fromName);
                 }
-                var customAttributes = propertiy.GetCustomAttributess(true);
-                //导航属性排除
-                if (customAttributes.Any(x => x.GetType().Equals(typeof(ForeignKey))))
+                else
                 {
-                    continue;
+                    //加上as标记
+                    fromName= $"{ProviderOption.CombineFieldName(fromName)} {entity.AsName}";
                 }
-                //主键标识
-                var typeAttribute = customAttributes.FirstOrDefault(x => x.GetType().Equals(typeof(Identity)));
-                if (typeAttribute != null)
-                {
-                    var identity = typeAttribute as Identity;
-                    //是否自增
-                    if (identity.IsIncrease)
-                    {
-                        continue;
-                    }
-                }
-                //排除掉时间格式为最小值的字段
-                if (propertiy.PropertyType == typeof(DateTime))
-                {
-                    if (Convert.ToDateTime(propertiy.GetValue(t)) == DateTime.MinValue)
-                    {
-                        continue;
-                    }
-                }
-                if (isAppend)
-                {
-                    paramSqlBuilder.Append(",");
-                    valueSqlBuilder.Append(",");
-                }
-                paramSqlBuilder.AppendFormat("{0}{1}{2}", ProviderOption.OpenQuote, fieldResetName, ProviderOption.CloseQuote);
-                valueSqlBuilder.Append(ProviderOption.ParameterPrefix + fieldResetName);
-                Params.Add(ProviderOption.ParameterPrefix + fieldResetName, propertiy.GetValue(t));
-                isAppend = true;
             }
-            return new[] { paramSqlBuilder.ToString(), valueSqlBuilder.ToString() };
+            else
+            {
+                fromName = ProviderOption.CombineFieldName(fromName);
+            }
+            string sqlString = $" {schema}{fromName} ";
+            //是否需要FROM
+            if (isNeedFrom)
+                sqlString = $" FROM {sqlString}";
+            return sqlString;
         }
 
-        protected DataBaseContext<T> DataBaseContext<T>()
-        {
-            return (DataBaseContext<T>)Context;
-        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        protected DataBaseContext<T> DataBaseContext<T>() => (DataBaseContext<T>)Context;
 
         /// <summary>
         /// 根据主键获取条件

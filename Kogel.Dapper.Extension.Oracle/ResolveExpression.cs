@@ -33,9 +33,7 @@ namespace Kogel.Dapper.Extension.Oracle
 			//去重
 			if (abstractSet.IsDistinct)
 				selectSql.Append(" DISTINCT ");
-			////top
-			//if (topNum.HasValue)
-			//	selectSql.Append($" TOP {topNum} ");
+
 			//不是自定义返回视图则显示所有字段
 			if (provider.Context.Set.SelectExpression == null)
 			{
@@ -64,8 +62,8 @@ namespace Kogel.Dapper.Extension.Oracle
 					{
 						EntityObject entityObject = EntityCache.QueryEntity(selector.Parameters[0].Type);
 						var memberName = selector.Body.GetCorrectPropertyName();
-						selectSql = $@" SELECT NVL(SUM({entityObject.GetAsName(providerOption)}
-                                 {providerOption.CombineFieldName(entityObject.FieldPairs[memberName])}),0)  ";
+						string fieldName = $"{entityObject.AsName}.{providerOption.CombineFieldName(entityObject.FieldPairs[memberName])}";
+						selectSql = $@" SELECT NVL(SUM({fieldName}),0)  ";
 					}
 					break;
 				case ExpressionType.MemberInit:
@@ -87,7 +85,8 @@ namespace Kogel.Dapper.Extension.Oracle
 					{
 						EntityObject entityObject = EntityCache.QueryEntity(selector.Parameters[0].Type);
 						var memberName = selector.Body.GetCorrectPropertyName();
-						selectSql = $" SELECT Max({entityObject.AsName}.{providerOption.CombineFieldName(entityObject.FieldPairs[memberName])})  ";
+						string fieldName = $"{entityObject.AsName}.{providerOption.CombineFieldName(entityObject.FieldPairs[memberName])}";
+						selectSql = $" SELECT Max({fieldName})  ";
 					}
 					break;
 				case ExpressionType.MemberInit:
@@ -110,7 +109,8 @@ namespace Kogel.Dapper.Extension.Oracle
 					{
 						EntityObject entityObject = EntityCache.QueryEntity(selector.Parameters[0].Type);
 						var memberName = selector.Body.GetCorrectPropertyName();
-						selectSql = $" SELECT Min({entityObject.AsName}.{providerOption.CombineFieldName(entityObject.FieldPairs[memberName])})  ";
+						string fieldName = $"{entityObject.AsName}.{providerOption.CombineFieldName(entityObject.FieldPairs[memberName])}";
+						selectSql = $" SELECT Min({fieldName})  ";
 					}
 					break;
 				case ExpressionType.MemberInit:

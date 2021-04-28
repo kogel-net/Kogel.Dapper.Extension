@@ -86,7 +86,7 @@ namespace Kogel.Dapper.Extension.MsSql.Extension
 		public string SyncField(EntityObject typeEntity, EntityField field)
 		{
 			string fieldName = connection.QuerySingleOrDefault<string>($@"SELECT TOP 1 COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
-                                               WHERE [TABLE_NAME] = '{typeEntity.AsName}' AND [COLUMN_NAME] = '{field.FieldName}'");
+                                               WHERE [TABLE_NAME] = '{typeEntity.Name}' AND [COLUMN_NAME] = '{field.FieldName}'");
 			//存在
 			if (!string.IsNullOrEmpty(fieldName))
 			{
@@ -116,7 +116,7 @@ namespace Kogel.Dapper.Extension.MsSql.Extension
 				//设置备注
 				if (!string.IsNullOrEmpty(field.Description))
 					fieldScript.Append($@"EXEC sp_addextendedproperty N'MS_Description', N'{field.Description}', N'SCHEMA',
-                                  N'dbo',N'TABLE', N'{typeEntity.AsName}', N'COLUMN', N'{field.FieldName}';");
+                                  N'dbo',N'TABLE', N'{typeEntity.Name}', N'COLUMN', N'{field.FieldName}';");
 				return fieldScript.ToString();
 			}
 		}
@@ -139,7 +139,7 @@ namespace Kogel.Dapper.Extension.MsSql.Extension
 		public void SyncTable(EntityObject typeEntity)
 		{
 			//首先检查表是否存在
-			string tableName = connection.QuerySingleOrDefault<string>($@"select top 1 Name from sysObjects where Id=OBJECT_ID(N'{typeEntity.AsName}') and xtype='U'");
+			string tableName = connection.QuerySingleOrDefault<string>($@"select top 1 Name from sysObjects where Id=OBJECT_ID(N'{typeEntity.Name}') and xtype='U'");
 			//脚本字符
 			StringBuilder scriptBuilder = new StringBuilder();
 			//创建表时会产生一个测试字段
@@ -148,7 +148,7 @@ namespace Kogel.Dapper.Extension.MsSql.Extension
 			if (string.IsNullOrEmpty(tableName))
 			{
 				//创建整张表
-				scriptBuilder.Append($@"CREATE TABLE [{typeEntity.AsName}](
+				scriptBuilder.Append($@"CREATE TABLE [{typeEntity.Name}](
                                        [{testidName}] INT 
                                      );");
 			}
@@ -163,7 +163,7 @@ namespace Kogel.Dapper.Extension.MsSql.Extension
 				//删除测试字段
 				if (script.Contains(testidName))
 				{
-					script += $@"ALTER TABLE [{typeEntity.AsName}]
+					script += $@"ALTER TABLE [{typeEntity.Name}]
                                             DROP Column [{testidName}]";
 				}
 				connection.Execute(script);

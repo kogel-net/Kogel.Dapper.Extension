@@ -195,19 +195,21 @@ namespace Kogel.Dapper.Extension.Model
 		/// <summary>
 		/// 获取asname
 		/// </summary>
-		/// <param name="IsAsName"></param>
+		/// <param name="providerOption"></param>
+		/// <param name="isAsName"></param>
+		/// <param name="isSuffix"></param>
 		/// <returns></returns>
-		public string GetAsName(IProviderOption providerOption, bool IsAsName = true, bool IsSuffix = true)
+		public string GetAsName(IProviderOption providerOption, bool isAsName = true, bool isSuffix = true)
 		{
 			string asName = string.Empty;
-			if (IsAsName)
+			if (isAsName)
 			{
 				asName = this.AsName;
 				//如果没有as name，则需要给表带上标记
 				if (asName.Equals(this.Name))
 					asName = providerOption.CombineFieldName(asName);
 				//是否需要后缀
-				if (IsSuffix)
+				if (isSuffix)
 					asName += ".";
 			}
 			return asName;

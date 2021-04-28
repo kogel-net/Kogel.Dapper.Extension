@@ -27,7 +27,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 
         int Insert(T entity, string[] excludeFields = null);
 
-        int InsertIdentity(T entity, string[] excludeFields = null);
+        long InsertIdentity(T entity, string[] excludeFields = null);
 
         int Insert(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120);
 
