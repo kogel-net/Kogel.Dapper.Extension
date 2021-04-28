@@ -80,6 +80,13 @@ namespace Kogel.Dapper.Extension
 
         public abstract SqlProvider Create();
 
+        public virtual SqlProvider Clear()
+        {
+            Params.Clear();
+            ProviderOption.MappingList.Clear();
+            return this;
+        }
+
         /// <summary>
         /// 获取表名称
         /// </summary>

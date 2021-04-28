@@ -82,7 +82,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         }
 
         /// <summary>
-        /// 返回对应行数数据（此方法只对mssql和mysql有效）
+        /// 返回对应行数数据
         /// </summary>
         /// <param name="num"></param>
         /// <returns></returns>

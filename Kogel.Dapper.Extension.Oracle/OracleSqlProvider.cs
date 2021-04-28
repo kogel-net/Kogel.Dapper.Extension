@@ -52,6 +52,11 @@ namespace Kogel.Dapper.Extension.Oracle
 
         public override SqlProvider FormatToList<T>()
         {
+            var topNum = DataBaseContext<T>().QuerySet.TopNum;
+
+            if (topNum.HasValue)
+                return FormatToPageList<T>(1, topNum.Value);
+
             var selectSql = ResolveExpression.ResolveSelect(null);
 
             var fromTableSql = FormatTableName();

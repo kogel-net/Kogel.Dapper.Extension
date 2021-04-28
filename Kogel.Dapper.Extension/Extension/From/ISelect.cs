@@ -103,8 +103,7 @@ namespace Kogel.Dapper.Extension.Extension.From
             var pageTotal = querySet.DbCon.QuerySingle<int>(querySet.SqlProvider.SqlString, querySet.SqlProvider.Params);
             //查询数据
             List<TReturn> itemList;
-            querySet.SqlProvider.Params.Clear();
-            querySet.SqlProvider.ProviderOption.MappingList.Clear();
+            querySet.SqlProvider.Clear();
             if (pageTotal != 0)
             {
                 querySet.SqlProvider.FormatToPageList<T>(pageIndex, pageSize);
@@ -125,8 +124,7 @@ namespace Kogel.Dapper.Extension.Extension.From
             var pageTotal = await querySet.DbCon.QuerySingleAsync<int>(querySet.SqlProvider.SqlString, querySet.SqlProvider.Params);
             //查询数据
             List<TReturn> itemList;
-            querySet.SqlProvider.Params.Clear();
-            querySet.SqlProvider.ProviderOption.MappingList.Clear();
+            querySet.SqlProvider.Clear();
             if (pageTotal != 0)
             {
                 querySet.SqlProvider.FormatToPageList<T>(pageIndex, pageSize);
