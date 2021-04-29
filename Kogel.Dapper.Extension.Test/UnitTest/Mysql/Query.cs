@@ -9,6 +9,7 @@ using Kogel.Repository;
 using Kogel.Dapper.Extension.MySql;
 using Kogel.Dapper.Extension.Test.Model.Dto;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 {
@@ -36,6 +37,15 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                     .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
                     .Get();
 
+                Task.Run(async () =>
+                {
+                    var flowOrderAsync = await repository.QuerySet()
+                           .ResetTableName(typeof(FlowOrder), "flow_order_1")
+                           .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
+                           .GetAsync();
+                }).Wait();
+
+
                 //切换数据库
                 repository.ChangeDataBase("fps_2021");
 
@@ -43,7 +53,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                     .ResetTableName(typeof(FlowOrder), "flow_order_1")
                     .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
                     .Top(10)
-                    .OrderBy("")      
+                    .OrderBy("")
                     .ToList();
 
                 repository.ChangeDataBase("master");

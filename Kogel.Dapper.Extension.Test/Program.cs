@@ -35,7 +35,7 @@ namespace Kogel.Dapper.Extension.Test
 
             #region mysql单元测试
             var mysqlQuery = new UnitTest.Mysql.Query();
-            //mysqlQuery.Test();
+            mysqlQuery.Test();
 
             var mysqlCommand = new UnitTest.Mysql.Command();
             mysqlCommand.Test();
