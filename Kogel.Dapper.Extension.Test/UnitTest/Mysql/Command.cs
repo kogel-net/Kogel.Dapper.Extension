@@ -1,4 +1,5 @@
 ﻿using Kogel.Dapper.Extension.Test.UnitTest.Mysql.Repository;
+using Kogel.Repository;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 {
@@ -9,11 +10,17 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
             //正常模式下仓储使用
             using (var repository = new FlowOrderRepository())
             {
-                var flowList = repository.QuerySet()
-                       .ToList();
+                repository.UnitOfWork.BeginTransaction(() =>
+                {
 
-               var count= repository.Insert(flowList);
+                    var flowList = repository.QuerySet()
+                           .NotUnitOfWork()
+                           .ToList();
 
+                    var count = repository.Insert(flowList);
+                });
+
+                repository.UnitOfWork.Rollback();
             }
         }
     }

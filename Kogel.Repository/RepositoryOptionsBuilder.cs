@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data;
 using Kogel.Dapper.Extension;
+using System.Data.Common;
 
 namespace Kogel.Repository
 {
@@ -59,7 +60,15 @@ namespace Kogel.Repository
                     //首次测试注册得到连接字符串(防止传空)
                     using (var dbConn = connection.Invoke(null))
                     {
-                        _connectionPool.Add(new ConnectionPool { FuncConnection = connection, DbName = dbName, ConnectionString = dbConn.ConnectionString });
+                        var dbConnection = dbConn as DbConnection;
+                        _connectionPool.Add(new ConnectionPool
+                        {
+                            FuncConnection = connection,
+                            DbName = dbName,
+                            ConnectionString = dbConnection.ConnectionString,
+                            Database = dbConnection.Database,
+                            DataSource = dbConnection.DataSource
+                        });
                     }
                 }
                 else
@@ -193,9 +202,18 @@ namespace Kogel.Repository
         internal string ConnectionString { get; set; }
 
         /// <summary>
-        /// 数据库名称
+        /// 数据库名称（自定义标识）
         /// </summary>
         public string DbName { get; set; }
 
+        /// <summary>
+        /// 数据库名称（实际名称）
+        /// </summary>
+        public string Database { get; set; }
+
+        /// <summary>
+        /// 数据源地址
+        /// </summary>
+        public string DataSource { get; set; }
     }
 }

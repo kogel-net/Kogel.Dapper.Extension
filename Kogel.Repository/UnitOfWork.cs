@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -81,7 +82,12 @@ namespace Kogel.Repository
                     //是否排除在工作单元外
                     if (command.IsExcludeUnitOfWork)
                     {
-                        var connectionFunc = RepositoryOptionsBuilder._connectionPool.FirstOrDefault(x => x.ConnectionString.Contains(this.Connection.ConnectionString));
+                        var dbConnection = this.Connection as DbConnection;
+                        var connectionFunc = RepositoryOptionsBuilder._connectionPool
+                            .FirstOrDefault(x =>
+                                (x.ConnectionString.Contains(this.Connection.ConnectionString))
+                                || (x.DataSource == dbConnection.DataSource && x.Database == dbConnection.Database)
+                                );
                         if (connectionFunc == null)
                             throw new DapperExtensionException($"连接未注入{this.Connection.ConnectionString}");
                         command.Connection = connectionFunc.FuncConnection.Invoke(null);
