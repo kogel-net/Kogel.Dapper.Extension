@@ -16,7 +16,5 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
             }
         }
-
     }
-
 }

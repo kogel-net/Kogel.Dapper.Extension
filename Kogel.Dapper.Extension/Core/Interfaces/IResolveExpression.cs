@@ -146,7 +146,8 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
             {
                 var entity = EntityCache.QueryEntity(a.Key.Type.GenericTypeArguments[0]);
                 var columnName = a.Key.Body.GetCorrectPropertyName();
-                return $"{entity.GetAsName(providerOption)}" + providerOption.CombineFieldName(columnName) + (a.Value == EOrderBy.Asc ? " ASC " : " DESC ");
+                string orderBySql = $"{entity.AsName}.{providerOption.CombineFieldName(columnName)}{(a.Value == EOrderBy.Asc ? " ASC " : " DESC ")}";
+                return orderBySql;
             }) ?? new List<string>();
             if (!orderByList.Any() && (abstractSet.OrderbyBuilder == null || abstractSet.OrderbyBuilder.Length == 0))
                 return "";
