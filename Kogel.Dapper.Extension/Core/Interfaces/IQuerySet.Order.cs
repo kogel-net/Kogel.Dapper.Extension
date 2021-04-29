@@ -1,24 +1,27 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
-using Kogel.Dapper.Extension.Core.SetQ;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Kogel.Dapper.Extension.Core.Interfaces
 {
-    public interface IOrder<T>
+    public partial interface IQuerySet<T>
     {
         /// <summary>
         /// 顺序
         /// </summary>
         /// <param name="field"></param>
         /// <returns></returns>
-        Order<T> OrderBy(Expression<Func<T, object>> field);
+        IQuerySet<T> OrderBy(Expression<Func<T, object>> field);
 
         /// <summary>
         /// 倒序
         /// </summary>
         /// <param name="field"></param>
         /// <returns></returns>
-        Order<T> OrderByDescing(Expression<Func<T, object>> field);
+        IQuerySet<T> OrderByDescing(Expression<Func<T, object>> field);
 
         /// <summary>
         /// 顺序
@@ -26,7 +29,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// <typeparam name="TProperty"></typeparam>
         /// <param name="field"></param>
         /// <returns></returns>
-        Order<T> OrderBy<TProperty>(Expression<Func<TProperty, object>> field);
+        IQuerySet<T> OrderBy<TProperty>(Expression<Func<TProperty, object>> field);
 
         /// <summary>
         /// 倒叙
@@ -34,13 +37,13 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// <typeparam name="TProperty"></typeparam>
         /// <param name="field"></param>
         /// <returns></returns>
-        Order<T> OrderByDescing<TProperty>(Expression<Func<TProperty, object>> field);
+        IQuerySet<T> OrderByDescing<TProperty>(Expression<Func<TProperty, object>> field);
 
         /// <summary>
         /// 字符串拼接排序
         /// </summary>
         /// <param name="orderBy"></param>
         /// <returns></returns>
-        Order<T> OrderBy(string orderBy);
+        IQuerySet<T> OrderBy(string orderBy);
     }
 }

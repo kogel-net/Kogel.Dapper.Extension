@@ -11,7 +11,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
     /// 聚合
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract class Aggregation<T> : Order<T>, IAggregation<T>
+    public abstract class Aggregation<T> : Query<T>, IAggregation<T>
     {
         protected Aggregation(IDbConnection conn, SqlProvider sqlProvider) : base(conn, sqlProvider)
         {

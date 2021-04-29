@@ -36,7 +36,8 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             Params = new DynamicParameters();
             GroupExpressionList = new List<LambdaExpression>();
             HavingExpressionList = new List<LambdaExpression>();
-            
+            OrderbyExpressionList = new Dictionary<LambdaExpression, EOrderBy>();
+            OrderbyBuilder = new StringBuilder();
         }
 
         public QuerySet(IDbConnection conn, SqlProvider sqlProvider, IDbTransaction dbTransaction) : base(conn, sqlProvider, dbTransaction)
@@ -53,6 +54,8 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             Params = new DynamicParameters();
             GroupExpressionList = new List<LambdaExpression>();
             HavingExpressionList = new List<LambdaExpression>();
+            OrderbyExpressionList = new Dictionary<LambdaExpression, EOrderBy>();
+            OrderbyBuilder = new StringBuilder();
         }
 
         #region 基础函数
@@ -92,6 +95,17 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             TopNum = num;
             return this;
         }
+
+        /// <summary>
+        /// 是否去重
+        /// </summary>
+        /// <returns></returns>
+        public IQuerySet<T> Distinct()
+        {
+            IsDistinct = true;
+            return this;
+        }
+
         #endregion
 
         #region 连表
@@ -285,15 +299,6 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             return this;
         }
 
-        /// <summary>
-        /// 是否去重
-        /// </summary>
-        /// <returns></returns>
-        public IQuerySet<T> Distinct()
-        {
-            IsDistinct = true;
-            return this;
-        }
         #endregion
 
         #region 多表索引扩展
@@ -308,89 +313,6 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         public ISelectFrom<T, T1, T2, T3, T4> From<T1, T2, T3, T4>()
         {
             return new ISelectFrom<T, T1, T2, T3, T4>(this);
-        }
-        #endregion
-    }
-
-    public partial class QuerySet<T> : Aggregation<T>, IQuerySet<T>
-    {
-        #region 条件
-        public IQuerySet<T> Where(Expression<Func<T, bool>> predicate)
-        {
-            WhereExpressionList.Add(predicate);
-            return this;
-        }
-
-        public IQuerySet<T> Where<TWhere>(Expression<Func<TWhere, bool>> predicate)
-        {
-            WhereExpressionList.Add(predicate);
-            return this;
-        }
-
-        /// <summary>
-        /// 动态化查讯(转换成表达式树集合)  注意，int参数不会判断为0的值
-        /// </summary>
-        /// <param name="dynamicTree"></param>
-        /// <returns></returns>
-        public IQuerySet<T> Where(Dictionary<string, DynamicTree> dynamicTree)
-        {
-            WhereExpressionList.AddRange(SqlProvider.FormatDynamicTreeWhereExpression<T>(dynamicTree));
-            return this;
-        }
-
-        /// <summary>
-        /// 使用sql查询条件
-        /// </summary>
-        /// <param name="sqlWhere"></param>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        public IQuerySet<T> Where(string sqlWhere, object param = null)
-        {
-            WhereBuilder.Append(" AND " + sqlWhere);
-            if (param != null)
-            {
-                Params.AddDynamicParams(param, true);
-            }
-            return this;
-        }
-
-        public IQuerySet<T> Where<TWhere1, TWhere2>(Expression<Func<TWhere1, TWhere2, bool>> exp)
-        {
-            WhereExpressionList.Add(exp);
-            return this;
-        }
-
-        /// <summary>
-        /// 带前置条件的Where判断
-        /// </summary>
-        /// <param name="where"></param>
-        /// <param name="truePredicate"></param>
-        /// <param name="falsePredicate"></param>
-        /// <returns></returns>
-        public IQuerySet<T> WhereIf(bool where, Expression<Func<T, bool>> truePredicate, Expression<Func<T, bool>> falsePredicate)
-        {
-            if (where)
-                WhereExpressionList.Add(truePredicate);
-            else
-                WhereExpressionList.Add(falsePredicate);
-            return this;
-        }
-
-        /// <summary>
-        /// 带前置条件的Where判断
-        /// </summary>
-        /// <typeparam name="TWhere"></typeparam>
-        /// <param name="where"></param>
-        /// <param name="truePredicate"></param>
-        /// <param name="falsePredicate"></param>
-        /// <returns></returns>
-        public IQuerySet<T> WhereIf<TWhere>(bool where, Expression<Func<TWhere, bool>> truePredicate, Expression<Func<TWhere, bool>> falsePredicate)
-        {
-            if (where)
-                WhereExpressionList.Add(truePredicate);
-            else
-                WhereExpressionList.Add(falsePredicate);
-            return this;
         }
         #endregion
     }
