@@ -412,6 +412,7 @@ namespace Dapper
 
         private static async Task<IEnumerable<T>> QueryAsync<T>(this IDbConnection cnn, Type effectiveType, CommandDefinition command)
         {
+            Aop.InvokeExecuting(ref command);
             object param = command.Parameters;
             var identity = new Identity(command.CommandText, command.CommandType, cnn, effectiveType, param?.GetType(), null);
             var info = GetCacheInfo(identity, param, command.AddToCache);
@@ -470,12 +471,15 @@ namespace Dapper
                 {
                     using (reader) { /* dispose if non-null */ }
                     if (wasClosed) cnn.Close();
+
+                    Aop.InvokeExecuted(ref command);
                 }
             }
         }
 
         private static async Task<T> QueryRowAsync<T>(this IDbConnection cnn, Row row, Type effectiveType, CommandDefinition command)
         {
+            Aop.InvokeExecuting(ref command);
             object param = command.Parameters;
             var identity = new Identity(command.CommandText, command.CommandType, cnn, effectiveType, param?.GetType(), null);
             var info = GetCacheInfo(identity, param, command.AddToCache);
@@ -528,6 +532,7 @@ namespace Dapper
                 {
                     using (reader) { /* dispose if non-null */ }
                     if (wasClosed) cnn.Close();
+                    Aop.InvokeExecuted(ref command);
                 }
             }
         }
@@ -580,6 +585,7 @@ namespace Dapper
 
         private static async Task<int> ExecuteMultiImplAsync(IDbConnection cnn, CommandDefinition command, IEnumerable multiExec)
         {
+            Aop.InvokeExecuting(ref command);
             bool isFirst = true;
             int total = 0;
             bool wasClosed = cnn.State == ConnectionState.Closed;
@@ -670,12 +676,14 @@ namespace Dapper
             finally
             {
                 if (wasClosed) cnn.Close();
+                Aop.InvokeExecuted(ref command);
             }
             return total;
         }
 
         private static async Task<int> ExecuteImplAsync(IDbConnection cnn, CommandDefinition command, object param)
         {
+            Aop.InvokeExecuting(ref command);
             var identity = new Identity(command.CommandText, command.CommandType, cnn, null, param?.GetType(), null);
             var info = GetCacheInfo(identity, param, command.AddToCache);
             bool wasClosed = cnn.State == ConnectionState.Closed;
@@ -691,6 +699,7 @@ namespace Dapper
                 finally
                 {
                     if (wasClosed) cnn.Close();
+                    Aop.InvokeExecuted(ref command);
                 }
             }
         }
@@ -943,6 +952,7 @@ namespace Dapper
 
         private static async Task<IEnumerable<TReturn>> MultiMapAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn>(this IDbConnection cnn, CommandDefinition command, Delegate map, string splitOn)
         {
+            Aop.InvokeExecuting(ref command);
             object param = command.Parameters;
             var identity = new Identity(command.CommandText, command.CommandType, cnn, typeof(TFirst), param?.GetType(), new[] { typeof(TFirst), typeof(TSecond), typeof(TThird), typeof(TFourth), typeof(TFifth), typeof(TSixth), typeof(TSeventh) });
             var info = GetCacheInfo(identity, param, command.AddToCache);
@@ -961,6 +971,7 @@ namespace Dapper
             finally
             {
                 if (wasClosed) cnn.Close();
+                Aop.InvokeExecuted(ref command);
             }
         }
 
@@ -988,6 +999,7 @@ namespace Dapper
 
         private static async Task<IEnumerable<TReturn>> MultiMapAsync<TReturn>(this IDbConnection cnn, CommandDefinition command, Type[] types, Func<object[], TReturn> map, string splitOn)
         {
+            Aop.InvokeExecuting(ref command);
             if (types.Length < 1)
             {
                 throw new ArgumentException("you must provide at least one type to deserialize");
@@ -1010,6 +1022,7 @@ namespace Dapper
             finally
             {
                 if (wasClosed) cnn.Close();
+                Aop.InvokeExecuted(ref command);
             }
         }
 
@@ -1045,6 +1058,7 @@ namespace Dapper
         /// <param name="command">The command to execute for this query.</param>
         public static async Task<GridReader> QueryMultipleAsync(this IDbConnection cnn, CommandDefinition command)
         {
+            Aop.InvokeExecuting(ref command);
             object param = command.Parameters;
             var identity = new Identity(command.CommandText, command.CommandType, cnn, typeof(GridReader), param?.GetType(), null);
             CacheInfo info = GetCacheInfo(identity, param, command.AddToCache);
@@ -1081,6 +1095,10 @@ namespace Dapper
                 cmd?.Dispose();
                 if (wasClosed) cnn.Close();
                 throw;
+            }
+            finally
+            {
+                Aop.InvokeExecuted(ref command);
             }
         }
 
@@ -1141,6 +1159,7 @@ namespace Dapper
 
         private static async Task<IDataReader> ExecuteReaderImplAsync(IDbConnection cnn, CommandDefinition command, CommandBehavior commandBehavior)
         {
+            Aop.InvokeExecuting(ref command);
             Action<IDbCommand, object> paramReader = GetParameterReader(cnn, ref command);
 
             DbCommand cmd = null;
@@ -1157,6 +1176,7 @@ namespace Dapper
             {
                 if (wasClosed) cnn.Close();
                 cmd?.Dispose();
+                Aop.InvokeExecuted(ref command);
             }
         }
 
@@ -1208,6 +1228,7 @@ namespace Dapper
 
         private static async Task<T> ExecuteScalarImplAsync<T>(IDbConnection cnn, CommandDefinition command)
         {
+            Aop.InvokeExecuting(ref command);
             Action<IDbCommand, object> paramReader = null;
             object param = command.Parameters;
             if (param != null)
@@ -1230,6 +1251,7 @@ namespace Dapper
             {
                 if (wasClosed) cnn.Close();
                 cmd?.Dispose();
+                Aop.InvokeExecuted(ref command);
             }
             return Parse<T>(result);
         }

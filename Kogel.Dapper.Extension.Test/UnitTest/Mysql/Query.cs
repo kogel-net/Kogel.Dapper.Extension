@@ -32,18 +32,24 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
             //正常模式下仓储使用
             using (var repository = new FlowOrderRepository())
             {
-                var flowOrder = repository.QuerySet()
-                    .ResetTableName(typeof(FlowOrder), "flow_order_1")
-                    .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
-                    .Get();
+                List<Task> tasks = new List<Task>();
 
-                Task.Run(async () =>
-                {
-                    var flowOrderAsync = await repository.QuerySet()
-                           .ResetTableName(typeof(FlowOrder), "flow_order_1")
-                           .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
-                           .GetAsync();
-                }).Wait();
+                var flowOrder = repository.QuerySet()
+                  .ResetTableName(typeof(FlowOrder), "flow_order_1")
+                  .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
+                  .Get();
+
+
+                tasks.Add(Task.Run(async () =>
+               {
+                   flowOrder = await repository.QuerySet()
+                        .ResetTableName(typeof(FlowOrder), "flow_order_1")
+                        .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
+                        .GetAsync();
+
+               }));
+
+                Task.WaitAll(tasks.ToArray());
 
 
                 //切换数据库
