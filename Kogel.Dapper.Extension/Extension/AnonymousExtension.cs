@@ -76,8 +76,16 @@ namespace Kogel.Dapper.Extension.Extension
                         {
                             var item = properties[i];
                             var value = reader[item.Name];
+
+                            Type nullableType = Nullable.GetUnderlyingType(item.PropertyType);
+
                             if (value != DBNull.Value)
-                                value = Convert.ChangeType(value, item.PropertyType);
+                            {
+                                if (nullableType != null)
+                                    value = Convert.ChangeType(value, nullableType);
+                                else
+                                    value = Convert.ChangeType(value, item.PropertyType);
+                            }
                             else
                                 value = default;
                             array[i] = value;
