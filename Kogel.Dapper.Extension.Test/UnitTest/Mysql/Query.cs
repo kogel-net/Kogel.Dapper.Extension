@@ -41,13 +41,13 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
 
                 tasks.Add(Task.Run(async () =>
-               {
+                {
                    flowOrder = await repository.QuerySet()
                         .ResetTableName(typeof(FlowOrder), "flow_order_1")
                         .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
                         .GetAsync();
 
-               }));
+                }));
 
                 Task.WaitAll(tasks.ToArray());
 

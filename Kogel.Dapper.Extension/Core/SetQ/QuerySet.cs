@@ -209,12 +209,17 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             return this;
         }
 
-        public IQuerySet<T> Join(string SqlJoin)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sqlJoin"></param>
+        /// <returns></returns>
+        public IQuerySet<T> Join(string sqlJoin)
         {
             SqlProvider.JoinList.Add(new JoinAssTable()
             {
                 Action = JoinAction.Sql,
-                JoinSql = SqlJoin,
+                JoinSql = sqlJoin,
                 IsMapperField = false
             });
             return this;
@@ -224,14 +229,14 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         /// 连接(通过sql连接，不指定表实体默认为不增加该表显示字段)
         /// </summary>
         /// <typeparam name="TInner"></typeparam>
-        /// <param name="SqlJoin"></param>
+        /// <param name="sqlJoin"></param>
         /// <returns></returns>
-        public IQuerySet<T> Join<TInner>(string SqlJoin)
+        public IQuerySet<T> Join<TInner>(string sqlJoin)
         {
             SqlProvider.JoinList.Add(new JoinAssTable()
             {
                 Action = JoinAction.Sql,
-                JoinSql = SqlJoin,
+                JoinSql = sqlJoin,
                 TableType = typeof(TInner),
             });
             return this;

@@ -64,6 +64,8 @@
   <ItemGroup>
     <Compile Include="Model\Dto\FlowOrderDto.cs" />
     <Compile Include="Model\FlowOrder.cs" />
+    <Compile Include="Model\HeadOrder.cs" />
+    <Compile Include="Model\WarehouseOrder.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UnitTest\Mssql\Command.cs" />

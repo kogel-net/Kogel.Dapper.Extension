@@ -12,6 +12,6 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 
 		ICommand<T> WhereIf(bool where, Expression<Func<T, bool>> truePredicate, Expression<Func<T, bool>> falsePredicate);
 
-		ICommand<T> AsTableName(Type type, string tableName);
+		ICommand<T> ResetTableName(Type type, string tableName);
 	}
 }
