@@ -25,6 +25,8 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 
         Task<int> DeleteAsync();
 
+        Task<int> DeleteAsync(T model);
+
         int Insert(T entity, string[] excludeFields = null);
 
         long InsertIdentity(T entity, string[] excludeFields = null);

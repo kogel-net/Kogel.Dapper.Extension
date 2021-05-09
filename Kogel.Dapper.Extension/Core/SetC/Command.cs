@@ -115,21 +115,25 @@ namespace Kogel.Dapper.Extension.Core.SetC
         public int Delete(T model)
         {
             SqlProvider.FormatDelete();
-            var entityObject = EntityCache.QueryEntity(model.GetType());
-            var identity = entityObject.EntityFieldList.FirstOrDefault(x => x.IsIdentity);
-            if (identity == null)
-                throw new System.Exception("主键不存在!");
             //设置参数
             DynamicParameters param = new DynamicParameters();
-            param.Add(entityObject.Identitys, identity.PropertyInfo.GetValue(model));
-            return DbCon.Execute($@"{SqlProvider.SqlString} AND {entityObject.Identitys}={SqlProvider.ProviderOption.ParameterPrefix}{entityObject.Identitys}
-			", param, isExcludeUnitOfWork: SqlProvider.IsExcludeUnitOfWork);
+            SqlProvider.SqlString = $"{SqlProvider.SqlString} {SqlProvider.GetIdentityWhere(model, param)}";
+            return DbCon.Execute(SqlProvider.SqlString, param, isExcludeUnitOfWork: SqlProvider.IsExcludeUnitOfWork);
         }
 
         public async Task<int> DeleteAsync()
         {
             SqlProvider.FormatDelete();
             return await DbCon.ExecuteAsync(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, isExcludeUnitOfWork: SqlProvider.IsExcludeUnitOfWork);
+        }
+
+        public async Task<int> DeleteAsync(T model)
+        {
+            SqlProvider.FormatDelete();
+            //设置参数
+            DynamicParameters param = new DynamicParameters();
+            SqlProvider.SqlString = $"{SqlProvider.SqlString} {SqlProvider.GetIdentityWhere(model, param)}";
+            return await DbCon.ExecuteAsync(SqlProvider.SqlString, param, isExcludeUnitOfWork: SqlProvider.IsExcludeUnitOfWork);
         }
 
         public int Insert(T entity, string[] excludeFields = null)

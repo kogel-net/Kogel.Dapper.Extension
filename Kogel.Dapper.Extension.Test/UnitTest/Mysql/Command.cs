@@ -62,7 +62,8 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                 var result = repository.CommandSet<FlowOrder>()
                      .Update(flowOrders);
 
-
+                result = repository.CommandSet<FlowOrder>()
+                   .Delete(flowOrders.FirstOrDefault());
             }
         }
 
