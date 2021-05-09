@@ -12,7 +12,7 @@ namespace Kogel.Dapper.Extension.Oracle
         private readonly static string OpenQuote = "\"";
         private readonly static string CloseQuote = "\"";
         private readonly static char ParameterPrefix = ':';
-        private IResolveExpression ResolveExpression;
+        public override IResolveExpression ResolveExpression { get; set; }
         public OracleSqlProvider()
         {
             ProviderOption = new ProviderOption(OpenQuote, CloseQuote, ParameterPrefix);

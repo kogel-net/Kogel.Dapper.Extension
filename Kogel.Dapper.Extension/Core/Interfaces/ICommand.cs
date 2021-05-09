@@ -7,13 +7,13 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 {
     public interface ICommand<T>
     {
-		int Update(T entity, string[] excludeFields = null);
+		int Update(T entity, string[] excludeFields = null, int timeout = 120);
 
 		int Update(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120);
 
         int Update(Expression<Func<T, T>> updateExpression);
 
-        Task<int> UpdateAsync(T entity);
+        Task<int> UpdateAsync(T entity, string[] excludeFields = null, int timeout = 120);
 
         Task<int> UpdateAsync(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120);
 

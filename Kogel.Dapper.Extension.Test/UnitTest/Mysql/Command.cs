@@ -30,32 +30,37 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
                 //repository.UnitOfWork.Rollback();
 
-                repository.ChangeDataBase("fps_test");
+                //repository.ChangeDataBase("fps_test");
 
-                var json = JsonConvert.SerializeObject(repository.Orm.Query("SELECT * FROM customer_pay_info LIMIT 1"));
+                // var json = JsonConvert.SerializeObject(repository.Orm.Query("SELECT * FROM customer_pay_info LIMIT 1"));
 
 
-                var headOrders = repository.QuerySet<HeadOrder>()
-                      .Where(x => x.CustomerCode == "G1119")
+                var flowOrders = repository.QuerySet<FlowOrder>()
+                      //.Where(x => x.CustomerCode == "G1119")
                       .Top(100)
                       .ToList();
 
                 int index = 0;
 
-                for (var i = 0; i < 50; i++)
+                //for (var i = 0; i < 50; i++)
+                //{
+
+
+
+                //    Console.WriteLine(index);
+                //}
+
+                foreach (var item in flowOrders)
                 {
-                    foreach (var item in headOrders)
-                    {
-                        item.OrderNumber = Guid.NewGuid().ToString("N");
-                    }
+                    item.UpdateTime = DateTime.Now;
+                    //item.OrderNumber = Guid.NewGuid().ToString("N");
 
-                    var result = repository.CommandSet<HeadOrder>()
-                          .Insert(headOrders);
 
-                    Console.WriteLine(index);
-                }
                  
+                }
 
+                var result = repository.CommandSet<FlowOrder>()
+                     .Update(flowOrders);
 
 
             }

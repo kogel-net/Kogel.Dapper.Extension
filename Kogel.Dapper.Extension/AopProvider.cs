@@ -65,12 +65,15 @@ namespace Kogel.Dapper.Extension
             }
             return _aop as AopProvider;
 #else  
-            if (_aop.Value == null)
+            lock (_aop) 
             {
-                //_aop = new ThreadLocal<AopProvider>();
-                _aop.Value = new AopProvider();
+                if (_aop.Value == null)
+                {
+                    //_aop = new ThreadLocal<AopProvider>();
+                    _aop.Value = new AopProvider();
+                }
+                return _aop.Value;
             }
-            return _aop.Value;
 #endif
         }
     }

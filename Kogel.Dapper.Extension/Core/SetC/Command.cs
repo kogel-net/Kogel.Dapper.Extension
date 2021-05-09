@@ -16,9 +16,8 @@ namespace Kogel.Dapper.Extension.Core.SetC
     /// <typeparam name="T"></typeparam>
     public abstract class Command<T> : AbstractSet, ICommand<T>
     {
-
         public readonly IDbConnection DbCon;
-        public readonly IDbTransaction DbTransaction;
+        public IDbTransaction DbTransaction { get; private set; }
 
         protected DataBaseContext<T> SetContext { get; set; }
 
@@ -35,29 +34,43 @@ namespace Kogel.Dapper.Extension.Core.SetC
             DbTransaction = dbTransaction;
         }
 
-        public int Update(T entity, string[] excludeFields = null)
+        public int Update(T entity, string[] excludeFields = null, int timeout = 120)
         {
             SqlProvider.FormatUpdate(entity, excludeFields);
-            return DbCon.Execute(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, isExcludeUnitOfWork: SqlProvider.IsExcludeUnitOfWork);
+            return DbCon.Execute(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, timeout, isExcludeUnitOfWork: SqlProvider.IsExcludeUnitOfWork);
         }
 
         public int Update(Expression<Func<T, T>> updateExpression)
         {
             SqlProvider.FormatUpdate(updateExpression);
-            return DbCon.Execute(SqlProvider.SqlString, SqlProvider.Params, DbTransaction);
+            return DbCon.Execute(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, isExcludeUnitOfWork: SqlProvider.IsExcludeUnitOfWork);
         }
 
         public int Update(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120)
         {
-            SqlProvider.FormatUpdate(entities.FirstOrDefault(), excludeFields, true);
-            //批量修改不需要别名（暂时有点小bug，先勉强使用下）
-            SqlProvider.SqlString = SqlProvider.SqlString.Replace("Update_", "").Replace("_0", "").Replace("_1", "");
-            var identity = EntityCache.QueryEntity(typeof(T)).Identitys;
-            SqlProvider.SqlString += $" AND {SqlProvider.ProviderOption.CombineFieldName(identity)}={SqlProvider.ProviderOption.ParameterPrefix + identity}";
-            return DbCon.Execute(SqlProvider.SqlString, entities, DbTransaction, timeout, isExcludeUnitOfWork: SqlProvider.IsExcludeUnitOfWork);
+            int result = 0;
+            bool isSeedTran = false;
+            if (DbTransaction == null)
+            {
+                isSeedTran = true;
+                if (DbCon.State == ConnectionState.Closed)
+                    DbCon.Open();
+                DbTransaction = DbCon.BeginTransaction();
+            }
+            foreach (var entity in entities)
+            {
+                result += Update(entity, excludeFields, timeout);
+            }
+            if (isSeedTran)
+            {
+                DbTransaction.Commit();
+                DbTransaction.Dispose();
+                DbCon.Close();
+            }
+            return result;
         }
 
-        public async Task<int> UpdateAsync(T entity)
+        public async Task<int> UpdateAsync(T entity, string[] excludeFields = null, int timeout = 120)
         {
             SqlProvider.FormatUpdate(entity, null);
             return await DbCon.ExecuteAsync(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, isExcludeUnitOfWork: SqlProvider.IsExcludeUnitOfWork);
@@ -71,12 +84,26 @@ namespace Kogel.Dapper.Extension.Core.SetC
 
         public async Task<int> UpdateAsync(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120)
         {
-            SqlProvider.FormatUpdate(entities.FirstOrDefault(), excludeFields, true);
-            //批量修改不需要别名（暂时有点小bug，先勉强使用下）
-            SqlProvider.SqlString = SqlProvider.SqlString.Replace("Update_", "").Replace("_0", "").Replace("_1", "");
-            var identity = EntityCache.QueryEntity(typeof(T)).Identitys;
-            SqlProvider.SqlString += $" AND {SqlProvider.ProviderOption.CombineFieldName(identity)}={SqlProvider.ProviderOption.ParameterPrefix + identity}";
-            return await DbCon.ExecuteAsync(SqlProvider.SqlString, entities, DbTransaction, timeout, isExcludeUnitOfWork: SqlProvider.IsExcludeUnitOfWork);
+            int result = 0;
+            bool isSeedTran = false;
+            if (DbTransaction == null)
+            {
+                isSeedTran = true;
+                if (DbCon.State == ConnectionState.Closed)
+                    DbCon.Open();
+                DbTransaction = DbCon.BeginTransaction();
+            }
+            foreach (var entity in entities)
+            {
+                result += await UpdateAsync(entity, excludeFields, timeout);
+            }
+            if (isSeedTran)
+            {
+                DbTransaction.Commit();
+                DbTransaction.Dispose();
+                DbCon.Close();
+            }
+            return result;
         }
 
         public int Delete()

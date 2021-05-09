@@ -26,8 +26,19 @@ namespace Kogel.Dapper.Extension
             AsTableNameDic = new Dictionary<Type, string>();
         }
 
+        /// <summary>
+        /// 工具方
+        /// </summary>
         public abstract IProviderOption ProviderOption { get; set; }
 
+        /// <summary>
+        /// 解析者
+        /// </summary>
+        public abstract IResolveExpression ResolveExpression { get; set; }
+
+        /// <summary>
+        /// 生成的sql
+        /// </summary>
         public string SqlString { get; set; }
 
         /// <summary>
@@ -118,7 +129,7 @@ namespace Kogel.Dapper.Extension
                 else
                 {
                     //加上as标记
-                    fromName= $"{ProviderOption.CombineFieldName(fromName)} {entity.AsName}";
+                    fromName = $"{ProviderOption.CombineFieldName(fromName)} {entity.AsName}";
                 }
             }
             else
@@ -145,17 +156,22 @@ namespace Kogel.Dapper.Extension
         /// <typeparam name="T"></typeparam>
         /// <param name="entity"></param>
         /// <returns></returns>
-        protected string GetIdentityWhere<T>(T entity, DynamicParameters param)
+        public string GetIdentityWhere<T>(T entity, DynamicParameters param = null)
         {
             var entityObject = EntityCache.QueryEntity(typeof(T));
             if (string.IsNullOrEmpty(entityObject.Identitys))
                 throw new DapperExtensionException("主键不存在!请前往实体类使用[Identity]特性设置主键。");
-            //获取主键数据
-            var id = entityObject.Properties
-                .FirstOrDefault(x => x.Name == entityObject.Identitys)
-                .GetValue(entity);
+        
             //设置参数
-            param.Add(entityObject.Identitys, id);
+            if (param != null)
+            {
+                //获取主键数据
+                var id = entityObject.EntityFieldList
+                    .FirstOrDefault(x => x.FieldName == entityObject.Identitys)
+                    .PropertyInfo
+                    .GetValue(entity);
+                param.Add(entityObject.Identitys, id);
+            }
             return $" AND {entityObject.Identitys}={ProviderOption.ParameterPrefix}{entityObject.Identitys} ";
         }
 

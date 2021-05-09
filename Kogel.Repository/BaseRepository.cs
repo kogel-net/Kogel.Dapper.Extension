@@ -183,7 +183,6 @@ namespace Kogel.Repository
             //设置参数
             DynamicParameters param = new DynamicParameters();
             param.Add(entityObject.Identitys, id);
-
             return this.QuerySet()
                 .Where($@"{this.Options.Provider.ProviderOption.CombineFieldName(entityObject.Identitys)}
                  ={Options.Provider.ProviderOption.ParameterPrefix}{entityObject.Identitys}", param)

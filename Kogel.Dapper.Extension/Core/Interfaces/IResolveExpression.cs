@@ -219,9 +219,9 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// <typeparam name="T"></typeparam>
         /// <param name="updateExpression"></param>
         /// <returns></returns>
-        public virtual UpdateExpression ResolveUpdate<T>(Expression<Func<T, T>> updateExpression)
+        public virtual UpdateExpression<T> ResolveUpdate<T>(Expression<Func<T, T>> updateExpression)
         {
-            return new UpdateExpression(updateExpression, provider);
+            return new UpdateExpression<T>(updateExpression, provider);
         }
 
         /// <summary>
@@ -233,9 +233,9 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// <param name="excludeFields"></param>
         /// <param name="isBatch">是否批量修改</param>
         /// <returns></returns>
-        public virtual string ResolveUpdates<T>(T t, DynamicParameters param, string[] excludeFields, bool isBatch = false)
+        public virtual string ResolveUpdates<T>(object entityValue, DynamicParameters param, string[] excludeFields, bool isBatch = false)
         {
-            var entity = EntityCache.QueryEntity(t.GetType());
+            var entity = EntityCache.QueryEntity(typeof(T));
             var properties = entity.Properties;
             StringBuilder builder = new StringBuilder();
             foreach (var propertiy in properties)
@@ -262,7 +262,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
                         continue;
                     }
                 }
-                object value = propertiy.GetValue(t);
+                object value = propertiy.GetValue(entityValue);
                 string name = entity.FieldPairs[propertiy.Name];
                 if (builder.Length != 0)
                 {
