@@ -56,14 +56,21 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                     //item.OrderNumber = Guid.NewGuid().ToString("N");
 
 
-                 
+
+
                 }
 
                 var result = repository.CommandSet<FlowOrder>()
                      .Update(flowOrders);
 
+                var testData = flowOrders.FirstOrDefault();
+
                 result = repository.CommandSet<FlowOrder>()
-                   .Delete(flowOrders.FirstOrDefault());
+                   .Delete(testData);
+
+
+                var newId = repository.CommandSet<FlowOrder>()
+                .InsertIdentity(testData);
             }
         }
 

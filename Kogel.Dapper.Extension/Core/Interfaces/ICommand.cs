@@ -35,6 +35,8 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 
         Task<int> InsertAsync(T entity, string[] excludeFields = null);
 
+        Task<long> InsertIdentityAsync(T entity, string[] excludeFields = null);
+
         Task<int> InsertAsync(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120);
 
 	

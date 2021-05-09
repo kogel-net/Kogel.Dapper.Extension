@@ -1190,8 +1190,9 @@ namespace Dapper
         /// <param name="commandTimeout">Number of seconds before command execution timeout.</param>
         /// <param name="commandType">Is it a stored proc or a batch?</param>
         /// <returns>The first cell returned, as <see cref="object"/>.</returns>
-        public static Task<object> ExecuteScalarAsync(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null) =>
-            ExecuteScalarImplAsync<object>(cnn, new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered));
+        public static Task<object> ExecuteScalarAsync(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null,
+            int? commandTimeout = null, CommandType? commandType = null, bool isExcludeUnitOfWork = false) =>
+            ExecuteScalarImplAsync<object>(cnn, new CommandDefinition(cnn, sql, param, transaction, commandTimeout, commandType, CommandFlags.Buffered, isExcludeUnitOfWork: isExcludeUnitOfWork));
 
         /// <summary>
         /// Execute parameterized SQL that selects a single value.

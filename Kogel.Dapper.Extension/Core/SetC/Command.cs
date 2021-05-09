@@ -91,7 +91,7 @@ namespace Kogel.Dapper.Extension.Core.SetC
                 isSeedTran = true;
                 if (DbCon.State == ConnectionState.Closed)
                     DbCon.Open();
-                DbTransaction = DbCon.BeginTransaction();
+                DbTransaction = DbCon.BeginTransaction(IsolationLevel.ReadCommitted);
             }
             foreach (var entity in entities)
             {
@@ -159,6 +159,13 @@ namespace Kogel.Dapper.Extension.Core.SetC
         {
             SqlProvider.FormatInsert(entity, excludeFields);
             return await DbCon.ExecuteAsync(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, isExcludeUnitOfWork: SqlProvider.IsExcludeUnitOfWork);
+        }
+
+        public async Task<long> InsertIdentityAsync(T entity, string[] excludeFields = null)
+        {
+            SqlProvider.FormatInsertIdentity(entity, excludeFields);
+            object result = await DbCon.ExecuteScalarAsync(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, isExcludeUnitOfWork: SqlProvider.IsExcludeUnitOfWork);
+            return result != null ? Convert.ToInt64(result) : 0;
         }
 
         public async Task<int> InsertAsync(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120)
