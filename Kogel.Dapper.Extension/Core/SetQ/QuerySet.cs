@@ -305,20 +305,5 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         }
 
         #endregion
-
-        #region 多表索引扩展
-        public ISelectFrom<T, T1, T2> From<T1, T2>()
-        {
-            return new ISelectFrom<T, T1, T2>(this);
-        }
-        public ISelectFrom<T, T1, T2, T3> From<T1, T2, T3>()
-        {
-            return new ISelectFrom<T, T1, T2, T3>(this);
-        }
-        public ISelectFrom<T, T1, T2, T3, T4> From<T1, T2, T3, T4>()
-        {
-            return new ISelectFrom<T, T1, T2, T3, T4>(this);
-        }
-        #endregion
     }
 }

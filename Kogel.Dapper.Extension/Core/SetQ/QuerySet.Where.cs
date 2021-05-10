@@ -9,16 +9,29 @@ using System.Threading.Tasks;
 
 namespace Kogel.Dapper.Extension.Core.SetQ
 {
-
+    /// <summary>
+    /// 条件筛选
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public partial class QuerySet<T> : Aggregation<T>, IQuerySet<T>
     {
-        #region 条件
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
         public IQuerySet<T> Where(Expression<Func<T, bool>> predicate)
         {
             WhereExpressionList.Add(predicate);
             return this;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TWhere"></typeparam>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
         public IQuerySet<T> Where<TWhere>(Expression<Func<TWhere, bool>> predicate)
         {
             WhereExpressionList.Add(predicate);
@@ -52,6 +65,13 @@ namespace Kogel.Dapper.Extension.Core.SetQ
             return this;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TWhere1"></typeparam>
+        /// <typeparam name="TWhere2"></typeparam>
+        /// <param name="exp"></param>
+        /// <returns></returns>
         public IQuerySet<T> Where<TWhere1, TWhere2>(Expression<Func<TWhere1, TWhere2, bool>> exp)
         {
             WhereExpressionList.Add(exp);
@@ -90,6 +110,5 @@ namespace Kogel.Dapper.Extension.Core.SetQ
                 WhereExpressionList.Add(falsePredicate);
             return this;
         }
-        #endregion
     }
 }

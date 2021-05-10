@@ -9,8 +9,10 @@ Koge.Dapper.Extension是一个小型库，通过为POCO添加基本的CRUD操作
 
 支持Mssql,Oracle,Mysql等数据库
 
-支持.net framework4.5.1,.net core2.0及以上,更低版本适配如.netFramework4.0及以下请加群下载710217654
+支持.net framework4.5,.net core2.0及以上
 
 应用层需要引用包Kogel.Dapper.Extension.MsSql(如果数据库是Oracle则引用Kogel.Dapper.Extension.Oracle),Nuget上可以下载安装。
 
 文档地址:https://www.cnblogs.com/kogel/p/10805696.html
+
+或者百度，谷歌直接搜索Dapper Linq

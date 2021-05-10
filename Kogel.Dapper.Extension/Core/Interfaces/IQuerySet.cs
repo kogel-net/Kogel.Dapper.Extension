@@ -154,10 +154,5 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// <returns></returns>
         IQuerySet<T> HavingIf<THaving>(bool where, Expression<Func<THaving, object>> trueHavingExp, Expression<Func<THaving, object>> falseHavingExp);
 
-        ISelectFrom<T, T1, T2> From<T1, T2>();
-
-        ISelectFrom<T, T1, T2, T3> From<T1, T2, T3>();
-
-        ISelectFrom<T, T1, T2, T3, T4> From<T1, T2, T3, T4>();
     }
 }
