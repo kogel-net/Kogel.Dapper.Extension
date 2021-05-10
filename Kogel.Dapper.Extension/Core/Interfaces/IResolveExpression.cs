@@ -145,7 +145,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
             var orderByList = abstractSet?.OrderbyExpressionList.Select(a =>
             {
                 var entity = EntityCache.QueryEntity(a.Key.Type.GenericTypeArguments[0]);
-                var columnName = a.Key.Body.GetCorrectPropertyName();
+                var columnName = entity.FieldPairs[a.Key.Body.GetCorrectPropertyName()];
                 string orderBySql = $"{entity.AsName}.{providerOption.CombineFieldName(columnName)}{(a.Value == EOrderBy.Asc ? " ASC " : " DESC ")}";
                 return orderBySql;
             }) ?? new List<string>();
