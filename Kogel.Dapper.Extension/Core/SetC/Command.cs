@@ -49,24 +49,24 @@ namespace Kogel.Dapper.Extension.Core.SetC
         public int Update(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120)
         {
             int result = 0;
-            bool isSeedTran = false;
-            if (DbTransaction == null)
-            {
-                isSeedTran = true;
-                if (DbCon.State == ConnectionState.Closed)
-                    DbCon.Open();
-                DbTransaction = DbCon.BeginTransaction();
-            }
+            //bool isSeedTran = false;
+            //if (DbTransaction == null)
+            //{
+            //    isSeedTran = true;
+            //    if (DbCon.State == ConnectionState.Closed)
+            //        DbCon.Open();
+            //    DbTransaction = DbCon.BeginTransaction();
+            //}
             foreach (var entity in entities)
             {
                 result += Update(entity, excludeFields, timeout);
             }
-            if (isSeedTran)
-            {
-                DbTransaction.Commit();
-                DbTransaction.Dispose();
-                DbCon.Close();
-            }
+            //if (isSeedTran)
+            //{
+            //    DbTransaction.Commit();
+            //    DbTransaction.Dispose();
+            //    DbCon.Close();
+            //}
             return result;
         }
 
@@ -85,24 +85,24 @@ namespace Kogel.Dapper.Extension.Core.SetC
         public async Task<int> UpdateAsync(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120)
         {
             int result = 0;
-            bool isSeedTran = false;
-            if (DbTransaction == null)
-            {
-                isSeedTran = true;
-                if (DbCon.State == ConnectionState.Closed)
-                    DbCon.Open();
-                DbTransaction = DbCon.BeginTransaction(IsolationLevel.ReadCommitted);
-            }
+            //bool isSeedTran = false;
+            //if (DbTransaction == null)
+            //{
+            //    isSeedTran = true;
+            //    if (DbCon.State == ConnectionState.Closed)
+            //        DbCon.Open();
+            //    DbTransaction = DbCon.BeginTransaction(IsolationLevel.ReadCommitted);
+            //}
             foreach (var entity in entities)
             {
                 result += await UpdateAsync(entity, excludeFields, timeout);
             }
-            if (isSeedTran)
-            {
-                DbTransaction.Commit();
-                DbTransaction.Dispose();
-                DbCon.Close();
-            }
+            //if (isSeedTran)
+            //{
+            //    DbTransaction.Commit();
+            //    DbTransaction.Dispose();
+            //    DbCon.Close();
+            //}
             return result;
         }
 
