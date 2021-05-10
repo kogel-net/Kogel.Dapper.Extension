@@ -63,7 +63,7 @@ namespace Kogel.Dapper.Extension.Core.SetC
             Params = new DynamicParameters();
         }
 
-        public ICommand<T> ResetTableName(Type type, string tableName)
+        public ICommandSet<T> ResetTableName(Type type, string tableName)
         {
             SqlProvider.AsTableNameDic.Add(type, tableName);
             return this;
@@ -73,7 +73,7 @@ namespace Kogel.Dapper.Extension.Core.SetC
 		/// </summary>
 		/// <param name="predicate"></param>
 		/// <returns></returns>
-        public ICommand<T> Where(Expression<Func<T, bool>> predicate)
+        public ICommandSet<T> Where(Expression<Func<T, bool>> predicate)
         {
             WhereExpressionList.Add(predicate);
             return this;
@@ -84,7 +84,7 @@ namespace Kogel.Dapper.Extension.Core.SetC
 		/// <param name="sqlWhere"></param>
 		/// <param name="param"></param>
 		/// <returns></returns>
-		public ICommand<T> Where(string sqlWhere, object param = null)
+		public ICommandSet<T> Where(string sqlWhere, object param = null)
 		{
 			WhereBuilder.Append(" AND " + sqlWhere);
 			if (param != null)
@@ -100,7 +100,7 @@ namespace Kogel.Dapper.Extension.Core.SetC
 		/// <param name="truePredicate"></param>
 		/// <param name="falsePredicate"></param>
 		/// <returns></returns>
-		public ICommand<T> WhereIf(bool where, Expression<Func<T, bool>> truePredicate, Expression<Func<T, bool>> falsePredicate)
+		public ICommandSet<T> WhereIf(bool where, Expression<Func<T, bool>> truePredicate, Expression<Func<T, bool>> falsePredicate)
 		{
 			if (where)
 				WhereExpressionList.Add(truePredicate);

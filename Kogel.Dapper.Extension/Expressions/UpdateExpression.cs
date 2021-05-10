@@ -56,7 +56,7 @@ namespace Kogel.Dapper.Extension.Expressions
                     {
                         //值对象
                         Visit(memberInit.Expression);
-                        var entityObject = EntityCache.QueryEntity(entityType);
+                        var entityObject = EntityCache.QueryEntity(expression.ReturnType);
                         string fieldName = entityObject.FieldPairs[memberInit.Member.Name];
                         _sqlCmd.Append($" {provider.ProviderOption.CombineFieldName(fieldName)} = {base.SpliceField} ");
                         Param.AddDynamicParams(base.Param);

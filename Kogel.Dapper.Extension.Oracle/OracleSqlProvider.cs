@@ -263,17 +263,17 @@ namespace Kogel.Dapper.Extension.Oracle
 
         public override SqlProvider FormatUpdateSelect<T>(Expression<Func<T, T>> updator)
         {
+            throw new DapperExtensionException("Oracle不支持修改并查询");
+
             var update = ResolveExpression.ResolveUpdate(updator);
 
-            var fromTableSql = FormatTableName(false, false);
-            var selectSql = ResolveExpression.ResolveSelectOfUpdate(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression);
+            var selectSql = ResolveExpression.ResolveSelect(null);
 
-            ProviderOption.IsAsName = false;
+            var fromTableSql = FormatTableName();
 
             var whereSql = ResolveExpression.ResolveWhereList();
-            Params.AddDynamicParams(update.Param);
 
-            SqlString = $"UPDATE {fromTableSql} {update.SqlCmd} {selectSql} {whereSql}";
+            SqlString = $"UPDATE {FormatTableName(false, false)} {update.SqlCmd} {whereSql}; {selectSql} {fromTableSql} {whereSql};";
 
             return this;
         }

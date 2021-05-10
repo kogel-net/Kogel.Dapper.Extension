@@ -177,43 +177,6 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         public abstract string ResolveMin(LambdaExpression selector);
 
         /// <summary>
-        /// 解析查询更新
-        /// </summary>
-        /// <param name="entityObject"></param>
-        /// <param name="selector"></param>
-        /// <returns></returns>
-        public virtual string ResolveSelectOfUpdate(EntityObject entityObject, LambdaExpression selector)
-        {
-            var selectSql = "";
-            if (selector == null)
-            {
-                var propertyBuilder = new StringBuilder();
-                foreach (var propertyInfo in entityObject.Properties)
-                {
-                    if (propertyBuilder.Length > 0)
-                        propertyBuilder.Append(",");
-                    propertyBuilder.AppendFormat($"INSERTED.{ providerOption.CombineFieldName(entityObject.FieldPairs[propertyInfo.Name])} { providerOption.CombineFieldName(propertyInfo.Name)}");
-                }
-                selectSql = propertyBuilder.ToString();
-            }
-            else
-            {
-                var nodeType = selector.Body.NodeType;
-                if (nodeType == ExpressionType.MemberAccess)
-                {
-                    var columnName = entityObject.FieldPairs[((MemberExpression)selector.Body).Member.Name];
-                    selectSql = "INSERTED." + providerOption.CombineFieldName(columnName);
-                }
-                else if (nodeType == ExpressionType.MemberInit)
-                {
-                    var memberInitExpression = (MemberInitExpression)selector.Body;
-                    selectSql = string.Join(",", memberInitExpression.Bindings.Select(a => "INSERTED." + providerOption.CombineFieldName(entityObject.FieldPairs[a.Member.Name])));
-                }
-            }
-            return "OUTPUT " + selectSql;
-        }
-
-        /// <summary>
         /// 解析更新
         /// </summary>
         /// <typeparam name="T"></typeparam>

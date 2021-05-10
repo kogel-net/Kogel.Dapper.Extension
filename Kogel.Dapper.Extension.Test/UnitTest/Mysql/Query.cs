@@ -42,10 +42,10 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
                 tasks.Add(Task.Run(async () =>
                 {
-                   flowOrder = await repository.QuerySet()
-                        .ResetTableName(typeof(FlowOrder), "flow_order_1")
-                        .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
-                        .GetAsync();
+                    flowOrder = await repository.QuerySet()
+                         .ResetTableName(typeof(FlowOrder), "flow_order_1")
+                         .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
+                         .GetAsync();
 
                 }));
 
@@ -57,7 +57,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
                 var gc_Fps_FlowOrder = repository.QuerySet()
                     .ResetTableName(typeof(FlowOrder), "flow_order_1")
-                    .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
+                    .Where(x => x.DeliveredTime.HasValue && x.CustomerCode.StartsWith("test"))
                     .Top(10)
                     .OrderBy("")
                     .ToList();

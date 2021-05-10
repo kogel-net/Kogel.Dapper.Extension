@@ -6,6 +6,8 @@ using MySql.Data.MySqlClient;
 using System.Linq;
 using System;
 using Newtonsoft.Json;
+using Kogel.Dapper.Extension.MySql.Extension;
+using Kogel.Dapper.Extension.MySql;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 {
@@ -65,6 +67,14 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                      .Update(flowOrders);
 
                 var testData = flowOrders.FirstOrDefault();
+
+                var updateFlowOrder = repository.CommandSet<FlowOrder>()
+                    .Where(x => x.Id.Between(4, 5))
+                    .UpdateSelect(x => new FlowOrder
+                    {
+                        Id = x.Id,
+                        AccountCode = x.AccountCode
+                    });
 
                 result = repository.CommandSet<FlowOrder>()
                    .Delete(testData);

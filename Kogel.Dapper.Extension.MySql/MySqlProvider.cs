@@ -241,12 +241,13 @@ namespace Kogel.Dapper.Extension
         {
             var update = ResolveExpression.ResolveUpdate(updator);
 
-            var selectSql = ResolveExpression.ResolveSelectOfUpdate(EntityCache.QueryEntity(typeof(T)), Context.Set.SelectExpression);
+            var selectSql = ResolveExpression.ResolveSelect(null);
+
+            var fromTableSql = FormatTableName();
 
             var whereSql = ResolveExpression.ResolveWhereList();
-            Params.AddDynamicParams(update.Param);
 
-            SqlString = $"UPDATE {FormatTableName(false, false)} {update.SqlCmd} {selectSql} {whereSql}";
+            SqlString = $"UPDATE {FormatTableName(false, false)} {update.SqlCmd} {whereSql}; {selectSql} {fromTableSql} {whereSql};";
 
             return this;
         }
