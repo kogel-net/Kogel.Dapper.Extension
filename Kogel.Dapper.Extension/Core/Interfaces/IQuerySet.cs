@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using Dapper;
 using Kogel.Dapper.Extension.Core.SetQ;
+using Kogel.Dapper.Extension.Extension.From;
 using Kogel.Dapper.Extension.Model;
 
 namespace Kogel.Dapper.Extension.Core.Interfaces
@@ -152,5 +153,11 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// <param name="falseHavingExp"></param>
         /// <returns></returns>
         IQuerySet<T> HavingIf<THaving>(bool where, Expression<Func<THaving, object>> trueHavingExp, Expression<Func<THaving, object>> falseHavingExp);
+
+        ISelectFrom<T, T1, T2> From<T1, T2>();
+
+        ISelectFrom<T, T1, T2, T3> From<T1, T2, T3>();
+
+        ISelectFrom<T, T1, T2, T3, T4> From<T1, T2, T3, T4>();
     }
 }

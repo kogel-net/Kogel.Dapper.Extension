@@ -11,8 +11,8 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql.Repository
         /// <param name="builder"></param>
         public override void OnConfiguring(RepositoryOptionsBuilder builder)
         {
-            builder.BuildConnection(x=> new MySqlConnection(@"server=localhost;port=3306;user id=root;password=A5101264a;database=gc_fps_receivable;"))
-                  .BuildConnection(x=>new MySqlConnection(@"server=192.168.87.141;port=63307;user id=fps_dbuser_dev;password=kxx44cuvlmjluqncju;
+            builder.BuildConnection(x => new MySqlConnection(@"server=localhost;port=3306;user id=root;password=A5101264a;database=gc_fps_receivable;"))
+                  .BuildConnection(x => new MySqlConnection(@"server=192.168.87.141;port=63307;user id=fps_dbuser_dev;password=kxx44cuvlmjluqncju;
                                  persistsecurityinfo=True;database=gc_fps_receivable_dev_2021_0;SslMode=none"), "fps_2021")
                   .BuildConnection(x => new MySqlConnection(@"server=192.168.87.203;port=63307;user id=fps_user;password=1Nl7C9CQRWhsEy1E;
                                  persistsecurityinfo=True;database=gc_fps_receivable_test;SslMode=none"), "fps_test")
