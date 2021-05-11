@@ -10,6 +10,7 @@ using Kogel.Dapper.Extension.MySql;
 using Kogel.Dapper.Extension.Test.Model.Dto;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 {
@@ -25,31 +26,24 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                 //生成的参数
                 var param = command.Parameters;
 #if DEBUG
-                Console.WriteLine(sql);
+                //Console.WriteLine(sql);
 #endif
             };
+
 
             //正常模式下仓储使用
             using (var repository = new FlowOrderRepository())
             {
-                List<Task> tasks = new List<Task>();
 
                 var flowOrder = repository.QuerySet()
                   .ResetTableName(typeof(FlowOrder), "flow_order_1")
                   .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
+                  .From<FlowOrder, FlowOrder>()
+                  .Where((a, b) => a.Id == 1)
+                  .GetQuerySet()
                   .Get();
 
-
-                tasks.Add(Task.Run(async () =>
-                {
-                    flowOrder = await repository.QuerySet()
-                         .ResetTableName(typeof(FlowOrder), "flow_order_1")
-                         .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
-                         .GetAsync();
-
-                }));
-
-                Task.WaitAll(tasks.ToArray());
+       
 
 
                 //切换数据库

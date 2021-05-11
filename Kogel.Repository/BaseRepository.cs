@@ -126,7 +126,7 @@ namespace Kogel.Repository
         }
 
         /// <summary>
-        /// 
+        /// 获取查询对象
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <returns></returns>
@@ -136,7 +136,7 @@ namespace Kogel.Repository
         }
 
         /// <summary>
-        /// 
+        /// 获取查询对象
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="transaction"></param>
@@ -165,7 +165,23 @@ namespace Kogel.Repository
             return new CommandSet<T>(Orm, Options.Provider.Create(), transaction);
         }
 
-        public ICommandSet<TEntity> CommandSet<TEntity>(IDbTransaction transaction = null)
+        /// <summary>
+        /// 获取编辑对象
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <returns></returns>
+        public ICommandSet<TEntity> CommandSet<TEntity>()
+        {
+            return new CommandSet<TEntity>(Orm, Options.Provider.Create(), null);
+        }
+
+        /// <summary>
+        /// 获取编辑对象
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="transaction"></param>
+        /// <returns></returns>
+        public ICommandSet<TEntity> CommandSet<TEntity>(IDbTransaction transaction)
         {
             return new CommandSet<TEntity>(Orm, Options.Provider.Create(), transaction);
         }

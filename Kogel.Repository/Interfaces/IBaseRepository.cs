@@ -73,10 +73,16 @@ namespace Kogel.Repository.Interfaces
 		/// 获取编辑对象
 		/// </summary>
 		/// <typeparam name="TEntity"></typeparam>
+		/// <returns></returns>
+		ICommandSet<TEntity> CommandSet<TEntity>();
+
+		/// <summary>
+		/// 获取编辑对象
+		/// </summary>
+		/// <typeparam name="TEntity"></typeparam>
 		/// <param name="transaction"></param>
 		/// <returns></returns>
-		ICommandSet<TEntity> CommandSet<TEntity>(IDbTransaction transaction = null);
-
+		ICommandSet<TEntity> CommandSet<TEntity>(IDbTransaction transaction);
 
 		/// <summary>
 		/// 根据主键获取当前实体数据

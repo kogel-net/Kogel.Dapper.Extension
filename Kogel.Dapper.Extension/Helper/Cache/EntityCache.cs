@@ -3,6 +3,7 @@ using Kogel.Dapper.Extension.Extension;
 using Kogel.Dapper.Extension.Helper;
 using Kogel.Dapper.Extension.Model;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -11,31 +12,27 @@ using System.Text;
 namespace Kogel.Dapper.Extension
 {
     /// <summary>
-    /// 实体类缓存帮助类
+    /// 实体类缓存
     /// </summary>
     public class EntityCache
     {
-        internal static List<EntityObject> EntitieList = new List<EntityObject>();
-        private static object EntitieLock = new object();
+        internal static ConcurrentBag<EntityObject> EntitieList = new ConcurrentBag<EntityObject>();
         /// <summary>
         /// 注册动态化查询可能会用到的实体类
         /// </summary>
         /// <param name="entity">实体类</param>
         public static EntityObject Register(Type entity)
         {
-            lock (EntitieLock)
+            EntityObject entityObject = new EntityObject(entity);
+            if (!EntitieList.Any(x => x.AssemblyString.Equals(entityObject.AssemblyString)))
             {
-                EntityObject entityObject = new EntityObject(entity);
-                if (!EntitieList.Exists(x => x.AssemblyString.Equals(entityObject.AssemblyString)))
-                {
-                    SqlMapper.SetTypeMap(entityObject.Type, new CustomPropertyTypeMap(entityObject.Type,
-                        (type, column) =>
-                        type.GetPropertys(entityObject.FieldPairs.FirstOrDefault(x => x.Value.Equals(column)).Key)
-                        ));
-                    EntitieList.Add(entityObject);
-                }
-                return entityObject;
+                SqlMapper.SetTypeMap(entityObject.Type, new CustomPropertyTypeMap(entityObject.Type,
+                    (type, column) =>
+                    type.GetPropertys(entityObject.FieldPairs.FirstOrDefault(x => x.Value.Equals(column)).Key)
+                    ));
+                EntitieList.Add(entityObject);
             }
+            return entityObject;
         }
 
         /// <summary>
@@ -71,17 +68,14 @@ namespace Kogel.Dapper.Extension
         /// <returns></returns>
         public static EntityObject QueryEntity(Type entity)
         {
-            lock (EntitieLock)
+            var entityType = EntitieList.FirstOrDefault(x => x.Type.FullName.Equals(entity.FullName));
+            if (entityType != null)
             {
-                var entityType = EntitieList.ToArray().FirstOrDefault(x => x.Type.FullName.Equals(entity.FullName));
-                if (entityType != null)
-                {
-                    return entityType;
-                }
-                else
-                {
-                    return Register(entity);
-                }
+                return entityType;
+            }
+            else
+            {
+                return Register(entity);
             }
         }
 
@@ -102,8 +96,7 @@ namespace Kogel.Dapper.Extension
         /// <returns></returns>
         public static List<EntityObject> GetEntities()
         {
-            Type entityType;
-            return EntitieList.Where(x => ExpressionExtension.IsAnyBaseEntity(x.Type, out entityType)).Distinct().ToList();
+            return EntitieList.Where(x => ExpressionExtension.IsAnyBaseEntity(x.Type, out Type entityType)).Distinct().ToList();
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Data;
 using Kogel.Dapper.Extension;
 using System.Data.Common;
+using System.Collections.Concurrent;
 
 namespace Kogel.Repository
 {
@@ -14,7 +15,7 @@ namespace Kogel.Repository
         /// <summary>
         /// 总连接池 (所有连接都会注册到总连接池中，总连接池中不区分主从)
         /// </summary>
-        internal static readonly List<ConnectionPool> _connectionPool = new List<ConnectionPool>();
+        internal static readonly ConcurrentBag<ConnectionPool> _connectionPool = new ConcurrentBag<ConnectionPool>();
 
         /// <summary>
         /// 当前仓储 数据库连接池   1.连接对象 2.是否是主连接对象 3.库名称(切换库时使用)
@@ -52,36 +53,33 @@ namespace Kogel.Repository
         public static void RegisterDataBase(Func<IDbConnection, IDbConnection> connection, string dbName, bool isReplace = false)
         {
             //验证总连接池是否注册过
-            lock (_connectionPool)
+            //不存在时注入到总连接池中
+            if (!_connectionPool.Any(x => x.DbName == dbName))
             {
-                //不存在时注入到总连接池中
-                if (!_connectionPool.Any(x => x.DbName == dbName))
+                //首次测试注册得到连接字符串(防止传空)
+                using (var dbConn = connection.Invoke(null))
                 {
+                    var dbConnection = dbConn as DbConnection;
+                    _connectionPool.Add(new ConnectionPool
+                    {
+                        FuncConnection = connection,
+                        DbName = dbName,
+                        ConnectionString = dbConnection.ConnectionString,
+                        Database = dbConnection.Database,
+                        DataSource = dbConnection.DataSource
+                    });
+                }
+            }
+            else
+            {
+                if (isReplace)
+                {
+                    var connectionPool = _connectionPool.FirstOrDefault(x => x.DbName == dbName);
                     //首次测试注册得到连接字符串(防止传空)
                     using (var dbConn = connection.Invoke(null))
                     {
-                        var dbConnection = dbConn as DbConnection;
-                        _connectionPool.Add(new ConnectionPool
-                        {
-                            FuncConnection = connection,
-                            DbName = dbName,
-                            ConnectionString = dbConnection.ConnectionString,
-                            Database = dbConnection.Database,
-                            DataSource = dbConnection.DataSource
-                        });
-                    }
-                }
-                else
-                {
-                    if (isReplace)
-                    {
-                        var connectionPool = _connectionPool.FirstOrDefault(x => x.DbName == dbName);
-                        //首次测试注册得到连接字符串(防止传空)
-                        using (var dbConn = connection.Invoke(null))
-                        {
-                            connectionPool.FuncConnection = connection;
-                            connectionPool.ConnectionString = dbConn.ConnectionString;
-                        }
+                        connectionPool.FuncConnection = connection;
+                        connectionPool.ConnectionString = dbConn.ConnectionString;
                     }
                 }
             }
@@ -106,39 +104,36 @@ namespace Kogel.Repository
 
                     if (connectionOptions == null)
                     {
-                        lock (_connectionPool)
+                        //如果不存在从总连接池中生存一个新的连接
+                        var connection = _connectionPool.FirstOrDefault(x => x.DbName == dbName);
+                        if (connection == null && dbName == "Orm")
                         {
-                            //如果不存在从总连接池中生存一个新的连接
-                            var connection = _connectionPool.FirstOrDefault(x => x.DbName == dbName);
-                            if (connection == null && dbName == "Orm")
-                            {
-                                connection = _connectionPool.FirstOrDefault();
-                                if (connection == null)
-                                    throw new DapperExtensionException($"请在 OnConfiguring 中配置Connection，DbName：{dbName}");
-
-                                var dbConn = connection.FuncConnection.Invoke(null);
-                                connectionOptions = new ConnectionOptions
-                                {
-                                    Connection = dbConn,
-                                    DbName = connection.DbName,
-                                    IsMaster = true
-                                };
-                            }
-                            else if (connection == null)
-                            {
+                            connection = _connectionPool.FirstOrDefault();
+                            if (connection == null)
                                 throw new DapperExtensionException($"请在 OnConfiguring 中配置Connection，DbName：{dbName}");
-                            }
-                            else
+
+                            var dbConn = connection.FuncConnection.Invoke(null);
+                            connectionOptions = new ConnectionOptions
                             {
-                                var dbConn = connection.FuncConnection.Invoke(null);
-                                connectionOptions = new ConnectionOptions
-                                {
-                                    Connection = dbConn,
-                                    DbName = connection.DbName
-                                };
-                            }
-                            CurrentConnectionPool.Add(connectionOptions);
+                                Connection = dbConn,
+                                DbName = connection.DbName,
+                                IsMaster = true
+                            };
                         }
+                        else if (connection == null)
+                        {
+                            throw new DapperExtensionException($"请在 OnConfiguring 中配置Connection，DbName：{dbName}");
+                        }
+                        else
+                        {
+                            var dbConn = connection.FuncConnection.Invoke(null);
+                            connectionOptions = new ConnectionOptions
+                            {
+                                Connection = dbConn,
+                                DbName = connection.DbName
+                            };
+                        }
+                        CurrentConnectionPool.Add(connectionOptions);
                     }
                 }
                 return connectionOptions;

@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using Dapper;
 using System.Data;
 using System.Threading.Tasks;
+using Kogel.Dapper.Extension.Core.Interfaces;
 
 namespace Kogel.Dapper.Extension.Extension.From
 {
@@ -18,96 +19,96 @@ namespace Kogel.Dapper.Extension.Extension.From
     /// <typeparam name="T"></typeparam>
     public class ISelect<T>
     {
-        private QuerySet<T> querySet { get; }
+        protected QuerySet<T> QuerySet { get; }
         public ISelect(QuerySet<T> querySet)
         {
-            this.querySet = querySet;
+            this.QuerySet = querySet;
         }
-        public QuerySet<T> GetQuerySet()
+        public IQuerySet<T> GetQuerySet()
         {
-            return querySet;
+            return QuerySet;
         }
         public QuerySet<T> Where(LambdaExpression exp)
         {
-            querySet.WhereExpressionList.Add(exp);
-            return querySet;
+            QuerySet.WhereExpressionList.Add(exp);
+            return QuerySet;
         }
         public ISelect<T> OrderBy<TProperty>(Expression<Func<TProperty, object>> field)
         {
             if (field != null)
-                querySet.OrderbyExpressionList.Add(field, EOrderBy.Asc);
+                QuerySet.OrderbyExpressionList.Add(field, EOrderBy.Asc);
             return this;
         }
 
         public ISelect<T> OrderBy(string orderBy)
         {
             if (!string.IsNullOrEmpty(orderBy))
-                querySet.OrderbyBuilder.Append(orderBy);
+                QuerySet.OrderbyBuilder.Append(orderBy);
             return this;
         }
 
         public ISelect<T> OrderByDescing<TProperty>(Expression<Func<TProperty, object>> field)
         {
             if (field != null)
-                querySet.OrderbyExpressionList.Add(field, EOrderBy.Desc);
+                QuerySet.OrderbyExpressionList.Add(field, EOrderBy.Desc);
             return this;
         }
 
         public TReturn Get<TReturn>(LambdaExpression exp)
         {
-            querySet.SqlProvider.Context.Set.SelectExpression = exp;
-            querySet.SqlProvider.FormatGet<T>();
-            return querySet.DbCon.QueryFirst_1<TReturn>(querySet.SqlProvider, querySet.DbTransaction);
+            QuerySet.SqlProvider.Context.Set.SelectExpression = exp;
+            QuerySet.SqlProvider.FormatGet<T>();
+            return QuerySet.DbCon.QueryFirst_1<TReturn>(QuerySet.SqlProvider, QuerySet.DbTransaction);
         }
 
         public async Task<TReturn> GetAsync<TReturn>(LambdaExpression exp)
         {
-            querySet.SqlProvider.Context.Set.SelectExpression = exp;
-            querySet.SqlProvider.FormatGet<T>();
-            return await querySet.DbCon.QueryFirst_1Async<TReturn>(querySet.SqlProvider, querySet.DbTransaction);
+            QuerySet.SqlProvider.Context.Set.SelectExpression = exp;
+            QuerySet.SqlProvider.FormatGet<T>();
+            return await QuerySet.DbCon.QueryFirst_1Async<TReturn>(QuerySet.SqlProvider, QuerySet.DbTransaction);
         }
 
         public IEnumerable<TReturn> ToList<TReturn>(LambdaExpression exp)
         {
-            querySet.SqlProvider.Context.Set.SelectExpression = exp;
-            querySet.SqlProvider.FormatToList<T>();
-            return querySet.DbCon.Query_1<TReturn>(querySet.SqlProvider, querySet.DbTransaction);
+            QuerySet.SqlProvider.Context.Set.SelectExpression = exp;
+            QuerySet.SqlProvider.FormatToList<T>();
+            return QuerySet.DbCon.Query_1<TReturn>(QuerySet.SqlProvider, QuerySet.DbTransaction);
         }
 
         public async Task<IEnumerable<TReturn>> ToListAsync<TReturn>(LambdaExpression exp)
         {
-            querySet.SqlProvider.Context.Set.SelectExpression = exp;
-            querySet.SqlProvider.FormatToList<T>();
-            return await querySet.DbCon.Query_1Async<TReturn>(querySet.SqlProvider, querySet.DbTransaction);
+            QuerySet.SqlProvider.Context.Set.SelectExpression = exp;
+            QuerySet.SqlProvider.FormatToList<T>();
+            return await QuerySet.DbCon.Query_1Async<TReturn>(QuerySet.SqlProvider, QuerySet.DbTransaction);
         }
 
         public DataSet ToDataSet<TReturn>(LambdaExpression exp, IDbDataAdapter dataAdapter = null)
         {
-            querySet.SqlProvider.Context.Set.SelectExpression = exp;
-            querySet.SqlProvider.FormatToList<T>();
-            return querySet.DbCon.QueryDataSets(querySet.SqlProvider, querySet.DbTransaction, dataAdapter);
+            QuerySet.SqlProvider.Context.Set.SelectExpression = exp;
+            QuerySet.SqlProvider.FormatToList<T>();
+            return QuerySet.DbCon.QueryDataSets(QuerySet.SqlProvider, QuerySet.DbTransaction, dataAdapter);
         }
 
         public async Task<DataSet> ToDataSetAsync<TReturn>(LambdaExpression exp, IDbDataAdapter dataAdapter = null)
         {
-            querySet.SqlProvider.Context.Set.SelectExpression = exp;
-            querySet.SqlProvider.FormatToList<T>();
-            return await querySet.DbCon.QueryDataSetsAsync(querySet.SqlProvider, querySet.DbTransaction, dataAdapter);
+            QuerySet.SqlProvider.Context.Set.SelectExpression = exp;
+            QuerySet.SqlProvider.FormatToList<T>();
+            return await QuerySet.DbCon.QueryDataSetsAsync(QuerySet.SqlProvider, QuerySet.DbTransaction, dataAdapter);
         }
 
         public PageList<TReturn> PageList<TReturn>(int pageIndex, int pageSize, LambdaExpression exp)
         {
-            querySet.SqlProvider.Context.Set.SelectExpression = exp;
+            QuerySet.SqlProvider.Context.Set.SelectExpression = exp;
             //查询总行数
-            querySet.SqlProvider.FormatCount();
-            var pageTotal = querySet.DbCon.QuerySingle<int>(querySet.SqlProvider.SqlString, querySet.SqlProvider.Params);
+            QuerySet.SqlProvider.FormatCount();
+            var pageTotal = QuerySet.DbCon.QuerySingle<int>(QuerySet.SqlProvider.SqlString, QuerySet.SqlProvider.Params);
             //查询数据
             List<TReturn> itemList;
-            querySet.SqlProvider.Clear();
+            QuerySet.SqlProvider.Clear();
             if (pageTotal != 0)
             {
-                querySet.SqlProvider.FormatToPageList<T>(pageIndex, pageSize);
-                itemList = querySet.DbCon.Query_1<TReturn>(querySet.SqlProvider, querySet.DbTransaction);
+                QuerySet.SqlProvider.FormatToPageList<T>(pageIndex, pageSize);
+                itemList = QuerySet.DbCon.Query_1<TReturn>(QuerySet.SqlProvider, QuerySet.DbTransaction);
             }
             else
             {
@@ -118,17 +119,17 @@ namespace Kogel.Dapper.Extension.Extension.From
 
         public async Task<PageList<TReturn>> PageListAsync<TReturn>(int pageIndex, int pageSize, LambdaExpression exp)
         {
-            querySet.SqlProvider.Context.Set.SelectExpression = exp;
+            QuerySet.SqlProvider.Context.Set.SelectExpression = exp;
             //查询总行数
-            querySet.SqlProvider.FormatCount();
-            var pageTotal = await querySet.DbCon.QuerySingleAsync<int>(querySet.SqlProvider.SqlString, querySet.SqlProvider.Params);
+            QuerySet.SqlProvider.FormatCount();
+            var pageTotal = await QuerySet.DbCon.QuerySingleAsync<int>(QuerySet.SqlProvider.SqlString, QuerySet.SqlProvider.Params);
             //查询数据
             List<TReturn> itemList;
-            querySet.SqlProvider.Clear();
+            QuerySet.SqlProvider.Clear();
             if (pageTotal != 0)
             {
-                querySet.SqlProvider.FormatToPageList<T>(pageIndex, pageSize);
-                itemList = await querySet.DbCon.Query_1Async<TReturn>(querySet.SqlProvider, querySet.DbTransaction);
+                QuerySet.SqlProvider.FormatToPageList<T>(pageIndex, pageSize);
+                itemList = await QuerySet.DbCon.Query_1Async<TReturn>(QuerySet.SqlProvider, QuerySet.DbTransaction);
             }
             else
             {

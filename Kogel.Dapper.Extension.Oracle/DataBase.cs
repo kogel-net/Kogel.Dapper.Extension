@@ -17,33 +17,51 @@ namespace Kogel.Dapper.Extension.Oracle
 			SqlMapper.RemoveTypeMap(typeof(bool));
 			SqlMapper.AddTypeHandler(typeof(bool), new BoolTypeHanlder());
 		}
-		/// <summary>
-		/// 用来解决表达式树不能使用默认参数
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="sqlConnection"></param>
-		/// <returns></returns>
-		public static IQuerySet<T> QuerySet<T>(this IDbConnection sqlConnection)
-		{
-			return new QuerySet<T>(sqlConnection, new OracleSqlProvider(), null);
-		}
-		public static IQuerySet<T> QuerySet<T>(this IDbConnection sqlConnection, IDbTransaction dbTransaction = null)
-		{
-			return new QuerySet<T>(sqlConnection, new OracleSqlProvider(), dbTransaction);
-		}
-		/// <summary>
-		/// 用来解决表达式树不能使用默认参数
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="sqlConnection"></param>
-		/// <returns></returns>
-		public static ICommandSet<T> CommandSet<T>(this IDbConnection sqlConnection)
-		{
-			return new CommandSet<T>(sqlConnection, new OracleSqlProvider(), null);
-		}
-		public static ICommandSet<T> CommandSet<T>(this IDbConnection sqlConnection, IDbTransaction dbTransaction = null)
-		{
-			return new CommandSet<T>(sqlConnection, new OracleSqlProvider(), dbTransaction);
-		}
-	}
+
+        /// <summary>
+        /// 查询
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sqlConnection"></param>
+        /// <returns></returns>
+        public static IQuerySet<T> QuerySet<T>(this IDbConnection sqlConnection)
+        {
+            return QuerySet<T>(sqlConnection, null);
+        }
+
+        /// <summary>
+        /// 查询(带事务)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sqlConnection"></param>
+        /// <param name="dbTransaction"></param>
+        /// <returns></returns>
+        public static IQuerySet<T> QuerySet<T>(this IDbConnection sqlConnection, IDbTransaction dbTransaction)
+        {
+            return new QuerySet<T>(sqlConnection, new OracleSqlProvider(), dbTransaction);
+        }
+
+        /// <summary>
+        /// 编辑
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sqlConnection"></param>
+        /// <returns></returns>
+        public static ICommandSet<T> CommandSet<T>(this IDbConnection sqlConnection)
+        {
+            return CommandSet<T>(sqlConnection);
+        }
+
+        /// <summary>
+        /// 编辑(带事务)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sqlConnection"></param>
+        /// <param name="dbTransaction"></param>
+        /// <returns></returns>
+        public static ICommandSet<T> CommandSet<T>(this IDbConnection sqlConnection, IDbTransaction dbTransaction)
+        {
+            return new CommandSet<T>(sqlConnection, new OracleSqlProvider(), dbTransaction);
+        }
+    }
 }
