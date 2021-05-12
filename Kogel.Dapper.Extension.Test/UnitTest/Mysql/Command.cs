@@ -34,8 +34,6 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
                 //repository.UnitOfWork.Rollback();
 
-                repository.ChangeDataBase("master");
-
                 // var json = JsonConvert.SerializeObject(repository.Orm.Query("SELECT * FROM customer_pay_info LIMIT 1"));
 
 

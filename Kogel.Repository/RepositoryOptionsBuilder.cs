@@ -105,7 +105,7 @@ namespace Kogel.Repository
                     if (connectionOptions == null)
                     {
                         //如果不存在从总连接池中生存一个新的连接
-                        var connection = _connectionPool.FirstOrDefault(x => x.DbName == dbName);
+                        var connection = _connectionPool.FirstOrDefault(x => (x.DbName == dbName) || (dbName == "Orm" && x.DbName == "master"));
                         if (connection == null && dbName == "Orm")
                         {
                             connection = _connectionPool.FirstOrDefault();
