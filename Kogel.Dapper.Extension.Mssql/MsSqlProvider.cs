@@ -189,17 +189,16 @@ namespace Kogel.Dapper.Extension
             return this;
         }
 
-        public override SqlProvider FormatUpdate<T>(T entity, string[] excludeFields, bool isBatch = false)
+        public override SqlProvider FormatUpdate<T>(T entity, string[] excludeFields)
         {
-            var update = ResolveExpression.ResolveUpdates<T>(entity, Params, excludeFields, isBatch);
+            var update = ResolveExpression.ResolveUpdates<T>(entity, Params, excludeFields);
 
             ProviderOption.IsAsName = false;
 
             var whereSql = ResolveExpression.ResolveWhereList();
             //如果不存在条件，就用主键作为条件
-            if (!isBatch)
-                if (whereSql.Trim().Equals("WHERE 1=1"))
-                    whereSql += GetIdentityWhere(entity, Params);
+            if (whereSql.Trim().Equals("WHERE 1=1"))
+                whereSql += GetIdentityWhere(entity, Params);
 
             SqlString = $"UPDATE {FormatTableName(false, false)} {update} {whereSql}";
             return this;

@@ -79,7 +79,7 @@ namespace Kogel.Dapper.Extension
 
         public abstract SqlProvider FormatUpdate<T>(Expression<Func<T, T>> updateExpression);
 
-        public abstract SqlProvider FormatUpdate<T>(T entity, string[] excludeFields, bool isBatch = false);
+        public abstract SqlProvider FormatUpdate<T>(T entity, string[] excludeFields);
 
         public abstract SqlProvider FormatSum(LambdaExpression sumExpression);
 

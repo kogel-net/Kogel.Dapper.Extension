@@ -194,48 +194,36 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// <param name="t"></param>
         /// <param name="Param"></param>
         /// <param name="excludeFields"></param>
-        /// <param name="isBatch">是否批量修改</param>
         /// <returns></returns>
-        public virtual string ResolveUpdates<T>(object entityValue, DynamicParameters param, string[] excludeFields, bool isBatch = false)
+        public virtual string ResolveUpdates<T>(object entityValue, DynamicParameters param, string[] excludeFields)
         {
             var entity = EntityCache.QueryEntity(typeof(T));
-            var properties = entity.Properties;
             StringBuilder builder = new StringBuilder();
-            foreach (var propertiy in properties)
+            foreach (var entityField in entity.EntityFieldList)
             {
+                string name = entityField.FieldName;
                 //是否是排除字段
-                if (excludeFields != null && excludeFields.Contains(propertiy.Name))
+                if (excludeFields != null && (excludeFields.Contains(entityField.PropertyInfo.Name) || excludeFields.Contains(name)))
                 {
                     continue;
                 }
-                var customAttributes = propertiy.GetCustomAttributess(true);
-                //导航属性排除
-                if (customAttributes.Any(x => x.GetType().Equals(typeof(ForeignKey))))
+                //var customAttributes = entityField.PropertyInfo.GetCustomAttributess(true);
+                ////导航属性排除
+                //if (customAttributes.Any(x => x.GetType().Equals(typeof(ForeignKey))))
+                //{
+                //    continue;
+                //}
+                //是否自增
+                if (entityField.IsIncrease)
                 {
                     continue;
                 }
-                //主键标识
-                var typeAttribute = customAttributes.FirstOrDefault(x => x.GetType().Equals(typeof(Identity)));
-                if (typeAttribute != null)
-                {
-                    var identity = typeAttribute as Identity;
-                    //是否自增
-                    if (identity.IsIncrease)
-                    {
-                        continue;
-                    }
-                }
-                object value = propertiy.GetValue(entityValue);
-                string name = entity.FieldPairs[propertiy.Name];
+                object value = entityField.PropertyInfo.GetValue(entityValue);
                 if (builder.Length != 0)
                 {
                     builder.Append(",");
                 }
-                string paramName = string.Empty;
-                if (!isBatch)
-                    paramName = $"{providerOption.ParameterPrefix}Update_{param.ParameterNames.Count()}";
-                else
-                    paramName = $"{providerOption.ParameterPrefix}Update_{name}";
+                string paramName = $"{providerOption.ParameterPrefix}Update_{name}_{param.ParameterNames.Count()}";
                 builder.Append($"{providerOption.CombineFieldName(name)}={paramName}");
                 param.Add($"{paramName}", value);
             }

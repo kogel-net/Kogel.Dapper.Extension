@@ -64,16 +64,16 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
                 }
 
-                List<Task> tasks = new List<Task>();
+               // List<Task> tasks = new List<Task>();
 
-                tasks.Add(Task.Run(async () =>
-               {
-                   var result1 = await repository.CommandSet<FlowOrder>()
-                     .InsertAsync(flowOrders);
-                   Console.WriteLine(result1);
-               }));
+               // tasks.Add(Task.Run(async () =>
+               //{
+               //    var result1 = await repository.CommandSet<FlowOrder>()
+               //      .InsertAsync(flowOrders);
+               //    Console.WriteLine(result1);
+               //}));
 
-                Task.WaitAll(tasks.ToArray());
+               // Task.WaitAll(tasks.ToArray());
 
 
                 var result = repository.CommandSet<FlowOrder>()
@@ -88,6 +88,8 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                         Id = x.Id,
                         AccountCode = x.AccountCode
                     });
+
+
 
                 result = repository.CommandSet<FlowOrder>()
                    .Delete(testData);
