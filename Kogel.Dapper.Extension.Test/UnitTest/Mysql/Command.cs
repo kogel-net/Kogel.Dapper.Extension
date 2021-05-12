@@ -8,6 +8,8 @@ using System;
 using Newtonsoft.Json;
 using Kogel.Dapper.Extension.MySql.Extension;
 using Kogel.Dapper.Extension.MySql;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 {
@@ -32,9 +34,10 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
                 //repository.UnitOfWork.Rollback();
 
-                //repository.ChangeDataBase("fps_test");
+                repository.ChangeDataBase("master");
 
                 // var json = JsonConvert.SerializeObject(repository.Orm.Query("SELECT * FROM customer_pay_info LIMIT 1"));
+
 
 
                 var flowOrders = repository.QuerySet<FlowOrder>()
@@ -62,6 +65,18 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
 
                 }
+
+                List<Task> tasks = new List<Task>();
+
+                tasks.Add(Task.Run(async () =>
+               {
+                   var result1 = await repository.CommandSet<FlowOrder>()
+                     .InsertAsync(flowOrders);
+                   Console.WriteLine(result1);
+               }));
+
+                Task.WaitAll(tasks.ToArray());
+
 
                 var result = repository.CommandSet<FlowOrder>()
                      .Update(flowOrders);
