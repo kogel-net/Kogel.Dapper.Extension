@@ -15,7 +15,7 @@ namespace Kogel.Dapper.Extension.MsSql
         /// <returns></returns>
         public static IQuerySet<T> QuerySet<T>(this IDbConnection sqlConnection)
         {
-            return QuerySet<T>(sqlConnection, null);
+            return new QuerySet<T>(sqlConnection, new MsSqlProvider());
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace Kogel.Dapper.Extension.MsSql
         /// <returns></returns>
         public static ICommandSet<T> CommandSet<T>(this IDbConnection sqlConnection)
         {
-            return CommandSet<T>(sqlConnection);
+            return new CommandSet<T>(sqlConnection, new MsSqlProvider());
         }
 
         /// <summary>
