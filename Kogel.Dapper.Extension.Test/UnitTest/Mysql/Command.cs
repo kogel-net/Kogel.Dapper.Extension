@@ -22,15 +22,16 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
             //正常模式下仓储使用
             using (var repository = new FlowOrderRepository())
             {
-                //repository.UnitOfWork.BeginTransaction(() =>
-                //{
+                repository.UnitOfWork.BeginTransaction(() =>
+                {
+                    var flowList = repository.QuerySet()
+                           .Top(10)
+                           .ToList();
 
-                //    var flowList = repository.QuerySet()
-                //           .NotUnitOfWork()
-                //           .ToList();
+                    var count = repository.Insert(flowList);
 
-                //    var count = repository.Insert(flowList);
-                //});
+                   
+                });
 
                 //repository.UnitOfWork.Rollback();
 

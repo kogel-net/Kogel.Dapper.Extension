@@ -72,8 +72,11 @@ namespace Kogel.Repository
         /// <param name="command"></param>
         private void Aop_OnExecuting(ref CommandDefinition command)
         {
+            var commandConnection = command.Connection as DbConnection;
+            var dbConnection = this.Connection as DbConnection;
             //相同数据库链接才会进入单元事务
-            if (command.Connection.ConnectionString.Contains(this.Connection.ConnectionString))
+            if (command.Connection.ConnectionString.Contains(this.Connection.ConnectionString)
+                || (commandConnection.DataSource == dbConnection.DataSource && commandConnection.Database == dbConnection.Database))
             {
                 //是否进入过工作单元(防止循环嵌套UnitOfWork)
                 if (!command.IsUnitOfWork)
@@ -82,7 +85,6 @@ namespace Kogel.Repository
                     //是否排除在工作单元外
                     if (command.IsExcludeUnitOfWork)
                     {
-                        var dbConnection = this.Connection as DbConnection;
                         var connectionFunc = RepositoryOptionsBuilder._connectionPool
                             .FirstOrDefault(x =>
                                 (x.ConnectionString.Contains(this.Connection.ConnectionString))
