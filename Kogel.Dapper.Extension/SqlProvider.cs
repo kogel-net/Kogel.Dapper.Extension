@@ -107,7 +107,7 @@ namespace Kogel.Dapper.Extension
         /// <param name="tableType">连接查询时会用到</param>
         /// <returns></returns>
 
-        public string FormatTableName(bool isNeedFrom = true, bool isAsName = true, Type tableType = null)
+        public virtual string FormatTableName(bool isNeedFrom = true, bool isAsName = true, Type tableType = null)
         {
             //实体解析类型
             var entity = EntityCache.QueryEntity(tableType == null ? Context.Set.TableType : tableType);
@@ -156,12 +156,12 @@ namespace Kogel.Dapper.Extension
         /// <typeparam name="T"></typeparam>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public string GetIdentityWhere<T>(T entity, DynamicParameters param = null)
+        public virtual string GetIdentityWhere<T>(T entity, DynamicParameters param = null)
         {
             var entityObject = EntityCache.QueryEntity(typeof(T));
             if (string.IsNullOrEmpty(entityObject.Identitys))
                 throw new DapperExtensionException("主键不存在!请前往实体类使用[Identity]特性设置主键。");
-        
+
             //设置参数
             if (param != null)
             {
@@ -170,6 +170,27 @@ namespace Kogel.Dapper.Extension
                     .FirstOrDefault(x => x.FieldName == entityObject.Identitys)
                     .PropertyInfo
                     .GetValue(entity);
+                param.Add(entityObject.Identitys, id);
+            }
+            return $" AND {entityObject.Identitys}={ProviderOption.ParameterPrefix}{entityObject.Identitys} ";
+        }
+
+        /// <summary>
+        /// 根据主键获取条件
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="id"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public virtual string GetIdentityWhere<T>(object id, DynamicParameters param = null)
+        {
+            var entityObject = EntityCache.QueryEntity(typeof(T));
+            if (string.IsNullOrEmpty(entityObject.Identitys))
+                throw new DapperExtensionException("主键不存在!请前往实体类使用[Identity]特性设置主键。");
+
+            //设置参数
+            if (param != null)
+            {
                 param.Add(entityObject.Identitys, id);
             }
             return $" AND {entityObject.Identitys}={ProviderOption.ParameterPrefix}{entityObject.Identitys} ";

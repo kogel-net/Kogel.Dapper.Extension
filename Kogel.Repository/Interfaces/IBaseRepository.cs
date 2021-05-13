@@ -13,14 +13,14 @@ namespace Kogel.Repository.Interfaces
 	public interface IBaseRepository<T>: IDisposable
 	{
 		/// <summary>
-		/// 
+		/// 当前的连接对象
 		/// </summary>
 		IDbConnection Orm { get; }
 
 		/// <summary>
 		/// 改变当前连接库（分库时可能会用到）
 		/// </summary>
-		/// <param name="dbConnection"></param>
+		/// <param name="dbName"></param>
 		void ChangeDataBase(string dbName = "master");
 
 		/// <summary>
@@ -87,12 +87,21 @@ namespace Kogel.Repository.Interfaces
 		/// <summary>
 		/// 根据主键获取当前实体数据
 		/// </summary>
+		/// <param name="id"></param>
 		/// <returns></returns>
 		T FindById(object id);
 
 		/// <summary>
+		/// 根据主键获取当前实体数据
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		Task<T> FindByIdAsync(object id);
+
+		/// <summary>
 		/// 新增
 		/// </summary>
+		/// <param name="entity"></param>
 		/// <returns></returns>
 		int Insert(T entity);
 
@@ -104,15 +113,45 @@ namespace Kogel.Repository.Interfaces
 		int Insert(IEnumerable<T> entitys);
 
 		/// <summary>
+		/// 新增
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <returns></returns>
+		Task<int> InsertAsync(T entity);
+
+		/// <summary>
+		/// 批量新增
+		/// </summary>
+		/// <param name="entitys"></param>
+		/// <returns></returns>
+		Task<int> InsertAsync(IEnumerable<T> entitys);
+
+		/// <summary>
 		/// 删除(根据主键)
 		/// </summary>
+		/// <param name="id"></param>
 		/// <returns></returns>
 		int Delete(object id);
 
 		/// <summary>
+		/// 删除(根据主键)
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		Task<int> DeleteAsync(object id);
+
+		/// <summary>
 		/// 修改(根据主键)
 		/// </summary>
+		/// <param name="entity"></param>
 		/// <returns></returns>
 		int Update(T entity);
+
+		/// <summary>
+		/// 修改(根据主键)
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <returns></returns>
+		Task<int> UpdateAsync(T entity);
 	}
 }

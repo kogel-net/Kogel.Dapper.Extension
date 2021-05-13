@@ -22,7 +22,7 @@ namespace Kogel.Repository
         public RepositoryOptionsBuilder Options { get; set; }
 
         /// <summary>
-        /// 当前主连接对象
+        /// 当前的连接对象
         /// </summary>
         public IDbConnection Orm { get => Options.GetConnection("Orm")?.Connection ?? throw new DapperExtensionException("请在 OnConfiguring 中配置Connection"); }
 
@@ -193,16 +193,25 @@ namespace Kogel.Repository
         /// <returns></returns>
         public T FindById(object id)
         {
-            var entityObject = EntityCache.QueryEntity(typeof(T));
-            if (string.IsNullOrEmpty(entityObject.Identitys))
-                throw new DapperExtensionException("主键不存在!请前往实体类使用[Identity]特性设置主键。");
-            //设置参数
             DynamicParameters param = new DynamicParameters();
-            param.Add(entityObject.Identitys, id);
-            return this.QuerySet()
-                .Where($@"{this.Options.Provider.ProviderOption.CombineFieldName(entityObject.Identitys)}
-                 ={Options.Provider.ProviderOption.ParameterPrefix}{entityObject.Identitys}", param)
+            string whereSql = Options.Provider.GetIdentityWhere<T>(id, param);
+            return QuerySet()
+                .Where($" 1=1 {whereSql}", param)
                 .Get();
+        }
+
+        /// <summary>
+        /// 根据主键获取当前实体数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<T> FindByIdAsync(object id)
+        {
+            DynamicParameters param = new DynamicParameters();
+            string whereSql = Options.Provider.GetIdentityWhere<T>(id, param);
+            return await QuerySet()
+                .Where($" 1=1 {whereSql}", param)
+                .GetAsync();
         }
 
         /// <summary>
@@ -212,7 +221,17 @@ namespace Kogel.Repository
         /// <returns></returns>
         public int Insert(T entity)
         {
-            return this.CommandSet().Insert(entity);
+            return CommandSet().Insert(entity);
+        }
+
+        /// <summary>
+        /// 新增
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<int> InsertAsync(T entity)
+        {
+            return await CommandSet().InsertAsync(entity);
         }
 
         /// <summary>
@@ -222,7 +241,17 @@ namespace Kogel.Repository
 		/// <returns></returns>
 		public int Insert(IEnumerable<T> entitys)
         {
-            return this.CommandSet().Insert(entitys);
+            return CommandSet().Insert(entitys);
+        }
+
+        /// <summary>
+        /// 批量新增
+        /// </summary>
+        /// <param name="entitys"></param>
+        /// <returns></returns>
+        public async Task<int> InsertAsync(IEnumerable<T> entitys)
+        {
+            return await CommandSet().InsertAsync(entitys);
         }
 
         /// <summary>
@@ -232,16 +261,25 @@ namespace Kogel.Repository
         /// <returns></returns>
         public int Delete(object id)
         {
-            var entityObject = EntityCache.QueryEntity(typeof(T));
-            if (string.IsNullOrEmpty(entityObject.Identitys))
-                throw new DapperExtensionException("主键不存在!请前往实体类使用[Identity]特性设置主键。");
-            //设置参数
             DynamicParameters param = new DynamicParameters();
-            param.Add(entityObject.Identitys, id);
-            return this.CommandSet()
-                .Where($@"{this.Options.Provider.ProviderOption.CombineFieldName(entityObject.Identitys)}
-                 ={Options.Provider.ProviderOption.ParameterPrefix}{entityObject.Identitys}", param)
+            string whereSql = Options.Provider.GetIdentityWhere<T>(id, param);
+            return CommandSet()
+                .Where($" 1=1 {whereSql}", param)
                 .Delete();
+        }
+
+        /// <summary>
+        /// 删除(根据主键)
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteAsync(object id)
+        {
+            DynamicParameters param = new DynamicParameters();
+            string whereSql = Options.Provider.GetIdentityWhere<T>(id, param);
+            return await CommandSet()
+                .Where($" 1=1 {whereSql}", param)
+                .DeleteAsync();
         }
 
         /// <summary>
@@ -251,20 +289,25 @@ namespace Kogel.Repository
         /// <returns></returns>
         public int Update(T entity)
         {
-            var entityObject = EntityCache.QueryEntity(typeof(T));
-            if (string.IsNullOrEmpty(entityObject.Identitys))
-                throw new DapperExtensionException("主键不存在!请前往实体类使用[Identity]特性设置主键。");
-            //获取主键数据
-            var id = entityObject.EntityFieldList
-                .First(x => x.IsIdentity).PropertyInfo
-                .GetValue(entity);
-            //设置参数
             DynamicParameters param = new DynamicParameters();
-            param.Add(entityObject.Identitys, id);
-            return this.CommandSet()
-                .Where($@"{this.Options.Provider.ProviderOption.CombineFieldName(entityObject.Identitys)}
-                ={Options.Provider.ProviderOption.ParameterPrefix}{entityObject.Identitys}", param)
+            string whereSql = Options.Provider.GetIdentityWhere(entity, param);
+            return CommandSet()
+                .Where($" 1=1 {whereSql}", param)
                 .Update(entity);
+        }
+
+        /// <summary>
+        /// 修改
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateAsync(T entity)
+        {
+            DynamicParameters param = new DynamicParameters();
+            string whereSql = Options.Provider.GetIdentityWhere(entity, param);
+            return await CommandSet()
+                .Where($" 1=1 {whereSql}", param)
+                .UpdateAsync(entity);
         }
 
         /// <summary>

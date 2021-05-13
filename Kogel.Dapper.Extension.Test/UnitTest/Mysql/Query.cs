@@ -71,7 +71,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
             using (var divReposirory = conn.QuerySet<FlowOrder>().GetRepository())
             {
                 //使用自定义仓储
-                var flowOrder = divReposirory.FindById(1);
+                var flowOrder = divReposirory.FindById(4);
 
 
                 var tupleList = divReposirory.QuerySet()
