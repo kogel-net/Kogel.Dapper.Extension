@@ -56,7 +56,7 @@ namespace Kogel.Repository
             }
             catch (Exception ex)
             {
-                this.Rollback();
+                //this.Rollback();此处回滚无效
                 throw ex;
             }
             finally

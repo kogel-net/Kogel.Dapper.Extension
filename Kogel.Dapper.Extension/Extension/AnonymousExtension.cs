@@ -77,7 +77,7 @@ namespace Kogel.Dapper.Extension.Extension
                             var item = properties[i];
                             var value = reader[item.Name];
                             if (value != DBNull.Value)
-                                value = Convert.ChangeType(value, item.PropertyType);
+                                value = Convert.ChangeType(value, item.PropertyType.GetAnonymousFieldType());
                             else
                                 value = default;
                             array[i] = value;

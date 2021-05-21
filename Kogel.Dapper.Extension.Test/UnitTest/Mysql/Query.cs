@@ -34,36 +34,42 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
             //正常模式下仓储使用
             using (var repository = new FlowOrderRepository())
             {
+                repository.UnitOfWork.BeginTransaction(() =>
+                {
 
-                var flowOrder = repository.QuerySet()
-                  .ResetTableName(typeof(FlowOrder), "flow_order_1")
-                  .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
-                  .From<FlowOrder, FlowOrder>()
-                  .Where((a, b) => a.Id == 1)
-                  .GetQuerySet()
-                  .Get();
+                    var flowOrder = repository.QuerySet()
+                      .ResetTableName(typeof(FlowOrder), "flow_order_1")
+                      .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
+                      .From<FlowOrder, FlowOrder>()
+                      .Where((a, b) => a.Id == 1)
+                      .GetQuerySet()
+                      .Get();
 
-       
+                    Convert.ToInt32("sss");
 
 
-                //切换数据库
-                repository.ChangeDataBase("fps_2021");
 
-                var gc_Fps_FlowOrder = repository.QuerySet()
-                    .ResetTableName(typeof(FlowOrder), "flow_order_1")
-                    .Where(x => x.DeliveredTime.HasValue && x.CustomerCode.StartsWith("test"))
-                    .Top(10)
-                    .OrderBy("")
-                    .ToList();
+                    //切换数据库
+                    repository.ChangeDataBase("fps_2021");
 
-                repository.ChangeDataBase("master");
+                    var gc_Fps_FlowOrder = repository.QuerySet()
+                        .ResetTableName(typeof(FlowOrder), "flow_order_1")
+                        .Where(x => x.DeliveredTime.HasValue && x.CustomerCode.StartsWith("test"))
+                        .Top(10)
+                        .OrderBy("")
+                        .ToList();
 
-                gc_Fps_FlowOrder = repository.QuerySet()
-                  .ResetTableName(typeof(FlowOrder), "flow_order_1")
-                  .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
-                  .Top(10)
-                  .ToList();
+                    repository.ChangeDataBase("master");
 
+                    gc_Fps_FlowOrder = repository.QuerySet()
+                      .ResetTableName(typeof(FlowOrder), "flow_order_1")
+                      .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
+                      .Top(10)
+                      .ToList();
+
+                }, System.Data.IsolationLevel.RepeatableRead);
+
+                repository.UnitOfWork.Rollback();
             }
 
             var conn = new MySqlConnection("server=localhost;port=3306;user id=root;password=A5101264a;database=gc_fps_receivable;");
