@@ -39,13 +39,14 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
                     var flowOrder = repository.QuerySet()
                       .ResetTableName(typeof(FlowOrder), "flow_order_1")
-                      .Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
+                      //.Where(x => x.DeliveredTime.HasValue && x.CustomerCode == "test")
+                      .WhereIf(false, x => x.CustomerCode == "test", x => 1 == 1)
                       .From<FlowOrder, FlowOrder>()
                       .Where((a, b) => a.Id == 1)
                       .GetQuerySet()
                       .Get();
 
-                    Convert.ToInt32("sss");
+                    //Convert.ToInt32("sss");
 
 
 

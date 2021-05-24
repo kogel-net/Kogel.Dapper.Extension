@@ -142,6 +142,7 @@ namespace Kogel.Dapper.Extension.Extension
             return data;
         }
         #endregion
+
         #region 导航拓展
         private static readonly MethodInfo _SetValueMethod = typeof(AnonymousExtension).GetMethod("SetValue");
         /// <summary>
@@ -181,6 +182,7 @@ namespace Kogel.Dapper.Extension.Extension
             }
             return data;
         }
+
         /// <summary>
         /// 执行对象并写入值到对象中
         /// </summary>
@@ -204,7 +206,6 @@ namespace Kogel.Dapper.Extension.Extension
                     property.SetValue(data, firstData);
             }
         }
-
 
         private static readonly MethodInfo _SetListValueMethod = typeof(AnonymousExtension).GetMethod("SetListValue");
         /// <summary>
@@ -252,6 +253,7 @@ namespace Kogel.Dapper.Extension.Extension
             }
             return data;
         }
+
         /// <summary>
         /// 执行对象并写入值到对象中
         /// </summary>
@@ -268,25 +270,26 @@ namespace Kogel.Dapper.Extension.Extension
             PropertyInfo property = EntityCache.QueryEntity(typeof(T)).Properties.FirstOrDefault(x => x.Name.Equals(memberName));
             //执行sql
             var mapperGridList = dbCon.QueryMultiple(sql, param);
-            var count = 0;
-            foreach (var item in data)
+            //根据list关联的条件把值分配回去
+            //ToList
+            if (property.PropertyType.FullName.Contains("System.Collections.Generic.List"))
             {
-                //根据list关联的条件把值分配回去
-                //ToList
-                if (property.PropertyType.FullName.Contains("System.Collections.Generic.List"))
+                foreach (var item in data)
                 {
                     var mapperDataList = mapperGridList.Read<T1>();
-                    property.SetValue(data[count], mapperDataList);
+                    property.SetValue(item, mapperDataList);
                 }
-                else
-                {
-                    //Get
-                    var mapperData = mapperGridList.ReadSingleOrDefault<T1>();
-                    property.SetValue(data[count], mapperData);
-                }
-                count++;
             }
+            else
+            {
+                //Get
+                foreach (var item in data)
+                {            
+                    var mapperData = mapperGridList.ReadSingleOrDefault<T1>();
+                    property.SetValue(item, mapperData);
+                }
+            }
+            #endregion
         }
-        #endregion
     }
 }

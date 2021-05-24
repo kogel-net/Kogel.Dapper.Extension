@@ -507,7 +507,7 @@ namespace Kogel.Dapper.Extension.Expressions
         /// <returns></returns>
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            if (FieldName != null)
+            if (!string.IsNullOrEmpty(FieldName))
             {
                 SpliceField.Append(ParamName);
                 Param.Add(ParamName, node.ToConvertAndGetValue());
