@@ -191,7 +191,7 @@ namespace Kogel.Dapper.Extension
 
         public override SqlProvider FormatUpdate<T>(T entity, string[] excludeFields)
         {
-            var update = ResolveExpression.ResolveUpdates<T>(entity, Params, excludeFields);
+            var update = ResolveExpression.ResolveUpdate(entity, Params, excludeFields);
 
             ProviderOption.IsAsName = false;
 
@@ -201,6 +201,11 @@ namespace Kogel.Dapper.Extension
                 whereSql += GetIdentityWhere(entity, Params);
 
             SqlString = $"UPDATE {FormatTableName(false, false)} {update} {whereSql}";
+            return this;
+        }
+
+        public override SqlProvider FormatUpdate<T>(IEnumerable<T> entity, string[] excludeFields)
+        {
             return this;
         }
 

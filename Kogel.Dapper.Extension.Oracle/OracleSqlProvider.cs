@@ -145,7 +145,7 @@ namespace Kogel.Dapper.Extension.Oracle
 
         public override SqlProvider FormatInsert<T>(T entity, string[] excludeFields)
         {
-            SqlString = ResolveExpression.ResolveBulkInsert<T>(new List<T> { entity }, excludeFields);
+            SqlString = ResolveExpression.ResolveBulkInsert(new List<T> { entity }, excludeFields);
             return this;
         }
 
@@ -197,7 +197,7 @@ namespace Kogel.Dapper.Extension.Oracle
 
         public override SqlProvider FormatUpdate<T>(T entity, string[] excludeFields)
         {
-            var update = ResolveExpression.ResolveUpdates<T>(entity, Params, excludeFields);
+            var update = ResolveExpression.ResolveUpdate<T>(entity, Params, excludeFields);
             var fromTableSql = FormatTableName(false, false);
 
             ProviderOption.IsAsName = false;
@@ -208,6 +208,11 @@ namespace Kogel.Dapper.Extension.Oracle
                 whereSql += GetIdentityWhere(entity, Params);
 
             SqlString = $"UPDATE {fromTableSql} {update} {whereSql}";
+            return this;
+        }
+
+        public override SqlProvider FormatUpdate<T>(IEnumerable<T> entity, string[] excludeFields)
+        {
             return this;
         }
 

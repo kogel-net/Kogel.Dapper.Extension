@@ -3,6 +3,9 @@ using Kogel.Dapper.Extension.Attributes;
 using System.Linq;
 using System.Reflection;
 using Kogel.Dapper.Extension;
+using System.Data;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Kogel.Dapper.Extension.Extension
 {
@@ -68,6 +71,45 @@ namespace Kogel.Dapper.Extension.Extension
             {
                 return type;
             }
+        }
+
+        /// <summary>
+        /// list 转dataset
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entites"></param>
+        /// <returns></returns>
+        public static DataSet ToDataSet<T>(this IEnumerable<T> entites, string[] excludeFields = null)
+        {
+            var entityObject = EntityCache.QueryEntity(typeof(T));
+            DataSet dataSet = new DataSet();
+            DataTable dataTable = new DataTable(entityObject.Name);
+
+            foreach (var field in entityObject.EntityFieldList)
+            {
+                //排除字段
+                if (excludeFields != null && excludeFields.Contains(field.FieldName))
+                {
+                    continue;
+                }
+                dataTable.Columns.Add(field.FieldName);
+            }
+            foreach (var item in entites)
+            {
+                DataRow dataRow = dataTable.NewRow();
+                foreach (var field in entityObject.EntityFieldList)
+                {
+                    //排除字段
+                    if (excludeFields != null && excludeFields.Contains(field.FieldName))
+                    {
+                        continue;
+                    }
+                    dataRow[field.FieldName] = field.PropertyInfo.GetValue(item);
+                }
+                dataTable.Rows.Add(dataRow);
+            }
+            dataSet.Tables.Add(dataTable);
+            return dataSet;
         }
     }
 }

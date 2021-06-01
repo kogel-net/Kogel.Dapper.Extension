@@ -81,6 +81,8 @@ namespace Kogel.Dapper.Extension
 
         public abstract SqlProvider FormatUpdate<T>(T entity, string[] excludeFields);
 
+        public abstract SqlProvider FormatUpdate<T>(IEnumerable<T> entity, string[] excludeFields);
+
         public abstract SqlProvider FormatSum(LambdaExpression sumExpression);
 
         public abstract SqlProvider FormatMin(LambdaExpression MinExpression);

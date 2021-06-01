@@ -53,11 +53,7 @@ namespace Kogel.Dapper.Extension
         /// <param name="assemblyString">通过给定程序集的长格式名称加载程序集。</param>
         public static void Register(string assemblyString)
         {
-#if !NETSTANDARD1_3
             Assembly assembly = Assembly.Load(assemblyString);
-#else
-            Assembly assembly = Assembly.Load(new AssemblyName(assemblyString));
-#endif
             Register(assembly.GetTypes());
         }
 

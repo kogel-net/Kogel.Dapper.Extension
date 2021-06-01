@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -9,7 +10,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
     {
 		int Update(T entity, string[] excludeFields = null, int timeout = 120);
 
-		int Update(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120);
+		int Update(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120, IDbDataAdapter adapter = null);
 
         int Update(Expression<Func<T, T>> updateExpression);
 

@@ -10,33 +10,39 @@ using Kogel.Dapper.Extension.MySql.Extension;
 using Kogel.Dapper.Extension.MySql;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Data;
+using System.Diagnostics;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 {
     class Command
     {
         public void Test()
-        {
+         {
+            decimal a = 3.3m;
+            var b = a.Round(2);
+
+
             SqlMapper.Aop.OnExecuting += Aop_OnExecuting;
 
             //正常模式下仓储使用
             using (var repository = new FlowOrderRepository())
             {
-                repository.UnitOfWork.BeginTransaction(() =>
-                {
-                    var flowList = repository.QuerySet()
-                           .Top(10)
-                           .ToList();
+                //    repository.UnitOfWork.BeginTransaction(() =>
+                //    {
+                //        //var flowList = repository.QuerySet()
+                //        //       .Top(10)
+                //        //       .ToList();
 
-                    var count = repository.Insert(flowList);
+                //        //var count = repository.Insert(flowList);
 
-                   
-                });
+                //        //BatchInsert(repository.Orm);
 
-                //repository.UnitOfWork.Rollback();
+                //    });
+
+                //    repository.UnitOfWork.Commit();
 
                 // var json = JsonConvert.SerializeObject(repository.Orm.Query("SELECT * FROM customer_pay_info LIMIT 1"));
-
 
 
                 var flowOrders = repository.QuerySet<FlowOrder>()
@@ -65,20 +71,20 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
                 }
 
-               // List<Task> tasks = new List<Task>();
+                // List<Task> tasks = new List<Task>();
 
-               // tasks.Add(Task.Run(async () =>
-               //{
-               //    var result1 = await repository.CommandSet<FlowOrder>()
-               //      .InsertAsync(flowOrders);
-               //    Console.WriteLine(result1);
-               //}));
+                // tasks.Add(Task.Run(async () =>
+                //{
+                //    var result1 = await repository.CommandSet<FlowOrder>()
+                //      .InsertAsync(flowOrders);
+                //    Console.WriteLine(result1);
+                //}));
 
-               // Task.WaitAll(tasks.ToArray());
+                // Task.WaitAll(tasks.ToArray());
 
 
                 var result = repository.CommandSet<FlowOrder>()
-                     .Update(flowOrders);
+                     .Update(flowOrders, adapter: new MySqlDataAdapter());
 
                 var testData = flowOrders.FirstOrDefault();
 
@@ -103,6 +109,73 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
         private void Aop_OnExecuting(ref CommandDefinition command)
         {
+
+        }
+
+        //测试批量插入10w条数据
+        private void BatchInsert(IDbConnection conn)
+        {
+            var flowOrders = new FlowOrder
+            {
+                AccountCode = "test",
+                BusinessType = "so",
+                CreateTime = DateTime.Now,
+                CustomerCode = "test",
+                DeliveredReceiveTime = DateTime.Now,
+                DeliveredStatus = 1,
+                DeliveredTime = DateTime.Now,
+                OrderCreateTime = DateTime.Now,
+                ReferenceNumber = "testref",
+                Source = 1,
+            };
+
+            int total = 100000;
+            List<FlowOrder> flows = new List<FlowOrder>();
+            for (var i = 0; i < total; i++)
+            {
+                flowOrders.OrderNumber = $"{Guid.NewGuid()}_{i + 1}";
+                flows.Add(flowOrders);
+            }
+
+            int pageSize = 500;
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            //分100次插入
+            for (var i = 0; i < total / pageSize; i++)
+            {
+                Console.WriteLine(i + 1);
+                var data = flows.Skip(i * pageSize).Take(pageSize);
+                conn.CommandSet<FlowOrder>()
+                    .Insert(data);
+            }
+            stopwatch.Stop();
+
+            Console.WriteLine(stopwatch.Elapsed.TotalSeconds);
+        }
+    }
+
+
+    public static class MathExtension
+    {
+        /// <summary>
+        /// 金额转换
+        /// </summary>
+        /// <param name="amount"></param>
+        /// <param name="decimals">保留几位小数</param>
+        /// <returns></returns>
+        public static decimal Round(this decimal amount, int decimals = 2)
+        {
+            string amountStr = amount.ToString();
+            var index = amountStr.IndexOf(".");
+            if (index == -1)
+            {
+                return amount;
+            }
+            if (amountStr.Substring(index + 1).Length <= decimals)
+            {
+                return amount;
+            }
+            return Convert.ToDecimal(amountStr.Substring(0, index + 1 + decimals));
 
         }
     }

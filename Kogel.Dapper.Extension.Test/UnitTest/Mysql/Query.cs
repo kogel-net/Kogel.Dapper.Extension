@@ -36,6 +36,8 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
             {
                 repository.UnitOfWork.BeginTransaction(() =>
                 {
+                    var aaa = (from t in repository.Orm.QuerySet<FlowOrder>() where t.CustomerCode == "test" select new { t.Id, t.OrderNumber, t.CustomerCode }).ToList();
+
 
                     var flowOrder = repository.QuerySet()
                       .ResetTableName(typeof(FlowOrder), "flow_order_1")
@@ -44,7 +46,12 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                       .From<FlowOrder, FlowOrder>()
                       .Where((a, b) => a.Id == 1)
                       .GetQuerySet()
-                      .Get();
+                      .Get(x => new
+                      {
+                          x.Id,
+                          x.OrderNumber,
+                          x.UpdateTime
+                      });
 
                     //Convert.ToInt32("sss");
 

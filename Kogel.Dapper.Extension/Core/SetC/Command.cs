@@ -46,28 +46,10 @@ namespace Kogel.Dapper.Extension.Core.SetC
             return DbCon.Execute(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, isExcludeUnitOfWork: SqlProvider.IsExcludeUnitOfWork);
         }
 
-        public int Update(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120)
+        public int Update(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120, IDbDataAdapter adapter = null)
         {
-            int result = 0;
-            //bool isSeedTran = false;
-            //if (DbTransaction == null)
-            //{
-            //    isSeedTran = true;
-            //    if (DbCon.State == ConnectionState.Closed)
-            //        DbCon.Open();
-            //    DbTransaction = DbCon.BeginTransaction();
-            //}
-            foreach (var entity in entities)
-            {
-                result += Update(entity, excludeFields, timeout);
-            }
-            //if (isSeedTran)
-            //{
-            //    DbTransaction.Commit();
-            //    DbTransaction.Dispose();
-            //    DbCon.Close();
-            //}
-            return result;
+            SqlProvider.FormatUpdate(entities, excludeFields);
+            return DbCon.Update(SqlProvider.SqlString, SqlProvider.Params, adapter, entities, excludeFields, DbTransaction, isExcludeUnitOfWork: SqlProvider.IsExcludeUnitOfWork);
         }
 
         public async Task<int> UpdateAsync(T entity, string[] excludeFields = null, int timeout = 120)

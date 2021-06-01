@@ -35,7 +35,7 @@ namespace Dapper
         /// <summary>
         /// The command (sql or a stored-procedure name) to execute
         /// </summary>
-        public string CommandText { get; }
+        public string CommandText { get; set; }
 
         /// <summary>
         /// The parameters associated with the command

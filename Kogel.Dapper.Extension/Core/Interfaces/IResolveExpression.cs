@@ -7,6 +7,7 @@ using Kogel.Dapper.Extension.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -191,15 +192,15 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// 解析更新语句
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="t"></param>
-        /// <param name="Param"></param>
+        /// <param name="entity"></param>
+        /// <param name="param"></param>
         /// <param name="excludeFields"></param>
         /// <returns></returns>
-        public virtual string ResolveUpdates<T>(object entityValue, DynamicParameters param, string[] excludeFields)
+        public virtual string ResolveUpdate<T>(T entity, DynamicParameters param, string[] excludeFields)
         {
-            var entity = EntityCache.QueryEntity(typeof(T));
+            var entityObject = EntityCache.QueryEntity(typeof(T));
             StringBuilder builder = new StringBuilder();
-            foreach (var entityField in entity.EntityFieldList)
+            foreach (var entityField in entityObject.EntityFieldList)
             {
                 string name = entityField.FieldName;
                 //是否是排除字段
@@ -218,7 +219,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
                 {
                     continue;
                 }
-                object value = entityField.PropertyInfo.GetValue(entityValue);
+                object value = entityField.PropertyInfo.GetValue(entity);
                 if (builder.Length != 0)
                 {
                     builder.Append(",");
@@ -226,6 +227,49 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
                 string paramName = $"{providerOption.ParameterPrefix}Update_{name}_{param.ParameterNames.Count()}";
                 builder.Append($"{providerOption.CombineFieldName(name)}={paramName}");
                 param.Add($"{paramName}", value);
+            }
+            builder.Insert(0, " SET ");
+            return builder.ToString();
+        }
+
+        /// <summary>
+        /// 批量修改
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entites"></param>
+        /// <param name="param"></param>
+        /// <param name="excludeFields"></param>
+        /// <returns></returns>
+        public virtual string ResolveBulkUpdate<T>(IEnumerable<T> entites,DynamicParameters param, string[] excludeFields)
+        {
+            var entityObject = EntityCache.QueryEntity(typeof(T));
+            StringBuilder builder = new StringBuilder();
+            foreach (var entityField in entityObject.EntityFieldList)
+            {
+                string name = entityField.FieldName;
+                //是否是排除字段
+                if (excludeFields != null && (excludeFields.Contains(entityField.PropertyInfo.Name) || excludeFields.Contains(name)))
+                {
+                    continue;
+                }
+                //var customAttributes = entityField.PropertyInfo.GetCustomAttributess(true);
+                ////导航属性排除
+                //if (customAttributes.Any(x => x.GetType().Equals(typeof(ForeignKey))))
+                //{
+                //    continue;
+                //}
+                //是否自增
+                if (entityField.IsIncrease)
+                {
+                    continue;
+                }
+                if (builder.Length != 0)
+                {
+                    builder.Append(",");
+                }
+                string paramName = $"{providerOption.ParameterPrefix}{name}";
+                builder.Append($"{providerOption.CombineFieldName(name)}={paramName}");
+                param.Add(paramName);
             }
             builder.Insert(0, " SET ");
             return builder.ToString();

@@ -4,6 +4,8 @@ using Kogel.Dapper.Extension.Model;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -457,6 +459,64 @@ namespace Dapper
             adapter.Fill(ds);
             if (wasClosed) cnn.Close();
             return ds;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cnn"></param>
+        /// <param name="sql"></param>
+        /// <param name="adapter"></param>
+        /// <param name="param"></param>
+        /// <param name="transaction"></param>
+        /// <param name="buffered"></param>
+        /// <param name="commandTimeout"></param>
+        /// <param name="commandType"></param>
+        /// <param name="isExcludeUnitOfWork"></param>
+        /// <returns></returns>
+        public static int Update<T>(this IDbConnection cnn, string sql, DynamicParameters parameters, IDbDataAdapter adapter, IEnumerable<T> entites, string[] excludeFields, IDbTransaction transaction = null,
+            bool buffered = true, int? commandTimeout = null, CommandType? commandType = null, bool isExcludeUnitOfWork = false)
+        {
+            var entityObject = EntityCache.QueryEntity(typeof(T));
+            bool wasClosed = cnn.State == ConnectionState.Closed;
+            if (wasClosed) cnn.Open();
+            var ds = entites.ToDataSet(excludeFields);
+            var selectCommand = cnn.CreateCommand();
+            selectCommand.CommandText = $"SELECT * FROM {entityObject.Name} WHERE 1!=1";
+            selectCommand.Transaction = transaction;
+            adapter.SelectCommand = selectCommand;
+
+            adapter.Fill(ds);
+
+            //修改
+            var order_number = new Random().Next(1, 100);
+            var updateCommand = cnn.CreateCommand();
+            updateCommand.CommandText = sql;
+            updateCommand.Transaction = transaction;
+            adapter.UpdateCommand = updateCommand;
+
+            foreach (var paramName in parameters.ParameterNames)
+            {
+                var parameter = updateCommand.CreateParameter();
+                parameter.ParameterName = $"@{paramName}";
+                parameter.SourceColumn = paramName;
+                updateCommand.Parameters.Add(parameter);
+            }
+
+            adapter.UpdateCommand = updateCommand;
+            foreach (DataRow row in ds.Tables[0].Rows)
+            {
+                row["order_number"] = order_number;
+            }
+
+            adapter.Update(ds);
+            if (wasClosed) cnn.Close();
+            if (ds.Tables != null && ds.Tables.Count != 0 && ds.Tables[0].Rows != null)
+            {
+                return ds.Tables[0].Rows.Count;
+            }
+            return 0;
         }
     }
 

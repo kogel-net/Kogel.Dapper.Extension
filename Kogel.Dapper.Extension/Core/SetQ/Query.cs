@@ -96,13 +96,13 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         public IEnumerable<T> ToIEnumerable()
         {
             SqlProvider.FormatToList<T>();
-            return DbCon.Querys<T>(SqlProvider, DbTransaction);
+            return DbCon.Query_1<T>(SqlProvider, DbTransaction);
         }
 
         public IEnumerable<TSource> ToIEnumerable<TSource>()
         {
             SqlProvider.FormatToList<T>();
-            return DbCon.Querys<TSource>(SqlProvider, DbTransaction);
+            return DbCon.Query_1<TSource>(SqlProvider, DbTransaction);
         }
 
         public IEnumerable<TReturn> ToIEnumerable<TReturn>(Expression<Func<T, TReturn>> select)
@@ -125,13 +125,13 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         public async Task<IEnumerable<T>> ToIEnumerableAsync()
         {
             SqlProvider.FormatToList<T>();
-            return await DbCon.QueryAsyncs<T>(SqlProvider, DbTransaction);
+            return await DbCon.Query_1Async<T>(SqlProvider, DbTransaction);
         }
 
         public async Task<IEnumerable<TSource>> ToIEnumerableAsync<TSource>()
         {
             SqlProvider.FormatToList<T>();
-            return await DbCon.QueryAsyncs<TSource>(SqlProvider, DbTransaction);
+            return await DbCon.Query_1Async<TSource>(SqlProvider, DbTransaction);
         }
 
         public async Task<IEnumerable<TReturn>> ToIEnumerableAsync<TReturn>(Expression<Func<T, TReturn>> select)
@@ -154,13 +154,13 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         public List<T> ToList()
         {
             SqlProvider.FormatToList<T>();
-            return DbCon.Querys<T>(SqlProvider, DbTransaction).ToList();
+            return DbCon.Query_1<T>(SqlProvider, DbTransaction).ToList();
         }
 
         public List<TSource> ToList<TSource>()
         {
             SqlProvider.FormatToList<T>();
-            return DbCon.Querys<TSource>(SqlProvider, DbTransaction).ToList();
+            return DbCon.Query_1<TSource>(SqlProvider, DbTransaction).ToList();
         }
 
         public List<TReturn> ToList<TReturn>(Expression<Func<T, TReturn>> select)
@@ -183,8 +183,7 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         public async Task<List<T>> ToListAsync()
         {
             SqlProvider.FormatToList<T>();
-            var iEnumerable = await DbCon.QueryAsyncs<T>(SqlProvider, DbTransaction);
-            return iEnumerable.ToList();
+            return (await DbCon.QueryAsyncs<T>(SqlProvider, DbTransaction)).ToList();
         }
 
         public async Task<List<TSource>> ToListAsync<TSource>()
@@ -424,6 +423,23 @@ namespace Kogel.Dapper.Extension.Core.SetQ
                 SqlProvider.Context.Set.SelectExpression = falseSelect;
             SqlProvider.FormatToList<T>();
             return await DbCon.QueryDataSetsAsync(SqlProvider, DbTransaction, dataAdapter);
+        }
+    }
+
+    public class Query<T, TReturn> : Query<T>, IQuery<T, TReturn>
+    {
+        public Query(IDbConnection conn, SqlProvider sqlProvider) : base(conn, sqlProvider)
+        {
+        }
+
+        public Query(IDbConnection conn, SqlProvider sqlProvider, IDbTransaction dbTransaction) : base(conn, sqlProvider, dbTransaction)
+        {
+        }
+
+
+        public new List<TReturn> ToList()
+        {
+            return base.ToList<TReturn>();
         }
     }
 }

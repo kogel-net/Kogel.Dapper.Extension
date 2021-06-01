@@ -51,21 +51,18 @@ namespace Kogel.Dapper.Extension.Extension
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="conn"></param>
-        /// <param name="sql"></param>
-        /// <param name="param"></param>
+        /// <param name="provider"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         private static List<T> QueryRowImpl<T>(IDbConnection conn, SqlProvider provider, IDbTransaction transaction = null)
         {
-            List<T> data = default(List<T>);
+            List<T> data;
             Type type = typeof(T);
             if (type.FullName.Contains("AnonymousType"))//匿名类型
             {
                 ConstructorInfo[] constructorInfoArray = type.GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-                ConstructorInfo noParameterConstructorInfo = constructorInfoArray.FirstOrDefault(x => x.GetParameters().Length == 0);
+                ConstructorInfo noParameterConstructorInfo = constructorInfoArray.FirstOrDefault();
                 data = new List<T>();
-                T t = default(T);
-                noParameterConstructorInfo = constructorInfoArray.FirstOrDefault();
                 using (var reader = conn.ExecuteReader(provider.SqlString, provider.Params, transaction))
                 {
                     var properties = EntityCache.QueryEntity(type).Properties;
@@ -82,7 +79,7 @@ namespace Kogel.Dapper.Extension.Extension
                                 value = default;
                             array[i] = value;
                         }
-                        t = (T)noParameterConstructorInfo.Invoke(array);
+                        T t = (T)noParameterConstructorInfo.Invoke(array);
                         data.Add(t);
                     }
                 }
@@ -99,21 +96,18 @@ namespace Kogel.Dapper.Extension.Extension
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="conn"></param>
-        /// <param name="sql"></param>
-        /// <param name="param"></param>
+        /// <param name="provider"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         private static async Task<List<T>> QueryRowImplAsync<T>(IDbConnection conn, SqlProvider provider, IDbTransaction transaction = null)
         {
-            List<T> data = default(List<T>);
+            List<T> data;
             Type type = typeof(T);
             if (type.FullName.Contains("AnonymousType"))//匿名类型
             {
                 ConstructorInfo[] constructorInfoArray = type.GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-                ConstructorInfo noParameterConstructorInfo = constructorInfoArray.FirstOrDefault(x => x.GetParameters().Length == 0);
+                ConstructorInfo noParameterConstructorInfo = constructorInfoArray.FirstOrDefault();
                 data = new List<T>();
-                T t = default(T);
-                noParameterConstructorInfo = constructorInfoArray.FirstOrDefault();
                 using (var reader = await conn.ExecuteReaderAsync(provider.SqlString, provider.Params, transaction))
                 {
                     var properties = EntityCache.QueryEntity(type).Properties;
@@ -130,7 +124,7 @@ namespace Kogel.Dapper.Extension.Extension
                                 value = default;
                             array[i] = value;
                         }
-                        t = (T)noParameterConstructorInfo.Invoke(array);
+                        T t = (T)noParameterConstructorInfo.Invoke(array);
                         data.Add(t);
                     }
                 }
@@ -284,7 +278,7 @@ namespace Kogel.Dapper.Extension.Extension
             {
                 //Get
                 foreach (var item in data)
-                {            
+                {
                     var mapperData = mapperGridList.ReadSingleOrDefault<T1>();
                     property.SetValue(item, mapperData);
                 }

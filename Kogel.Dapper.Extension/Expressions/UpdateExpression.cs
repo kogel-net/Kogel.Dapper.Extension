@@ -68,7 +68,7 @@ namespace Kogel.Dapper.Extension.Expressions
             else//匿名类
             {
                 var entityValue = expression.Body.ToConvertAndGetValue();
-                string sql = provider.ResolveExpression.ResolveUpdates<T>(entityValue, Param, null);
+                string sql = provider.ResolveExpression.ResolveUpdate((T)entityValue, Param, null);
                 _sqlCmd.Append(sql);
                 //throw new DapperExtensionException("更新操作不支持匿名类写入");
             }
