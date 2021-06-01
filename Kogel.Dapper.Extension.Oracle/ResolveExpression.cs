@@ -119,8 +119,7 @@ namespace Kogel.Dapper.Extension.Oracle
 
 			return selectSql;
 		}
-
-		public override string ResolveBulkInsert<T>(IEnumerable<T> entitys, string[] excludeFields)
+        public override string ResolveBulkInsert<T>(IEnumerable<T> entitys, string[] excludeFields)
         {
             var sqlBuilder = new StringBuilder();
             DynamicParameters parameters = new DynamicParameters();
@@ -141,19 +140,17 @@ namespace Kogel.Dapper.Extension.Oracle
                 //增加字段(只加一次)
                 if (sqlBuilder.Length == 0)
                 {
-                    sqlBuilder.Append($"INSERT ALL");
+                    sqlBuilder.Append($"INSERT ALL ");
                 }
                 //增加参数
-                if (index == 1)
-                    sqlBuilder.Append($"INTO {tableName} ({fieldStr}) Values({paramStr})");
-                sqlBuilder.Append("SELECT 1 FROM DUAL");
+                sqlBuilder.Append($"INTO {tableName} ({fieldStr}) Values({paramStr}) ");
                 parameters.AddDynamicParams(parameter);
             }
-            provider.Params.AddDynamicParams(parameters);
+            sqlBuilder.Append("SELECT 1 FROM DUAL");
+			provider.Params.AddDynamicParams(parameters);
             return sqlBuilder.ToString();
         }
-
-		public override string ResolveWithNoLock(bool nolock)
+        public override string ResolveWithNoLock(bool nolock)
 		{
 			return "";
 		}
