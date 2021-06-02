@@ -111,5 +111,33 @@ namespace Kogel.Dapper.Extension.Extension
             dataSet.Tables.Add(dataTable);
             return dataSet;
         }
+
+        /// <summary>
+        /// 通过list改变dataset
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dataSet"></param>
+        /// <param name="entites"></param>
+        /// <returns></returns>
+        public static void UpdateDataSet<T>(this DataSet dataSet, IEnumerable<T> entites)
+        {
+            var entityObject = EntityCache.QueryEntity(typeof(T));
+            int index = 0;
+            var table = dataSet.Tables[0];
+            foreach (var item in entites)
+            {
+                //防止db数据中途发生了变化
+                if (index == table.Rows.Count)
+                    break;
+                DataRow dataRow = table.Rows[index++];
+                foreach (DataColumn column in table.Columns)
+                {
+                    var value = entityObject.EntityFieldList.FirstOrDefault(x => x.FieldName.Equals(column.ColumnName))
+                        .PropertyInfo
+                        .GetValue(item);
+                    dataRow[column.ColumnName] = value;
+                }
+            }
+        }
     }
 }

@@ -49,7 +49,7 @@ namespace Kogel.Dapper.Extension.Core.SetC
         public int Update(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120, IDbDataAdapter adapter = null)
         {
             SqlProvider.FormatUpdate(entities, excludeFields);
-            return DbCon.Update(SqlProvider.SqlString, SqlProvider.Params, adapter, entities, excludeFields, DbTransaction, isExcludeUnitOfWork: SqlProvider.IsExcludeUnitOfWork);
+            return DbCon.Update(SqlProvider.SqlString, SqlProvider.Params, adapter, entities, SqlProvider, DbTransaction, isExcludeUnitOfWork: SqlProvider.IsExcludeUnitOfWork);
         }
 
         public async Task<int> UpdateAsync(T entity, string[] excludeFields = null, int timeout = 120)

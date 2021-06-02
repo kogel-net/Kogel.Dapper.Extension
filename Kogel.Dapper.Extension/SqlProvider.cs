@@ -158,7 +158,7 @@ namespace Kogel.Dapper.Extension
         /// <typeparam name="T"></typeparam>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public virtual string GetIdentityWhere<T>(T entity, DynamicParameters param = null)
+        public virtual string GetIdentityWhere<T>(T entite, DynamicParameters param = null)
         {
             var entityObject = EntityCache.QueryEntity(typeof(T));
             if (string.IsNullOrEmpty(entityObject.Identitys))
@@ -171,10 +171,40 @@ namespace Kogel.Dapper.Extension
                 var id = entityObject.EntityFieldList
                     .FirstOrDefault(x => x.FieldName == entityObject.Identitys)
                     .PropertyInfo
-                    .GetValue(entity);
+                    .GetValue(entite);
                 param.Add(entityObject.Identitys, id);
             }
             return $" AND {entityObject.Identitys}={ProviderOption.ParameterPrefix}{entityObject.Identitys} ";
+        }
+
+        /// <summary>
+        /// 根据主键获取条件
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public virtual string GetIdentityWhere<T>(IEnumerable<T> entites, DynamicParameters param = null)
+        {
+            var entityObject = EntityCache.QueryEntity(typeof(T));
+            if (string.IsNullOrEmpty(entityObject.Identitys))
+                throw new DapperExtensionException("主键不存在!请前往实体类使用[Identity]特性设置主键。");
+
+            //设置参数
+            if (param != null)
+            {
+                List<object> idList = new List<object>();
+                foreach (var entite in entites)
+                {
+                    //获取主键数据
+                    var id = entityObject.EntityFieldList
+                        .FirstOrDefault(x => x.FieldName == entityObject.Identitys)
+                        .PropertyInfo
+                        .GetValue(entite);
+                    idList.Add(id);
+                }
+                param.Add(entityObject.Identitys, idList);
+            }
+            return $" AND {entityObject.Identitys} IN {ProviderOption.ParameterPrefix}{entityObject.Identitys} ";
         }
 
         /// <summary>

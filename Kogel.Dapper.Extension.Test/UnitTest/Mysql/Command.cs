@@ -47,8 +47,8 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
                 var flowOrders = repository.QuerySet<FlowOrder>()
                       //.Where(x => x.CustomerCode == "G1119")
-                      .OrderBy(x => x.OrderNumber)
-                      .Top(100)
+                      .OrderBy(x => x.Id)
+                      .Top(10)
                       .ToList();
 
                 int index = 0;

@@ -119,13 +119,14 @@ namespace Kogel.Dapper.Extension.Oracle
 
 			return selectSql;
 		}
-        public override string ResolveBulkInsert<T>(IEnumerable<T> entitys, string[] excludeFields)
+
+        public override string ResolveBulkInsert<T>(IEnumerable<T> entites, string[] excludeFields)
         {
             var sqlBuilder = new StringBuilder();
             DynamicParameters parameters = new DynamicParameters();
             //当前数据索引
             int index = 0;
-            foreach (var item in entitys)
+            foreach (var item in entites)
             {
 #if NET45 || NET451
                 var resolveInsertParamsAndValues = ResolveInsertParamsAndValues(item, excludeFields, index++);
@@ -150,6 +151,7 @@ namespace Kogel.Dapper.Extension.Oracle
 			provider.Params.AddDynamicParams(parameters);
             return sqlBuilder.ToString();
         }
+
         public override string ResolveWithNoLock(bool nolock)
 		{
 			return "";

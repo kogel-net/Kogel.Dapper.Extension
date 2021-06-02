@@ -18,7 +18,7 @@ namespace Kogel.Dapper.Extension.Test
     {
         static void Main(string[] args)
         {
-
+             
             var amount = Math.Ceiling(-2018.1);
 
             #region mssql单元测试

@@ -461,55 +461,59 @@ namespace Dapper
             return ds;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="cnn"></param>
-        /// <param name="sql"></param>
-        /// <param name="adapter"></param>
-        /// <param name="param"></param>
-        /// <param name="transaction"></param>
-        /// <param name="buffered"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="commandType"></param>
-        /// <param name="isExcludeUnitOfWork"></param>
-        /// <returns></returns>
-        public static int Update<T>(this IDbConnection cnn, string sql, DynamicParameters parameters, IDbDataAdapter adapter, IEnumerable<T> entites, string[] excludeFields, IDbTransaction transaction = null,
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <typeparam name="T"></typeparam>
+      /// <param name="cnn"></param>
+      /// <param name="sql"></param>
+      /// <param name="parameters"></param>
+      /// <param name="adapter"></param>
+      /// <param name="entites"></param>
+      /// <param name="provider"></param>
+      /// <param name="transaction"></param>
+      /// <param name="buffered"></param>
+      /// <param name="commandTimeout"></param>
+      /// <param name="commandType"></param>
+      /// <param name="isExcludeUnitOfWork"></param>
+      /// <returns></returns>
+        public static int Update<T>(this IDbConnection cnn, string sql, DynamicParameters parameters, IDbDataAdapter adapter, IEnumerable<T> entites,
+            SqlProvider provider, IDbTransaction transaction = null,
             bool buffered = true, int? commandTimeout = null, CommandType? commandType = null, bool isExcludeUnitOfWork = false)
         {
             var entityObject = EntityCache.QueryEntity(typeof(T));
             bool wasClosed = cnn.State == ConnectionState.Closed;
             if (wasClosed) cnn.Open();
-            var ds = entites.ToDataSet(excludeFields);
-            var selectCommand = cnn.CreateCommand();
-            selectCommand.CommandText = $"SELECT * FROM {entityObject.Name} WHERE 1!=1";
-            selectCommand.Transaction = transaction;
-            adapter.SelectCommand = selectCommand;
 
-            adapter.Fill(ds);
-
-            //修改
-            var order_number = new Random().Next(1, 100);
+            StringBuilder selectSqlBuild = new StringBuilder();
+            DynamicParameters selectParam = new DynamicParameters();
             var updateCommand = cnn.CreateCommand();
             updateCommand.CommandText = sql;
             updateCommand.Transaction = transaction;
             adapter.UpdateCommand = updateCommand;
-
             foreach (var paramName in parameters.ParameterNames)
             {
+                //修改参数
                 var parameter = updateCommand.CreateParameter();
                 parameter.ParameterName = $"@{paramName}";
                 parameter.SourceColumn = paramName;
                 updateCommand.Parameters.Add(parameter);
+                //添加需要查询的字段
+                if (selectSqlBuild.Length != 0)
+                    selectSqlBuild.Append(",");
+                selectSqlBuild.Append(paramName);
+                //最后增加主键条件
+                if (updateCommand.Parameters.Count == parameters.ParameterNames.Count())
+                {
+                    var selectWhereSql = provider.GetIdentityWhere(entites, selectParam);
+                    var tableName = provider.ProviderOption.CombineFieldName(entityObject.Name);
+                    selectSqlBuild.Append($" FROM {tableName} WHERE 1=1 {selectWhereSql} ");
+                }
             }
-
-            adapter.UpdateCommand = updateCommand;
-            foreach (DataRow row in ds.Tables[0].Rows)
-            {
-                row["order_number"] = order_number;
-            }
-
+            //先查询出ds对象
+            var ds = QueryDataSet(cnn, adapter, $"SELECT {selectSqlBuild}", selectParam, transaction, buffered, commandTimeout, commandType, isExcludeUnitOfWork);
+            //改变ds对象
+            ds.UpdateDataSet(entites);
             adapter.Update(ds);
             if (wasClosed) cnn.Close();
             if (ds.Tables != null && ds.Tables.Count != 0 && ds.Tables[0].Rows != null)
