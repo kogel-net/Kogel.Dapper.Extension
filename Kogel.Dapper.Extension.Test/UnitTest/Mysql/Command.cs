@@ -84,7 +84,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
 
                 var result = repository.CommandSet<FlowOrder>()
-                     .Update(flowOrders, new string[] { "reference_number" }, adapter: new MySqlDataAdapter());
+                     .Update(flowOrders, new MySqlDataAdapter(), new string[] { "reference_number" });
 
                 var testData = flowOrders.FirstOrDefault();
 
