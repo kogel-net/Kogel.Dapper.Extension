@@ -46,7 +46,7 @@ namespace Kogel.Dapper.Extension.Core.SetC
             return DbCon.Execute(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, isExcludeUnitOfWork: SqlProvider.IsExcludeUnitOfWork);
         }
 
-        public int Update(IEnumerable<T> entities, string[] excludeFields = null, int timeout = 120, IDbDataAdapter adapter = null)
+        public int Update(IEnumerable<T> entities, IDbDataAdapter adapter, string[] excludeFields = null, int timeout = 120)
         {
             SqlProvider.FormatUpdate(entities, excludeFields);
             return DbCon.Update(SqlProvider.SqlString, SqlProvider.Params, adapter, entities, SqlProvider, DbTransaction, isExcludeUnitOfWork: SqlProvider.IsExcludeUnitOfWork);

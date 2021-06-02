@@ -18,7 +18,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
     class Command
     {
         public void Test()
-         {
+        {
             decimal a = 3.3m;
             var b = a.Round(2);
 
@@ -48,7 +48,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                 var flowOrders = repository.QuerySet<FlowOrder>()
                       //.Where(x => x.CustomerCode == "G1119")
                       .OrderBy(x => x.Id)
-                      .Top(10)
+                      .Top(100)
                       .ToList();
 
                 int index = 0;
@@ -66,7 +66,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                     item.UpdateTime = DateTime.Now;
                     //item.OrderNumber = Guid.NewGuid().ToString("N");
 
-
+                    item.DeliveredTime = DateTime.Now;
 
 
                 }
@@ -84,7 +84,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
 
                 var result = repository.CommandSet<FlowOrder>()
-                     .Update(flowOrders, adapter: new MySqlDataAdapter());
+                     .Update(flowOrders, new string[] { "reference_number" }, adapter: new MySqlDataAdapter());
 
                 var testData = flowOrders.FirstOrDefault();
 

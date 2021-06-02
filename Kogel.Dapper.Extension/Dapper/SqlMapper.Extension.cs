@@ -461,22 +461,22 @@ namespace Dapper
             return ds;
         }
 
-      /// <summary>
-      /// 
-      /// </summary>
-      /// <typeparam name="T"></typeparam>
-      /// <param name="cnn"></param>
-      /// <param name="sql"></param>
-      /// <param name="parameters"></param>
-      /// <param name="adapter"></param>
-      /// <param name="entites"></param>
-      /// <param name="provider"></param>
-      /// <param name="transaction"></param>
-      /// <param name="buffered"></param>
-      /// <param name="commandTimeout"></param>
-      /// <param name="commandType"></param>
-      /// <param name="isExcludeUnitOfWork"></param>
-      /// <returns></returns>
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cnn"></param>
+        /// <param name="sql"></param>
+        /// <param name="parameters"></param>
+        /// <param name="adapter"></param>
+        /// <param name="entites"></param>
+        /// <param name="provider"></param>
+        /// <param name="transaction"></param>
+        /// <param name="buffered"></param>
+        /// <param name="commandTimeout"></param>
+        /// <param name="commandType"></param>
+        /// <param name="isExcludeUnitOfWork"></param>
+        /// <returns></returns>
         public static int Update<T>(this IDbConnection cnn, string sql, DynamicParameters parameters, IDbDataAdapter adapter, IEnumerable<T> entites,
             SqlProvider provider, IDbTransaction transaction = null,
             bool buffered = true, int? commandTimeout = null, CommandType? commandType = null, bool isExcludeUnitOfWork = false)
