@@ -393,7 +393,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// <param name="excludeFields">排除字段</param>
         /// <param name="index">当前数据索引</param>
         /// <returns></returns>
-        private Tuple<string, StringBuilder, StringBuilder, DynamicParameters> ResolveInsertParamsAndValues<T>(T tValue, string[] excludeFields = null, int index = 0)
+        protected Tuple<string, StringBuilder, StringBuilder, DynamicParameters> ResolveInsertParamsAndValues<T>(T tValue, string[] excludeFields = null, int index = 0)
         {
             var fieldBuilder = new StringBuilder(64);
             var paramBuilder = new StringBuilder(64);
