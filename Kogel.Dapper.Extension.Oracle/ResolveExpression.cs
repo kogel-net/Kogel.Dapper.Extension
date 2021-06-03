@@ -17,8 +17,8 @@ namespace Kogel.Dapper.Extension.Oracle
 	{
 		public ResolveExpression(SqlProvider provider) : base(provider)
 		{
-
 		}
+
 		public override string ResolveSelect(int? topNum)
 		{
 			//添加需要连接的导航表

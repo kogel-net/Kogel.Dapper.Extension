@@ -402,6 +402,7 @@ namespace Dapper
                 return await cnn.QueryAsync<TFirst>(provider.SqlString, provider.Params, transaction);
             }
         }
+
         /// <summary>
         /// 查询返回DataSet
         /// </summary>
@@ -421,14 +422,22 @@ namespace Dapper
             var ds = new DataSet();
             var command = new CommandDefinition(cnn, sql, (object)param, transaction, commandTimeout, commandType,
                 buffered ? CommandFlags.Buffered : CommandFlags.None, isExcludeUnitOfWork: isExcludeUnitOfWork);
-            var identity = new Identity(command.CommandText, command.CommandType, cnn, null, param == null ? null : param.GetType(), null);
-            var info = SqlMapper.GetCacheInfo(identity, param, command.AddToCache);
-            bool wasClosed = cnn.State == ConnectionState.Closed;
-            if (wasClosed) cnn.Open();
-            adapter.SelectCommand = command.SetupCommand(cnn, info.ParamReader);
-            adapter.Fill(ds);
-            if (wasClosed) cnn.Close();
-            return ds;
+            try
+            {
+                Aop.InvokeExecuting(ref command);
+                var identity = new Identity(command.CommandText, command.CommandType, cnn, null, param == null ? null : param.GetType(), null);
+                var info = SqlMapper.GetCacheInfo(identity, param, command.AddToCache);
+                bool wasClosed = cnn.State == ConnectionState.Closed;
+                if (wasClosed) cnn.Open();
+                adapter.SelectCommand = command.SetupCommand(cnn, info.ParamReader);
+                adapter.Fill(ds);
+                if (wasClosed) cnn.Close();
+                return ds;
+            }
+            finally
+            {
+                Aop.InvokeExecuted(ref command);
+            }
         }
 
         /// <summary>
@@ -450,15 +459,23 @@ namespace Dapper
             var ds = new DataSet();
             var command = new CommandDefinition(cnn, sql, (object)param, transaction, commandTimeout, commandType,
                 buffered ? CommandFlags.Buffered : CommandFlags.None, isExcludeUnitOfWork: isExcludeUnitOfWork);
-            var identity = new Identity(command.CommandText, command.CommandType, cnn, null, param == null ? null : param.GetType(), null);
-            var info = SqlMapper.GetCacheInfo(identity, param, command.AddToCache);
-            bool wasClosed = cnn.State == ConnectionState.Closed;
-            var cancel = command.CancellationToken;
-            if (wasClosed) await cnn.TryOpenAsync(cancel).ConfigureAwait(false);
-            adapter.SelectCommand = command.SetupCommand(cnn, info.ParamReader);
-            adapter.Fill(ds);
-            if (wasClosed) cnn.Close();
-            return ds;
+            try
+            {
+                Aop.InvokeExecuting(ref command);
+                var identity = new Identity(command.CommandText, command.CommandType, cnn, null, param == null ? null : param.GetType(), null);
+                var info = SqlMapper.GetCacheInfo(identity, param, command.AddToCache);
+                bool wasClosed = cnn.State == ConnectionState.Closed;
+                var cancel = command.CancellationToken;
+                if (wasClosed) await cnn.TryOpenAsync(cancel).ConfigureAwait(false);
+                adapter.SelectCommand = command.SetupCommand(cnn, info.ParamReader);
+                adapter.Fill(ds);
+                if (wasClosed) cnn.Close();
+                return ds;
+            }
+            finally
+            {
+                Aop.InvokeExecuted(ref command);
+            }
         }
 
         /// <summary>
@@ -481,46 +498,58 @@ namespace Dapper
             SqlProvider provider, IDbTransaction transaction = null,
             bool buffered = true, int? commandTimeout = null, CommandType? commandType = null, bool isExcludeUnitOfWork = false)
         {
-            var entityObject = EntityCache.QueryEntity(typeof(T));
-            bool wasClosed = cnn.State == ConnectionState.Closed;
-            if (wasClosed) cnn.Open();
+            var command = new CommandDefinition(cnn, sql, parameters, transaction, commandTimeout, commandType,
+              buffered ? CommandFlags.Buffered : CommandFlags.None, isExcludeUnitOfWork: isExcludeUnitOfWork);
+            try
+            {
+                Aop.InvokeExecuting(ref command);
+                var entityObject = EntityCache.QueryEntity(typeof(T));
+                bool wasClosed = command.Connection.State == ConnectionState.Closed;
+                if (wasClosed) command.Connection.Open();
 
-            StringBuilder selectSqlBuild = new StringBuilder();
-            DynamicParameters selectParam = new DynamicParameters();
-            var updateCommand = cnn.CreateCommand();
-            updateCommand.CommandText = sql;
-            updateCommand.Transaction = transaction;
-            adapter.UpdateCommand = updateCommand;
-            foreach (var paramName in parameters.ParameterNames)
-            {
-                //修改参数
-                var parameter = updateCommand.CreateParameter();
-                parameter.ParameterName = $"@{paramName}";
-                parameter.SourceColumn = paramName;
-                updateCommand.Parameters.Add(parameter);
-                //添加需要查询的字段
-                if (selectSqlBuild.Length != 0)
-                    selectSqlBuild.Append(",");
-                selectSqlBuild.Append(paramName);
-                //最后增加主键条件
-                if (updateCommand.Parameters.Count == parameters.ParameterNames.Count())
+                StringBuilder selectSqlBuild = new StringBuilder();
+                DynamicParameters selectParam = new DynamicParameters();
+                var updateCommand = command.Connection.CreateCommand();
+                updateCommand.CommandText = command.CommandText;
+                updateCommand.Transaction = command.Transaction;
+                adapter.UpdateCommand = updateCommand;
+                var updateParam = ((DynamicParameters)command.Parameters);
+                foreach (var paramName in updateParam.ParameterNames)
                 {
-                    var selectWhereSql = provider.GetIdentityWhere(entites, selectParam);
-                    var tableName = provider.ProviderOption.CombineFieldName(entityObject.Name);
-                    selectSqlBuild.Append($" FROM {tableName} WHERE 1=1 {selectWhereSql} ");
+                    //修改参数
+                    var parameter = updateCommand.CreateParameter();
+                    parameter.ParameterName = $"@{paramName}";
+                    parameter.SourceColumn = paramName;
+                    updateCommand.Parameters.Add(parameter);
+                    //添加需要查询的字段
+                    if (selectSqlBuild.Length != 0)
+                        selectSqlBuild.Append(",");
+                    selectSqlBuild.Append(paramName);
+                    //最后增加主键条件
+                    if (updateCommand.Parameters.Count == updateParam.ParameterNames.Count())
+                    {
+                        var selectWhereSql = provider.GetIdentityWhere(entites, selectParam);
+                        var tableName = provider.ProviderOption.CombineFieldName(entityObject.Name);
+                        selectSqlBuild.Append($" FROM {tableName} WHERE 1=1 {selectWhereSql} ");
+                    }
                 }
+                //先查询出ds对象
+                var ds = QueryDataSet(command.Connection, adapter, $"SELECT {selectSqlBuild}", selectParam, command.Transaction, command.Buffered, command.CommandTimeout
+                    , command.CommandType, command.IsExcludeUnitOfWork);
+                //改变ds对象
+                ds.UpdateDataSet(entites);
+                adapter.Update(ds);
+                if (wasClosed) command.Connection.Close();
+                if (ds.Tables != null && ds.Tables.Count != 0 && ds.Tables[0].Rows != null)
+                {
+                    return ds.Tables[0].Rows.Count;
+                }
+                return 0;
             }
-            //先查询出ds对象
-            var ds = QueryDataSet(cnn, adapter, $"SELECT {selectSqlBuild}", selectParam, transaction, buffered, commandTimeout, commandType, isExcludeUnitOfWork);
-            //改变ds对象
-            ds.UpdateDataSet(entites);
-            adapter.Update(ds);
-            if (wasClosed) cnn.Close();
-            if (ds.Tables != null && ds.Tables.Count != 0 && ds.Tables[0].Rows != null)
+            finally
             {
-                return ds.Tables[0].Rows.Count;
+                Aop.InvokeExecuted(ref command);
             }
-            return 0;
         }
     }
 
