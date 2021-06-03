@@ -153,30 +153,4 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
             Console.WriteLine(stopwatch.Elapsed.TotalSeconds);
         }
     }
-
-
-    public static class MathExtension
-    {
-        /// <summary>
-        /// 金额转换
-        /// </summary>
-        /// <param name="amount"></param>
-        /// <param name="decimals">保留几位小数</param>
-        /// <returns></returns>
-        public static decimal Round(this decimal amount, int decimals = 2)
-        {
-            string amountStr = amount.ToString();
-            var index = amountStr.IndexOf(".");
-            if (index == -1)
-            {
-                return amount;
-            }
-            if (amountStr.Substring(index + 1).Length <= decimals)
-            {
-                return amount;
-            }
-            return Convert.ToDecimal(amountStr.Substring(0, index + 1 + decimals));
-
-        }
-    }
 }
