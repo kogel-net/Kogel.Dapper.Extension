@@ -19,10 +19,6 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
     {
         public void Test()
         {
-            decimal a = 3.3m;
-            var b = a.Round(2);
-
-
             SqlMapper.Aop.OnExecuting += Aop_OnExecuting;
 
             //正常模式下仓储使用
