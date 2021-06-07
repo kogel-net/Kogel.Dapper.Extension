@@ -240,7 +240,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// <param name="param"></param>
         /// <param name="excludeFields"></param>
         /// <returns></returns>
-        public virtual string ResolveBulkUpdate<T>(IEnumerable<T> entites,DynamicParameters param, string[] excludeFields)
+        public virtual string ResolveBulkUpdate<T>(IEnumerable<T> entites, DynamicParameters param, string[] excludeFields)
         {
             var entityObject = EntityCache.QueryEntity(typeof(T));
             StringBuilder builder = new StringBuilder();
@@ -307,32 +307,47 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
                         continue;
                     }
                     item.MapperList.Clear();
-                    //连表实体
-                    var leftEntity = EntityCache.QueryEntity(item.TableType);
-                    //默认连表
-                    if (item.Action == JoinAction.Default || item.Action == JoinAction.Navigation)
+                    if (item.TableType != null)
                     {
-                        string leftTable = providerOption.CombineFieldName(item.LeftTabName);
-                        builder.Append($@" {item.JoinMode.ToString()} JOIN 
+                        //连表实体
+                        EntityObject leftEntity = EntityCache.QueryEntity(item.TableType);
+                        //默认连表
+                        if (item.Action == JoinAction.Default || item.Action == JoinAction.Navigation)
+                        {
+                            string leftTable = providerOption.CombineFieldName(item.LeftTabName);
+                            builder.Append($@" {item.JoinMode} JOIN 
                                        {leftTable} {leftEntity.AsName} ON {leftEntity.AsName}
                                       .{providerOption.CombineFieldName(item.LeftAssName)} = {providerOption.CombineFieldName(item.RightTabName)}
                                       .{providerOption.CombineFieldName(item.RightAssName)} " + Environment.NewLine);
-                    }
-                    else//sql连表
-                    {
-                        builder.Append(" " + item.JoinSql);
-                        //判断是否需要显示连表的字段
-                        if (!item.IsMapperField)
+                        }
+                        else//sql连表
+                        {
+                            builder.Append(" " + item.JoinSql);
+                            //判断是否需要显示连表的字段
+                            if (!item.IsMapperField)
+                            {
+                                continue;
+                            }
+                        }
+                        //自定义返回
+                        if (provider.Context.Set.SelectExpression != null)
                         {
                             continue;
                         }
+                        FieldDetailWith(ref sql, item, leftEntity);
                     }
-                    //自定义返回
-                    if (provider.Context.Set.SelectExpression != null)
+                    else
                     {
-                        continue;
+                        if (item.Action == JoinAction.Sql)
+                        {
+                            builder.Append(" " + item.JoinSql);
+                            //判断是否需要显示连表的字段
+                            if (!item.IsMapperField)
+                            {
+                                continue;
+                            }
+                        }
                     }
-                    FieldDetailWith(ref sql, item, leftEntity);
                 }
             }
             return builder.ToString();
