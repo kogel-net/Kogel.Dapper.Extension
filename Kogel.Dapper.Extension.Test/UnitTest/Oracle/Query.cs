@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Kogel.Dapper.Extension.Core.Interfaces;
-using Kogel.Dapper.Extension.Oracle;
-using Kogel.Dapper.Extension.Oracle.Extension;
+﻿using Kogel.Dapper.Extension.Oracle;
 using Kogel.Dapper.Extension.Test.Model;
 using Oracle.ManagedDataAccess.Client;
 
