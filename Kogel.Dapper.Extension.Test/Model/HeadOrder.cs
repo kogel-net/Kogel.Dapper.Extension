@@ -7,13 +7,14 @@ using Kogel.Dapper.Extension.Attributes;
 
 namespace Kogel.Dapper.Extension.Test.Model
 {
-    public class HeadOrder
+    public class HeadOrder : IBaseEntity<HeadOrder, int>
     {
         /// <summary>
         /// 
         /// </summary>
         [Identity]
-        public int HeadOrderId { get; set; }
+        [Display(Rename = "HeadOrderId")]
+        public override int Id { get; set; }
         /// <summary>
         /// 
         /// </summary>

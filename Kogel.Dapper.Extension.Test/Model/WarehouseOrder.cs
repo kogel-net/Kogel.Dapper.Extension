@@ -10,13 +10,14 @@ namespace Kogel.Dapper.Extension.Test.Model
     /// <summary>
     /// 仓储订单表
     /// </summary>
-    public class WarehouseOrder
+    public class WarehouseOrder : IBaseEntity<WarehouseOrder, long>
     {
         /// <summary>
         /// 主键
         /// </summary>
         [Identity(IsIncrease = false)]
-        public long OrderId { set; get; }
+        [Display(Rename = "OrderId")]
+        public override long Id { set; get; }
 
         /// <summary>
         /// 单号

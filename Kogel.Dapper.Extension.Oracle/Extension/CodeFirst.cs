@@ -72,7 +72,7 @@ namespace Kogel.Dapper.Extension.Oracle.Extension
 					}
 				case SqlDbType.DateTime:
 					{
-						fieldType = $"DATE";
+						fieldType = $"TIMESTAMP";
 						break;
 					}
 				case SqlDbType.UniqueIdentifier:
@@ -113,13 +113,13 @@ namespace Kogel.Dapper.Extension.Oracle.Extension
 				if (field.DefaultValue != null)
 					fieldScript.Append($" DEFAULT '{field.DefaultValue}'");
 				//设置是否可以为空
-				if (field.IsNull)
+				if (field.IfNull)
 					fieldScript.Append(" NULL");
 				else
 					fieldScript.Append(" NOT NULL");
 				//设置是否是主键
 				if (field.IsIdentity)
-					fieldScript.Append($" CONSTRAINT PRIMARY_KEY_{typeEntity.Name}_{field.FieldName} PRIMARY KEY");
+					fieldScript.Append($" CONSTRAINT PRIMARY_{typeEntity.Name}_{field.FieldName} PRIMARY KEY");
 				fieldScript.Append(")");
 
 				string script = fieldScript.ToString();

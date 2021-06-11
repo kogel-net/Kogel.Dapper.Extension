@@ -90,11 +90,11 @@ namespace Kogel.Repository
                     {
                         if (item.DbName == dbName)
                         {
-                            item.IsMaster = true;
+                            item.IsCurrent = true;
                         }
                         else
                         {
-                            item.IsMaster = false;
+                            item.IsCurrent = false;
                         }
                     }
                 }

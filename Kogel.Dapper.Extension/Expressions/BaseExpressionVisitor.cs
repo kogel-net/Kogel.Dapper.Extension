@@ -21,18 +21,22 @@ namespace Kogel.Dapper.Extension.Expressions
         /// 字段sql
         /// </summary>
         internal StringBuilder SpliceField { get; set; }
+
         /// <summary>
         /// 参数
         /// </summary>
         protected DynamicParameters Param { get; set; }
+
         /// <summary>
         /// 解析提供方
         /// </summary>
         protected SqlProvider Provider { get; set; }
+
         /// <summary>
         /// 解析第n个下标
         /// </summary>
         protected int Index { get; set; }
+
         /// <summary>
         /// 提供方选项
         /// </summary>
@@ -45,6 +49,7 @@ namespace Kogel.Dapper.Extension.Expressions
             this.Provider = provider;
             this.providerOption = provider.ProviderOption;
         }
+
         /// <summary>
         /// 有+ - * /需要拼接的对象
         /// </summary>
@@ -57,6 +62,7 @@ namespace Kogel.Dapper.Extension.Expressions
             this.Param.AddDynamicParams(binary.Param);
             return node;
         }
+
         /// <summary>
         /// 值对象
         /// </summary>
@@ -73,6 +79,7 @@ namespace Kogel.Dapper.Extension.Expressions
             Param.Add(paramName, nodeValue);
             return node;
         }
+
         /// <summary>
         /// 成员对象
         /// </summary>
@@ -145,7 +152,7 @@ namespace Kogel.Dapper.Extension.Expressions
             else if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension"))
             {
                 DynamicParameters parameters = new DynamicParameters();
-                SpliceField.Append("(" + node.MethodCallExpressionToSql(ref parameters, Index) + ")");
+                SpliceField.Append($"({node.MethodCallExpressionToSql(ref parameters, Index)})");
                 Param.AddDynamicParams(parameters);
             }
             else
@@ -375,8 +382,6 @@ namespace Kogel.Dapper.Extension.Expressions
             StringBuilder builder = new StringBuilder();
             builder.Append(providerOption.ParameterPrefix);
             if (!string.IsNullOrEmpty(FieldName))
-                //builder.Append(FieldName.Replace(".", "_"));
-                //builder.Append(FieldName.Substring(FieldName.IndexOf(".") + 1));
                 builder.Append("Param");
             builder.Append($"_{Param.ParameterNames.Count()}{Index}");
             return builder.ToString();

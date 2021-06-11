@@ -40,7 +40,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// <returns></returns>
         public string CombineFieldName(string field)
         {
-            return OpenQuote + field + CloseQuote;
+            return $"{OpenQuote}{field}{CloseQuote}";
         }
 
         /// <summary>

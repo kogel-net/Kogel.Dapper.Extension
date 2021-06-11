@@ -3,7 +3,7 @@ using Kogel.Dapper.Extension.Attributes;
 
 namespace Kogel.Dapper.Extension.Test.Model
 {
-    [Display(Rename = "flow_order")]
+    [Display(Rename = "flow_order",AsName = "flow_order1")]
     public class FlowOrder : IBaseEntity<FlowOrder, int>
     {
         /// <summary>

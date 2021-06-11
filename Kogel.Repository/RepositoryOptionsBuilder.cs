@@ -100,7 +100,7 @@ namespace Kogel.Repository
                 {
                     //通过orm对象获取
                     if (dbName == "Orm")
-                        connectionOptions = CurrentConnectionPool.FirstOrDefault(x => x.IsMaster);
+                        connectionOptions = CurrentConnectionPool.FirstOrDefault(x => x.IsCurrent);
 
                     if (connectionOptions == null)
                     {
@@ -117,7 +117,7 @@ namespace Kogel.Repository
                             {
                                 Connection = dbConn,
                                 DbName = connection.DbName,
-                                IsMaster = true
+                                IsCurrent = true
                             };
                         }
                         else if (connection == null)
@@ -181,7 +181,7 @@ namespace Kogel.Repository
         /// <summary>
         /// 是否是主链接
         /// </summary>
-        public bool IsMaster { get; set; }
+        public bool IsCurrent { get; set; }
     }
 
     public class ConnectionPool

@@ -99,7 +99,7 @@ namespace Kogel.Dapper.Extension.MsSql.Extension
 				StringBuilder fieldScript = new StringBuilder($"ALTER TABLE [{typeEntity.AsName}]");
 				fieldScript.Append($" ADD [{field.FieldName}] {fieldType} ");
 				//设置是否可以为空
-				if (field.IsNull)
+				if (field.IfNull)
 					fieldScript.Append(" NULL");
 				else
 					fieldScript.Append(" NOT NULL");

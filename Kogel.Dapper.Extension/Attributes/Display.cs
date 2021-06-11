@@ -5,6 +5,9 @@ using System.Data;
 
 namespace Kogel.Dapper.Extension.Attributes
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class Display : BaseAttrbute
 	{
 		/// <summary>
@@ -40,7 +43,7 @@ namespace Kogel.Dapper.Extension.Attributes
 		/// <summary>
 		/// 是否允许为空
 		/// </summary>
-		public bool IsNull { get; set; }
+		public bool? IfNull { get; set; }
 
 		/// <summary>
 		/// 默认值
@@ -62,7 +65,7 @@ namespace Kogel.Dapper.Extension.Attributes
 		/// <param name="DefaultValue">字段默认值</param>
 		public Display(string Name = null, string Description = null, string Rename = null, string Schema = null,
 			string AsName = null, bool IsField = true, SqlDbType SqlDbType = SqlDbType.Structured, int Length = 0,
-			bool IsNull = false, object DefaultValue = null)
+			bool IfNull = default, object DefaultValue = null)
 		{
 			this.Name = Name;
 			this.Description = Description;
@@ -72,7 +75,7 @@ namespace Kogel.Dapper.Extension.Attributes
 			this.AsName = AsName;
 			this.SqlDbType = SqlDbType;
 			this.Length = Length;
-			this.IsNull = IsNull;
+			this.IfNull = IfNull;
 			this.DefaultValue = DefaultValue;
 		}
 	}
