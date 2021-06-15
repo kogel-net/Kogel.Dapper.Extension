@@ -481,7 +481,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
                     paramBuilder.Append(",");
                 }
                 //字段添加
-                fieldBuilder.Append($"{fieldName}");
+                fieldBuilder.Append($"{provider.ProviderOption.CombineFieldName(fieldName)}");
                 //参数添加
                 paramBuilder.Append($"{provider.ProviderOption.ParameterPrefix}{fieldName}{index}");
                 parameters.Add($"{provider.ProviderOption.ParameterPrefix}{fieldName}{index}", entityField.PropertyInfo.GetValue(tValue));

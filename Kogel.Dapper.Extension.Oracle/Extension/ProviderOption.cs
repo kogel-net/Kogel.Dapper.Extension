@@ -64,7 +64,7 @@ namespace Kogel.Dapper.Extension.Oracle.Extension
 					{
 						spliceField.Append("to_date(");
 						fieldInkove.Invoke();
-						spliceField.Append(",'YYYY-MM-D HH24:MI:SS')");
+						spliceField.Append(",'YYYY-MM-DD HH24:MI:SS')");
 					}
 					break;
 			}
