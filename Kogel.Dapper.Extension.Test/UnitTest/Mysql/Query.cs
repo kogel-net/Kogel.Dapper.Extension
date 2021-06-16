@@ -83,7 +83,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                 repository.UnitOfWork.Rollback();
             }
 
-            var conn = new MySqlConnection("server=localhost;port=3306;user id=root;password=A5101264a;database=gc_fps_receivable;");
+            var conn = new MySqlConnection("server=192.168.0.120;port=3306;user id=root;password=123456;database=gc_fps_receivable;");
             //自定义仓储释放时 conn也会释放
             using (var divReposirory = conn.QuerySet<FlowOrder>().GetRepository())
             {
@@ -94,9 +94,7 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
                 var tupleList = divReposirory.QuerySet()
                          .ToListAsync(x => new
                          {
-                             Id = x.Id,
-                             flowOrders1 = divReposirory.Orm.QuerySet<FlowOrder1>().Where(y => y.Id == x.Id).Get(y => true),
-                             flowOrders2 = divReposirory.Orm.QuerySet<FlowOrder2>().Where(y => y.Id == x.Id).Get(y => true),
+                             Id = x.Id, 
                              dateTime = x.DeliveredReceiveTime
                          }).Result;
 

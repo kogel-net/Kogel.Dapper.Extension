@@ -39,7 +39,7 @@ namespace Kogel.Dapper.Extension
             if (provider.Context.Set.SelectExpression == null)
             {
                 var propertyBuilder = GetTableField(masterEntity);
-                selectSql.Append(propertyBuilder);
+                selectSql.Append($" {propertyBuilder} ");
             }
             else//自定义查询字段
             {

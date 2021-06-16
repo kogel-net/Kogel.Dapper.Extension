@@ -84,13 +84,13 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
                 var testData = flowOrders.FirstOrDefault();
 
-                var updateFlowOrder = repository.CommandSet<FlowOrder>()
-                    .Where(x => x.Id.Between(4, 5))
-                    .UpdateSelect(x => new FlowOrder
-                    {
-                        Id = x.Id,
-                        AccountCode = x.AccountCode
-                    });
+                //var updateFlowOrder = repository.CommandSet<FlowOrder>()
+                //    .Where(x => x.Id.Between(4, 5))
+                //    .UpdateSelect(x => new FlowOrder
+                //    {
+                //        Id = x.Id,
+                //        AccountCode = x.AccountCode
+                //    });
 
 
 

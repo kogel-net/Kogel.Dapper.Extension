@@ -54,11 +54,11 @@ namespace Kogel.Repository
                 SqlMapper.Aop.OnExecuting += Aop_OnExecuting;
                 transactionMethod.Invoke();
             }
-            catch (Exception ex)
-            {
-                //this.Rollback();此处回滚无效
-                throw ex;
-            }
+            //catch (Exception ex)
+            //{
+            //    //this.Rollback();此处回滚无效
+            //    throw ex;
+            //}
             finally
             {
                 SqlMapper.Aop.OnExecuting -= Aop_OnExecuting;
