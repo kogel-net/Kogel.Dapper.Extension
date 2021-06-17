@@ -102,6 +102,11 @@ namespace Kogel.Dapper.Extension
         }
 
         /// <summary>
+        /// 条件是否需要加上asname（一般修改和删除时不需要）
+        /// </summary>
+        public bool IsAppendAsName { get; set; } = true;
+
+        /// <summary>
         /// 获取表名称
         /// </summary>
         /// <param name="isNeedFrom"></param>

@@ -78,6 +78,12 @@ namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 
                 // Task.WaitAll(tasks.ToArray());
 
+                repository.CommandSet<FlowOrder>()
+                    .Where(x => x.CustomerCode.Contains("test"))
+                    .Update(x => new FlowOrder
+                    {
+                        DeliveredReceiveTime = DateTime.Now
+                    });
 
                 var result = repository.CommandSet<FlowOrder>()
                      .Update(flowOrders, new MySqlDataAdapter(), new string[] { "reference_number" });

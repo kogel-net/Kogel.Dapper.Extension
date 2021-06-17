@@ -26,6 +26,7 @@ namespace Kogel.Dapper.Extension.Core.SetC
             };
 
             sqlProvider.Context = SetContext;
+            sqlProvider.IsAppendAsName = false;
             WhereExpressionList = new List<LambdaExpression>();
             WhereBuilder = new StringBuilder();
             Params = new DynamicParameters();
@@ -41,6 +42,7 @@ namespace Kogel.Dapper.Extension.Core.SetC
             };
 
             sqlProvider.Context = SetContext;
+            sqlProvider.IsAppendAsName = false;
             WhereExpressionList = new List<LambdaExpression>();
             WhereBuilder = new StringBuilder();
             Params = new DynamicParameters();
@@ -57,6 +59,7 @@ namespace Kogel.Dapper.Extension.Core.SetC
             };
 
             sqlProvider.Context = SetContext;
+            sqlProvider.IsAppendAsName = false;
             WhereExpressionList = new List<LambdaExpression>();
             WhereExpressionList.Add(whereExpression);
             WhereBuilder = new StringBuilder();

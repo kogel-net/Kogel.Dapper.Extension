@@ -108,8 +108,13 @@ namespace Kogel.Dapper.Extension.Expressions
                     }
                     var member = EntityCache.QueryEntity(node.Expression.Type);
                     string fieldName = member.FieldPairs[node.Member.Name];
-                    string field = $"{member.AsName}.{providerOption.CombineFieldName(fieldName)}";
-                    SpliceField.Append(field);
+                    //字段全称
+                    string fieldStr = Provider.IsAppendAsName ? $"{member.AsName}.{providerOption.CombineFieldName(fieldName)}"
+                        : providerOption.CombineFieldName(member.FieldPairs[node.Member.Name]);
+                    SpliceField.Append(fieldStr);
+
+                    //string field = $"{member.AsName}.{providerOption.CombineFieldName(fieldName)}";
+                    //SpliceField.Append(field);
                 }
                 else
                 {
@@ -455,7 +460,10 @@ namespace Kogel.Dapper.Extension.Expressions
                     }
                     var member = EntityCache.QueryEntity(node.Expression.Type);
                     this.FieldName = member.FieldPairs[node.Member.Name];
-                    SpliceField.Append($"{member.AsName}.{providerOption.CombineFieldName(member.FieldPairs[node.Member.Name])}");
+                    //字段全称
+                    string fieldStr = Provider.IsAppendAsName ? $"{member.AsName}.{providerOption.CombineFieldName(member.FieldPairs[node.Member.Name])}"
+                        : providerOption.CombineFieldName(member.FieldPairs[node.Member.Name]);
+                    SpliceField.Append(fieldStr);
                     //导航属性允许显示字段
                     if (expTypeName == "System.Linq.Expressions.PropertyExpression")
                     {
