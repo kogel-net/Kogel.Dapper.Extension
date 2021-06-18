@@ -10,7 +10,7 @@ https://www.cnblogs.com/kogel/p/10805696.html</Description>
     <Company>Kogel.Repository</Company>
     <Product>Kogel.Repository</Product>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>3.2.1.0</Version>
+    <Version>3.2.1.1</Version>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net45' Or '$(TargetFramework)' == 'net451'">
     <Reference Include="System" />
