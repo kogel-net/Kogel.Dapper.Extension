@@ -16,10 +16,7 @@ namespace Kogel.Repository
     public static class RepositoryExtension
     {
 
-        public class BaseRepositoryExtension<T> : BaseRepository<T>
-#if NETCOREAPP
-            ,IRepository<T>
-#endif
+        public class BaseRepositoryExtension<T> : BaseRepository<T>, IRepository<T>
         {
             public BaseRepositoryExtension(RepositoryOptionsBuilder options) : base(options)
             {
