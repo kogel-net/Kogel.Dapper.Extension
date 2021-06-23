@@ -1,4 +1,5 @@
 ﻿#if NETCOREAPP
+using Kogel.Dapper.Extension;
 using Kogel.Repository.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -53,6 +54,7 @@ namespace Kogel.Repository
         {
             foreach (var entite in entites)
             {
+                EntityCache.Register(entite);
                 BuilderType(builder, entite);
             }
             return builder;
