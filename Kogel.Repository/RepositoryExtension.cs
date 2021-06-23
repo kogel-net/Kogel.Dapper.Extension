@@ -17,6 +17,9 @@ namespace Kogel.Repository
     {
 
         public class BaseRepositoryExtension<T> : BaseRepository<T>
+#if NETCOREAPP
+            ,IRepository<T>
+#endif
         {
             public BaseRepositoryExtension(RepositoryOptionsBuilder options) : base(options)
             {
@@ -130,5 +133,14 @@ namespace Kogel.Repository
             commandSet.SqlProvider.IsExcludeUnitOfWork = true;
             return commandSet;
         }
+    }
+
+    /// <summary>
+    /// 简化仓储名称
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public interface IRepository<T> : IBaseRepository<T>
+    {
+
     }
 }
