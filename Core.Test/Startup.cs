@@ -34,7 +34,7 @@ namespace Core.Test
             {
                 kogel.BuildConnection(x => new MySqlConnection(@"server=192.168.0.120;port=3306;user id=root;password=123456;database=gc_fps_receivable;Persist Security Info=True;"));
                 kogel.BuildProvider(new MySqlProvider());
-                kogel.BuilderType(new Type[] { typeof(FlowOrder) });
+                //kogel.BuilderType(new Type[] { typeof(FlowOrder) });
             });
 
 
