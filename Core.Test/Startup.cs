@@ -30,11 +30,15 @@ namespace Core.Test
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //简便版仓储定义
             services.AddKogelRepository((kogel) =>
             {
                 kogel.BuildConnection(x => new MySqlConnection(@"server=192.168.0.120;port=3306;user id=root;password=123456;database=gc_fps_receivable;Persist Security Info=True;"));
                 kogel.BuildProvider(new MySqlProvider());
             });
+
+            ////多种不同类型数据库版仓储定义
+            //services.AddTransient(typeof(IMySqlRepository<>), typeof(MySqlRepository<>));
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
@@ -55,5 +59,21 @@ namespace Core.Test
             app.UseHttpsRedirection();
             app.UseMvc();
         }
+    }
+
+
+    public class MySqlRepository<T> : BaseRepository<T>, IMySqlRepository<T>
+    {
+        public override void OnConfiguring(RepositoryOptionsBuilder builder)
+        {
+            builder.BuildConnection(x => new MySqlConnection(@"server=192.168.0.120;port=3306;user id=root;password=123456;database=gc_fps_receivable;Persist Security Info=True;"));
+            builder.BuildProvider(new MySqlProvider());
+        }
+    }
+
+
+    public interface IMySqlRepository<T> : IRepository<T>
+    {
+
     }
 }
