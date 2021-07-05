@@ -30,6 +30,6 @@ namespace Kogel.Repository
         /// <summary>
         /// 解析方池（总连接池中不区分主从）
         /// </summary>
-        internal static ConcurrentBag<ProviderPool> ProviderPool { get; set; }
+        internal static ConcurrentBag<ProviderPool> ProviderPool { get; }
     }
 }
