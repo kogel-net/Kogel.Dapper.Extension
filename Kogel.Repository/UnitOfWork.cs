@@ -85,7 +85,7 @@ namespace Kogel.Repository
                     //是否排除在工作单元外
                     if (command.IsExcludeUnitOfWork)
                     {
-                        var connectionFunc = RepositoryOptionsBuilder._connectionPool
+                        var connectionFunc = Global.ConnectionPool
                             .FirstOrDefault(x =>
                                 (x.ConnectionString.Contains(this.Connection.ConnectionString))
                                 || (x.DataSource == dbConnection.DataSource && x.Database == dbConnection.Database)

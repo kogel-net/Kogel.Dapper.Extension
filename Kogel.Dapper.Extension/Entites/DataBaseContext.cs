@@ -1,6 +1,6 @@
 ﻿using Kogel.Dapper.Extension.Core.SetC;
 using Kogel.Dapper.Extension.Core.SetQ;
-using Kogel.Dapper.Extension.Model;
+using Kogel.Dapper.Extension.Entites;
 
 namespace Kogel.Dapper.Extension
 {

@@ -9,7 +9,7 @@ using MySql.Data.MySqlClient;
 using System.Linq;
 using System.Data.SqlClient;
 using Kogel.Dapper.Extension.MsSql;
-using Kogel.Dapper.Extension.Model;
+using Kogel.Dapper.Extension.Entites;
 using System.Collections.Concurrent;
 
 namespace Kogel.Dapper.Extension.Test

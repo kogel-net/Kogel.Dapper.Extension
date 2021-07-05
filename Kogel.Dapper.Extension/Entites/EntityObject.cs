@@ -8,7 +8,7 @@ using Kogel.Dapper.Extension.Core.Interfaces;
 using System.Linq.Expressions;
 using System.Data;
 
-namespace Kogel.Dapper.Extension.Model
+namespace Kogel.Dapper.Extension.Entites
 {
     public class EntityObject
     {

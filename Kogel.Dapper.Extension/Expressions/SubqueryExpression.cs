@@ -8,6 +8,7 @@ using System.Text;
 using System;
 using Kogel.Dapper.Extension.Core.SetQ;
 using System.Collections.ObjectModel;
+using Kogel.Dapper.Extension.Entites;
 
 namespace Kogel.Dapper.Extension.Expressions
 {
@@ -334,9 +335,9 @@ namespace Kogel.Dapper.Extension.Expressions
         public void FormatSendOrder<T>(QuerySet<T> querySet, LambdaExpression orderExpression, string methodName)
         {
             if (methodName == "OrderBy")
-                querySet.OrderbyExpressionList.Add(orderExpression, Model.EOrderBy.Asc);
+                querySet.OrderbyExpressionList.Add(orderExpression, EOrderBy.Asc);
             else
-                querySet.OrderbyExpressionList.Add(orderExpression, Model.EOrderBy.Desc);
+                querySet.OrderbyExpressionList.Add(orderExpression, EOrderBy.Desc);
         }
     }
 }

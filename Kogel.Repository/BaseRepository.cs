@@ -26,6 +26,9 @@ namespace Kogel.Repository
         /// </summary>
         public IDbConnection Orm { get => Options.GetConnection("Orm")?.Connection ?? throw new DapperExtensionException("请在 OnConfiguring 中配置Connection"); }
 
+
+        public SqlProvider OrmProvider { get => Options.GetProvider("Orm")?.Provider.Invoke(null) ?? throw new DapperExtensionException("请在 OnConfiguring 中配置Provider"); }
+
         /// <summary>
         /// 工作单元
         /// </summary>
@@ -82,27 +85,51 @@ namespace Kogel.Repository
         /// <param name="dbName">为空时切换回主库</param>
         public void ChangeDataBase(string dbName = "master")
         {
-            lock (Options.CurrentConnectionPool)
+            if (Options.CurrentConnectionPool.Any(x => x.DbName == dbName))
             {
-                if (Options.CurrentConnectionPool.Any(x => x.DbName == dbName))
+                foreach (var item in Options.CurrentConnectionPool)
                 {
-                    foreach (var item in Options.CurrentConnectionPool)
+                    if (item.DbName == dbName)
                     {
-                        if (item.DbName == dbName)
-                        {
-                            item.IsCurrent = true;
-                        }
-                        else
-                        {
-                            item.IsCurrent = false;
-                        }
+                        item.IsCurrent = true;
+                    }
+                    else
+                    {
+                        item.IsCurrent = false;
                     }
                 }
-                else
+            }
+            else
+            {
+                Options.GetConnection(dbName);
+                ChangeDataBase(dbName);
+            }
+        }
+
+        /// <summary>
+        /// 改变连接（分库时可能会用到）
+        /// </summary>
+        /// <param name="dbName">为空时切换回主库</param>
+        public void ChangeProvider(string dbName = "master")
+        {
+            if (Options.CurrentPoviderPool.Any(x => x.DbName == dbName))
+            {
+                foreach (var item in Options.CurrentPoviderPool)
                 {
-                    Options.GetConnection(dbName);
-                    ChangeDataBase(dbName);
+                    if (item.DbName == dbName)
+                    {
+                        item.IsCurrent = true;
+                    }
+                    else
+                    {
+                        item.IsCurrent = false;
+                    }
                 }
+            }
+            else
+            {
+                Options.GetProvider(dbName);
+                ChangeProvider(dbName);
             }
         }
 
@@ -112,7 +139,7 @@ namespace Kogel.Repository
         /// <returns></returns>
         public IQuerySet<T> QuerySet()
         {
-            return new QuerySet<T>(Orm, Options.Provider.Create(), null);
+            return new QuerySet<T>(Orm, OrmProvider, null);
         }
 
         /// <summary>
@@ -122,7 +149,7 @@ namespace Kogel.Repository
         /// <returns></returns>
         public IQuerySet<T> QuerySet(IDbTransaction transaction)
         {
-            return new QuerySet<T>(Orm, Options.Provider.Create(), transaction);
+            return new QuerySet<T>(Orm, OrmProvider, transaction);
         }
 
         /// <summary>
@@ -132,7 +159,7 @@ namespace Kogel.Repository
         /// <returns></returns>
         public IQuerySet<TEntity> QuerySet<TEntity>()
         {
-            return new QuerySet<TEntity>(Orm, Options.Provider.Create());
+            return new QuerySet<TEntity>(Orm, OrmProvider);
         }
 
         /// <summary>
@@ -143,7 +170,7 @@ namespace Kogel.Repository
         /// <returns></returns>
         public IQuerySet<TEntity> QuerySet<TEntity>(IDbTransaction transaction)
         {
-            return new QuerySet<TEntity>(Orm, Options.Provider.Create(), transaction);
+            return new QuerySet<TEntity>(Orm, OrmProvider, transaction);
         }
 
         /// <summary>
@@ -152,7 +179,7 @@ namespace Kogel.Repository
         /// <returns></returns>
         public ICommandSet<T> CommandSet()
         {
-            return new CommandSet<T>(Orm, Options.Provider.Create(), null);
+            return new CommandSet<T>(Orm, OrmProvider, null);
         }
 
         /// <summary>
@@ -162,7 +189,7 @@ namespace Kogel.Repository
         /// <returns></returns>
         public ICommandSet<T> CommandSet(IDbTransaction transaction)
         {
-            return new CommandSet<T>(Orm, Options.Provider.Create(), transaction);
+            return new CommandSet<T>(Orm, OrmProvider, transaction);
         }
 
         /// <summary>
@@ -172,7 +199,7 @@ namespace Kogel.Repository
         /// <returns></returns>
         public ICommandSet<TEntity> CommandSet<TEntity>()
         {
-            return new CommandSet<TEntity>(Orm, Options.Provider.Create(), null);
+            return new CommandSet<TEntity>(Orm, OrmProvider, null);
         }
 
         /// <summary>
@@ -183,7 +210,7 @@ namespace Kogel.Repository
         /// <returns></returns>
         public ICommandSet<TEntity> CommandSet<TEntity>(IDbTransaction transaction)
         {
-            return new CommandSet<TEntity>(Orm, Options.Provider.Create(), transaction);
+            return new CommandSet<TEntity>(Orm, OrmProvider, transaction);
         }
 
         /// <summary>
@@ -194,7 +221,7 @@ namespace Kogel.Repository
         public T FindById(object id)
         {
             DynamicParameters param = new DynamicParameters();
-            string whereSql = Options.Provider.GetIdentityWhere<T>(id, param);
+            string whereSql = OrmProvider.GetIdentityWhere<T>(id, param);
             return QuerySet()
                 .Where($" 1=1 {whereSql}", param)
                 .Get();
@@ -208,7 +235,7 @@ namespace Kogel.Repository
         public async Task<T> FindByIdAsync(object id)
         {
             DynamicParameters param = new DynamicParameters();
-            string whereSql = Options.Provider.GetIdentityWhere<T>(id, param);
+            string whereSql = OrmProvider.GetIdentityWhere<T>(id, param);
             return await QuerySet()
                 .Where($" 1=1 {whereSql}", param)
                 .GetAsync();
@@ -262,7 +289,7 @@ namespace Kogel.Repository
         public int Delete(object id)
         {
             DynamicParameters param = new DynamicParameters();
-            string whereSql = Options.Provider.GetIdentityWhere<T>(id, param);
+            string whereSql = OrmProvider.GetIdentityWhere<T>(id, param);
             return CommandSet()
                 .Where($" 1=1 {whereSql}", param)
                 .Delete();
@@ -276,7 +303,7 @@ namespace Kogel.Repository
         public async Task<int> DeleteAsync(object id)
         {
             DynamicParameters param = new DynamicParameters();
-            string whereSql = Options.Provider.GetIdentityWhere<T>(id, param);
+            string whereSql = OrmProvider.GetIdentityWhere<T>(id, param);
             return await CommandSet()
                 .Where($" 1=1 {whereSql}", param)
                 .DeleteAsync();
@@ -290,7 +317,7 @@ namespace Kogel.Repository
         public int Update(T entity)
         {
             DynamicParameters param = new DynamicParameters();
-            string whereSql = Options.Provider.GetIdentityWhere(entity, param);
+            string whereSql = OrmProvider.GetIdentityWhere(entity, param);
             return CommandSet()
                 .Where($" 1=1 {whereSql}", param)
                 .Update(entity);
@@ -304,7 +331,7 @@ namespace Kogel.Repository
         public async Task<int> UpdateAsync(T entity)
         {
             DynamicParameters param = new DynamicParameters();
-            string whereSql = Options.Provider.GetIdentityWhere(entity, param);
+            string whereSql = OrmProvider.GetIdentityWhere(entity, param);
             return await CommandSet()
                 .Where($" 1=1 {whereSql}", param)
                 .UpdateAsync(entity);
@@ -338,7 +365,7 @@ namespace Kogel.Repository
                         string nameSpaces = string.Empty;
                         //类的完全限定名
                         string fullName = string.Empty;
-                        switch (this.Options.Provider.GetType().Name)
+                        switch (this.OrmProvider.GetType().Name)
                         {
                             case "MsSqlProvider":
                                 {

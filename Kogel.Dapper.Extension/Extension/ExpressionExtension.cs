@@ -6,7 +6,7 @@ using System.Reflection;
 using Dapper;
 using Kogel.Dapper.Extension;
 using Kogel.Dapper.Extension.Expressions;
-using Kogel.Dapper.Extension.Model;
+using Kogel.Dapper.Extension.Entites;
 
 namespace Kogel.Dapper.Extension.Extension
 {

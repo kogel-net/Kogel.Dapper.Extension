@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 using System.Text;
 using Dapper;
-using Kogel.Dapper.Extension.Model;
+using Kogel.Dapper.Extension.Entites;
 using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension;
 using Kogel.Dapper.Extension.Extension;

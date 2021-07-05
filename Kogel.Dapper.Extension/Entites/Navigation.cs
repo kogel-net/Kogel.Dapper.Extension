@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kogel.Dapper.Extension.Model
+namespace Kogel.Dapper.Extension.Entites
 {
 	/// <summary>
 	/// 导航属性的关联解析实体

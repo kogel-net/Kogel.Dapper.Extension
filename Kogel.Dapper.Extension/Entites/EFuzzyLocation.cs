@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kogel.Dapper.Extension.Model
+namespace Kogel.Dapper.Extension.Entites
 {
     public enum EFuzzyLocation
     {

@@ -4,7 +4,7 @@ using System.Data;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace Kogel.Dapper.Extension.Model
+namespace Kogel.Dapper.Extension.Entites
 {
     public class DynamicTree
     {

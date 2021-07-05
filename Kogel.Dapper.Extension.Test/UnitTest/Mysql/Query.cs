@@ -11,7 +11,7 @@ using Kogel.Dapper.Extension.Test.Model.Dto;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
-using Kogel.Dapper.Extension.Model;
+using Kogel.Dapper.Extension.Entites;
 
 namespace Kogel.Dapper.Extension.Test.UnitTest.Mysql
 {

@@ -4,7 +4,7 @@ using System.Data;
 using System.Linq.Expressions;
 using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension.Helper;
-using Kogel.Dapper.Extension.Model;
+using Kogel.Dapper.Extension.Entites;
 using System.Linq;
 using Kogel.Dapper.Extension.Extension;
 using Dapper;

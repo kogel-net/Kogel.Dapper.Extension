@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using Kogel.Dapper.Extension.Extension;
 using Kogel.Dapper.Extension.Helper;
-using Kogel.Dapper.Extension.Model;
+using Kogel.Dapper.Extension.Entites;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

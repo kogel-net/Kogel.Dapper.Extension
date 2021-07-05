@@ -1,4 +1,4 @@
-﻿namespace Kogel.Dapper.Extension.Model
+﻿namespace Kogel.Dapper.Extension.Entites
 {
     public enum EOperateType
     {

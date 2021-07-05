@@ -24,6 +24,12 @@ namespace Kogel.Repository.Interfaces
 		void ChangeDataBase(string dbName = "master");
 
 		/// <summary>
+		/// 改变当前提供方（分库时可能会用到）
+		/// </summary>
+		/// <param name="dbName"></param>
+		void ChangeProvider(string dbName = "master");
+
+		/// <summary>
 		/// 工作单元
 		/// </summary>
 		IUnitOfWork UnitOfWork { get; set; }

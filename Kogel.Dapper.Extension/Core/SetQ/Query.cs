@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
 using Kogel.Dapper.Extension.Core.Interfaces;
-using Kogel.Dapper.Extension.Model;
+using Kogel.Dapper.Extension.Entites;
 using Kogel.Dapper.Extension.Extension;
 using Dapper;
 

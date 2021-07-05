@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Kogel.Dapper.Extension.Model
+namespace Kogel.Dapper.Extension
 {
     /// <summary>
     /// 分页实体类

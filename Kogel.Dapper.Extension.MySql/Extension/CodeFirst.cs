@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using System.Data;
-using Kogel.Dapper.Extension.Model;
+using Kogel.Dapper.Extension.Entites;
 using Kogel.Dapper.Extension.Extension;
 
 namespace Kogel.Dapper.Extension.MySql.Extension

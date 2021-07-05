@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Text;
 using Dapper;
 
-namespace Kogel.Dapper.Extension.Model
+namespace Kogel.Dapper.Extension.Entites
 {
 	public class JoinAssTable : ICloneable
 	{
