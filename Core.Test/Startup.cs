@@ -34,7 +34,7 @@ namespace Core.Test
             services.AddKogelRepository((kogel) =>
             {
                 kogel.BuildConnection(x => new MySqlConnection(@"server=192.168.0.120;port=3306;user id=root;password=123456;database=gc_fps_receivable;Persist Security Info=True;"));
-                kogel.BuildProvider(new MySqlProvider());
+                kogel.BuildProvider(x => new MySqlProvider());
             });
 
             ////多种不同类型数据库版仓储定义

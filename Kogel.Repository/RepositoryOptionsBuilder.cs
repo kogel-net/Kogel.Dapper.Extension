@@ -139,6 +139,7 @@ namespace Kogel.Repository
         /// <param name="provider"></param>
         /// <param name="dbName"></param>
         /// <returns></returns>
+        [Obsolete]
         public RepositoryOptionsBuilder BuildProvider(SqlProvider provider, string dbName = "master")
         {
             if (!Global.ProviderPool.Any(x => x.DbName == dbName))
@@ -146,6 +147,25 @@ namespace Kogel.Repository
                 Global.ProviderPool.Add(new ProviderPool
                 {
                     FuncProvider = (x => provider.Create()),
+                    DbName = dbName
+                });
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// 配置数据库提供者
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <param name="dbName"></param>
+        /// <returns></returns>
+        public RepositoryOptionsBuilder BuildProvider(Func<SqlProvider, SqlProvider> provider, string dbName = "master")
+        {
+            if (!Global.ProviderPool.Any(x => x.DbName == dbName))
+            {
+                Global.ProviderPool.Add(new ProviderPool
+                {
+                    FuncProvider = provider,
                     DbName = dbName
                 });
             }

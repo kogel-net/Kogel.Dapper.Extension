@@ -28,6 +28,7 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// 字段匹配(适用于实体类字段和数据库字段不一致时,返回值为Dynamic类型时不适用)
         /// </summary>
         /// <returns></returns>
+        [Obsolete]
         IQuerySet<T> FieldMatch<TSource>();
 
         /// <summary>

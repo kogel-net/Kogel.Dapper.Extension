@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Dapper;
 
 namespace Core.Test.Controllers
 {
@@ -22,10 +23,13 @@ namespace Core.Test.Controllers
         [HttpGet]
         public ActionResult<object> Get()
         {
-            var flowOrder = repository.FindById(4);
-
-
-            flowOrder = repository.FindById(5);
+            var flowOrder = repository.QuerySet()
+                .Top(100)
+                .Distinct()
+                .ToList(x => new
+                {
+                    x.CustomerCode
+                });
             return flowOrder;
         }
     }
