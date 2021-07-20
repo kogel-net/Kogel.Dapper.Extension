@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP
+﻿#if NETCOREAPP || NETSTANDARD2_0
 using Kogel.Dapper.Extension;
 using Kogel.Repository.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
