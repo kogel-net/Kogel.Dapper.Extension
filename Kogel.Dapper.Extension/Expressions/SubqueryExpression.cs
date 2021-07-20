@@ -161,7 +161,7 @@ namespace Kogel.Dapper.Extension.Expressions
                             }
                         }
                         //正常方法
-                        string[] methodArr = new string[] { "Count", "Sum", "Min", "Max", "Get", "ToList", "PageList" };
+                        string[] methodArr = new string[] { "Count", "Sum", "Min", "Max", "Get", "ToList", "Page", "PageList" };
                         if (!methodArr.Contains(methodCallExpression.Method.Name))
                         {
                             object[] parameters = methodCallExpression.Arguments.Select(x => x.ToConvertAndGetValue()).ToArray();
@@ -313,6 +313,38 @@ namespace Kogel.Dapper.Extension.Expressions
                         }
                         sqlProvider.Context.Set.SelectExpression = lambda;
                         sqlProvider.FormatToList<T>();
+                    }
+                    break;
+                case "Page":
+                    {
+                        int pageIndex = Convert.ToInt32(this.expression.Arguments[0].ToConvertAndGetValue());
+                        int pageSize = Convert.ToInt32(this.expression.Arguments[1].ToConvertAndGetValue());
+                        LambdaExpression lambda = default(LambdaExpression);
+                        if (this.expression.Arguments.Count == 3)
+                        {
+                            lambda = this.expression.Arguments[2].GetLambdaExpression();
+                            this.ReturnType = lambda.ReturnType;
+                        }
+                        else if (this.expression.Arguments.Count == 2)//无自定义列表返回
+                        {
+                            lambda = null;
+                            this.ReturnType = this.expression.Method.ReturnType.GenericTypeArguments[0];
+                        }
+                        else
+                        {
+                            //带if判断
+                            if (this.expression.Arguments[2].ToConvertAndGetValue().Equals(true))
+                            {
+                                lambda = this.expression.Arguments[3].GetLambdaExpression();
+                            }
+                            else
+                            {
+                                lambda = this.expression.Arguments[4].GetLambdaExpression();
+                            }
+                            this.ReturnType = lambda.ReturnType;
+                        }
+                        sqlProvider.Context.Set.SelectExpression = lambda;
+                        sqlProvider.FormatToPageList<T>(pageIndex, pageSize);
                     }
                     break;
                 default:

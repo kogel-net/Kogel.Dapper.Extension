@@ -57,6 +57,22 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
 
         Task<List<TReturn>> ToListAsync<TReturn>(bool where, Expression<Func<T, TReturn>> trueSelect, Expression<Func<T, TReturn>> falseSelect);
 
+        List<T> Page(int pageIndex, int pageSize);
+
+        List<TSource> Page<TSource>(int pageIndex, int pageSize);
+
+        List<TReturn> Page<TReturn>(int pageIndex, int pageSize, Expression<Func<T, TReturn>> select);
+
+        List<TReturn> Page<TReturn>(int pageIndex, int pageSize, bool where, Expression<Func<T, TReturn>> trueSelect, Expression<Func<T, TReturn>> falseSelect);
+
+        Task<List<T>> PageAsync(int pageIndex, int pageSize);
+
+        Task<List<TSource>> PageAsync<TSource>(int pageIndex, int pageSize);
+
+        Task<List<TReturn>> PageAsync<TReturn>(int pageIndex, int pageSize, Expression<Func<T, TReturn>> select);
+
+        Task<List<TReturn>> PageAsync<TReturn>(int pageIndex, int pageSize, bool where, Expression<Func<T, TReturn>> trueSelect, Expression<Func<T, TReturn>> falseSelect);
+
         PageList<T> PageList(int pageIndex, int pageSize);
 
         PageList<TSource> PageList<TSource>(int pageIndex, int pageSize);

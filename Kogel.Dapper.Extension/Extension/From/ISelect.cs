@@ -96,6 +96,20 @@ namespace Kogel.Dapper.Extension.Extension.From
             return await QuerySet.DbCon.QueryDataSetsAsync(QuerySet.SqlProvider, QuerySet.DbTransaction, dataAdapter);
         }
 
+        public List<TReturn> Page<TReturn>(int pageIndex, int pageSize, LambdaExpression exp)
+        {
+            QuerySet.SqlProvider.Context.Set.SelectExpression = exp;
+            QuerySet.SqlProvider.FormatToPageList<T>(pageIndex, pageSize);
+            return QuerySet.DbCon.Query_1<TReturn>(QuerySet.SqlProvider, QuerySet.DbTransaction);
+        }
+
+        public async Task<List<TReturn>> PageAsync<TReturn>(int pageIndex, int pageSize, LambdaExpression exp)
+        {
+            QuerySet.SqlProvider.Context.Set.SelectExpression = exp;
+            QuerySet.SqlProvider.FormatToPageList<T>(pageIndex, pageSize);
+            return await QuerySet.DbCon.Query_1Async<TReturn>(QuerySet.SqlProvider, QuerySet.DbTransaction);
+        }
+
         public PageList<TReturn> PageList<TReturn>(int pageIndex, int pageSize, LambdaExpression exp)
         {
             QuerySet.SqlProvider.Context.Set.SelectExpression = exp;
@@ -266,6 +280,32 @@ namespace Kogel.Dapper.Extension.Extension.From
             return this;
         }
 
+        public List<TReturn> Page<TReturn>(int pageIndex, int pageSize, Expression<Func<T1, T2, TReturn>> select)
+        {
+            return base.Page<TReturn>(pageIndex, pageSize, select);
+        }
+
+        public List<TReturn> Page<TReturn>(int pageIndex, int pageSize, bool where, Expression<Func<T1, T2, TReturn>> trueSelect, Expression<Func<T1, T2, TReturn>> falseSelect)
+        {
+            if (where)
+                return base.Page<TReturn>(pageIndex, pageSize, trueSelect);
+            else
+                return base.Page<TReturn>(pageIndex, pageSize, falseSelect);
+        }
+
+        public Task<List<TReturn>> PageAsync<TReturn>(int pageIndex, int pageSize, Expression<Func<T1, T2, TReturn>> select)
+        {
+            return base.PageAsync<TReturn>(pageIndex, pageSize, select);
+        }
+
+        public Task<List<TReturn>> PageAsync<TReturn>(int pageIndex, int pageSize, bool where, Expression<Func<T1, T2, TReturn>> trueSelect, Expression<Func<T1, T2, TReturn>> falseSelect)
+        {
+            if (where)
+                return base.PageAsync<TReturn>(pageIndex, pageSize, trueSelect);
+            else
+                return base.PageAsync<TReturn>(pageIndex, pageSize, falseSelect);
+        }
+
         public PageList<TReturn> PageList<TReturn>(int pageIndex, int pageSize, Expression<Func<T1, T2, TReturn>> select)
         {
             return base.PageList<TReturn>(pageIndex, pageSize, select);
@@ -410,6 +450,32 @@ namespace Kogel.Dapper.Extension.Extension.From
             return this;
         }
 
+        public List<TReturn> Page<TReturn>(int pageIndex, int pageSize, Expression<Func<T1, T2, T3, TReturn>> select)
+        {
+            return base.Page<TReturn>(pageIndex, pageSize, select);
+        }
+
+        public List<TReturn> Page<TReturn>(int pageIndex, int pageSize, bool where, Expression<Func<T1, T2, T3, TReturn>> trueSelect, Expression<Func<T1, T2, T3, TReturn>> falseSelect)
+        {
+            if (where)
+                return base.Page<TReturn>(pageIndex, pageSize, trueSelect);
+            else
+                return base.Page<TReturn>(pageIndex, pageSize, falseSelect);
+        }
+
+        public Task<List<TReturn>> PageAsync<TReturn>(int pageIndex, int pageSize, Expression<Func<T1, T2, T3, TReturn>> select)
+        {
+            return base.PageAsync<TReturn>(pageIndex, pageSize, select);
+        }
+
+        public Task<List<TReturn>> PageAsync<TReturn>(int pageIndex, int pageSize, bool where, Expression<Func<T1, T2, T3, TReturn>> trueSelect, Expression<Func<T1, T2, T3, TReturn>> falseSelect)
+        {
+            if (where)
+                return base.PageAsync<TReturn>(pageIndex, pageSize, trueSelect);
+            else
+                return base.PageAsync<TReturn>(pageIndex, pageSize, falseSelect);
+        }
+
         public PageList<TReturn> PageList<TReturn>(int pageIndex, int pageSize, Expression<Func<T1, T2, T3, TReturn>> select)
         {
             return base.PageList<TReturn>(pageIndex, pageSize, select);
@@ -503,6 +569,29 @@ namespace Kogel.Dapper.Extension.Extension.From
             base.OrderByDescing(field);
             return this;
         }
+        public List<TReturn> Page<TReturn>(int pageIndex, int pageSize, Expression<Func<T1, T2, T3, T4, TReturn>> select)
+        {
+            return base.Page<TReturn>(pageIndex, pageSize, select);
+        }
+        public List<TReturn> Page<TReturn>(int pageIndex, int pageSize, bool where, Expression<Func<T1, T2, T3, T4, TReturn>> trueSelect, Expression<Func<T1, T2, T3, T4, TReturn>> falseSelect)
+        {
+            if (where)
+                return base.Page<TReturn>(pageIndex, pageSize, trueSelect);
+            else
+                return base.Page<TReturn>(pageIndex, pageSize, falseSelect);
+        }
+        public async Task<List<TReturn>> PageAsync<TReturn>(int pageIndex, int pageSize, Expression<Func<T1, T2, T3, T4, TReturn>> select)
+        {
+            return await base.PageAsync<TReturn>(pageIndex, pageSize, select);
+        }
+        public async Task<List<TReturn>> PageAsync<TReturn>(int pageIndex, int pageSize, bool where, Expression<Func<T1, T2, T3, T4, TReturn>> trueSelect, Expression<Func<T1, T2, T3, T4, TReturn>> falseSelect)
+        {
+            if (where)
+                return await base.PageAsync<TReturn>(pageIndex, pageSize, trueSelect);
+            else
+                return await base.PageAsync<TReturn>(pageIndex, pageSize, falseSelect);
+        }
+
         public PageList<TReturn> PageList<TReturn>(int pageIndex, int pageSize, Expression<Func<T1, T2, T3, T4, TReturn>> select)
         {
             return base.PageList<TReturn>(pageIndex, pageSize, select);
@@ -513,6 +602,17 @@ namespace Kogel.Dapper.Extension.Extension.From
                 return base.PageList<TReturn>(pageIndex, pageSize, trueSelect);
             else
                 return base.PageList<TReturn>(pageIndex, pageSize, falseSelect);
+        }
+        public async Task<PageList<TReturn>> PageListAsync<TReturn>(int pageIndex, int pageSize, Expression<Func<T1, T2, T3, T4, TReturn>> select)
+        {
+            return await base.PageListAsync<TReturn>(pageIndex, pageSize, select);
+        }
+        public async Task<PageList<TReturn>> PageListAsync<TReturn>(int pageIndex, int pageSize, bool where, Expression<Func<T1, T2, T3, T4, TReturn>> trueSelect, Expression<Func<T1, T2, T3, T4, TReturn>> falseSelect)
+        {
+            if (where)
+                return await base.PageListAsync<TReturn>(pageIndex, pageSize, trueSelect);
+            else
+                return await base.PageListAsync<TReturn>(pageIndex, pageSize, falseSelect);
         }
     }
 }

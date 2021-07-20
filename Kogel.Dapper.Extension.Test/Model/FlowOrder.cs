@@ -4,14 +4,14 @@ using Kogel.Dapper.Extension.Attributes;
 namespace Kogel.Dapper.Extension.Test.Model
 {
     [Display(Rename = "flow_order",AsName = "flow_order1")]
-    public class FlowOrder : IBaseEntity<FlowOrder, int>
+    public class FlowOrder : IBaseEntity<FlowOrder, long>
     {
         /// <summary>
         /// id
         /// </summary>
         [Identity(IsIncrease = true)]
         [Display(Rename = "id")]
-        public override int Id { get; set; }
+        public override long Id { get; set; }
 
         /// <summary>
         /// 业务单号
