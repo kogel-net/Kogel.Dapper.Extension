@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace Dapper
+namespace Kogel.Dapper.Extension
 {
     public partial class DynamicParameters
     {

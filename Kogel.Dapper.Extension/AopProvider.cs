@@ -1,4 +1,4 @@
-﻿using Dapper;
+﻿using Kogel.Dapper.Extension;
 using System.Threading;
 
 #if NET45 || NET451

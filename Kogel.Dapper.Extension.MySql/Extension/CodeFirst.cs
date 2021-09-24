@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Dapper;
+using Kogel.Dapper.Extension;
 using System.Data;
 using Kogel.Dapper.Extension.Entites;
 using Kogel.Dapper.Extension.Extension;

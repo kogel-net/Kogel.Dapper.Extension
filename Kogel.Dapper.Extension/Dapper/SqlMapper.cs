@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 using DataException = System.InvalidOperationException;
 #endif
 
-namespace Dapper
+namespace Kogel.Dapper.Extension
 {
     /// <summary>
     /// Dapper, a light weight object mapper for ADO.NET

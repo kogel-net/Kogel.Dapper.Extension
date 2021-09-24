@@ -1,4 +1,4 @@
-﻿using Dapper;
+﻿using Kogel.Dapper.Extension;
 using Kogel.Dapper.Extension.Extension;
 using Kogel.Dapper.Extension.Helper;
 using Kogel.Dapper.Extension.Entites;

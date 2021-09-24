@@ -1,4 +1,4 @@
-﻿using Dapper;
+﻿using Kogel.Dapper.Extension;
 using Kogel.Dapper.Extension.MySql.Extension;
 using Kogel.Dapper.Extension.Test.Model;
 using Kogel.Dapper.Extension.Test.UnitTest.Mysql.Repository;

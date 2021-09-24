@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Dapper;
+using Kogel.Dapper.Extension;
 using Kogel.Dapper.Extension;
 using Kogel.Dapper.Extension.Expressions;
 using Kogel.Dapper.Extension.Entites;

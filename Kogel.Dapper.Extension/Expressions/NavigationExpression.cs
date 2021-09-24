@@ -1,4 +1,4 @@
-﻿using Dapper;
+﻿using Kogel.Dapper.Extension;
 using System;
 using System.Collections.Generic;
 using System.Linq;

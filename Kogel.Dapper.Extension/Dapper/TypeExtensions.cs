@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Collections.Generic;
 
-namespace Dapper
+namespace Kogel.Dapper.Extension
 {
     internal static class TypeExtensions
     {

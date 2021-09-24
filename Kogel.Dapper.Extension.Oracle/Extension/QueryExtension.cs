@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Dapper;
+using Kogel.Dapper.Extension;
 using Kogel.Dapper.Extension.Core.SetQ;
 
 namespace Kogel.Dapper.Extension.Oracle.Extension

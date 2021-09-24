@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Linq.Expressions;
-using Dapper;
+using Kogel.Dapper.Extension;
 using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension.Extension;
 

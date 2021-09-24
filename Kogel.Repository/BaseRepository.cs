@@ -8,7 +8,7 @@ using Kogel.Dapper.Extension;
 using Kogel.Dapper.Extension.Core.SetC;
 using Kogel.Dapper.Extension.Core.SetQ;
 using Kogel.Repository.Interfaces;
-using Dapper;
+using Kogel.Dapper.Extension;
 using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension.Extension;
 

@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 using Kogel.Dapper.Extension.Core.Interfaces;
 using Kogel.Dapper.Extension.Entites;
 using Kogel.Dapper.Extension.Extension;
-using Dapper;
+using Kogel.Dapper.Extension;
 
 namespace Kogel.Dapper.Extension.Core.SetQ
 {

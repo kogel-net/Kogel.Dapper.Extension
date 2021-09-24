@@ -1,7 +1,7 @@
 ﻿using Kogel.Dapper.Extension.Test.Model;
 using Kogel.Dapper.Extension.Test.UnitTest.Mysql.Repository;
 using Kogel.Repository;
-using Dapper;
+using Kogel.Dapper.Extension;
 using MySql.Data.MySqlClient;
 using System.Linq;
 using System;

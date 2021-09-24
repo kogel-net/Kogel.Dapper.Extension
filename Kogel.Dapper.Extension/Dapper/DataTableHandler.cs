@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data;
 #if !NETSTANDARD1_3
-namespace Dapper
+namespace Kogel.Dapper.Extension
 {
     internal sealed class DataTableHandler : SqlMapper.ITypeHandler
     {

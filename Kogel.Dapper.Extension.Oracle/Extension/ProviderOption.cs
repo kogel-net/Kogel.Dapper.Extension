@@ -1,4 +1,4 @@
-﻿using Dapper;
+﻿using Kogel.Dapper.Extension;
 using Kogel.Dapper.Extension.Core.Interfaces;
 using System;
 using System.Data;

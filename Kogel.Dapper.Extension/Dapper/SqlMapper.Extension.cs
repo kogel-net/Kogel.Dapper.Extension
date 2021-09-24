@@ -9,9 +9,9 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Dapper.SqlMapper;
+using static Kogel.Dapper.Extension.SqlMapper;
 
-namespace Dapper
+namespace Kogel.Dapper.Extension
 {
     public static class SqlMapperExtension
     {

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Dapper
+namespace Kogel.Dapper.Extension
 {
     public static partial class SqlMapper
     {

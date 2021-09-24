@@ -3,7 +3,7 @@ using System.Data;
 using System.Reflection;
 
 #if !NETSTANDARD1_3
-namespace Dapper
+namespace Kogel.Dapper.Extension
 {
     /// <summary>
     /// Used to pass a DataTable as a TableValuedParameter

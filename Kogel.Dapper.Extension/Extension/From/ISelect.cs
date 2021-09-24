@@ -6,7 +6,7 @@ using System.Linq;
 using Kogel.Dapper.Extension.Entites;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
-using Dapper;
+using Kogel.Dapper.Extension;
 using System.Data;
 using System.Threading.Tasks;
 using Kogel.Dapper.Extension.Core.Interfaces;

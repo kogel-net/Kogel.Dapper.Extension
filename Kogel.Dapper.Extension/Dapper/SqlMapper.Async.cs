@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Dapper
+namespace Kogel.Dapper.Extension
 {
     public static partial class SqlMapper
     {

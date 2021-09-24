@@ -1,4 +1,4 @@
-﻿namespace Dapper
+﻿namespace Kogel.Dapper.Extension
 {
     public static partial class SqlMapper
     {

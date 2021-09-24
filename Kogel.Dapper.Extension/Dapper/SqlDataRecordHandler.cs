@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 
-namespace Dapper
+namespace Kogel.Dapper.Extension
 {
     internal sealed class SqlDataRecordHandler : SqlMapper.ITypeHandler
     {
