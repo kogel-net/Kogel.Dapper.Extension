@@ -3,14 +3,14 @@
     <PackageId>Kogel.Dapper.Extension</PackageId>
     <PackageTags>orm;sql;micro-orm</PackageTags>
     <Title>Dapper</Title>
-    <Description>官方文档
-https://www.cnblogs.com/kogel/p/10805696.html</Description>
+    <Description>orm;sql;micro-orm</Description>
     <Authors>Kogel</Authors>
     <TargetFrameworks>net45;net451;netstandard2.0;netcoreapp2.1;netcoreapp3.1;</TargetFrameworks>
     <Company>Kogel.Dapper.Extension</Company>
     <Product>Kogel.Dapper.Extension</Product>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>3.2.2.0</Version>
+    <Version>3.2.2.1</Version>
+    <PackageIcon>icon.jpg</PackageIcon>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net45' Or '$(TargetFramework)' == 'net451'">
     <Reference Include="System" />
@@ -50,5 +50,12 @@ https://www.cnblogs.com/kogel/p/10805696.html</Description>
     <PackageReference Include="System.Xml.XmlDocument">
       <Version>4.3.0</Version>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\Resource\icon.jpg">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 </Project>

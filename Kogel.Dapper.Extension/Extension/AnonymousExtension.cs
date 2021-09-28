@@ -43,7 +43,7 @@ namespace Kogel.Dapper.Extension.Extension
         public static async Task<List<T>> Query_1Async<T>(this IDbConnection conn, SqlProvider provider, IDbTransaction transaction = null)
         {
             List<T> queryRow = await QueryRowImplAsync<T>(conn, provider, transaction);
-            return queryRow.SetNavigation(conn, provider.ProviderOption);
+            return queryRow.SetNavigationList(conn, provider.ProviderOption);
         }
 
         /// <summary>

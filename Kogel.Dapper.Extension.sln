@@ -19,7 +19,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FrameWork", "FrameWork", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kogel.Repository", "Kogel.Repository\Kogel.Repository.csproj", "{ACE6D42E-6830-4733-B5B7-A91E9B9E4451}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Test", "Core.Test\Core.Test.csproj", "{CE79D5FE-69A2-4664-9A63-9B3E257B2AF7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Test", "Core.Test\Core.Test.csproj", "{CE79D5FE-69A2-4664-9A63-9B3E257B2AF7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Src", "Src", "{1D41244A-346A-4988-8CCB-9F244BEEED90}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
