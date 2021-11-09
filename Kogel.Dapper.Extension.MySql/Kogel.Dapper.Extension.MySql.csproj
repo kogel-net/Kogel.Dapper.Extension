@@ -9,7 +9,7 @@
     <Company>Kogel.Dapper.Extension.MySql</Company>
     <Product>Kogel.Dapper.Extension.MySql</Product>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>3.2.2.1</Version>
+    <Version>3.2.2.2</Version>
     <PackageIcon>icon.jpg</PackageIcon>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net45' Or '$(TargetFramework)' == 'net451'">
