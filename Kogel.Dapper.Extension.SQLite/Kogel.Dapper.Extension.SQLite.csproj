@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageId>Kogel.Dapper.Extension.SQLite</PackageId>
+    <PackageTags>orm;sql;micro-orm</PackageTags>
+    <Title>Dapper</Title>
+    <Description>orm;sql;micro-orm</Description>
+    <Authors>Kogel</Authors>
+    <TargetFrameworks>net45;net451;netstandard2.0;netcoreapp2.1;netcoreapp3.1;</TargetFrameworks>
+    <Company>Kogel.Dapper.Extension.SQLite</Company>
+    <Product>Kogel.Dapper.Extension.SQLite</Product>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>3.2.2.2</Version>
+    <PackageIcon>icon.jpg</PackageIcon>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net45' Or '$(TargetFramework)' == 'net451'">
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Kogel.Dapper.Extension\Kogel.Dapper.Extension.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Resource\icon.jpg">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+</Project>
