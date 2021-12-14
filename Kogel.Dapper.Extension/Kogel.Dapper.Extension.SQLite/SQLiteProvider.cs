@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Kogel.Dapper.Extension.Core.Interfaces;
+using Kogel.Dapper.Extension.SQLite;
 using Kogel.Dapper.Extension.SQLite.Extension;
 
 namespace Kogel.Dapper.Extension

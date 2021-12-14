@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using Kogel.Dapper.Extension.Extension;
 using System.Collections.Generic;
 using System.Linq;
+using Kogel.Dapper.Extension.MsSql;
 
 namespace Kogel.Dapper.Extension
 {

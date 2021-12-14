@@ -87,18 +87,6 @@
     <Folder Include="ViewModel\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Kogel.Dapper.Extension.Mssql\Kogel.Dapper.Extension.MsSql.csproj">
-      <Project>{4febb10f-c126-4c82-af5a-ee5361fee46c}</Project>
-      <Name>Kogel.Dapper.Extension.MsSql</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Kogel.Dapper.Extension.MySql\Kogel.Dapper.Extension.MySql.csproj">
-      <Project>{1e431ff9-d7f5-4a31-8a1d-cd30ad7ebe6a}</Project>
-      <Name>Kogel.Dapper.Extension.MySql</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Kogel.Dapper.Extension.Oracle\Kogel.Dapper.Extension.Oracle.csproj">
-      <Project>{fa113961-e269-437d-bb8d-b30ee87b7883}</Project>
-      <Name>Kogel.Dapper.Extension.Oracle</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Kogel.Dapper.Extension\Kogel.Dapper.Extension.csproj">
       <Project>{87e91d82-ce44-43b0-92b0-f4279a6708d7}</Project>
       <Name>Kogel.Dapper.Extension</Name>
