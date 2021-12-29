@@ -128,6 +128,18 @@ namespace Kogel.Dapper.Extension.Core.SetC
         {
             SqlProvider.FormatInsertIdentity(entity, excludeFields);
             object result = DbCon.ExecuteScalar(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, isExcludeUnitOfWork: SqlProvider.IsExcludeUnitOfWork);
+            var field = EntityCache.QueryEntity(typeof(T)).EntityFieldList.FirstOrDefault(x => x.IsIdentity);
+            if (result != null && field != null && field.PropertyInfo != null)
+            {
+                if (field.PropertyInfo.PropertyType == typeof(int))
+                {
+                    field.PropertyInfo.SetValue(entity, Convert.ToInt32(result), null);
+                }
+                else if (field.PropertyInfo.PropertyType == typeof(long))
+                {
+                    field.PropertyInfo.SetValue(entity, Convert.ToInt64(result), null);
+                }
+            }
             return result != null ? Convert.ToInt64(result) : 0;
         }
 
@@ -147,6 +159,18 @@ namespace Kogel.Dapper.Extension.Core.SetC
         {
             SqlProvider.FormatInsertIdentity(entity, excludeFields);
             object result = await DbCon.ExecuteScalarAsync(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, isExcludeUnitOfWork: SqlProvider.IsExcludeUnitOfWork);
+            var field = EntityCache.QueryEntity(typeof(T)).EntityFieldList.FirstOrDefault(x => x.IsIdentity);
+            if (result != null && field != null && field.PropertyInfo != null)
+            {
+                if (field.PropertyInfo.PropertyType == typeof(int))
+                {
+                    field.PropertyInfo.SetValue(entity, Convert.ToInt32(result), null);
+                }
+                else if (field.PropertyInfo.PropertyType == typeof(long))
+                {
+                    field.PropertyInfo.SetValue(entity, Convert.ToInt64(result), null);
+                }
+            }
             return result != null ? Convert.ToInt64(result) : 0;
         }
 

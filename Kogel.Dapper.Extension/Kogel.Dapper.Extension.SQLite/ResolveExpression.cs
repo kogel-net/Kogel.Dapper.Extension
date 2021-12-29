@@ -7,7 +7,7 @@ using Kogel.Dapper.Extension.Entites;
 using Kogel.Dapper.Extension.Expressions;
 using Kogel.Dapper.Extension.Extension;
 
-namespace Kogel.Dapper.Extension
+namespace Kogel.Dapper.Extension.SQLite
 {
     internal class ResolveExpression : IResolveExpression
     {

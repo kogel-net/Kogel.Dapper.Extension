@@ -11,7 +11,7 @@ using Kogel.Dapper.Extension.Expressions;
 using Kogel.Dapper.Extension.Extension;
 using Kogel.Dapper.Extension.Entites;
 
-namespace Kogel.Dapper.Extension
+namespace Kogel.Dapper.Extension.MySql
 {
     internal class ResolveExpression : IResolveExpression
     {
