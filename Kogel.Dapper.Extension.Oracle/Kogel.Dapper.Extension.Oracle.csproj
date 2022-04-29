@@ -9,7 +9,7 @@
     <Company>Kogel.Dapper.Extension.Oracle</Company>
     <Product>Kogel.Dapper.Extension.Oracle</Product>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>3.2.2.2</Version>
+    <Version>3.2.2.3</Version>
     <PackageIcon>icon.jpg</PackageIcon>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net45' Or '$(TargetFramework)' == 'net451'">

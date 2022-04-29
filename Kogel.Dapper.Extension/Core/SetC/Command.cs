@@ -54,7 +54,7 @@ namespace Kogel.Dapper.Extension.Core.SetC
 
         public async Task<int> UpdateAsync(T entity, string[] excludeFields = null, int timeout = 120)
         {
-            SqlProvider.FormatUpdate(entity, null);
+            SqlProvider.FormatUpdate(entity, excludeFields);
             return await DbCon.ExecuteAsync(SqlProvider.SqlString, SqlProvider.Params, DbTransaction, isExcludeUnitOfWork: SqlProvider.IsExcludeUnitOfWork);
         }
 

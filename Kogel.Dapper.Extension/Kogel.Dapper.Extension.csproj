@@ -9,8 +9,10 @@
     <Company>Kogel.Dapper.Extension</Company>
     <Product>Kogel.Dapper.Extension</Product>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>3.2.2.2</Version>
+    <Version>3.2.2.3</Version>
     <PackageIcon>icon.jpg</PackageIcon>
+    <AssemblyVersion>3.2.2.3</AssemblyVersion>
+    <FileVersion>3.2.2.3</FileVersion>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net45' Or '$(TargetFramework)' == 'net451'">
     <Reference Include="System" />

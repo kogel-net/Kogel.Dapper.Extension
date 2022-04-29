@@ -9,8 +9,9 @@
     <Company>Kogel.Dapper.Extension.SQLite</Company>
     <Product>Kogel.Dapper.Extension.SQLite</Product>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>3.2.2.2</Version>
+    <Version>3.2.2.3</Version>
     <PackageIcon>icon.jpg</PackageIcon>
+    <AssemblyVersion>3.2.2.3</AssemblyVersion>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net45' Or '$(TargetFramework)' == 'net451'">
     <Reference Include="System" />
