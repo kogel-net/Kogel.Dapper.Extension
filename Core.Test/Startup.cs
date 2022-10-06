@@ -15,6 +15,7 @@ using MySql.Data.MySqlClient;
 using Kogel.Dapper.Extension.MySql;
 using Kogel.Dapper.Extension;
 using Core.Test.Model;
+using System.Data.SqlClient;
 
 namespace Core.Test
 {
@@ -33,8 +34,11 @@ namespace Core.Test
             //简便版仓储定义
             services.AddKogelRepository((kogel) =>
             {
-                kogel.BuildConnection(x => new MySqlConnection(@"server=192.168.0.120;port=3306;user id=root;password=123456;database=gc_fps_receivable;Persist Security Info=True;"));
-                kogel.BuildProvider(x => new MySqlProvider());
+                //kogel.BuildConnection(x => new MySqlConnection(@"server=192.168.0.120;port=3306;user id=root;password=123456;database=gc_fps_receivable;Persist Security Info=True;"));
+                //kogel.BuildProvider(x => new MySqlProvider());
+                kogel.BuildConnection(x => new SqlConnection("server=192.168.3.9;uid=sa;pwd=ABCabc123;database=XiaoMingMall;"), "master");
+                kogel.BuildConnection(x => new SqlConnection("server=192.168.3.9;uid=sa;pwd=ABCabc123;database=KPcba;"), "KPcba");
+                kogel.BuildProvider(x => new MsSqlProvider());
             });
 
             ////多种不同类型数据库版仓储定义

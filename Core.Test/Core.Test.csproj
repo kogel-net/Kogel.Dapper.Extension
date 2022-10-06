@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Kogel.Dapper.Extension.Mssql\Kogel.Dapper.Extension.MsSql.csproj" />
     <ProjectReference Include="..\Kogel.Dapper.Extension.MySql\Kogel.Dapper.Extension.MySql.csproj" />
     <ProjectReference Include="..\Kogel.Repository\Kogel.Repository.csproj" />
   </ItemGroup>

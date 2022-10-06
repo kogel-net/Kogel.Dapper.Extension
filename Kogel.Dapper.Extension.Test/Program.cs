@@ -20,10 +20,10 @@ namespace Kogel.Dapper.Extension.Test
         {
             #region mssql单元测试
             var mssqlQuery = new UnitTest.Mssql.Query();
-            mssqlQuery.Test();
+            //mssqlQuery.Test();
 
-            //var mssqlCommand = new UnitTest.Mssql.Command();
-            //mssqlCommand.Test();
+            var mssqlCommand = new UnitTest.Mssql.Command();
+            mssqlCommand.Test();
             #endregion
 
             #region mysql单元测试
