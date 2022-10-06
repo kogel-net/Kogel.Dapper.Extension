@@ -51,7 +51,7 @@ namespace Core.Test.Controllers
         public ActionResult<object> TestUnitOfWork()
         {
             //测试不同数据库中多阶段事务提交
-            repository1.UnitOfWork.BeginTransaction(XaBeginMethod);
+            repository1.UnitOfWork.BeginTransaction(XaBeginMethod);     
             //这里会做统一提交
             repository1.UnitOfWork.Commit();
             return "success";
@@ -68,6 +68,8 @@ namespace Core.Test.Controllers
             });
             //因为嵌套工作单元和不是一个db连接的关系，这里是一个伪提交
             repository2.UnitOfWork.Commit();
+
+            throw new Exception("这里异常了!");
         }
 
     }

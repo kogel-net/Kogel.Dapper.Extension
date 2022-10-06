@@ -81,11 +81,14 @@ namespace Kogel.Repository
 #endif
                 transactionMethod.Invoke();
             }
-            //catch (Exception ex)
-            //{
-            //    //this.Rollback();此处回滚无效
-            //    throw ex;
-            //}
+            catch (Exception)
+            {
+                //手动处理所有异常
+#if NETCOREAPP || NETSTANDARD
+                _unitOfWorkContext.Value.ForEach(x => x.Dispose());
+#endif
+                throw;
+            }
             finally
             {
                 SqlMapper.Aop.OnExecuting -= Aop_OnExecuting;
