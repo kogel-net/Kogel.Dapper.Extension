@@ -9,6 +9,7 @@ using Kogel.Dapper.Extension;
 using Kogel.Dapper.Extension.Attributes;
 using System.Xml.Linq;
 using Kogel.Repository.Interfaces;
+using System.Data.SqlClient;
 
 namespace Core.Test.Controllers
 {
@@ -31,6 +32,14 @@ namespace Core.Test.Controllers
             this.repository2 = repository.QuerySet<Test>().GetRepository();
             //并切换到另一个数据源
             this.repository2.ChangeDataBase("KPcba");
+
+
+            SqlMapper.Aop.OnExecuting += Aop_OnExecuting;
+        }
+
+        private void Aop_OnExecuting(ref CommandDefinition command)
+        {
+
         }
 
         //// GET api/values
@@ -51,14 +60,21 @@ namespace Core.Test.Controllers
         public ActionResult<object> TestUnitOfWork()
         {
             //测试不同数据库中多阶段事务提交
-            repository1.UnitOfWork.BeginTransaction(XaBeginMethod);     
+            repository1.UnitOfWork.BeginTransaction(XaBeginMethod);
             //这里会做统一提交
-            repository1.UnitOfWork.Commit();
+            repository1.UnitOfWork.Rollback();
             return "success";
         }
 
         public void XaBeginMethod()
         {
+            _ = repository1.CommandSet()
+                 .Where(x => x.Name == "1")
+                 .Update(x => new Test
+                 {
+                     Name = Function.IfNull(x.Name, "123") + "4"
+                 });
+
             repository1.Insert(new Test { Name = "1" });
             repository2.Insert(new Test { Name = "2" });
 
@@ -69,7 +85,11 @@ namespace Core.Test.Controllers
             //因为嵌套工作单元和不是一个db连接的关系，这里是一个伪提交
             repository2.UnitOfWork.Commit();
 
-            throw new Exception("这里异常了!");
+            //甚至写sql都可以哦，一样会强制进入到事务中
+            using (var conn = new SqlConnection("server=192.168.3.9;uid=sa;pwd=ABCabc123;database=XiaoMingMall;"))
+            {
+                var id = conn.ExecuteScalar<int>("Insert into test(name)values('kogel牛逼!')SELECT @@IDENTITY");
+            }
         }
 
     }
