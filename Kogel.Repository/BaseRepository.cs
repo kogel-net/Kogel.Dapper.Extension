@@ -75,7 +75,8 @@ namespace Kogel.Repository
             if (Options.CurrentConnectionPool != null)
                 foreach (var item in Options.CurrentConnectionPool)
                 {
-                    item.Connection.Dispose();
+                    if (item.Connection != null)
+                        item.Connection.Dispose();
                 }
         }
 

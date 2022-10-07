@@ -58,7 +58,7 @@ namespace Core.Test.Controllers
 
         [HttpGet]
         public ActionResult<object> TestUnitOfWork()
-        {
+        {   
             //测试不同数据库中多阶段事务提交
             repository1.UnitOfWork.BeginTransaction(XaBeginMethod);
             //这里会做统一提交

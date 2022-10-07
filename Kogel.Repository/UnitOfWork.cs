@@ -220,16 +220,16 @@ namespace Kogel.Repository
         /// </summary>
         public void Dispose()
         {
+#if NET45 || NET451
             if (Transaction != null)
             {
-#if NET45 || NET451
                 Transaction.Dispose();
-#else
-                //上下文中所有事务提交
-                _unitOfWorkContext.Value.ForEach(x => x.Transaction.Dispose());
-#endif
             }
-
+#else
+            //上下文中所有事务提交
+            if (_unitOfWorkContext.Value != null)
+                _unitOfWorkContext.Value.ForEach(x => x.Transaction?.Dispose());
+#endif
             GC.SuppressFinalize(this);
         }
 
