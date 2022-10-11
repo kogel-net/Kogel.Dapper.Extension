@@ -26,6 +26,11 @@ namespace Kogel.Repository
         /// </summary>
         public IDbTransaction Transaction { get; set; }
 
+        /// <summary>
+        /// 事务隔离级别（可能继承给当前上下文中的事务）
+        /// </summary>
+        private IsolationLevel? _isolationLevel { get; set; }
+
 #if NETCOREAPP || NETSTANDARD
         /// <summary>
         /// 上下文中所有得工作单元
@@ -60,13 +65,16 @@ namespace Kogel.Repository
         /// <param name="isolationLevel"></param>
         /// <returns></returns>
         [UnitOfWorkAttrbute]
-        public IUnitOfWork BeginTransaction(Action transactionMethod, System.Data.IsolationLevel isolationLevel = System.Data.IsolationLevel.ReadCommitted)
+        public IUnitOfWork BeginTransaction(Action transactionMethod, IsolationLevel isolationLevel = IsolationLevel.ReadCommitted)
         {
             if (Connection.State == ConnectionState.Closed)
                 Connection.Open();
 
             if (Transaction == null)
                 Transaction = Connection.BeginTransaction(isolationLevel);
+
+            if (_isolationLevel == null)
+                _isolationLevel = isolationLevel;
             try
             {
                 SqlMapper.Aop.OnExecuting += Aop_OnExecuting;
@@ -85,7 +93,7 @@ namespace Kogel.Repository
             {
                 //手动处理所有异常
 #if NETCOREAPP || NETSTANDARD
-                _unitOfWorkContext.Value.ForEach(x => x.Dispose());
+                _unitOfWorkContext?.Value?.ForEach(x => x?.Dispose());
 #endif
                 throw;
             }
@@ -153,7 +161,7 @@ namespace Kogel.Repository
                                 throw new DapperExtensionException($"连接未注入{this.Connection.ConnectionString}");
                             command.Connection = connectionFunc.FuncConnection.Invoke(null);
                             command.Connection.Open();
-                            command.Transaction = command.Connection.BeginTransaction();
+                            command.Transaction = command.Connection.BeginTransaction(_isolationLevel ?? IsolationLevel.ReadCommitted);
                             _unitOfWorkContext.Value.Add(new UnitOfWork(command.Connection, command.Transaction));
                         }
                     }
@@ -186,16 +194,12 @@ namespace Kogel.Repository
         /// </summary>
         public void Commit()
         {
-            if (Transaction != null)
-                if (!IsAnyUnitOfWork())
-                {
 #if NET45 || NET451
-                    Transaction.Commit();
+            Transaction?.Commit();
 #else
-                    //上下文中所有事务提交
-                    _unitOfWorkContext.Value.ForEach(x => x.Transaction.Commit());
+            //上下文中所有事务提交
+            _unitOfWorkContext?.Value?.ForEach(x => x.Transaction?.Commit());
 #endif
-                }
         }
 
         /// <summary>
@@ -203,16 +207,15 @@ namespace Kogel.Repository
         /// </summary>
         public void Rollback()
         {
-            if (Transaction != null)
-                if (!IsAnyUnitOfWork())
-                {
+            if (!IsAnyUnitOfWork())
+            {
 #if NET45 || NET451
-                    Transaction.Rollback();
+                Transaction?.Rollback();
 #else
-                    //上下文中所有事务提交
-                    _unitOfWorkContext.Value.ForEach(x => x.Transaction.Rollback());
+                //上下文中所有事务提交
+                _unitOfWorkContext?.Value?.ForEach(x => x.Transaction?.Rollback());
 #endif
-                }
+            }
         }
 
         /// <summary>
@@ -221,19 +224,12 @@ namespace Kogel.Repository
         public void Dispose()
         {
 #if NET45 || NET451
-            if (Transaction != null)
-            {
-                Transaction.Dispose();
-            }
+            Transaction?.Dispose();
 #else
-            //上下文中所有事务提交
-            if (_unitOfWorkContext.Value != null)
-                _unitOfWorkContext.Value.ForEach(x => x.Transaction?.Dispose());
+            _unitOfWorkContext?.Value?.ForEach(x => x.Transaction?.Dispose());
 #endif
             GC.SuppressFinalize(this);
         }
-
-        ~UnitOfWork() => this.Dispose();
 
         /// <summary>
         /// 是否存在最外层嵌套单元

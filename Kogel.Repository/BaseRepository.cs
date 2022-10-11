@@ -55,29 +55,20 @@ namespace Kogel.Repository
             SyncStructure();
         }
 
-        ~BaseRepository()
-        {
-            Dispose();
-        }
-
         /// <summary>
         /// 配置连接信息
         /// </summary>
-        /// <param name="connectionFactory"></param>
+        /// <param name="builder"></param>
         public abstract void OnConfiguring(RepositoryOptionsBuilder builder);
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void Dispose()
         {
-            if (UnitOfWork != null)
-                UnitOfWork.Dispose();
-
+            UnitOfWork?.Dispose();
             //释放整个连接池
-            if (Options.CurrentConnectionPool != null)
-                foreach (var item in Options.CurrentConnectionPool)
-                {
-                    if (item.Connection != null)
-                        item.Connection.Dispose();
-                }
+            Options.CurrentConnectionPool?.ForEach(x => x.Connection?.Dispose());
         }
 
         /// <summary>
