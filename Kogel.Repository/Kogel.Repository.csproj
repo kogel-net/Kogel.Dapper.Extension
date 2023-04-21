@@ -5,14 +5,14 @@
     <Title>Dapper</Title>
     <Description>orm;sql;micro-orm</Description>
     <Authors>Kogel</Authors>
-    <TargetFrameworks>net45;net451;netstandard2.0;netcoreapp2.1;netcoreapp3.1;</TargetFrameworks>
+    <TargetFrameworks>net451;netstandard2.0;netcoreapp2.1;netcoreapp3.1;</TargetFrameworks>
     <Company>Kogel.Repository</Company>
     <Product>Kogel.Repository</Product>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>3.2.2.7</Version>
+    <Version>3.2.2.8</Version>
     <PackageIcon>icon.jpg</PackageIcon>
   </PropertyGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net45' Or '$(TargetFramework)' == 'net451'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net451'">
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
