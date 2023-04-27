@@ -48,7 +48,7 @@ namespace Kogel.Dapper.Extension.Expressions
 				var memberInitExpression = expression.Body as MemberInitExpression;
 				foreach (MemberAssignment memberInit in memberInitExpression.Bindings)
 				{
-					base.SpliceField.Clear();
+					base.SqlBuilder.Clear();
 					base.Param = new DynamicParameters();
 					if (_sqlCmd.Length != 0)
 						_sqlCmd.Append(",");
@@ -88,7 +88,7 @@ namespace Kogel.Dapper.Extension.Expressions
 						{
 							_sqlCmd.Remove(_sqlCmd.Length - 1, 1);
 							//自定义查询列表
-							providerOption.NavigationList.Add(new NavigationMemberAssign()
+							ProviderOption.NavigationList.Add(new NavigationMemberAssign()
 							{
 								MemberAssign = memberInit,
 								MemberAssignName = memberInit.Member.Name
@@ -117,13 +117,13 @@ namespace Kogel.Dapper.Extension.Expressions
 					{
 						//值对象
 						Visit(memberInit.Expression);
-						_sqlCmd.Append($"{base.SpliceField} AS {memberInit.Member.Name}");
-						this.SelectFieldPairs.Add(base.SpliceField.ToString(), memberInit.Member.Name);
+						_sqlCmd.Append($"{base.SqlBuilder} AS {memberInit.Member.Name}");
+						this.SelectFieldPairs.Add(base.SqlBuilder.ToString(), memberInit.Member.Name);
 						Param.AddDynamicParams(base.Param);
 						//记录映射字段对应关系
-						providerOption.MappingList.Add(base.SpliceField.ToString(), memberInit.Member.Name);
+						ProviderOption.MappingList.Add(base.SqlBuilder.ToString(), memberInit.Member.Name);
 					}
-					base.Index++;
+					base.ExpIndex++;
 				}
 			}
 			else//匿名类
@@ -135,12 +135,12 @@ namespace Kogel.Dapper.Extension.Expressions
 				{
 					foreach (var argument in newExpression.Arguments)
 					{
-						base.SpliceField.Clear();
+						base.SqlBuilder.Clear();
 						base.Param = new DynamicParameters();
 						if (_sqlCmd.Length != 0)
 							_sqlCmd.Append(",");
 						//返回类型
-						var returnProperty = entity.Properties[base.Index];
+						var returnProperty = entity.Properties[base.ExpIndex];
 						//实体类型
 						Type entityType;
 						//验证是实体类或者是泛型
@@ -152,17 +152,17 @@ namespace Kogel.Dapper.Extension.Expressions
 						{
 							//值对象
 							Visit(argument);
-							_sqlCmd.Append($" {base.SpliceField} AS {returnProperty.Name} ");
+							_sqlCmd.Append($" {base.SqlBuilder} AS {returnProperty.Name} ");
 							Param.AddDynamicParams(base.Param);
 						}
-						base.Index++;
+						base.ExpIndex++;
 					}
 				}
 				else
 				{
 					//单个属性，例如 .Get(x => x.Id);
 					Visit(expression.Body);
-					_sqlCmd.Append(base.SpliceField);
+					_sqlCmd.Append(base.SqlBuilder);
 					Param.AddDynamicParams(base.Param);
 				}
 			}

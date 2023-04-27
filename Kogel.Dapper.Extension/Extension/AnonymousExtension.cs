@@ -46,95 +46,53 @@ namespace Kogel.Dapper.Extension.Extension
             return queryRow.SetNavigationList(conn, provider.ProviderOption);
         }
 
-        /// <summary>
-        /// 查询返回匿名类
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="conn"></param>
-        /// <param name="provider"></param>
-        /// <param name="transaction"></param>
-        /// <returns></returns>
-        private static List<T> QueryRowImpl<T>(IDbConnection conn, SqlProvider provider, IDbTransaction transaction = null)
+        private static async Task<List<T>> QueryRowImplAsync<T>(IDbConnection conn, SqlProvider provider, IDbTransaction transaction = null, bool isAsync = true)
         {
-            List<T> data;
+            List<T> data = new List<T>();
             Type type = typeof(T);
-            if (type.FullName.Contains("AnonymousType"))//匿名类型
+            bool isAnonymousType = type.FullName.Contains("AnonymousType");
+            using (var reader = isAsync ? await conn.ExecuteReaderAsync(provider.SqlString, provider.Params, transaction) : conn.ExecuteReader(provider.SqlString, provider.Params, transaction))
             {
-                ConstructorInfo[] constructorInfoArray = type.GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-                ConstructorInfo noParameterConstructorInfo = constructorInfoArray.FirstOrDefault();
-                data = new List<T>();
-                using (var reader = conn.ExecuteReader(provider.SqlString, provider.Params, transaction))
+                var properties = EntityCache.QueryEntity(type).Properties;
+                while (reader.Read())
                 {
-                    var properties = EntityCache.QueryEntity(type).Properties;
-                    while (reader.Read())
+                    if (isAnonymousType)
                     {
+                        ConstructorInfo[] constructorInfoArray = type.GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                        ConstructorInfo noParameterConstructorInfo = constructorInfoArray.FirstOrDefault();
                         object[] array = new object[properties.Length];
                         for (var i = 0; i < properties.Length; i++)
                         {
                             var item = properties[i];
                             var value = reader[item.Name];
-                            if (value != DBNull.Value)
-                                value = Convert.ChangeType(value, item.PropertyType.GetAnonymousFieldType());
-                            else
-                                value = default;
-                            array[i] = value;
+                            array[i] = value != DBNull.Value ? Convert.ChangeType(value, item.PropertyType.GetAnonymousFieldType()) : default;
                         }
                         T t = (T)noParameterConstructorInfo.Invoke(array);
                         data.Add(t);
                     }
+                    else
+                    {
+                        T t = Activator.CreateInstance<T>();
+                        foreach (var property in properties)
+                        {
+                            var value = reader[property.Name];
+                            if (value != DBNull.Value)
+                            {
+                                property.SetValue(t, Convert.ChangeType(value, property.PropertyType));
+                            }
+                        }
+                        data.Add(t);
+                    }
                 }
-            }
-            else
-            {
-                data = conn.Querys<T>(provider, transaction).ToList();
             }
             return data;
         }
 
-        /// <summary>
-        /// 查询返回匿名类
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="conn"></param>
-        /// <param name="provider"></param>
-        /// <param name="transaction"></param>
-        /// <returns></returns>
-        private static async Task<List<T>> QueryRowImplAsync<T>(IDbConnection conn, SqlProvider provider, IDbTransaction transaction = null)
+        private static List<T> QueryRowImpl<T>(IDbConnection conn, SqlProvider provider, IDbTransaction transaction = null)
         {
-            List<T> data;
-            Type type = typeof(T);
-            if (type.FullName.Contains("AnonymousType"))//匿名类型
-            {
-                ConstructorInfo[] constructorInfoArray = type.GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-                ConstructorInfo noParameterConstructorInfo = constructorInfoArray.FirstOrDefault();
-                data = new List<T>();
-                using (var reader = await conn.ExecuteReaderAsync(provider.SqlString, provider.Params, transaction))
-                {
-                    var properties = EntityCache.QueryEntity(type).Properties;
-                    while (reader.Read())
-                    {
-                        object[] array = new object[properties.Length];
-                        for (var i = 0; i < properties.Length; i++)
-                        {
-                            var item = properties[i];
-                            var value = reader[item.Name];
-                            if (value != DBNull.Value)
-                                value = Convert.ChangeType(value, item.PropertyType.GetAnonymousFieldType());
-                            else
-                                value = default;
-                            array[i] = value;
-                        }
-                        T t = (T)noParameterConstructorInfo.Invoke(array);
-                        data.Add(t);
-                    }
-                }
-            }
-            else
-            {
-                data = (await conn.QueryAsyncs<T>(provider, transaction)).ToList();
-            }
-            return data;
+            return QueryRowImplAsync<T>(conn, provider, transaction, false).GetAwaiter().GetResult();
         }
+
         #endregion
 
         #region 导航拓展

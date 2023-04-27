@@ -37,12 +37,12 @@ namespace Kogel.Dapper.Extension.Expressions
 			var newExpression = expression.Body as NewExpression;
 			foreach (var argument in newExpression.Arguments)
 			{
-				base.SpliceField.Clear();
+				base.SqlBuilder.Clear();
 				base.Param = new DynamicParameters();
 				if (_sqlCmd.Length != 0)
 					_sqlCmd.Append(",");
 				//返回类型
-				var returnProperty = entity.Properties[base.Index];
+				var returnProperty = entity.Properties[base.ExpIndex];
 				//实体类型
 				Type entityType;
 				//验证是实体类或者是泛型
@@ -54,10 +54,10 @@ namespace Kogel.Dapper.Extension.Expressions
 				{
 					//值对象
 					Visit(argument);
-					_sqlCmd.Append($" {base.SpliceField} ");
+					_sqlCmd.Append($" {base.SqlBuilder} ");
 					Param.AddDynamicParams(base.Param);
 				}
-				base.Index++;
+				base.ExpIndex++;
 			}
 		}
 	}

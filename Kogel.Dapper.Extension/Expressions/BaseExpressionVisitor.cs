@@ -19,7 +19,7 @@ namespace Kogel.Dapper.Extension.Expressions
         /// <summary>
         /// 字段sql
         /// </summary>
-        internal StringBuilder SpliceField { get; set; }
+        internal StringBuilder SqlBuilder { get; set; }
 
         /// <summary>
         /// 参数
@@ -34,19 +34,19 @@ namespace Kogel.Dapper.Extension.Expressions
         /// <summary>
         /// 解析第n个下标
         /// </summary>
-        protected int Index { get; set; }
+        protected int ExpIndex { get; set; }
 
         /// <summary>
         /// 提供方选项
         /// </summary>
-        protected IProviderOption providerOption;
+        protected IProviderOption ProviderOption;
 
         public BaseExpressionVisitor(SqlProvider provider)
         {
-            SpliceField = new StringBuilder();
+            SqlBuilder = new StringBuilder();
             this.Param = new DynamicParameters();
             this.Provider = provider;
-            this.providerOption = provider.ProviderOption;
+            this.ProviderOption = provider.ProviderOption;
         }
 
         /// <summary>
@@ -56,8 +56,8 @@ namespace Kogel.Dapper.Extension.Expressions
         /// <returns></returns>
         protected override Expression VisitBinary(BinaryExpression node)
         {
-            var binary = new BinaryExpressionVisitor(node, Provider, Index);
-            SpliceField.Append(binary.SpliceField);
+            var binary = new BinaryExpressionVisitor(node, Provider, ExpIndex);
+            SqlBuilder.Append(binary._sqlBuilder);
             this.Param.AddDynamicParams(binary.Param);
             return node;
         }
@@ -70,11 +70,11 @@ namespace Kogel.Dapper.Extension.Expressions
         protected override Expression VisitConstant(ConstantExpression node)
         {
             //参数
-            string paramName = $"{providerOption.ParameterPrefix}Member_Param_{Index}_{Param.ParameterNames.Count()}";
+            string paramName = $"{ProviderOption.ParameterPrefix}Member_Param_{ExpIndex}_{Param.ParameterNames.Count()}";
             //值
             object nodeValue = node.ToConvertAndGetValue();
             //设置sql
-            SpliceField.Append(paramName);
+            SqlBuilder.Append(paramName);
             Param.Add(paramName, nodeValue);
             return node;
         }
@@ -97,23 +97,23 @@ namespace Kogel.Dapper.Extension.Expressions
                     if (expTypeName == "System.Linq.Expressions.PropertyExpression" && node.IsConstantExpression())
                     {
                         //参数
-                        string paramName = $"{providerOption.ParameterPrefix}Member_Param_{Index}_{Param.ParameterNames.Count()}";
+                        string paramName = $"{ProviderOption.ParameterPrefix}Member_Param_{ExpIndex}_{Param.ParameterNames.Count()}";
                         //值
                         object nodeValue = node.ToConvertAndGetValue();
                         //设置sql
-                        SpliceField.Append(paramName);
+                        SqlBuilder.Append(paramName);
                         Param.Add(paramName, nodeValue);
                         return node;
                     }
                     var member = EntityCache.QueryEntity(node.Expression.Type);
                     string fieldName = member.FieldPairs[node.Member.Name];
                     //字段全称
-                    string fieldStr = Provider.IsAppendAsName ? $"{member.AsName}.{providerOption.CombineFieldName(fieldName)}"
-                        : providerOption.CombineFieldName(member.FieldPairs[node.Member.Name]);
-                    SpliceField.Append(fieldStr);
+                    string fieldStr = Provider.IsAppendAsName ? $"{member.AsName}.{ProviderOption.CombineFieldName(fieldName)}"
+                        : ProviderOption.CombineFieldName(member.FieldPairs[node.Member.Name]);
+                    SqlBuilder.Append(fieldStr);
 
-                    //string field = $"{member.AsName}.{providerOption.CombineFieldName(fieldName)}";
-                    //SpliceField.Append(field);
+                    //string field = $"{member.AsName}.{ProviderOption.CombineFieldName(fieldName)}";
+                    //_sqlBuilder.Append(field);
                 }
                 else
                 {
@@ -123,7 +123,7 @@ namespace Kogel.Dapper.Extension.Expressions
                     {
                         case "HasValue":
                             {
-                                this.SpliceField.Append(" IS NOT NULL");
+                                this.SqlBuilder.Append(" IS NOT NULL");
                             }
                             break;
                     }
@@ -132,11 +132,11 @@ namespace Kogel.Dapper.Extension.Expressions
             else
             {
                 //参数
-                string paramName = $"{providerOption.ParameterPrefix}Member_Param_{Index}_{Param.ParameterNames.Count()}";
+                string paramName = $"{ProviderOption.ParameterPrefix}Member_Param_{ExpIndex}_{Param.ParameterNames.Count()}";
                 //值
                 object nodeValue = node.ToConvertAndGetValue();
                 //设置sql
-                SpliceField.Append(paramName);
+                SqlBuilder.Append(paramName);
                 Param.Add(paramName, nodeValue);
             }
             return node;
@@ -156,7 +156,7 @@ namespace Kogel.Dapper.Extension.Expressions
             else if (node.Method.DeclaringType.FullName.Contains("Kogel.Dapper.Extension"))
             {
                 DynamicParameters parameters = new DynamicParameters();
-                SpliceField.Append($"({node.MethodCallExpressionToSql(ref parameters, Index)})");
+                SqlBuilder.Append($"({node.MethodCallExpressionToSql(ref parameters, ExpIndex)})");
                 Param.AddDynamicParams(parameters);
             }
             else
@@ -183,7 +183,7 @@ namespace Kogel.Dapper.Extension.Expressions
                 case "ToDateTime":
                     {
                         var convertOption = (ConvertOption)Enum.Parse(typeof(ConvertOption), node.Method.Name);
-                        providerOption.CombineConvert(convertOption, SpliceField, () =>
+                        ProviderOption.CombineConvert(convertOption, SqlBuilder, () =>
                         {
                             Visit(node.Object != null ? node.Object : node.Arguments[0]);
                         });
@@ -199,7 +199,7 @@ namespace Kogel.Dapper.Extension.Expressions
                 case "AddSeconds":
                     {
                         var dateOption = (DateOption)Enum.Parse(typeof(DateOption), node.Method.Name);
-                        providerOption.CombineDate(dateOption, SpliceField,
+                        ProviderOption.CombineDate(dateOption, SqlBuilder,
                             () =>
                             {
                                 Visit(node.Object);
@@ -214,7 +214,7 @@ namespace Kogel.Dapper.Extension.Expressions
                 #region 字符处理
                 case "ToLower":
                     {
-                        providerOption.ToLower(SpliceField,
+                        ProviderOption.ToLower(SqlBuilder,
                             () =>
                             {
                                 if (node.Object != null)
@@ -226,7 +226,7 @@ namespace Kogel.Dapper.Extension.Expressions
                     break;
                 case "ToUpper":
                     {
-                        providerOption.ToUpper(SpliceField,
+                        ProviderOption.ToUpper(SqlBuilder,
                             () =>
                             {
                                 if (node.Object != null)
@@ -239,43 +239,43 @@ namespace Kogel.Dapper.Extension.Expressions
                 case "Replace":
                     {
 
-                        SpliceField.Append("Replace(");
+                        SqlBuilder.Append("Replace(");
                         Visit(node.Object);
-                        SpliceField.Append(",");
+                        SqlBuilder.Append(",");
                         Visit(node.Arguments[0]);
-                        SpliceField.Append(",");
+                        SqlBuilder.Append(",");
                         Visit(node.Arguments[1]);
-                        SpliceField.Append(")");
+                        SqlBuilder.Append(")");
                     }
                     break;
                 case "Trim":
                     {
-                        SpliceField.Append("Trim(");
+                        SqlBuilder.Append("Trim(");
                         Visit(node.Object);
-                        SpliceField.Append(")");
+                        SqlBuilder.Append(")");
                     }
                     break;
                 case "Concat":
                     {
-                        SpliceField.Append("Concat(");
+                        SqlBuilder.Append("Concat(");
                         Visit(node.Arguments[0]);
-                        SpliceField.Append(",");
+                        SqlBuilder.Append(",");
                         Visit(node.Arguments[1]);
-                        SpliceField.Append(")");
+                        SqlBuilder.Append(")");
                     }
                     break;
                 case "IfNull":
                     {
-                        SpliceField.Append($"{providerOption.IfNull()}(");
+                        SqlBuilder.Append($"{ProviderOption.IfNull()}(");
                         Visit(node.Arguments[0]);
-                        SpliceField.Append(",");
+                        SqlBuilder.Append(",");
                         Visit(node.Arguments[1]);
-                        SpliceField.Append(")");
+                        SqlBuilder.Append(")");
                     }
                     break;
                 case "ConcatSql":
                     {
-                        SpliceField.Append(node.Arguments[0].ToConvertAndGetValue());
+                        SqlBuilder.Append(node.Arguments[0].ToConvertAndGetValue());
                         // Param
                         if (node.Arguments.Count > 1)
                         {
@@ -287,7 +287,7 @@ namespace Kogel.Dapper.Extension.Expressions
                 #region 聚合函数
                 case "Count":
                     {
-                        providerOption.Count(SpliceField, () =>
+                        ProviderOption.Count(SqlBuilder, () =>
                         {
                             Visit(node.Arguments);
                         });
@@ -295,7 +295,7 @@ namespace Kogel.Dapper.Extension.Expressions
                     break;
                 case "Sum":
                     {
-                        providerOption.Sum(SpliceField, () =>
+                        ProviderOption.Sum(SqlBuilder, () =>
                         {
                             Visit(node.Arguments);
                         });
@@ -303,7 +303,7 @@ namespace Kogel.Dapper.Extension.Expressions
                     break;
                 case "Max":
                     {
-                        providerOption.Max(SpliceField, () =>
+                        ProviderOption.Max(SqlBuilder, () =>
                         {
                             Visit(node.Arguments);
                         });
@@ -311,7 +311,7 @@ namespace Kogel.Dapper.Extension.Expressions
                     break;
                 case "Min":
                     {
-                        providerOption.Min(SpliceField, () =>
+                        ProviderOption.Min(SqlBuilder, () =>
                         {
                             Visit(node.Arguments);
                         });
@@ -319,7 +319,7 @@ namespace Kogel.Dapper.Extension.Expressions
                     break;
                 case "Avg":
                     {
-                        providerOption.Avg(SpliceField, () =>
+                        ProviderOption.Avg(SqlBuilder, () =>
                         {
                             Visit(node.Arguments);
                         });
@@ -334,7 +334,7 @@ namespace Kogel.Dapper.Extension.Expressions
                     }
                 #endregion
                 default:
-                    SpliceField.Append(node.ToConvertAndGetValue());
+                    SqlBuilder.Append(node.ToConvertAndGetValue());
                     break;
             }
         }
@@ -353,17 +353,17 @@ namespace Kogel.Dapper.Extension.Expressions
         /// <summary>
         /// 字段
         /// </summary>
-        private string FieldName { get; set; } = "";
+        private string _fieldName { get; set; } = string.Empty;
 
         /// <summary>
         /// 带参数标识的参数名称
         /// </summary>
-        private string ParamName { get => $"{GetParamName()}{Prefix}"; }
+        private string _paramName => $"{GetParamName()}{Prefix}";
 
         /// <summary>
         /// 拼接sql
         /// </summary>
-        internal new StringBuilder SpliceField { get; set; }
+        internal new StringBuilder _sqlBuilder { get; set; }
 
         /// <summary>
         /// 参数目录
@@ -373,7 +373,7 @@ namespace Kogel.Dapper.Extension.Expressions
 
         public WhereExpressionVisitor(SqlProvider provider) : base(provider)
         {
-            this.SpliceField = new StringBuilder();
+            this._sqlBuilder = new StringBuilder();
             this.Param = new DynamicParameters();
         }
 
@@ -384,10 +384,10 @@ namespace Kogel.Dapper.Extension.Expressions
         private string GetParamName()
         {
             StringBuilder builder = new StringBuilder();
-            builder.Append(providerOption.ParameterPrefix);
-            if (!string.IsNullOrEmpty(FieldName))
+            builder.Append(ProviderOption.ParameterPrefix);
+            if (!string.IsNullOrEmpty(_fieldName))
                 builder.Append("Param");
-            builder.Append($"_{Param.ParameterNames.Count()}{Index}");
+            builder.Append($"_{Param.ParameterNames.Count()}{ExpIndex}");
             return builder.ToString();
         }
 
@@ -406,7 +406,7 @@ namespace Kogel.Dapper.Extension.Expressions
             else if (callName.Contains("Kogel.Dapper.Extension"))
             {
                 base.VisitMethodCall(node);
-                this.SpliceField.Append(base.SpliceField);
+                this._sqlBuilder.Append(base.SqlBuilder);
                 this.Param.AddDynamicParams(base.Param);
             }
             else
@@ -424,9 +424,9 @@ namespace Kogel.Dapper.Extension.Expressions
         {
             if (node.NodeType == ExpressionType.Not)
             {
-                SpliceField.Append("NOT(");
+                _sqlBuilder.Append("NOT(");
                 Visit(node.Operand);
-                SpliceField.Append(")");
+                _sqlBuilder.Append(")");
             }
             else
             {
@@ -452,17 +452,17 @@ namespace Kogel.Dapper.Extension.Expressions
                     //是否是成员值对象
                     if (expTypeName == "System.Linq.Expressions.PropertyExpression" && node.IsConstantExpression())
                     {
-                        SpliceField.Append(ParamName);
+                        _sqlBuilder.Append(_paramName);
                         object nodeValue = node.ToConvertAndGetValue();
-                        Param.Add(ParamName, nodeValue);
+                        Param.Add(_paramName, nodeValue);
                         return node;
                     }
                     var member = EntityCache.QueryEntity(node.Expression.Type);
-                    this.FieldName = member.FieldPairs[node.Member.Name];
+                    this._fieldName = member.FieldPairs[node.Member.Name];
                     //字段全称
-                    string fieldStr = Provider.IsAppendAsName ? $"{member.AsName}.{providerOption.CombineFieldName(member.FieldPairs[node.Member.Name])}"
-                        : providerOption.CombineFieldName(member.FieldPairs[node.Member.Name]);
-                    SpliceField.Append(fieldStr);
+                    string fieldStr = Provider.IsAppendAsName ? $"{member.AsName}.{ProviderOption.CombineFieldName(member.FieldPairs[node.Member.Name])}"
+                        : ProviderOption.CombineFieldName(member.FieldPairs[node.Member.Name]);
+                    _sqlBuilder.Append(fieldStr);
                     //导航属性允许显示字段
                     if (expTypeName == "System.Linq.Expressions.PropertyExpression")
                     {
@@ -497,7 +497,7 @@ namespace Kogel.Dapper.Extension.Expressions
                     {
                         case "HasValue":
                             {
-                                this.SpliceField.Append(" IS NOT NULL");
+                                this._sqlBuilder.Append(" IS NOT NULL");
                             }
                             break;
                     }
@@ -505,9 +505,9 @@ namespace Kogel.Dapper.Extension.Expressions
             }
             else
             {
-                SpliceField.Append(ParamName);
+                _sqlBuilder.Append(_paramName);
                 object nodeValue = node.ToConvertAndGetValue();
-                Param.Add(ParamName, nodeValue);
+                Param.Add(_paramName, nodeValue);
             }
             return node;
         }
@@ -519,10 +519,10 @@ namespace Kogel.Dapper.Extension.Expressions
         /// <returns></returns>
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            if (!string.IsNullOrEmpty(FieldName))
+            if (!string.IsNullOrEmpty(_fieldName))
             {
-                SpliceField.Append(ParamName);
-                Param.Add(ParamName, node.ToConvertAndGetValue());
+                _sqlBuilder.Append(_paramName);
+                Param.Add(_paramName, node.ToConvertAndGetValue());
             }
             else
             {
@@ -530,14 +530,14 @@ namespace Kogel.Dapper.Extension.Expressions
                 switch (nodeValue)
                 {
                     case true:
-                        SpliceField.Append("1=1");
+                        _sqlBuilder.Append("1=1");
                         break;
                     case false:
-                        SpliceField.Append("1!=1");
+                        _sqlBuilder.Append("1!=1");
                         break;
                     default:
-                        SpliceField.Append(ParamName);
-                        Param.Add(ParamName, nodeValue);
+                        _sqlBuilder.Append(_paramName);
+                        Param.Add(_paramName, nodeValue);
                         break;
                 }
             }
@@ -558,26 +558,26 @@ namespace Kogel.Dapper.Extension.Expressions
                         {
                             Visit(node.Object);
                             var value = node.Arguments[0].ToConvertAndGetValue();
-                            string param = ParamName;
-                            value = providerOption.FuzzyEscaping(value, ref param);
-                            this.SpliceField.Append($" LIKE {param}");
-                            Param.Add(ParamName, value);
+                            string param = _paramName;
+                            value = ProviderOption.FuzzyEscaping(value, ref param);
+                            this._sqlBuilder.Append($" LIKE {param}");
+                            Param.Add(_paramName, value);
                         }
                         else
                         {
                             if (node.Object != null)
                             {
                                 Visit(node.Arguments[0]);
-                                this.SpliceField.Append(" IN ");
+                                this._sqlBuilder.Append(" IN ");
                                 Visit(node.Object);
                             }
                             else
                             {
                                 Visit(node.Arguments[1]);
-                                this.SpliceField.Append($" IN {ParamName}");
+                                this._sqlBuilder.Append($" IN {_paramName}");
                                 //这里只能手动记录参数
                                 var nodeValue = node.Arguments[0].ToConvertAndGetValue();
-                                Param.Add(ParamName, nodeValue);
+                                Param.Add(_paramName, nodeValue);
                             }
                         }
                     }
@@ -586,20 +586,20 @@ namespace Kogel.Dapper.Extension.Expressions
                     {
                         Visit(node.Object);
                         var value = node.Arguments[0].ToConvertAndGetValue();
-                        string param = ParamName;
-                        value = providerOption.FuzzyEscaping(value, ref param, EFuzzyLocation.Right);
-                        this.SpliceField.Append($" LIKE {param}");
-                        Param.Add(ParamName, value);
+                        string param = _paramName;
+                        value = ProviderOption.FuzzyEscaping(value, ref param, EFuzzyLocation.Right);
+                        this._sqlBuilder.Append($" LIKE {param}");
+                        Param.Add(_paramName, value);
                     }
                     break;
                 case "EndsWith":
                     {
                         Visit(node.Object);
                         var value = node.Arguments[0].ToConvertAndGetValue();
-                        string param = ParamName;
-                        value = providerOption.FuzzyEscaping(value, ref param, EFuzzyLocation.Left);
-                        this.SpliceField.Append($" LIKE {param}");
-                        Param.Add(ParamName, value);
+                        string param = _paramName;
+                        value = ProviderOption.FuzzyEscaping(value, ref param, EFuzzyLocation.Left);
+                        this._sqlBuilder.Append($" LIKE {param}");
+                        Param.Add(_paramName, value);
                     }
                     break;
                 case "Equals":
@@ -607,13 +607,13 @@ namespace Kogel.Dapper.Extension.Expressions
                         if (node.Object != null)
                         {
                             Visit(node.Object);
-                            this.SpliceField.Append($" = ");
+                            this._sqlBuilder.Append($" = ");
                             Visit(node.Arguments[0]);
                         }
                         else
                         {
                             Visit(node.Arguments[0]);
-                            this.SpliceField.Append($" = ");
+                            this._sqlBuilder.Append($" = ");
                             Visit(node.Arguments[1]);
                         }
                     }
@@ -621,39 +621,39 @@ namespace Kogel.Dapper.Extension.Expressions
                 case "In":
                     {
                         Visit(node.Arguments[0]);
-                        this.SpliceField.Append($" IN {ParamName}");
+                        this._sqlBuilder.Append($" IN {_paramName}");
                         object value = node.Arguments[1].ToConvertAndGetValue();
-                        Param.Add(ParamName, value);
+                        Param.Add(_paramName, value);
                     }
                     break;
                 case "NotIn":
                     {
                         Visit(node.Arguments[0]);
-                        this.SpliceField.Append($" NOT IN {ParamName}");
+                        this._sqlBuilder.Append($" NOT IN {_paramName}");
                         object value = node.Arguments[1].ToConvertAndGetValue();
-                        Param.Add(ParamName, value);
+                        Param.Add(_paramName, value);
                     }
                     break;
                 case "IsNull":
                     {
                         Visit(node.Arguments[0]);
-                        this.SpliceField.Append(" IS NULL");
+                        this._sqlBuilder.Append(" IS NULL");
                     }
                     break;
                 case "IsNotNull":
                     {
                         Visit(node.Arguments[0]);
-                        this.SpliceField.Append(" IS NOT NULL");
+                        this._sqlBuilder.Append(" IS NOT NULL");
                     }
                     break;
                 case "IsNullOrEmpty":
                     {
-                        this.SpliceField.Append("(");
+                        this._sqlBuilder.Append("(");
                         Visit(node.Arguments[0]);
-                        this.SpliceField.Append(" IS NULL OR ");
+                        this._sqlBuilder.Append(" IS NULL OR ");
                         Visit(node.Arguments[0]);
-                        this.SpliceField.Append(" =''");
-                        this.SpliceField.Append(")");
+                        this._sqlBuilder.Append(" =''");
+                        this._sqlBuilder.Append(")");
                     }
                     break;
                 case "Between":
@@ -661,17 +661,17 @@ namespace Kogel.Dapper.Extension.Expressions
                         if (node.Object != null)
                         {
                             Visit(node.Object);
-                            SpliceField.Append(" BETWEEN ");
+                            _sqlBuilder.Append(" BETWEEN ");
                             Visit(node.Arguments[0]);
-                            SpliceField.Append(" AND ");
+                            _sqlBuilder.Append(" AND ");
                             Visit(node.Arguments[1]);
                         }
                         else
                         {
                             Visit(node.Arguments[0]);
-                            SpliceField.Append(" BETWEEN ");
+                            _sqlBuilder.Append(" BETWEEN ");
                             Visit(node.Arguments[1]);
-                            SpliceField.Append(" AND ");
+                            _sqlBuilder.Append(" AND ");
                             Visit(node.Arguments[2]);
                         }
                     }
@@ -703,7 +703,7 @@ namespace Kogel.Dapper.Extension.Expressions
                             //解析导航属性条件
                             var navigationExpression = new WhereExpression(node.Arguments[1] as LambdaExpression, $"_Navi_{navigationTable.PropertyInfo.Name}", Provider);
                             //添加sql和参数
-                            this.SpliceField.Append($" 1=1 {navigationExpression.SqlCmd}");
+                            this._sqlBuilder.Append($" 1=1 {navigationExpression.SqlCmd}");
                             foreach (var paramName in navigationExpression.Param.ParameterNames)
                             {
                                 //相同的key会直接顶掉
@@ -726,7 +726,7 @@ namespace Kogel.Dapper.Extension.Expressions
                 case "ToDateTime":
                     {
                         var convertOption = (ConvertOption)Enum.Parse(typeof(ConvertOption), node.Method.Name);
-                        providerOption.CombineConvert(convertOption, SpliceField, () =>
+                        ProviderOption.CombineConvert(convertOption, _sqlBuilder, () =>
                         {
                             Visit(node.Object != null ? node.Object : node.Arguments[0]);
                         });
@@ -742,7 +742,7 @@ namespace Kogel.Dapper.Extension.Expressions
                 case "AddSeconds":
                     {
                         var dateOption = (DateOption)Enum.Parse(typeof(DateOption), node.Method.Name);
-                        providerOption.CombineDate(dateOption, SpliceField,
+                        ProviderOption.CombineDate(dateOption, _sqlBuilder,
                             () =>
                             {
                                 Visit(node.Object);
@@ -757,7 +757,7 @@ namespace Kogel.Dapper.Extension.Expressions
                 #region 字符处理
                 case "ToLower":
                     {
-                        providerOption.ToLower(SpliceField,
+                        ProviderOption.ToLower(_sqlBuilder,
                             () =>
                             {
                                 if (node.Object != null)
@@ -769,7 +769,7 @@ namespace Kogel.Dapper.Extension.Expressions
                     break;
                 case "ToUpper":
                     {
-                        providerOption.ToUpper(SpliceField,
+                        ProviderOption.ToUpper(_sqlBuilder,
                             () =>
                             {
                                 if (node.Object != null)
@@ -782,43 +782,43 @@ namespace Kogel.Dapper.Extension.Expressions
                 case "Replace":
                     {
 
-                        SpliceField.Append("Replace(");
+                        _sqlBuilder.Append("Replace(");
                         Visit(node.Object);
-                        SpliceField.Append(",");
+                        _sqlBuilder.Append(",");
                         Visit(node.Arguments[0]);
-                        SpliceField.Append(",");
+                        _sqlBuilder.Append(",");
                         Visit(node.Arguments[1]);
-                        SpliceField.Append(")");
+                        _sqlBuilder.Append(")");
                     }
                     break;
                 case "Trim":
                     {
-                        SpliceField.Append("Trim(");
+                        _sqlBuilder.Append("Trim(");
                         Visit(node.Object);
-                        SpliceField.Append(")");
+                        _sqlBuilder.Append(")");
                     }
                     break;
                 case "Concat":
                     {
-                        SpliceField.Append("Concat(");
+                        _sqlBuilder.Append("Concat(");
                         Visit(node.Arguments[0]);
-                        SpliceField.Append(",");
+                        _sqlBuilder.Append(",");
                         Visit(node.Arguments[1]);
-                        SpliceField.Append(")");
+                        _sqlBuilder.Append(")");
                     }
                     break;
                 case "IfNull":
                     {
-                        SpliceField.Append($"{providerOption.IfNull()}(");
+                        _sqlBuilder.Append($"{ProviderOption.IfNull()}(");
                         Visit(node.Arguments[0]);
-                        SpliceField.Append(",");
+                        _sqlBuilder.Append(",");
                         Visit(node.Arguments[1]);
-                        SpliceField.Append(")");
+                        _sqlBuilder.Append(")");
                     }
                     break;
                 case "ConcatSql":
                     {
-                        SpliceField.Append(node.Arguments[0].ToConvertAndGetValue());
+                        _sqlBuilder.Append(node.Arguments[0].ToConvertAndGetValue());
                         // Param
                         if (node.Arguments.Count > 1)
                         {
@@ -830,7 +830,7 @@ namespace Kogel.Dapper.Extension.Expressions
                 #region 聚合函数
                 case "Count":
                     {
-                        providerOption.Count(SpliceField, () =>
+                        ProviderOption.Count(_sqlBuilder, () =>
                         {
                             Visit(node.Arguments);
                         });
@@ -838,7 +838,7 @@ namespace Kogel.Dapper.Extension.Expressions
                     break;
                 case "Sum":
                     {
-                        providerOption.Sum(SpliceField, () =>
+                        ProviderOption.Sum(_sqlBuilder, () =>
                         {
                             Visit(node.Arguments);
                         });
@@ -846,7 +846,7 @@ namespace Kogel.Dapper.Extension.Expressions
                     break;
                 case "Max":
                     {
-                        providerOption.Max(SpliceField, () =>
+                        ProviderOption.Max(_sqlBuilder, () =>
                         {
                             Visit(node.Arguments);
                         });
@@ -854,7 +854,7 @@ namespace Kogel.Dapper.Extension.Expressions
                     break;
                 case "Min":
                     {
-                        providerOption.Min(SpliceField, () =>
+                        ProviderOption.Min(_sqlBuilder, () =>
                         {
                             Visit(node.Arguments);
                         });
@@ -862,7 +862,7 @@ namespace Kogel.Dapper.Extension.Expressions
                     break;
                 case "Avg":
                     {
-                        providerOption.Avg(SpliceField, () =>
+                        ProviderOption.Avg(_sqlBuilder, () =>
                         {
                             Visit(node.Arguments);
                         });
@@ -872,8 +872,8 @@ namespace Kogel.Dapper.Extension.Expressions
                 #region lambda函数
                 case "FirstOrDefault":
                     {
-                        string paramName = ParamName;
-                        this.SpliceField.Append(paramName);
+                        string paramName = _paramName;
+                        this._sqlBuilder.Append(paramName);
                         Param.Add(paramName, node.ToConvertAndGetValue());
                     }
                     break;
@@ -896,30 +896,30 @@ namespace Kogel.Dapper.Extension.Expressions
     {
         public BinaryExpressionVisitor(BinaryExpression expression, SqlProvider provider, int index = 0, string prefix = null) : base(provider)
         {
-            SpliceField = new StringBuilder();
+            _sqlBuilder = new StringBuilder();
             Param = new DynamicParameters();
-            base.Index = index;
+            base.ExpIndex = index;
             base.Prefix = prefix;
-            SpliceField.Append("(");
+            _sqlBuilder.Append("(");
             Visit(expression);
-            SpliceField.Append(")");
+            _sqlBuilder.Append(")");
         }
 
         protected override Expression VisitBinary(BinaryExpression node)
         {
-            SpliceField.Append("(");
+            _sqlBuilder.Append("(");
             Visit(node.Left);
             var expressionType = node.GetExpressionType();
-            SpliceField.Append(expressionType);
+            _sqlBuilder.Append(expressionType);
             if (expressionType == " AND " || expressionType == " OR ")
             {
                 switch (node.Right.ToString())
                 {
                     case "True":
-                        SpliceField.Append("1=1");
+                        _sqlBuilder.Append("1=1");
                         break;
                     case "False":
-                        SpliceField.Append("1!=1");
+                        _sqlBuilder.Append("1!=1");
                         break;
                     default:
                         Visit(node.Right);
@@ -930,7 +930,7 @@ namespace Kogel.Dapper.Extension.Expressions
             {
                 Visit(node.Right);
             }
-            SpliceField.Append(")");
+            _sqlBuilder.Append(")");
             return node;
         }
     }

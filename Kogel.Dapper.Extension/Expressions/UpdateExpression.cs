@@ -32,13 +32,13 @@ namespace Kogel.Dapper.Extension.Expressions
             this._sqlCmd = new StringBuilder(100);
             this.Param = new DynamicParameters();
             //update不需要重命名
-            providerOption.IsAsName = false;
+            ProviderOption.IsAsName = false;
             if (expression.Body is MemberInitExpression)
             {
                 var memberInitExpression = expression.Body as MemberInitExpression;
                 foreach (MemberAssignment memberInit in memberInitExpression.Bindings)
                 {
-                    base.SpliceField.Clear();
+                    base.SqlBuilder.Clear();
                     base.Param = new DynamicParameters();
                     if (_sqlCmd.Length != 0)
                         _sqlCmd.Append(",");
@@ -58,10 +58,10 @@ namespace Kogel.Dapper.Extension.Expressions
                         Visit(memberInit.Expression);
                         var entityObject = EntityCache.QueryEntity(expression.ReturnType);
                         string fieldName = entityObject.FieldPairs[memberInit.Member.Name];
-                        _sqlCmd.Append($" {provider.ProviderOption.CombineFieldName(fieldName)} = {base.SpliceField} ");
+                        _sqlCmd.Append($" {provider.ProviderOption.CombineFieldName(fieldName)} = {base.SqlBuilder} ");
                         Param.AddDynamicParams(base.Param);
                     }
-                    base.Index++;
+                    base.ExpIndex++;
                 }
                 _sqlCmd.Insert(0, " SET ");
             }

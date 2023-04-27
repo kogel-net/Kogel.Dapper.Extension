@@ -53,18 +53,18 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// 结合转换处理
         /// </summary>
         /// <param name="convertOption"></param>
-        /// <param name="spliceField"></param>
+        /// <param name="_sqlBuilder"></param>
         /// <param name="fieldInkove"></param>
-        public abstract void CombineConvert(ConvertOption convertOption, StringBuilder spliceField, Action fieldInkove);
+        public abstract void CombineConvert(ConvertOption convertOption, StringBuilder _sqlBuilder, Action fieldInkove);
 
         /// <summary>
         /// 结合时间处理
         /// </summary>
         /// <param name="dateOption"></param>
-        /// <param name="spliceField"></param>
+        /// <param name="_sqlBuilder"></param>
         /// <param name="fieldInkove"></param>
         /// <param name="valueInkove"></param>
-        public abstract void CombineDate(DateOption dateOption, StringBuilder spliceField, Action fieldInkove, Action valueInkove);
+        public abstract void CombineDate(DateOption dateOption, StringBuilder _sqlBuilder, Action fieldInkove, Action valueInkove);
 
         /// <summary>
         /// 模糊转义
@@ -92,27 +92,27 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// <summary>
         /// 转小写
         /// </summary>
-        /// <param name="spliceField"></param>
+        /// <param name="_sqlBuilder"></param>
         /// <param name="fieldInkove"></param>
         /// <returns></returns>
-        public virtual void ToLower(StringBuilder spliceField, Action fieldInkove)
+        public virtual void ToLower(StringBuilder _sqlBuilder, Action fieldInkove)
         {
-            spliceField.Append(" lower(");
+            _sqlBuilder.Append(" lower(");
             fieldInkove.Invoke();
-            spliceField.Append(") ");
+            _sqlBuilder.Append(") ");
         }
 
         /// <summary>
         /// 转大写
         /// </summary>
-        /// <param name="spliceField"></param>
+        /// <param name="_sqlBuilder"></param>
         /// <param name="fieldInkove"></param>
         /// <returns></returns>
-        public virtual void ToUpper(StringBuilder spliceField, Action fieldInkove)
+        public virtual void ToUpper(StringBuilder _sqlBuilder, Action fieldInkove)
         {
-            spliceField.Append(" upper(");
+            _sqlBuilder.Append(" upper(");
             fieldInkove.Invoke();
-            spliceField.Append(") ");
+            _sqlBuilder.Append(") ");
         }
 
         /// <summary>
@@ -143,62 +143,62 @@ namespace Kogel.Dapper.Extension.Core.Interfaces
         /// <summary>
         /// 计数
         /// </summary>
-        /// <param name="spliceField"></param>
+        /// <param name="_sqlBuilder"></param>
         /// <param name="fieldInkove"></param>
         /// <returns></returns>
-        public virtual void Count(StringBuilder spliceField, Action fieldInkove)
+        public virtual void Count(StringBuilder _sqlBuilder, Action fieldInkove)
         {
-            spliceField.Append(" Count(");
+            _sqlBuilder.Append(" Count(");
             fieldInkove.Invoke();
-            spliceField.Append(") ");
+            _sqlBuilder.Append(") ");
         }
 
         /// <summary>
         /// 计总
         /// </summary>
-        /// <param name="spliceField"></param>
+        /// <param name="_sqlBuilder"></param>
         /// <param name="fieldInkove"></param>
-        public virtual void Sum(StringBuilder spliceField, Action fieldInkove)
+        public virtual void Sum(StringBuilder _sqlBuilder, Action fieldInkove)
         {
-            spliceField.Append(" Sum(");
+            _sqlBuilder.Append(" Sum(");
             fieldInkove.Invoke();
-            spliceField.Append(") ");
+            _sqlBuilder.Append(") ");
         }
 
         /// <summary>
         /// 最大值
         /// </summary>
-        /// <param name="spliceField"></param>
+        /// <param name="_sqlBuilder"></param>
         /// <param name="fieldInkove"></param>
-        public virtual void Max(StringBuilder spliceField, Action fieldInkove)
+        public virtual void Max(StringBuilder _sqlBuilder, Action fieldInkove)
         {
-            spliceField.Append(" Max(");
+            _sqlBuilder.Append(" Max(");
             fieldInkove.Invoke();
-            spliceField.Append(") ");
+            _sqlBuilder.Append(") ");
         }
 
         /// <summary>
         /// 最小值
         /// </summary>
-        /// <param name="spliceField"></param>
+        /// <param name="_sqlBuilder"></param>
         /// <param name="fieldInkove"></param>
-        public virtual void Min(StringBuilder spliceField, Action fieldInkove)
+        public virtual void Min(StringBuilder _sqlBuilder, Action fieldInkove)
         {
-            spliceField.Append(" Min(");
+            _sqlBuilder.Append(" Min(");
             fieldInkove.Invoke();
-            spliceField.Append(") ");
+            _sqlBuilder.Append(") ");
         }
 
         /// <summary>
         /// 平均值
         /// </summary>
-        /// <param name="spliceField"></param>
+        /// <param name="_sqlBuilder"></param>
         /// <param name="fieldInkove"></param>
-        public virtual void Avg(StringBuilder spliceField, Action fieldInkove)
+        public virtual void Avg(StringBuilder _sqlBuilder, Action fieldInkove)
         {
-            spliceField.Append(" Avg(");
+            _sqlBuilder.Append(" Avg(");
             fieldInkove.Invoke();
-            spliceField.Append(") ");
+            _sqlBuilder.Append(") ");
         }
         #endregion
     }

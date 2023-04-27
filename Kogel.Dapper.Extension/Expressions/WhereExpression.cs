@@ -32,12 +32,12 @@ namespace Kogel.Dapper.Extension.Expressions
         {
             this._sqlCmd = new StringBuilder(100);
             this.Param = new DynamicParameters();
-            this.providerOption = provider.ProviderOption;
+            this.ProviderOption = provider.ProviderOption;
             base.Prefix = prefix;
             //开始解析对象
             Visit(expression);
             //开始拼接成条件
-            this._sqlCmd.Append(base.SpliceField);
+            this._sqlCmd.Append(base._sqlBuilder);
             this.SqlCmd = " AND " + this._sqlCmd.ToString();
             this.Param.AddDynamicParams(base.Param);
         }
@@ -50,7 +50,7 @@ namespace Kogel.Dapper.Extension.Expressions
         protected override Expression VisitBinary(BinaryExpression node)
         {
             var binaryWhere = new BinaryExpressionVisitor(node, base.Provider, 0, base.Prefix);
-            this._sqlCmd.Append(binaryWhere.SpliceField);
+            this._sqlCmd.Append(binaryWhere._sqlBuilder);
             base.Param.AddDynamicParams(binaryWhere.Param);
             return node;
         }
@@ -64,9 +64,9 @@ namespace Kogel.Dapper.Extension.Expressions
         {
             if (node.NodeType == ExpressionType.Not)
             {
-                base.SpliceField.Append(" Not (");
+                base._sqlBuilder.Append(" Not (");
                 Visit(node.Operand);
-                base.SpliceField.Append(") ");
+                base._sqlBuilder.Append(") ");
             }
             else
             {
