@@ -9,7 +9,7 @@
     <Company>Kogel.Repository</Company>
     <Product>Kogel.Repository</Product>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>3.2.2.9</Version>
+    <Version>3.2.2.10</Version>
     <PackageIcon>icon.jpg</PackageIcon>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net451'">

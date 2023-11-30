@@ -9,7 +9,7 @@
     <Company>Kogel.Dapper.Extension.Mssql</Company>
     <Product>Kogel.Dapper.Extension.Mssql</Product>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>3.2.2.4</Version>
+    <Version>3.2.2.6</Version>
     <PackageIcon>icon.jpg</PackageIcon>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net451'">
