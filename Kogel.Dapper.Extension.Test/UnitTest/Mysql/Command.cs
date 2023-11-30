@@ -5,7 +5,6 @@ using Kogel.Dapper.Extension;
 using MySql.Data.MySqlClient;
 using System.Linq;
 using System;
-using Newtonsoft.Json;
 using Kogel.Dapper.Extension.MySql.Extension;
 using Kogel.Dapper.Extension.MySql;
 using System.Collections.Generic;

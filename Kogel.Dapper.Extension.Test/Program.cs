@@ -18,17 +18,19 @@ namespace Kogel.Dapper.Extension.Test
     {
         static void Main(string[] args)
         {
-            #region mssql单元测试
-            var mssqlQuery = new UnitTest.Mssql.Query();
-            //mssqlQuery.Test();
+            /* #region mssql单元测试
+             var mssqlQuery = new UnitTest.Mssql.Query();
+             //mssqlQuery.Test();
 
-            var mssqlCommand = new UnitTest.Mssql.Command();
-            mssqlCommand.Test();
-            #endregion
+             var mssqlCommand = new UnitTest.Mssql.Command();
+             mssqlCommand.Test();
+             #endregion*/
 
             #region mysql单元测试
-            //var mysqlQuery = new UnitTest.Mysql.Query();
-            //mysqlQuery.Test();
+            var mysqlQuery = new UnitTest.Mysql.Query();
+            mysqlQuery.Test();
+
+            EntityCache.Register("Kogel.Dapper.Extension.Test.Models");
 
             //var mysqlCommand = new UnitTest.Mysql.Command();
             //mysqlCommand.Test();

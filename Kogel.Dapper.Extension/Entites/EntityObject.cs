@@ -260,7 +260,7 @@ namespace Kogel.Dapper.Extension.Entites
             else
             {
                 //可空类型
-                if (type.FullName.Contains("System.Nullable"))
+                if (type.FullName?.Contains("System.Nullable") == true)
                 {
                     ifNull = true;
                     return GetSqlDbType(type.GenericTypeArguments[0], out ifNull);
