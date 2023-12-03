@@ -27,7 +27,12 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         public int Count()
         {
             SqlProvider.FormatCount();
-			return DbCon.QuerySingleOrDefault<int>(SqlProvider.SqlString, SqlProvider.Params, dbTransaction);
+            return DbCon.QuerySingleOrDefault<int>(SqlProvider.SqlString, SqlProvider.Params, dbTransaction);
+        }
+        public async Task<int> CountAsync()
+        {
+            SqlProvider.FormatCount();
+            return await DbCon.QuerySingleOrDefaultAsync<int>(SqlProvider.SqlString, SqlProvider.Params, dbTransaction);
         }
 
         /// <inheritdoc />
@@ -35,18 +40,35 @@ namespace Kogel.Dapper.Extension.Core.SetQ
         {
             SqlProvider.FormatSum(sumExpression);
             return DbCon.QuerySingleOrDefault<TResult>(SqlProvider.SqlString, SqlProvider.Params, dbTransaction);
-		}
+        }
+        public async Task<TResult> SumAsync<TResult>(Expression<Func<T, TResult>> sumExpression)
+        {
+            SqlProvider.FormatSum(sumExpression);
+            return await DbCon.QuerySingleOrDefaultAsync<TResult>(SqlProvider.SqlString, SqlProvider.Params, dbTransaction);
+        }
 
         public TResult Max<TResult>(Expression<Func<T, TResult>> maxExpression)
         {
             SqlProvider.FormatMax(maxExpression);
             return DbCon.QuerySingleOrDefault<TResult>(SqlProvider.SqlString, SqlProvider.Params, dbTransaction);
-		}
+        }
+
+        public async Task<TResult> MaxAsync<TResult>(Expression<Func<T, TResult>> maxExpression)
+        {
+            SqlProvider.FormatMax(maxExpression);
+            return await DbCon.QuerySingleOrDefaultAsync<TResult>(SqlProvider.SqlString, SqlProvider.Params, dbTransaction);
+        }
+
 
         public TResult Min<TResult>(Expression<Func<T, TResult>> minExpression)
         {
             SqlProvider.FormatMin(minExpression);
             return DbCon.QuerySingleOrDefault<TResult>(SqlProvider.SqlString, SqlProvider.Params, dbTransaction);
-		}
+        }
+        public async Task<TResult> MinAsync<TResult>(Expression<Func<T, TResult>> minExpression)
+        {
+            SqlProvider.FormatMin(minExpression);
+            return await DbCon.QuerySingleOrDefaultAsync<TResult>(SqlProvider.SqlString, SqlProvider.Params, dbTransaction);
+        }
     }
 }
